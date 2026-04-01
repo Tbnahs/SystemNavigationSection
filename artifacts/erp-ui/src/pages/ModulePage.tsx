@@ -136,7 +136,7 @@ export default function ModulePage() {
               onClick={() => setLocation(`/module/${moduleId}/${sub.id}`)}
               className="group bg-white border border-border rounded-xl p-4 text-left hover:border-primary/40 hover:shadow-sm active:scale-[0.99] transition-all duration-150 cursor-pointer"
             >
-              <div className="w-10 h-10 rounded-xl bg-primary/8 flex items-center justify-center mb-3 group-hover:bg-primary/15 transition-colors">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
                 <Icon className="w-5 h-5 text-primary" strokeWidth={1.5} />
               </div>
               <h3 className="font-semibold text-foreground text-sm mb-1">{t(sub.nameKey)}</h3>

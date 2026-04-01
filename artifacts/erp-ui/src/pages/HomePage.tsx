@@ -89,7 +89,7 @@ export default function HomePage() {
                 className="bg-white border border-border rounded-xl p-4 hover:border-primary/30 transition-colors"
               >
                 <div className="flex items-center justify-between mb-3">
-                  <div className="w-8 h-8 rounded-lg bg-primary/8 flex items-center justify-center">
+                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
                     <Icon className="w-4 h-4 text-primary" strokeWidth={1.5} />
                   </div>
                   <span className="text-xs font-medium text-primary">{stat.change}</span>

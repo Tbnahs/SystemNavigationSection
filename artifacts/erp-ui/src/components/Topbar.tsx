@@ -47,7 +47,7 @@ export default function Topbar({ onMenuToggle, menuOpen }: TopbarProps) {
         <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center">
           <span className="text-white text-xs font-bold">A</span>
         </div>
-        <span className="font-semibold text-sm text-foreground">AgriERP</span>
+        <span className="font-semibold text-sm text-foreground">ESG VELLAY</span>
       </div>
 
       {/* Search */}
@@ -116,7 +116,7 @@ export default function Topbar({ onMenuToggle, menuOpen }: TopbarProps) {
               </div>
               <div className="divide-y divide-border">
                 {notifications.map((n) => (
-                  <div key={n.id} className={`px-4 py-3 hover:bg-accent/50 cursor-pointer transition-colors ${n.unread ? "bg-primary/3" : ""}`}>
+                  <div key={n.id} className={`px-4 py-3 hover:bg-accent/50 cursor-pointer transition-colors ${n.unread ? "bg-primary/5" : ""}`}>
                     <div className="flex items-start gap-3">
                       {n.unread && <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />}
                       {!n.unread && <div className="w-2 h-2 mt-1.5 shrink-0" />}
