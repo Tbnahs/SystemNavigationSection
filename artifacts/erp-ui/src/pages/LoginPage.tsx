@@ -50,7 +50,7 @@ export default function LoginPage() {
               <Leaf className="w-9 h-9 text-white" strokeWidth={1.5} />
             </div>
           </div>
-          <h1 className="text-3xl font-bold mb-3">{t("login.welcome")}</h1>
+          <h1 className="text-3xl font-bold mb-3">ESG VELLAY</h1>
           <p className="text-green-100 text-base leading-relaxed max-w-xs">
             Nền tảng quản trị nông nghiệp thông minh — minh bạch, hiệu quả, bền vững
           </p>
