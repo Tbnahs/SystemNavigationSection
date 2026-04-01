@@ -55,20 +55,6 @@ export default function LoginPage() {
             Nền tảng quản trị nông nghiệp thông minh — minh bạch, hiệu quả, bền vững
           </p>
 
-          {/* Feature pills */}
-          <div className="mt-10 space-y-3">
-            {[
-              { icon: "🔍", label: "Truy xuất nguồn gốc" },
-              { icon: "🌾", label: "Quản lý vùng trồng" },
-              { icon: "📊", label: "Phân tích dữ liệu" },
-            ].map((f) => (
-              <div key={f.label} className="flex items-center gap-3 bg-white/15 backdrop-blur-sm rounded-xl px-4 py-3 text-left">
-                <span className="text-xl">{f.icon}</span>
-                <span className="text-white font-medium text-sm">{f.label}</span>
-              </div>
-            ))}
-          </div>
-
           {/* Trust indicators */}
           <div className="mt-12 flex items-center gap-6 justify-center text-green-100 text-xs">
             <div className="flex items-center gap-1.5">
