@@ -55,21 +55,6 @@ export default function LoginPage() {
             Nền tảng quản trị nông nghiệp thông minh — minh bạch, hiệu quả, bền vững
           </p>
 
-          {/* Trust indicators */}
-          <div className="mt-12 flex items-center gap-6 justify-center text-green-100 text-xs">
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-200" />
-              Trust
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-200" />
-              Trace
-            </div>
-            <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-green-200" />
-              Transparency
-            </div>
-          </div>
         </div>
       </div>
 
