@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language, languageLabels } from "@/i18n/translations";
 import { Leaf, Eye, EyeOff, Globe, ChevronDown } from "lucide-react";
-import logoImg from "@assets/image_1775019365958.png";
+import logoImg from "@assets/Logo ESG.png";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("admin@agrierp.vn");
