@@ -31,10 +31,9 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           onClick={onClose}
         />
       )}
-
       {/* Sidebar */}
       <aside
-        className={`fixed left-0 top-16 bottom-0 w-60 bg-sidebar border-r border-sidebar-border z-20 flex flex-col transition-transform duration-200 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
+        className={`fixed left-0 top-16 bottom-0 w-60 bg-white border-r border-border z-20 flex flex-col transition-transform duration-200 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
       >
         {/* Logo area */}
         <div className="px-4 py-5 border-b border-sidebar-border">
@@ -43,7 +42,8 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               <Leaf className="w-5 h-5 text-white" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="font-bold text-foreground text-sm">AgriERP</p>
+              <p className="font-bold text-foreground text-sm">ESG VALLEY
+</p>
               <p className="text-xs text-muted-foreground">v2.0.1</p>
             </div>
           </div>
