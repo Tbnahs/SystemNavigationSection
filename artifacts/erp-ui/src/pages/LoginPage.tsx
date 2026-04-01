@@ -4,6 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language, languageLabels } from "@/i18n/translations";
 import { Leaf, Eye, EyeOff, Globe, ChevronDown } from "lucide-react";
+import logoImg from "@assets/image_1775019365958.png";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("admin@agrierp.vn");
@@ -46,9 +47,7 @@ export default function LoginPage() {
         {/* Content */}
         <div className="relative z-10 text-white text-center">
           <div className="flex items-center justify-center mb-8">
-            <div className="w-16 h-16 bg-white/20 backdrop-blur rounded-2xl flex items-center justify-center shadow-lg">
-              <Leaf className="w-9 h-9 text-white" strokeWidth={1.5} />
-            </div>
+            <img src={logoImg} alt="ESG VELLAY logo" className="w-24 h-24 object-contain rounded-2xl shadow-lg" />
           </div>
           <h1 className="text-3xl font-bold mb-3">ESG VELLAY</h1>
 
