@@ -5,7 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Language, languageLabels } from "@/i18n/translations";
 import { Leaf, Eye, EyeOff, Globe, ChevronDown } from "lucide-react";
 import logoImg from "@assets/Logo ESG.png";
-import teaHillImg from "@assets/stock_images/thai_nguyen_tea_hill.jpg";
+import teaHillImg from "@assets/Nền_login_1775103396718.jpg";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("admin@agrierp.vn");
