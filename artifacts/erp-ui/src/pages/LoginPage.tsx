@@ -96,7 +96,7 @@ export default function LoginPage() {
             </div>
 
             <div className="mb-8">
-              <img src={logoImg} alt="ESG VELLAY logo" className="w-16 h-16 object-contain mb-5" />
+              <img src={logoImg} alt="ESG VELLAY logo" className="w-28 h-28 object-contain mb-5 mx-auto" />
               <h2 className="text-2xl font-bold text-foreground mb-1">{t("login.title")}</h2>
               <p className="text-muted-foreground text-sm">{t("login.subtitle")}</p>
             </div>
