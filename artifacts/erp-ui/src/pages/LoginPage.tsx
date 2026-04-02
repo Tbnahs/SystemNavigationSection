@@ -46,7 +46,6 @@ export default function LoginPage() {
 
         {/* Caption */}
         <div className="relative z-10 p-8 text-white">
-          <p className="text-sm font-medium opacity-80">Chè cổ thụ Thái Nguyên</p>
           <p className="text-xs opacity-60 mt-0.5">Vùng trồng được quản lý & truy xuất nguồn gốc</p>
         </div>
       </div>
