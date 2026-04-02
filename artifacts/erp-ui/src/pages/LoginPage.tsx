@@ -5,6 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Language, languageLabels } from "@/i18n/translations";
 import { Leaf, Eye, EyeOff, Globe, ChevronDown } from "lucide-react";
 import logoImg from "@assets/Logo ESG.png";
+import teaHillImg from "@assets/stock_images/thai_nguyen_tea_hill.jpg";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("admin@agrierp.vn");
@@ -33,20 +34,20 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-5/12 bg-gradient-to-br from-green-600 via-green-500 to-emerald-400 relative overflow-hidden flex-col items-center justify-center p-12">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-24 -left-24 w-96 h-96 bg-white/5 rounded-full" />
-          <div className="absolute top-1/3 -right-32 w-80 h-80 bg-white/5 rounded-full" />
-          <div className="absolute -bottom-16 left-1/4 w-64 h-64 bg-white/5 rounded-full" />
-          <svg className="absolute bottom-0 left-0 right-0 w-full opacity-10" viewBox="0 0 1440 200" fill="none">
-            <path d="M0,100 C360,200 1080,0 1440,100 L1440,200 L0,200 Z" fill="white"/>
-          </svg>
-        </div>
+      <div className="hidden lg:flex lg:w-5/12 relative overflow-hidden flex-col items-end justify-end">
+        {/* Tea hill background image */}
+        <img
+          src={teaHillImg}
+          alt="Đồi chè cổ thụ Thái Nguyên"
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Gradient overlay for readability */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-        {/* Content */}
-        <div className="relative z-10 text-white text-center">
-          <h1 className="text-3xl font-bold mb-3">ESG VELLAY</h1>
+        {/* Caption */}
+        <div className="relative z-10 p-8 text-white">
+          <p className="text-sm font-medium opacity-80">Chè cổ thụ Thái Nguyên</p>
+          <p className="text-xs opacity-60 mt-0.5">Vùng trồng được quản lý & truy xuất nguồn gốc</p>
         </div>
       </div>
 
