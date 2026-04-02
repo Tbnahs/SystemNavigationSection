@@ -44,10 +44,7 @@ export default function LoginPage() {
         {/* Gradient overlay for readability */}
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
 
-        {/* Caption */}
-        <div className="relative z-10 p-8 text-white">
-          <p className="text-xs opacity-60 mt-0.5">Vùng trồng được quản lý & truy xuất nguồn gốc</p>
-        </div>
+
       </div>
 
       {/* Right Panel - Login Form */}
