@@ -1,0 +1,675 @@
+import { useState, useMemo } from "react";
+import { useLocation } from "wouter";
+import AppLayout from "@/components/AppLayout";
+import {
+  ArrowLeft,
+  Search,
+  Download,
+  ChevronUp,
+  ChevronDown,
+  Users,
+  Package,
+  Box,
+  Star,
+  Leaf,
+  TrendingUp,
+  Calendar,
+  Filter,
+} from "lucide-react";
+
+const TABS = [
+  { id: "thu-mua", label: "1. Thu mua" },
+  { id: "san-xuat", label: "2. Sản xuất" },
+  { id: "dong-goi", label: "3. Đóng gói" },
+  { id: "ds-ho-lk", label: "DS hộ LK" },
+  { id: "quy-cach", label: "Quy cách" },
+];
+
+const thuMuaData = [
+  { stt: 1, maHo: "NH004", tenHo: "Triệu Văn Thạo", diaChi: "Nà Hồng", thoiGian: "30/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 13.50, donGia: 27000, thanhTien: 364500, maME: "NH0043003" },
+  { stt: 2, maHo: "NB002", tenHo: "Nông Văn Nghiễm", diaChi: "Nà Bay", thoiGian: "30/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 12.00, donGia: 27000, thanhTien: 324000, maME: "NB0023003" },
+  { stt: 3, maHo: "NH008", tenHo: "Đồng Thị Khuyết", diaChi: "Nà Hồng", thoiGian: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 8.50, donGia: 28500, thanhTien: 242250, maME: "NH0083103" },
+  { stt: 4, maHo: "NH001", tenHo: "Hoàng Thị Luyến", diaChi: "Nà Hồng", thoiGian: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 10.00, donGia: 28000, thanhTien: 280000, maME: "NH0013103" },
+  { stt: 5, maHo: "NH002", tenHo: "Hoàng Thị Đào", diaChi: "Nà Hồng", thoiGian: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 9.00, donGia: 28000, thanhTien: 252000, maME: "NH0023103" },
+  { stt: 6, maHo: "NH009", tenHo: "Hạ Văn Thắng", diaChi: "Nà Hồng", thoiGian: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 3.00, donGia: 27000, thanhTien: 81000, maME: "NH0093103" },
+  { stt: 7, maHo: "NH004", tenHo: "Triệu Văn Thạo", diaChi: "Nà Hồng", thoiGian: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 25.50, donGia: 28000, thanhTien: 714000, maME: "NH0043103" },
+  { stt: 8, maHo: "NH006", tenHo: "Triệu Văn Hòa", diaChi: "Nà Hồng", thoiGian: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 15.00, donGia: 28000, thanhTien: 420000, maME: "NH0063103" },
+  { stt: 9, maHo: "NH007", tenHo: "Hoàng Văn Tuấn", diaChi: "Nà Hồng", thoiGian: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 22.00, donGia: 27000, thanhTien: 594000, maME: "NH0073103" },
+  { stt: 10, maHo: "NB009", tenHo: "Triệu Văn Hánh", diaChi: "Nà Bay", thoiGian: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 13.50, donGia: 28000, thanhTien: 378000, maME: "NB0093103" },
+  { stt: 11, maHo: "NB010", tenHo: "Mạnh Văn Hồ", diaChi: "Nà Bay", thoiGian: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 5.00, donGia: 29000, thanhTien: 145000, maME: "NB0103103" },
+  { stt: 12, maHo: "NH010", tenHo: "Dương Thị Tươi", diaChi: "Nà Hồng", thoiGian: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 9.30, donGia: 27000, thanhTien: 251100, maME: "NH0103103" },
+  { stt: 13, maHo: "NB010", tenHo: "Mạnh Văn Hồ", diaChi: "Nà Bay", thoiGian: "31/03/2026", quyCach: "1 tôm", khoiLuong: 2.50, donGia: 520000, thanhTien: 1300000, maME: "NB0103103" },
+  { stt: 14, maHo: "NB001", tenHo: "Nông Thị Dung", diaChi: "Nà Bay", thoiGian: "31/03/2026", quyCach: "1 tôm", khoiLuong: 1.80, donGia: 520000, thanhTien: 936000, maME: "NB0013103" },
+  { stt: 15, maHo: "NB002", tenHo: "Nông Văn Nghiễm", diaChi: "Nà Bay", thoiGian: "31/03/2026", quyCach: "1 tôm", khoiLuong: 2.80, donGia: 520000, thanhTien: 1456000, maME: "NB0023103" },
+  { stt: 16, maHo: "NB007", tenHo: "Nguyễn Văn Hân", diaChi: "Nà Bay", thoiGian: "31/03/2026", quyCach: "1 tôm", khoiLuong: 2.37, donGia: 520000, thanhTien: 1232400, maME: "NB0073103" },
+  { stt: 17, maHo: "NB009", tenHo: "Triệu Văn Hánh", diaChi: "Nà Bay", thoiGian: "31/03/2026", quyCach: "1 tôm", khoiLuong: 0.40, donGia: 520000, thanhTien: 208000, maME: "NB0093103" },
+  { stt: 18, maHo: "NB004", tenHo: "Triệu Văn Mỹ", diaChi: "Nà Bay", thoiGian: "31/03/2026", quyCach: "1 tôm", khoiLuong: 1.05, donGia: 520000, thanhTien: 546000, maME: "NB0043103" },
+  { stt: 19, maHo: "NB006", tenHo: "Hoàng Văn Thống", diaChi: "Nà Bay", thoiGian: "31/03/2026", quyCach: "1 tôm", khoiLuong: 4.90, donGia: 520000, thanhTien: 2548000, maME: "NB0063103" },
+  { stt: 20, maHo: "NH001", tenHo: "Hoàng Thị Luyến", diaChi: "Nà Hồng", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 3.20, donGia: 29000, thanhTien: 92800, maME: "NH001104" },
+  { stt: 21, maHo: "NH004", tenHo: "Triệu Văn Thạo", diaChi: "Nà Hồng", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 21.50, donGia: 29000, thanhTien: 623500, maME: "NH004104" },
+  { stt: 22, maHo: "NB011", tenHo: "Hoàng Thị Điềm", diaChi: "Nà Bay", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 5.00, donGia: 29000, thanhTien: 145000, maME: "NB011104" },
+  { stt: 23, maHo: "NB012", tenHo: "Lâm Thị Tới", diaChi: "Nà Bay", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 11.50, donGia: 29000, thanhTien: 333500, maME: "NB012104" },
+  { stt: 24, maHo: "NB010", tenHo: "Mạnh Văn Hồ", diaChi: "Nà Bay", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 15.00, donGia: 29000, thanhTien: 435000, maME: "NB010104" },
+  { stt: 25, maHo: "NB013", tenHo: "Triệu Văn Cường", diaChi: "Nà Bay", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 35.70, donGia: 29000, thanhTien: 1035300, maME: "NB013104" },
+  { stt: 26, maHo: "NB002", tenHo: "Nông Văn Nghiễm", diaChi: "Nà Bay", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 19.30, donGia: 29000, thanhTien: 559700, maME: "NB002104" },
+  { stt: 27, maHo: "NB004", tenHo: "Triệu Văn Mỹ", diaChi: "Nà Bay", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 13.40, donGia: 29000, thanhTien: 388600, maME: "NB004104" },
+  { stt: 28, maHo: "NB001", tenHo: "Nông Thị Dung", diaChi: "Nà Bay", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 31.50, donGia: 29000, thanhTien: 913500, maME: "NB001104" },
+  { stt: 29, maHo: "NB006", tenHo: "Hoàng Văn Thống", diaChi: "Nà Bay", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 23.80, donGia: 29000, thanhTien: 690200, maME: "NB006104" },
+  { stt: 30, maHo: "NH007", tenHo: "Hoàng Văn Tuấn", diaChi: "Nà Hồng", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 11.50, donGia: 28000, thanhTien: 322000, maME: "NH007104" },
+  { stt: 31, maHo: "NH003", tenHo: "Phạm Thị Huyền", diaChi: "Nà Hồng", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 4.60, donGia: 28000, thanhTien: 128800, maME: "NH003104" },
+  { stt: 32, maHo: "NH010", tenHo: "Dương Thị Tươi", diaChi: "Nà Hồng", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 6.30, donGia: 28000, thanhTien: 176400, maME: "NH010104" },
+  { stt: 33, maHo: "BC003", tenHo: "Hoàng Văn Mỹ", diaChi: "Bản Chang", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 11.70, donGia: 28000, thanhTien: 327600, maME: "BC003104" },
+  { stt: 34, maHo: "NH006", tenHo: "Triệu Văn Hòa", diaChi: "Nà Hồng", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 16.50, donGia: 28000, thanhTien: 462000, maME: "NH006104" },
+  { stt: 35, maHo: "NH008", tenHo: "Đồng Thị Khuyết", diaChi: "Nà Hồng", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 9.00, donGia: 28000, thanhTien: 252000, maME: "NH008104" },
+  { stt: 36, maHo: "NB009", tenHo: "Triệu Văn Hánh", diaChi: "Nà Bay", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 34.50, donGia: 27000, thanhTien: 931500, maME: "NB009104" },
+  { stt: 37, maHo: "NH009", tenHo: "Hạ Văn Thắng", diaChi: "Nà Hồng", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 18.00, donGia: 29000, thanhTien: 522000, maME: "NH009104" },
+  { stt: 38, maHo: "NH002", tenHo: "Hoàng Thị Đào", diaChi: "Nà Hồng", thoiGian: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 13.50, donGia: 29000, thanhTien: 391500, maME: "NH002104" },
+  { stt: 39, maHo: "NB009", tenHo: "Triệu Văn Hánh", diaChi: "Nà Bay", thoiGian: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 15.00, donGia: 28000, thanhTien: 420000, maME: "NB009304" },
+  { stt: 40, maHo: "NB002", tenHo: "Nông Văn Nghiễm", diaChi: "Nà Bay", thoiGian: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 44.00, donGia: 29000, thanhTien: 1276000, maME: "NB002304" },
+  { stt: 41, maHo: "NB001", tenHo: "Nông Thị Dung", diaChi: "Nà Bay", thoiGian: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 32.00, donGia: 29000, thanhTien: 928000, maME: "NB001304" },
+  { stt: 42, maHo: "NB006", tenHo: "Hoàng Văn Thống", diaChi: "Nà Bay", thoiGian: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 49.20, donGia: 29000, thanhTien: 1426800, maME: "NB006304" },
+  { stt: 43, maHo: "NB013", tenHo: "Triệu Văn Cường", diaChi: "Nà Bay", thoiGian: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 50.00, donGia: 29000, thanhTien: 1450000, maME: "NB013304" },
+  { stt: 44, maHo: "NH006", tenHo: "Triệu Văn Hòa", diaChi: "Nà Hồng", thoiGian: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 10.80, donGia: 28000, thanhTien: 302400, maME: "NH006304" },
+  { stt: 45, maHo: "NH002", tenHo: "Hoàng Thị Đào", diaChi: "Nà Hồng", thoiGian: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 6.00, donGia: 28000, thanhTien: 168000, maME: "NH002304" },
+  { stt: 46, maHo: "NH003", tenHo: "Phạm Thị Huyền", diaChi: "Nà Hồng", thoiGian: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 6.00, donGia: 28000, thanhTien: 168000, maME: "NH003304" },
+  { stt: 47, maHo: "NH001", tenHo: "Hoàng Thị Luyến", diaChi: "Nà Hồng", thoiGian: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 3.00, donGia: 28000, thanhTien: 84000, maME: "NH001304" },
+  { stt: 48, maHo: "NH004", tenHo: "Triệu Văn Thạo", diaChi: "Nà Hồng", thoiGian: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 23.50, donGia: 29000, thanhTien: 681500, maME: "NH004304" },
+  { stt: 49, maHo: "NH009", tenHo: "Hạ Văn Thắng", diaChi: "Nà Hồng", thoiGian: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 6.00, donGia: 27000, thanhTien: 162000, maME: "NH009304" },
+  { stt: 50, maHo: "NB010", tenHo: "Mạnh Văn Hồ", diaChi: "Nà Bay", thoiGian: "03/04/2026", quyCach: "1 tôm", khoiLuong: 1.04, donGia: 520000, thanhTien: 540800, maME: "NB010304" },
+  { stt: 51, maHo: "NB009", tenHo: "Triệu Văn Hánh", diaChi: "Nà Bay", thoiGian: "03/04/2026", quyCach: "1 tôm", khoiLuong: 2.40, donGia: 520000, thanhTien: 1248000, maME: "NB009304" },
+  { stt: 52, maHo: "NB002", tenHo: "Nông Văn Nghiễm", diaChi: "Nà Bay", thoiGian: "03/04/2026", quyCach: "1 tôm", khoiLuong: 3.30, donGia: 520000, thanhTien: 1716000, maME: "NB002304" },
+  { stt: 53, maHo: "NB006", tenHo: "Hoàng Văn Thống", diaChi: "Nà Bay", thoiGian: "03/04/2026", quyCach: "1 tôm", khoiLuong: 2.60, donGia: 520000, thanhTien: 1352000, maME: "NB006304" },
+  { stt: 54, maHo: "NB001", tenHo: "Nông Thị Dung", diaChi: "Nà Bay", thoiGian: "03/04/2026", quyCach: "1 tôm", khoiLuong: 0.75, donGia: 520000, thanhTien: 390000, maME: "NB001304" },
+];
+
+const sanXuatData = [
+  { stt: 1, maME: "NH0043003", nguoiThucHien: "HTX Hồng Hà", thoiGian: "30/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maLoSX: "L013003" },
+  { stt: 1, maME: "NB0023003", nguoiThucHien: "HTX Hồng Hà", thoiGian: "30/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maLoSX: "L013003" },
+  { stt: 2, maME: "NH0013103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maLoSX: "L023103" },
+  { stt: 2, maME: "NH0023103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maLoSX: "L023103" },
+  { stt: 2, maME: "NH0083103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maLoSX: "L023103" },
+  { stt: 3, maME: "NH0093103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maLoSX: "L033103" },
+  { stt: 3, maME: "NH0043103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maLoSX: "L033103" },
+  { stt: 4, maME: "NH0063103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maLoSX: "L043103" },
+  { stt: 4, maME: "NH0083103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maLoSX: "L043103" },
+  { stt: 5, maME: "NH0073103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maLoSX: "L053103" },
+  { stt: 6, maME: "NB0093103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maLoSX: "L063103" },
+  { stt: 6, maME: "NB0103103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maLoSX: "L063103" },
+  { stt: 7, maME: "NB0103103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Bạch trà", maLoSX: "L073103" },
+  { stt: 7, maME: "NB0013103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Bạch trà", maLoSX: "L073103" },
+  { stt: 7, maME: "NB0023103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Bạch trà", maLoSX: "L073103" },
+  { stt: 7, maME: "NB0073103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Bạch trà", maLoSX: "L073103" },
+  { stt: 8, maME: "NH0103103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maLoSX: "L083103" },
+  { stt: 9, maME: "NH001104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L09104" },
+  { stt: 9, maME: "NH004104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L09104" },
+  { stt: 10, maME: "NB011104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L010104" },
+  { stt: 10, maME: "NB012104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L010104" },
+  { stt: 10, maME: "NB010104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L010104" },
+  { stt: 11, maME: "NB013104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L011104" },
+  { stt: 11, maME: "NB002104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L011104" },
+  { stt: 12, maME: "NB004104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L012104" },
+  { stt: 12, maME: "NB001104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L012104" },
+  { stt: 13, maME: "NB006104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L013104" },
+  { stt: 14, maME: "NH007104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L014104" },
+  { stt: 14, maME: "NH003104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L014104" },
+  { stt: 14, maME: "NH010104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L014104" },
+  { stt: 15, maME: "BC003104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L015104" },
+  { stt: 16, maME: "NH006104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L016104" },
+  { stt: 16, maME: "NH008104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L016104" },
+  { stt: 17, maME: "NB009104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L017104" },
+  { stt: 18, maME: "NH009104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L018104" },
+  { stt: 18, maME: "NH002104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maLoSX: "L018104" },
+];
+
+const dongGoiData = [
+  { stt: 1, maLoSX: "L013003", nguoiThucHien: "HTX Hồng Hà", thoiGian: "30/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maDongGoi: "S013003" },
+  { stt: 2, maLoSX: "L023103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maDongGoi: "S023103" },
+  { stt: 3, maLoSX: "L033103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maDongGoi: "S033103" },
+  { stt: 4, maLoSX: "L043103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maDongGoi: "S043103" },
+  { stt: 5, maLoSX: "L053103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maDongGoi: "S053103" },
+  { stt: 6, maLoSX: "L063103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maDongGoi: "S063103" },
+  { stt: 7, maLoSX: "L073103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Bạch trà", maDongGoi: "S073103" },
+  { stt: 8, maLoSX: "L083103", nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà", maDongGoi: "S083103" },
+  { stt: 9, maLoSX: "L09104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S09104" },
+  { stt: 10, maLoSX: "L010104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S010104" },
+  { stt: 11, maLoSX: "L011104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S011104" },
+  { stt: 12, maLoSX: "L012104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S012104" },
+  { stt: 13, maLoSX: "L013104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S013104" },
+  { stt: 14, maLoSX: "L014104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S014104" },
+  { stt: 15, maLoSX: "L015104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S015104" },
+  { stt: 16, maLoSX: "L016104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S016104" },
+  { stt: 17, maLoSX: "L017104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S017104" },
+  { stt: 18, maLoSX: "L018104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S018104" },
+  { stt: 19, maLoSX: "L019104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S019104" },
+  { stt: 20, maLoSX: "L020104", nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S020104" },
+];
+
+const dsHoLKData = [
+  { stt: 1, hoDan: "Hoàng Thị Luyến", maHo: "NH001", diaChi: "Nà Hồng", sdt: "354125321", dienTich: 0.5 },
+  { stt: 2, hoDan: "Hoàng Thị Đào", maHo: "NH002", diaChi: "Nà Hồng", sdt: "374704822", dienTich: 0.4 },
+  { stt: 3, hoDan: "Phạm Thị Huyền", maHo: "NH003", diaChi: "Nà Hồng", sdt: "379251872", dienTich: 1.0 },
+  { stt: 4, hoDan: "Triệu Văn Thạo", maHo: "NH004", diaChi: "Nà Hồng", sdt: "354871949", dienTich: 0.8 },
+  { stt: 5, hoDan: "Hoàng Văn Thái", maHo: "NH005", diaChi: "Nà Hồng", sdt: "972061820", dienTich: 0.5 },
+  { stt: 6, hoDan: "Triệu Văn Hòa", maHo: "NH006", diaChi: "Nà Hồng", sdt: "378360830", dienTich: 0.8 },
+  { stt: 7, hoDan: "Hoàng Văn Tuấn", maHo: "NH007", diaChi: "Nà Hồng", sdt: "387851867", dienTich: 1.0 },
+  { stt: 8, hoDan: "Đồng Thị Khuyết", maHo: "NH008", diaChi: "Nà Hồng", sdt: "962041090", dienTich: 0.7 },
+  { stt: 9, hoDan: "Hạ Văn Thắng", maHo: "NH009", diaChi: "Nà Hồng", sdt: "337318858", dienTich: 1.5 },
+  { stt: 10, hoDan: "Dương Thị Tươi", maHo: "NH010", diaChi: "Nà Hồng", sdt: "", dienTich: 0.5 },
+  { stt: 11, hoDan: "Nông Thị Dung", maHo: "NB001", diaChi: "Nà Bay", sdt: "961466732", dienTich: 1.5 },
+  { stt: 12, hoDan: "Nông Văn Nghiễm", maHo: "NB002", diaChi: "Nà Bay", sdt: "814665955", dienTich: 1.0 },
+  { stt: 13, hoDan: "Mùng Văn Thời", maHo: "NB003", diaChi: "Nà Bay", sdt: "369254973", dienTich: 0.6 },
+  { stt: 14, hoDan: "Triệu Văn Mỹ", maHo: "NB004", diaChi: "Nà Bay", sdt: "383760794", dienTich: 1.0 },
+  { stt: 15, hoDan: "Nông Văn Đẳng", maHo: "NB005", diaChi: "Nà Bay", sdt: "374258744", dienTich: 1.0 },
+  { stt: 16, hoDan: "Hoàng Văn Thống", maHo: "NB006", diaChi: "Nà Bay", sdt: "967186387", dienTich: 1.0 },
+  { stt: 17, hoDan: "Nguyễn Văn Hân", maHo: "NB007", diaChi: "Nà Bay", sdt: "984922577", dienTich: 1.0 },
+  { stt: 18, hoDan: "Nguyễn Thị Đa", maHo: "NB008", diaChi: "Nà Bay", sdt: "372122030", dienTich: 0.7 },
+  { stt: 19, hoDan: "Triệu Văn Hánh", maHo: "NB009", diaChi: "Nà Bay", sdt: "345665232", dienTich: 0.8 },
+  { stt: 20, hoDan: "Mạnh Văn Hồ", maHo: "NB010", diaChi: "Nà Bay", sdt: "349055299", dienTich: 2.0 },
+  { stt: 21, hoDan: "Hoàng Thị Điềm", maHo: "NB011", diaChi: "Nà Bay", sdt: "375182932", dienTich: 0.4 },
+  { stt: 22, hoDan: "Lâm Thị Tới", maHo: "NB012", diaChi: "Nà Bay", sdt: "353839713", dienTich: 0.0 },
+  { stt: 23, hoDan: "Triệu Văn Cường", maHo: "NB013", diaChi: "Nà Bay", sdt: "", dienTich: 0.0 },
+  { stt: 24, hoDan: "Hoàng Phúc Khôi", maHo: "BC001", diaChi: "Bản Chang", sdt: "333770931", dienTich: 0.6 },
+  { stt: 25, hoDan: "Triệu Văn Dựng", maHo: "BC002", diaChi: "Bản Chang", sdt: "343233785", dienTich: 2.0 },
+  { stt: 26, hoDan: "Hoàng Văn Mỹ", maHo: "BC003", diaChi: "Bản Chang", sdt: "", dienTich: 0.0 },
+];
+
+const quyCachData = [
+  { stt: 1, quyCach: "1 tôm", donGia: "27.000 - 30.000 đ/kg", loaiChe: "Chè xanh" },
+  { stt: 2, quyCach: "1 tôm 1 lá", donGia: "50.000 đ/kg", loaiChe: "Hồng trà" },
+  { stt: 3, quyCach: "1 tôm 2 lá", donGia: "27.000 - 30.000 đ/kg", loaiChe: "Bạch trà" },
+  { stt: 4, quyCach: "2 lá", donGia: "27.000 đ/kg", loaiChe: "" },
+];
+
+const tichLuongData = [
+  { stt: 1, danhGia: "70–79%", donGia: "27.000 đ/kg" },
+  { stt: 2, danhGia: "80–89%", donGia: "28.000 đ/kg" },
+  { stt: 3, danhGia: "90–99%", donGia: "29.000 đ/kg" },
+  { stt: 4, danhGia: "100%", donGia: "30.000 đ/kg" },
+  { stt: 5, danhGia: "Cây di sản", donGia: "40.000 – 60.000 đ/kg" },
+];
+
+const productColor: Record<string, string> = {
+  "Hồng trà": "bg-rose-100 text-rose-700",
+  "Bạch trà": "bg-blue-100 text-blue-700",
+  "Chè xanh": "bg-emerald-100 text-emerald-700",
+};
+
+function formatCurrency(value: number) {
+  return value.toLocaleString("vi-VN") + " đ";
+}
+
+type SortKey = string;
+type SortDir = "asc" | "desc";
+
+export default function PurchasePage() {
+  const [, setLocation] = useLocation();
+  const [activeTab, setActiveTab] = useState("thu-mua");
+  const [search, setSearch] = useState("");
+  const [sortKey, setSortKey] = useState<SortKey>("stt");
+  const [sortDir, setSortDir] = useState<SortDir>("asc");
+  const [dateFilter, setDateFilter] = useState("");
+
+  const totalKhoiLuong = thuMuaData.reduce((s, r) => s + r.khoiLuong, 0);
+  const totalThanhTien = thuMuaData.reduce((s, r) => s + r.thanhTien, 0);
+  const uniqueHo = new Set(thuMuaData.map((r) => r.maHo)).size;
+
+  const handleSort = (key: SortKey) => {
+    if (sortKey === key) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortKey(key);
+      setSortDir("asc");
+    }
+  };
+
+  const SortIcon = ({ col }: { col: string }) => {
+    if (sortKey !== col) return <ChevronUp className="w-3 h-3 opacity-30" />;
+    return sortDir === "asc" ? <ChevronUp className="w-3 h-3 text-primary" /> : <ChevronDown className="w-3 h-3 text-primary" />;
+  };
+
+  const filteredThuMua = useMemo(() => {
+    let data = thuMuaData;
+    if (search) {
+      const q = search.toLowerCase();
+      data = data.filter(
+        (r) =>
+          r.maHo.toLowerCase().includes(q) ||
+          r.tenHo.toLowerCase().includes(q) ||
+          r.diaChi.toLowerCase().includes(q) ||
+          r.maME.toLowerCase().includes(q)
+      );
+    }
+    if (dateFilter) {
+      data = data.filter((r) => r.thoiGian === dateFilter);
+    }
+    return [...data].sort((a, b) => {
+      const av = (a as Record<string, unknown>)[sortKey];
+      const bv = (b as Record<string, unknown>)[sortKey];
+      if (typeof av === "number" && typeof bv === "number") {
+        return sortDir === "asc" ? av - bv : bv - av;
+      }
+      return sortDir === "asc"
+        ? String(av).localeCompare(String(bv))
+        : String(bv).localeCompare(String(av));
+    });
+  }, [search, sortKey, sortDir, dateFilter]);
+
+  const filteredSanXuat = useMemo(() => {
+    if (!search) return sanXuatData;
+    const q = search.toLowerCase();
+    return sanXuatData.filter(
+      (r) =>
+        r.maME.toLowerCase().includes(q) ||
+        r.maLoSX.toLowerCase().includes(q) ||
+        r.thanhPham.toLowerCase().includes(q)
+    );
+  }, [search]);
+
+  const filteredDongGoi = useMemo(() => {
+    if (!search) return dongGoiData;
+    const q = search.toLowerCase();
+    return dongGoiData.filter(
+      (r) =>
+        r.maLoSX.toLowerCase().includes(q) ||
+        r.maDongGoi.toLowerCase().includes(q) ||
+        r.thanhPham.toLowerCase().includes(q)
+    );
+  }, [search]);
+
+  const filteredHoLK = useMemo(() => {
+    if (!search) return dsHoLKData;
+    const q = search.toLowerCase();
+    return dsHoLKData.filter(
+      (r) =>
+        r.hoDan.toLowerCase().includes(q) ||
+        r.maHo.toLowerCase().includes(q) ||
+        r.diaChi.toLowerCase().includes(q)
+    );
+  }, [search]);
+
+  const uniqueDates = [...new Set(thuMuaData.map((r) => r.thoiGian))].sort();
+
+  return (
+    <AppLayout>
+      <div className="mb-5">
+        <button
+          onClick={() => setLocation("/module/erp")}
+          className="flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm transition-colors mb-4"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Quay lại ERP
+        </button>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Quản lý Thu mua</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">
+              HTX Hồng Hà · Chè Shan Tuyết Bằng Phúc
+            </p>
+          </div>
+          <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-lg hover:bg-muted/50 transition-colors">
+            <Download className="w-3.5 h-3.5" />
+            Xuất Excel
+          </button>
+        </div>
+      </div>
+
+      {/* Summary stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        {[
+          { icon: Leaf, label: "Tổng khối lượng", value: `${totalKhoiLuong.toFixed(2)} kg`, sub: "thu mua", color: "text-emerald-600 bg-emerald-50" },
+          { icon: TrendingUp, label: "Tổng thành tiền", value: formatCurrency(totalThanhTien), sub: "chi trả", color: "text-blue-600 bg-blue-50" },
+          { icon: Users, label: "Hộ dân liên kết", value: `${uniqueHo} hộ`, sub: `/ ${dsHoLKData.length} hộ tổng`, color: "text-violet-600 bg-violet-50" },
+          { icon: Calendar, label: "Ngày thu mua", value: `${uniqueDates.length} ngày`, sub: "trong kỳ", color: "text-orange-600 bg-orange-50" },
+        ].map((stat, i) => (
+          <div key={i} className="bg-white border border-border rounded-xl p-4 flex items-start gap-3">
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${stat.color}`}>
+              <stat.icon className="w-4.5 h-4.5" strokeWidth={1.5} />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{stat.label}</p>
+              <p className="text-base font-bold text-foreground">{stat.value}</p>
+              <p className="text-xs text-muted-foreground">{stat.sub}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Tabs */}
+      <div className="bg-white border border-border rounded-xl overflow-hidden">
+        <div className="flex border-b border-border overflow-x-auto">
+          {TABS.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => { setActiveTab(tab.id); setSearch(""); setDateFilter(""); }}
+              className={`px-4 py-3 text-sm font-medium whitespace-nowrap transition-colors border-b-2 -mb-px ${
+                activeTab === tab.id
+                  ? "border-primary text-primary bg-primary/5"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        <div className="p-4">
+          {/* Search + Filter bar */}
+          {activeTab !== "quy-cach" && (
+            <div className="flex gap-2 mb-4">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                <input
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Tìm kiếm..."
+                  className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+              {activeTab === "thu-mua" && (
+                <div className="relative">
+                  <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                  <select
+                    value={dateFilter}
+                    onChange={(e) => setDateFilter(e.target.value)}
+                    className="pl-9 pr-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+                  >
+                    <option value="">Tất cả ngày</option>
+                    {uniqueDates.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Thu mua tab */}
+          {activeTab === "thu-mua" && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    {[
+                      { key: "stt", label: "STT" },
+                      { key: "maHo", label: "Mã hộ" },
+                      { key: "tenHo", label: "Tên hộ" },
+                      { key: "diaChi", label: "Địa chỉ" },
+                      { key: "thoiGian", label: "Thời gian" },
+                      { key: "quyCach", label: "Quy cách" },
+                      { key: "khoiLuong", label: "KL (kg)" },
+                      { key: "donGia", label: "Đơn giá" },
+                      { key: "thanhTien", label: "Thành tiền" },
+                      { key: "maME", label: "Mã mẻ" },
+                    ].map((col) => (
+                      <th
+                        key={col.key}
+                        onClick={() => handleSort(col.key)}
+                        className="text-left pb-2 px-2 font-semibold text-xs text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground select-none whitespace-nowrap"
+                      >
+                        <span className="flex items-center gap-1">
+                          {col.label} <SortIcon col={col.key} />
+                        </span>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredThuMua.map((row, i) => (
+                    <tr key={i} className="border-b border-border/60 hover:bg-muted/30 transition-colors">
+                      <td className="py-2.5 px-2 text-muted-foreground text-xs">{row.stt}</td>
+                      <td className="py-2.5 px-2 font-mono text-xs font-semibold text-primary">{row.maHo}</td>
+                      <td className="py-2.5 px-2 font-medium">{row.tenHo}</td>
+                      <td className="py-2.5 px-2 text-muted-foreground">{row.diaChi}</td>
+                      <td className="py-2.5 px-2 text-muted-foreground whitespace-nowrap">{row.thoiGian}</td>
+                      <td className="py-2.5 px-2">
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                          row.quyCach === "1 tôm" ? "bg-amber-100 text-amber-700" : "bg-green-100 text-green-700"
+                        }`}>
+                          {row.quyCach}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-2 text-right font-semibold">{row.khoiLuong.toFixed(2)}</td>
+                      <td className="py-2.5 px-2 text-right text-muted-foreground whitespace-nowrap">{row.donGia.toLocaleString("vi-VN")} đ</td>
+                      <td className="py-2.5 px-2 text-right font-semibold text-foreground whitespace-nowrap">{formatCurrency(row.thanhTien)}</td>
+                      <td className="py-2.5 px-2 font-mono text-xs text-muted-foreground">{row.maME}</td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-border bg-muted/30">
+                    <td colSpan={6} className="py-2.5 px-2 font-bold text-sm">Tổng cộng</td>
+                    <td className="py-2.5 px-2 text-right font-bold">{filteredThuMua.reduce((s, r) => s + r.khoiLuong, 0).toFixed(2)}</td>
+                    <td className="py-2.5 px-2"></td>
+                    <td className="py-2.5 px-2 text-right font-bold text-primary whitespace-nowrap">
+                      {formatCurrency(filteredThuMua.reduce((s, r) => s + r.thanhTien, 0))}
+                    </td>
+                    <td></td>
+                  </tr>
+                </tfoot>
+              </table>
+              <p className="text-xs text-muted-foreground mt-2">
+                Hiển thị {filteredThuMua.length} / {thuMuaData.length} bản ghi
+              </p>
+            </div>
+          )}
+
+          {/* Sản xuất tab */}
+          {activeTab === "san-xuat" && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    {["STT", "Mã mẻ", "Người thực hiện", "Thời gian", "Địa điểm", "Thành phẩm", "Mã lô SX"].map((h) => (
+                      <th key={h} className="text-left pb-2 px-2 font-semibold text-xs text-muted-foreground uppercase tracking-wide whitespace-nowrap">
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredSanXuat.map((row, i) => (
+                    <tr key={i} className="border-b border-border/60 hover:bg-muted/30 transition-colors">
+                      <td className="py-2.5 px-2 text-muted-foreground text-xs">{row.stt}</td>
+                      <td className="py-2.5 px-2 font-mono text-xs font-semibold text-primary">{row.maME}</td>
+                      <td className="py-2.5 px-2">{row.nguoiThucHien}</td>
+                      <td className="py-2.5 px-2 text-muted-foreground whitespace-nowrap">{row.thoiGian}</td>
+                      <td className="py-2.5 px-2 text-muted-foreground">{row.diaDiem}</td>
+                      <td className="py-2.5 px-2">
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${productColor[row.thanhPham] ?? "bg-gray-100 text-gray-600"}`}>
+                          {row.thanhPham}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-2 font-mono text-xs text-muted-foreground">{row.maLoSX}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="text-xs text-muted-foreground mt-2">
+                {filteredSanXuat.length} bản ghi
+              </p>
+            </div>
+          )}
+
+          {/* Đóng gói tab */}
+          {activeTab === "dong-goi" && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    {["STT", "Mã lô SX", "Người thực hiện", "Thời gian", "Địa điểm", "Thành phẩm", "Mã đóng gói"].map((h) => (
+                      <th key={h} className="text-left pb-2 px-2 font-semibold text-xs text-muted-foreground uppercase tracking-wide whitespace-nowrap">
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredDongGoi.map((row, i) => (
+                    <tr key={i} className="border-b border-border/60 hover:bg-muted/30 transition-colors">
+                      <td className="py-2.5 px-2 text-muted-foreground text-xs">{row.stt}</td>
+                      <td className="py-2.5 px-2 font-mono text-xs font-semibold text-primary">{row.maLoSX}</td>
+                      <td className="py-2.5 px-2">{row.nguoiThucHien}</td>
+                      <td className="py-2.5 px-2 text-muted-foreground whitespace-nowrap">{row.thoiGian}</td>
+                      <td className="py-2.5 px-2 text-muted-foreground">{row.diaDiem}</td>
+                      <td className="py-2.5 px-2">
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${productColor[row.thanhPham] ?? "bg-gray-100 text-gray-600"}`}>
+                          {row.thanhPham}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-2 font-mono text-xs text-muted-foreground">{row.maDongGoi}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+              <p className="text-xs text-muted-foreground mt-2">
+                {filteredDongGoi.length} lô đóng gói
+              </p>
+            </div>
+          )}
+
+          {/* DS hộ LK tab */}
+          {activeTab === "ds-ho-lk" && (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    {["STT", "Họ và tên", "Mã hộ", "Địa chỉ", "Số điện thoại", "Diện tích (ha)"].map((h) => (
+                      <th key={h} className="text-left pb-2 px-2 font-semibold text-xs text-muted-foreground uppercase tracking-wide whitespace-nowrap">
+                        {h}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredHoLK.map((row, i) => (
+                    <tr key={i} className="border-b border-border/60 hover:bg-muted/30 transition-colors">
+                      <td className="py-2.5 px-2 text-muted-foreground text-xs">{row.stt}</td>
+                      <td className="py-2.5 px-2 font-medium">{row.hoDan}</td>
+                      <td className="py-2.5 px-2 font-mono text-xs font-semibold text-primary">{row.maHo}</td>
+                      <td className="py-2.5 px-2">
+                        <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${
+                          row.diaChi === "Nà Hồng" ? "bg-emerald-100 text-emerald-700" :
+                          row.diaChi === "Nà Bay" ? "bg-blue-100 text-blue-700" :
+                          "bg-orange-100 text-orange-700"
+                        }`}>
+                          {row.diaChi}
+                        </span>
+                      </td>
+                      <td className="py-2.5 px-2 text-muted-foreground font-mono text-xs">{row.sdt || "—"}</td>
+                      <td className="py-2.5 px-2 text-right">
+                        {row.dienTich > 0 ? (
+                          <span className="font-semibold">{row.dienTich.toFixed(1)} ha</span>
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className="border-t-2 border-border bg-muted/30">
+                    <td colSpan={5} className="py-2.5 px-2 font-bold text-sm">Tổng cộng ({filteredHoLK.length} hộ)</td>
+                    <td className="py-2.5 px-2 text-right font-bold">
+                      {filteredHoLK.reduce((s, r) => s + r.dienTich, 0).toFixed(1)} ha
+                    </td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
+          )}
+
+          {/* Quy cách tab */}
+          {activeTab === "quy-cach" && (
+            <div className="space-y-6">
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                  <Star className="w-4 h-4 text-amber-500" />
+                  Quy cách thu mua
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        {["STT", "Quy cách", "Đơn giá", "Loại chè"].map((h) => (
+                          <th key={h} className="text-left pb-2 px-3 font-semibold text-xs text-muted-foreground uppercase tracking-wide">
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {quyCachData.map((row) => (
+                        <tr key={row.stt} className="border-b border-border/60 hover:bg-muted/30 transition-colors">
+                          <td className="py-2.5 px-3 text-muted-foreground text-xs">{row.stt}</td>
+                          <td className="py-2.5 px-3 font-semibold">{row.quyCach}</td>
+                          <td className="py-2.5 px-3 font-mono text-sm text-primary font-semibold">{row.donGia}</td>
+                          <td className="py-2.5 px-3">
+                            {row.loaiChe ? (
+                              <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${productColor[row.loaiChe] ?? "bg-gray-100 text-gray-600"}`}>
+                                {row.loaiChe}
+                              </span>
+                            ) : "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-2">
+                  <Package className="w-4 h-4 text-blue-500" />
+                  Tiêu chuẩn đánh giá chất lượng
+                </h3>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b border-border">
+                        {["STT", "Đánh giá %", "Đơn giá", "Ghi chú"].map((h) => (
+                          <th key={h} className="text-left pb-2 px-3 font-semibold text-xs text-muted-foreground uppercase tracking-wide">
+                            {h}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {tichLuongData.map((row) => (
+                        <tr key={row.stt} className="border-b border-border/60 hover:bg-muted/30 transition-colors">
+                          <td className="py-2.5 px-3 text-muted-foreground text-xs">{row.stt}</td>
+                          <td className="py-2.5 px-3">
+                            <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                              row.danhGia === "100%" ? "bg-emerald-100 text-emerald-700" :
+                              row.danhGia === "Cây di sản" ? "bg-amber-100 text-amber-700" :
+                              "bg-blue-50 text-blue-700"
+                            }`}>
+                              {row.danhGia}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 font-mono font-semibold text-primary">{row.donGia}</td>
+                          <td className="py-2.5 px-3 text-muted-foreground text-xs">—</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="mt-4 p-3 bg-muted/50 rounded-lg border border-border">
+                  <p className="text-xs font-semibold text-foreground mb-2">Tiêu chuẩn đánh giá tỉ lệ đạt chất lượng:</p>
+                  <ul className="space-y-1">
+                    {["Độ non, già của búp chè", "Độ đồng đều của búp chè khi thu hái", "Độ chuẩn chỉ khi thu hái"].map((item) => (
+                      <li key={item} className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Box className="w-3 h-3 text-primary" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </AppLayout>
+  );
+}
