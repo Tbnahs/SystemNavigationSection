@@ -29,6 +29,12 @@ import {
   ClipboardCheck,
   ArrowLeft,
   ChevronRight,
+  Cpu,
+  Zap,
+  Bell,
+  Activity,
+  BarChart2,
+  CheckSquare,
 } from "lucide-react";
 
 interface SubModule {
@@ -58,6 +64,7 @@ const moduleConfig: Record<
       { id: "accounting", icon: DollarSign, nameKey: "submodule.erp.accounting", descKey: "submodule.erp.accounting.desc" },
       { id: "hr", icon: Users, nameKey: "submodule.erp.hr", descKey: "submodule.erp.hr.desc" },
       { id: "production", icon: Factory, nameKey: "submodule.erp.production", descKey: "submodule.erp.production.desc" },
+      { id: "quality", icon: CheckSquare, nameKey: "submodule.erp.quality", descKey: "submodule.erp.quality.desc" },
       { id: "crm", icon: UserCircle, nameKey: "submodule.erp.crm", descKey: "submodule.erp.crm.desc" },
       { id: "reports", icon: FileBarChart, nameKey: "submodule.erp.reports", descKey: "submodule.erp.reports.desc" },
       { id: "settings", icon: Settings, nameKey: "submodule.erp.settings", descKey: "submodule.erp.settings.desc" },
@@ -87,6 +94,17 @@ const moduleConfig: Record<
       { id: "harvest", icon: Scissors, nameKey: "submodule.farming.harvest", descKey: "submodule.farming.harvest.desc" },
       { id: "weather", icon: CloudSun, nameKey: "submodule.farming.weather", descKey: "submodule.farming.weather.desc" },
       { id: "inspection", icon: ClipboardCheck, nameKey: "submodule.farming.inspection", descKey: "submodule.farming.inspection.desc" },
+    ],
+  },
+  iot: {
+    nameKey: "module.iot",
+    descKey: "module.iot.desc",
+    icon: Cpu,
+    subModules: [
+      { id: "sensors", icon: Zap, nameKey: "submodule.iot.sensors", descKey: "submodule.iot.sensors.desc" },
+      { id: "alerts", icon: Bell, nameKey: "submodule.iot.alerts", descKey: "submodule.iot.alerts.desc" },
+      { id: "monitoring", icon: Activity, nameKey: "submodule.iot.monitoring", descKey: "submodule.iot.monitoring.desc" },
+      { id: "reports", icon: BarChart2, nameKey: "submodule.iot.reports", descKey: "submodule.iot.reports.desc" },
     ],
   },
 };

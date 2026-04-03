@@ -32,6 +32,8 @@ export type TranslationKey =
   | "module.txng.desc"
   | "module.farming"
   | "module.farming.desc"
+  | "module.iot"
+  | "module.iot.desc"
   | "submodule.back"
   | "submodule.erp.sales"
   | "submodule.erp.sales.desc"
@@ -45,6 +47,8 @@ export type TranslationKey =
   | "submodule.erp.hr.desc"
   | "submodule.erp.production"
   | "submodule.erp.production.desc"
+  | "submodule.erp.quality"
+  | "submodule.erp.quality.desc"
   | "submodule.erp.crm"
   | "submodule.erp.crm.desc"
   | "submodule.erp.reports"
@@ -75,10 +79,19 @@ export type TranslationKey =
   | "submodule.farming.weather.desc"
   | "submodule.farming.inspection"
   | "submodule.farming.inspection.desc"
+  | "submodule.iot.sensors"
+  | "submodule.iot.sensors.desc"
+  | "submodule.iot.alerts"
+  | "submodule.iot.alerts.desc"
+  | "submodule.iot.monitoring"
+  | "submodule.iot.monitoring.desc"
+  | "submodule.iot.reports"
+  | "submodule.iot.reports.desc"
   | "nav.home"
   | "nav.erp"
   | "nav.txng"
   | "nav.farming"
+  | "nav.iot"
   | "nav.reports"
   | "nav.settings";
 
@@ -129,6 +142,8 @@ const vi: Translations = {
   "submodule.erp.hr.desc": "Quản lý nhân viên và lương",
   "submodule.erp.production": "Sản xuất",
   "submodule.erp.production.desc": "Kế hoạch và sản xuất",
+  "submodule.erp.quality": "Chất lượng",
+  "submodule.erp.quality.desc": "Quản lý chất lượng sản phẩm",
   "submodule.erp.crm": "Khách hàng",
   "submodule.erp.crm.desc": "Quan hệ khách hàng",
   "submodule.erp.reports": "Báo cáo",
@@ -159,10 +174,21 @@ const vi: Translations = {
   "submodule.farming.weather.desc": "Dự báo và giám sát khí hậu",
   "submodule.farming.inspection": "Kiểm định",
   "submodule.farming.inspection.desc": "Kiểm tra chất lượng sản phẩm",
+  "submodule.iot.sensors": "Cảm biến",
+  "submodule.iot.sensors.desc": "Quản lý cảm biến IoT",
+  "submodule.iot.alerts": "Cảnh báo",
+  "submodule.iot.alerts.desc": "Giám sát và cảnh báo",
+  "submodule.iot.monitoring": "Giám sát",
+  "submodule.iot.monitoring.desc": "Theo dõi dữ liệu thực tế",
+  "submodule.iot.reports": "Báo cáo IoT",
+  "submodule.iot.reports.desc": "Phân tích dữ liệu IoT",
+  "module.iot": "Hệ thống IoT & IOC",
+  "module.iot.desc": "Giám sát và thu thập dữ liệu từ cảm biến",
   "nav.home": "Trang chủ",
   "nav.erp": "ERP",
   "nav.txng": "Truy xuất",
   "nav.farming": "Vùng trồng",
+  "nav.iot": "IoT & IOC",
   "nav.reports": "Báo cáo",
   "nav.settings": "Cài đặt",
 };
@@ -242,10 +268,23 @@ const en: Translations = {
   "submodule.farming.weather.desc": "Weather forecast and monitoring",
   "submodule.farming.inspection": "Inspection",
   "submodule.farming.inspection.desc": "Quality inspection",
+  "submodule.erp.quality": "Quality",
+  "submodule.erp.quality.desc": "Product quality management",
+  "submodule.iot.sensors": "Sensors",
+  "submodule.iot.sensors.desc": "Manage IoT sensors",
+  "submodule.iot.alerts": "Alerts",
+  "submodule.iot.alerts.desc": "Monitoring and alerting",
+  "submodule.iot.monitoring": "Monitoring",
+  "submodule.iot.monitoring.desc": "Real-time data tracking",
+  "submodule.iot.reports": "IoT Reports",
+  "submodule.iot.reports.desc": "IoT data analysis",
+  "module.iot": "IoT & IOC System",
+  "module.iot.desc": "Sensor monitoring and data collection",
   "nav.home": "Home",
   "nav.erp": "ERP",
   "nav.txng": "Traceability",
   "nav.farming": "Farming",
+  "nav.iot": "IoT & IOC",
   "nav.reports": "Reports",
   "nav.settings": "Settings",
 };
@@ -325,10 +364,23 @@ const ko: Translations = {
   "submodule.farming.weather.desc": "날씨 예보 및 모니터링",
   "submodule.farming.inspection": "검사",
   "submodule.farming.inspection.desc": "품질 검사",
+  "submodule.erp.quality": "품질",
+  "submodule.erp.quality.desc": "제품 품질 관리",
+  "submodule.iot.sensors": "센서",
+  "submodule.iot.sensors.desc": "IoT 센서 관리",
+  "submodule.iot.alerts": "경고",
+  "submodule.iot.alerts.desc": "모니터링 및 경고",
+  "submodule.iot.monitoring": "모니터링",
+  "submodule.iot.monitoring.desc": "실시간 데이터 추적",
+  "submodule.iot.reports": "IoT 보고서",
+  "submodule.iot.reports.desc": "IoT 데이터 분석",
+  "module.iot": "IoT & IOC 시스템",
+  "module.iot.desc": "센서 모니터링 및 데이터 수집",
   "nav.home": "홈",
   "nav.erp": "ERP",
   "nav.txng": "추적",
   "nav.farming": "농업",
+  "nav.iot": "IoT & IOC",
   "nav.reports": "보고서",
   "nav.settings": "설정",
 };
@@ -408,10 +460,23 @@ const ja: Translations = {
   "submodule.farming.weather.desc": "天気予報とモニタリング",
   "submodule.farming.inspection": "検査",
   "submodule.farming.inspection.desc": "品質検査",
+  "submodule.erp.quality": "品質",
+  "submodule.erp.quality.desc": "製品品質管理",
+  "submodule.iot.sensors": "センサー",
+  "submodule.iot.sensors.desc": "IoTセンサー管理",
+  "submodule.iot.alerts": "警告",
+  "submodule.iot.alerts.desc": "監視とアラート",
+  "submodule.iot.monitoring": "監視",
+  "submodule.iot.monitoring.desc": "リアルタイムデータ追跡",
+  "submodule.iot.reports": "IoTレポート",
+  "submodule.iot.reports.desc": "IoTデータ分析",
+  "module.iot": "IoT & IOCシステム",
+  "module.iot.desc": "センサー監視とデータ収集",
   "nav.home": "ホーム",
   "nav.erp": "ERP",
   "nav.txng": "トレース",
   "nav.farming": "農業",
+  "nav.iot": "IoT & IOC",
   "nav.reports": "レポート",
   "nav.settings": "設定",
 };

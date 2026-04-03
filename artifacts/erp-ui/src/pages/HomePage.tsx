@@ -13,6 +13,7 @@ import {
   Clock,
   CheckCircle2,
   AlertCircle,
+  Cpu,
 } from "lucide-react";
 
 const modules = [
@@ -22,7 +23,7 @@ const modules = [
     nameKey: "module.erp" as const,
     descKey: "module.erp.desc" as const,
     href: "/module/erp",
-    count: "9",
+    count: "10",
   },
   {
     id: "txng",
@@ -39,6 +40,14 @@ const modules = [
     descKey: "module.farming.desc" as const,
     href: "/module/farming",
     count: "6",
+  },
+  {
+    id: "iot",
+    icon: Cpu,
+    nameKey: "module.iot" as const,
+    descKey: "module.iot.desc" as const,
+    href: "/module/iot",
+    count: "4",
   },
 ];
 
