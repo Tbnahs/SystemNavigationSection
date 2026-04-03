@@ -94,17 +94,10 @@ const moduleConfig: Record<
       { id: "harvest", icon: Scissors, nameKey: "submodule.farming.harvest", descKey: "submodule.farming.harvest.desc" },
       { id: "weather", icon: CloudSun, nameKey: "submodule.farming.weather", descKey: "submodule.farming.weather.desc" },
       { id: "inspection", icon: ClipboardCheck, nameKey: "submodule.farming.inspection", descKey: "submodule.farming.inspection.desc" },
-    ],
-  },
-  iot: {
-    nameKey: "module.iot",
-    descKey: "module.iot.desc",
-    icon: Cpu,
-    subModules: [
-      { id: "sensors", icon: Zap, nameKey: "submodule.iot.sensors", descKey: "submodule.iot.sensors.desc" },
-      { id: "alerts", icon: Bell, nameKey: "submodule.iot.alerts", descKey: "submodule.iot.alerts.desc" },
-      { id: "monitoring", icon: Activity, nameKey: "submodule.iot.monitoring", descKey: "submodule.iot.monitoring.desc" },
-      { id: "reports", icon: BarChart2, nameKey: "submodule.iot.reports", descKey: "submodule.iot.reports.desc" },
+      { id: "iot-sensors", icon: Cpu, nameKey: "submodule.iot.sensors", descKey: "submodule.iot.sensors.desc" },
+      { id: "iot-alerts", icon: Bell, nameKey: "submodule.iot.alerts", descKey: "submodule.iot.alerts.desc" },
+      { id: "iot-monitoring", icon: Activity, nameKey: "submodule.iot.monitoring", descKey: "submodule.iot.monitoring.desc" },
+      { id: "iot-reports", icon: BarChart2, nameKey: "submodule.iot.reports", descKey: "submodule.iot.reports.desc" },
     ],
   },
 };
