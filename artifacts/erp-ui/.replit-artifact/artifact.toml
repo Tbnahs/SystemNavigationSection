@@ -1,31 +1,32 @@
 kind = "web"
-previewPath = "/"
-title = "ERP Modern UI"
-version = "1.0.0"
-id = "artifacts/erp-ui"
-router = "path"
+  previewPath = "/"
+  title = "ERP Modern UI"
+  version = "1.0.0"
+  id = "artifacts/erp-ui"
+  router = "path"
 
-[[integratedSkills]]
-name = "react-vite"
-version = "1.0.0"
+  [[integratedSkills]]
+  name = "react-vite"
+  version = "1.0.0"
 
-[[services]]
-name = "web"
-paths = [ "/" ]
-localPort = 18366
+  [[services]]
+  name = "web"
+  paths = [ "/" ]
+  localPort = 18366
 
-[services.development]
-run = "pnpm --filter @workspace/erp-ui run dev"
+  [services.development]
+  run = "pnpm --filter @workspace/erp-ui run dev"
 
-[services.production]
-build = [ "pnpm", "--filter", "@workspace/erp-ui", "run", "build" ]
-publicDir = "artifacts/erp-ui/dist/public"
-serve = "static"
+  [services.production]
+  build = [ "pnpm", "--filter", "@workspace/erp-ui", "run", "build" ]
+  publicDir = "artifacts/erp-ui/dist/public"
+  serve = "static"
 
-[[services.production.rewrites]]
-from = "/*"
-to = "/index.html"
+  [[services.production.rewrites]]
+  from = "/*"
+  to = "/index.html"
 
-[services.env]
-PORT = "18366"
-BASE_PATH = "/"
+  [services.env]
+  PORT = "18366"
+  BASE_PATH = "/"
+  
