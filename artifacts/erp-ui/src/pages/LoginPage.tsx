@@ -42,9 +42,17 @@ export default function LoginPage() {
           className="absolute inset-0 w-full h-full object-cover"
         />
         {/* Gradient overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-
+        {/* Overlay text */}
+        <div className="relative z-10 p-10 text-white">
+          <h2 className="text-2xl font-bold leading-snug mb-2">
+            Hệ thống Truy xuất nguồn gốc<br />Chè Quân Chu
+          </h2>
+          <p className="text-sm text-white/70 leading-relaxed">
+            Nền tảng quản lý và truy xuất nguồn gốc chuỗi cung ứng tích hợp toàn diện.
+          </p>
+        </div>
       </div>
 
       {/* Right Panel - Login Form */}
