@@ -6,6 +6,7 @@ import {
   ArrowLeft, Search, Download, ChevronUp, ChevronDown,
   Users, Leaf, TrendingUp, Calendar, Filter, X,
   CheckSquare, Square, Plus, ChevronRight, MapPin, Phone,
+  FileSpreadsheet, FileText, Printer,
 } from "lucide-react";
 
 const thuMuaData = [
@@ -135,7 +136,9 @@ export default function PurchasePage() {
   const [search, setSearch] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("stt");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
-  const [dateFilter, setDateFilter] = useState("");
+  const [quyCachFilter, setQuyCachFilter] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
 
   const [showAddForm, setShowAddForm] = useState(false);
   const [formStep, setFormStep] = useState<"chon-ho" | "nhap-chi-tiet">("chon-ho");
@@ -218,7 +221,10 @@ export default function PurchasePage() {
     return sortDir === "asc" ? <ChevronUp className="w-3 h-3 text-primary" /> : <ChevronDown className="w-3 h-3 text-primary" />;
   };
 
-  const uniqueDates = [...new Set(thuMuaData.map((r) => r.thoiGian))].sort();
+  const uniqueQuyCach = [...new Set(thuMuaData.map((r) => r.quyCach))];
+  const uniqueDates = [...new Set(thuMuaData.map((r) => r.thoiGian))];
+
+  const parseDateVN = (s: string) => { const [d, m, y] = s.split("/"); return `${y}-${m}-${d}`; };
 
   const filteredThuMua = useMemo(() => {
     let data = thuMuaData;
@@ -232,7 +238,9 @@ export default function PurchasePage() {
           r.maME.toLowerCase().includes(q)
       );
     }
-    if (dateFilter) data = data.filter((r) => r.thoiGian === dateFilter);
+    if (quyCachFilter) data = data.filter((r) => r.quyCach === quyCachFilter);
+    if (dateFrom) data = data.filter((r) => parseDateVN(r.thoiGian) >= dateFrom);
+    if (dateTo) data = data.filter((r) => parseDateVN(r.thoiGian) <= dateTo);
     return [...data].sort((a, b) => {
       const av = (a as Record<string, unknown>)[sortKey];
       const bv = (b as Record<string, unknown>)[sortKey];
@@ -253,9 +261,23 @@ export default function PurchasePage() {
             <h1 className="text-xl font-bold text-foreground">Quản lý Thu mua</h1>
             <p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · Chè Shan Tuyết Bằng Phúc</p>
           </div>
-          <button onClick={handleExport} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-lg hover:bg-muted/50 transition-colors">
-            <Download className="w-3.5 h-3.5" /> Xuất Excel
-          </button>
+          <div className="flex items-center gap-2">
+            <button onClick={handleExport} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors">
+              <FileSpreadsheet className="w-3.5 h-3.5" /> Excel
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors">
+              <FileText className="w-3.5 h-3.5" /> PDF
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+              <Printer className="w-3.5 h-3.5" /> In
+            </button>
+            <button
+              onClick={() => { resetForm(); setShowAddForm(true); }}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap"
+            >
+              <Plus className="w-4 h-4" /> Thêm phiếu
+            </button>
+          </div>
         </div>
       </div>
 
@@ -283,8 +305,8 @@ export default function PurchasePage() {
       {/* Table */}
       <div className="bg-white border border-border rounded-xl overflow-hidden">
         {/* Toolbar */}
-        <div className="flex gap-2 p-4 border-b border-border flex-wrap">
-          <div className="relative flex-1 min-w-40">
+        <div className="flex items-center gap-2 p-4 border-b border-border flex-wrap">
+          <div className="relative flex-1 min-w-48">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <input
               value={search}
@@ -293,22 +315,22 @@ export default function PurchasePage() {
               className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <select
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className="pl-9 pr-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary"
-            >
-              <option value="">Tất cả ngày</option>
-              {uniqueDates.map((d) => <option key={d} value={d}>{d}</option>)}
-            </select>
-          </div>
-          <button
-            onClick={() => { resetForm(); setShowAddForm(true); }}
-            className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap"
+          <select
+            value={quyCachFilter}
+            onChange={(e) => setQuyCachFilter(e.target.value)}
+            className="px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary"
           >
-            <Plus className="w-4 h-4" /> Thêm phiếu
+            <option value="">Tất cả</option>
+            {uniqueQuyCach.map((q) => <option key={q} value={q}>{q}</option>)}
+          </select>
+          <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary" />
+          <span className="text-muted-foreground text-sm">—</span>
+          <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary" />
+          <button
+            onClick={() => { setSearch(""); setQuyCachFilter(""); setDateFrom(""); setDateTo(""); }}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium border border-border rounded-lg hover:bg-muted/50 transition-colors"
+          >
+            <Filter className="w-3.5 h-3.5" /> Lọc
           </button>
         </div>
 

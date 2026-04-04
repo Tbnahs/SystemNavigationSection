@@ -4,7 +4,7 @@ import AppLayout from "@/components/AppLayout";
 import {
   ArrowLeft, Search, Plus, Filter, Download,
   ChevronUp, ChevronDown, Factory, Package,
-  Leaf, FlaskConical, X,
+  Leaf, FlaskConical, X, FileSpreadsheet, FileText, Printer,
 } from "lucide-react";
 
 const productColor: Record<string, string> = {
@@ -56,13 +56,15 @@ export default function ProductionPage() {
   const [, setLocation] = useLocation();
   const [search, setSearch] = useState("");
   const [productFilter, setProductFilter] = useState("");
-  const [dateFilter, setDateFilter] = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [sortKey, setSortKey] = useState("stt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
   const [showCreate, setShowCreate] = useState(false);
 
-  const uniqueDates = useMemo(() => [...new Set(sanXuatData.map((r) => r.thoiGian))].sort(), []);
   const uniqueProducts = useMemo(() => [...new Set(sanXuatData.map((r) => r.thanhPham))], []);
+
+  const parseDateVN = (s: string) => { const [d, m, y] = s.split("/"); return `${y}-${m}-${d}`; };
 
   const filtered = useMemo(() => {
     let data = sanXuatData;
@@ -75,14 +77,15 @@ export default function ProductionPage() {
       );
     }
     if (productFilter) data = data.filter((r) => r.thanhPham === productFilter);
-    if (dateFilter) data = data.filter((r) => r.thoiGian === dateFilter);
+    if (dateFrom) data = data.filter((r) => parseDateVN(r.thoiGian) >= dateFrom);
+    if (dateTo) data = data.filter((r) => parseDateVN(r.thoiGian) <= dateTo);
     return [...data].sort((a, b) => {
       const av = (a as Record<string, unknown>)[sortKey];
       const bv = (b as Record<string, unknown>)[sortKey];
       if (typeof av === "number" && typeof bv === "number") return sortDir === "asc" ? av - bv : bv - av;
       return sortDir === "asc" ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
     });
-  }, [search, productFilter, dateFilter, sortKey, sortDir]);
+  }, [search, productFilter, dateFrom, dateTo, sortKey, sortDir]);
 
   const handleSort = (key: string) => {
     if (sortKey === key) setSortDir((d) => d === "asc" ? "desc" : "asc");
@@ -114,12 +117,20 @@ export default function ProductionPage() {
             <h1 className="text-xl font-bold text-foreground">Quản lý Sản xuất</h1>
             <p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · Mẻ chế biến & Lô sản xuất</p>
           </div>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            <Plus className="w-4 h-4" /> Thêm phiếu
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors">
+              <FileSpreadsheet className="w-3.5 h-3.5" /> Excel
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors">
+              <FileText className="w-3.5 h-3.5" /> PDF
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+              <Printer className="w-3.5 h-3.5" /> In
+            </button>
+            <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap">
+              <Plus className="w-4 h-4" /> Thêm phiếu
+            </button>
+          </div>
         </div>
       </div>
 
@@ -148,7 +159,7 @@ export default function ProductionPage() {
       <div className="bg-white border border-border rounded-xl overflow-hidden">
         {/* Toolbar */}
         <div className="flex items-center gap-2 p-4 border-b border-border flex-wrap">
-          <div className="relative flex-1 min-w-40">
+          <div className="relative flex-1 min-w-48">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <input
               value={search}
@@ -157,30 +168,22 @@ export default function ProductionPage() {
               className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <select
-              value={productFilter}
-              onChange={(e) => setProductFilter(e.target.value)}
-              className="pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"
-            >
-              <option value="">Tất cả thành phẩm</option>
-              {uniqueProducts.map((p) => <option key={p} value={p}>{p}</option>)}
-            </select>
-          </div>
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <select
-              value={dateFilter}
-              onChange={(e) => setDateFilter(e.target.value)}
-              className="pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"
-            >
-              <option value="">Tất cả ngày</option>
-              {uniqueDates.map((d) => <option key={d} value={d}>{d}</option>)}
-            </select>
-          </div>
-          <button className="flex items-center gap-1.5 px-3 py-2 text-sm border border-border rounded-lg hover:bg-muted/50 transition-colors">
-            <Download className="w-3.5 h-3.5" /> Xuất
+          <select
+            value={productFilter}
+            onChange={(e) => setProductFilter(e.target.value)}
+            className="px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary"
+          >
+            <option value="">Tất cả</option>
+            {uniqueProducts.map((p) => <option key={p} value={p}>{p}</option>)}
+          </select>
+          <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary" />
+          <span className="text-muted-foreground text-sm">—</span>
+          <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary" />
+          <button
+            onClick={() => { setSearch(""); setProductFilter(""); setDateFrom(""); setDateTo(""); }}
+            className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium border border-border rounded-lg hover:bg-muted/50 transition-colors"
+          >
+            <Filter className="w-3.5 h-3.5" /> Lọc
           </button>
         </div>
 

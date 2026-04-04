@@ -2,9 +2,9 @@ import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import AppLayout from "@/components/AppLayout";
 import {
-  ArrowLeft, Search, Plus, Download,
+  ArrowLeft, Search, Plus, Download, Filter,
   ChevronUp, ChevronDown, Users, MapPin,
-  Phone, Leaf, X,
+  Phone, Leaf, X, FileSpreadsheet, FileText, Printer,
 } from "lucide-react";
 
 const dsHoLKData = [
@@ -94,9 +94,17 @@ export default function FarmersPage() {
             <h1 className="text-xl font-bold text-foreground">Danh sách Hộ liên kết</h1>
             <p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · Nông hộ thu mua chè Shan Tuyết Bằng Phúc</p>
           </div>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
-            <Download className="w-4 h-4" /> Xuất Excel
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors">
+              <FileSpreadsheet className="w-3.5 h-3.5" /> Excel
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors">
+              <FileText className="w-3.5 h-3.5" /> PDF
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+              <Printer className="w-3.5 h-3.5" /> In
+            </button>
+          </div>
         </div>
       </div>
 
@@ -124,19 +132,16 @@ export default function FarmersPage() {
       {/* Table */}
       <div className="bg-white border border-border rounded-xl overflow-hidden">
         <div className="flex items-center gap-2 p-4 border-b border-border flex-wrap">
-          <div className="relative flex-1 min-w-40">
+          <div className="relative flex-1 min-w-48">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tìm tên, mã hộ, SĐT..." className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
           </div>
-          <div className="relative">
-            <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <select value={zoneFilter} onChange={(e) => setZoneFilter(e.target.value)} className="pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
-              <option value="">Tất cả địa bàn</option>
-              {uniqueZones.map((z) => <option key={z} value={z}>{z}</option>)}
-            </select>
-          </div>
-          <button className="flex items-center gap-1.5 px-3 py-2 text-sm border border-border rounded-lg hover:bg-muted/50">
-            <Download className="w-3.5 h-3.5" /> Xuất
+          <select value={zoneFilter} onChange={(e) => setZoneFilter(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="">Tất cả</option>
+            {uniqueZones.map((z) => <option key={z} value={z}>{z}</option>)}
+          </select>
+          <button onClick={() => { setSearch(""); setZoneFilter(""); }} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium border border-border rounded-lg hover:bg-muted/50 transition-colors">
+            <Filter className="w-3.5 h-3.5" /> Lọc
           </button>
         </div>
 

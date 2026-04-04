@@ -6,7 +6,7 @@ import {
   ChevronDown, ChevronUp, Eye, MoreHorizontal,
   CheckCircle2, Clock, Truck, XCircle, FileText,
   TrendingUp, ShoppingBag, Users, Package,
-  X, ChevronRight, Trash2, Edit2,
+  X, ChevronRight, Trash2, Edit2, FileSpreadsheet, Printer,
 } from "lucide-react";
 
 type OrderStatus = "nhap" | "xac-nhan" | "dang-giao" | "hoan-thanh" | "huy";
@@ -115,6 +115,8 @@ export default function SalesPage() {
   const [, setLocation] = useLocation();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "">("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo] = useState("");
   const [selectedOrder, setSelectedOrder] = useState<SalesOrder | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [sortKey, setSortKey] = useState("ngayDat");
@@ -127,6 +129,8 @@ export default function SalesPage() {
     if (selectedOrder?.id === orderId) setSelectedOrder((o) => o ? { ...o, trangThai: newStatus } : o);
   };
 
+  const parseDateVN = (s: string) => { const [d, m, y] = s.split("/"); return `${y}-${m}-${d}`; };
+
   const filtered = useMemo(() => {
     let data = orders;
     if (search) {
@@ -138,13 +142,15 @@ export default function SalesPage() {
       );
     }
     if (statusFilter) data = data.filter((o) => o.trangThai === statusFilter);
+    if (dateFrom) data = data.filter((o) => parseDateVN(o.ngayDat) >= dateFrom);
+    if (dateTo) data = data.filter((o) => parseDateVN(o.ngayDat) <= dateTo);
     return [...data].sort((a, b) => {
       const av = (a as Record<string, unknown>)[sortKey];
       const bv = (b as Record<string, unknown>)[sortKey];
       if (typeof av === "number" && typeof bv === "number") return sortDir === "asc" ? av - bv : bv - av;
       return sortDir === "asc" ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
     });
-  }, [orders, search, statusFilter, sortKey, sortDir]);
+  }, [orders, search, statusFilter, dateFrom, dateTo, sortKey, sortDir]);
 
   const totalRevenue = orders.filter((o) => o.trangThai !== "huy").reduce((s, o) => s + o.tongTien, 0);
   const completedCount = orders.filter((o) => o.trangThai === "hoan-thanh").length;
@@ -171,12 +177,20 @@ export default function SalesPage() {
             <h1 className="text-xl font-bold text-foreground">Quản lý Bán hàng</h1>
             <p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · Đơn bán hàng</p>
           </div>
-          <button
-            onClick={() => setShowCreate(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors"
-          >
-            <Plus className="w-4 h-4" /> Tạo đơn hàng
-          </button>
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors">
+              <FileSpreadsheet className="w-3.5 h-3.5" /> Excel
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors">
+              <FileText className="w-3.5 h-3.5" /> PDF
+            </button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
+              <Printer className="w-3.5 h-3.5" /> In
+            </button>
+            <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap">
+              <Plus className="w-4 h-4" /> Tạo đơn hàng
+            </button>
+          </div>
         </div>
       </div>
 
@@ -204,22 +218,22 @@ export default function SalesPage() {
       {/* Table card */}
       <div className="bg-white border border-border rounded-xl overflow-hidden">
         {/* Toolbar */}
-        <div className="flex items-center gap-2 p-4 border-b border-border">
-          <div className="relative flex-1">
+        <div className="flex items-center gap-2 p-4 border-b border-border flex-wrap">
+          <div className="relative flex-1 min-w-48">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
             <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tìm mã đơn, khách hàng..." className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
           </div>
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as OrderStatus | "")} className="pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
-              <option value="">Tất cả trạng thái</option>
-              {Object.entries(STATUS_CONFIG).map(([k, v]) => (
-                <option key={k} value={k}>{v.label}</option>
-              ))}
-            </select>
-          </div>
-          <button className="flex items-center gap-1.5 px-3 py-2 text-sm border border-border rounded-lg hover:bg-muted/50 transition-colors">
-            <Download className="w-3.5 h-3.5" /> Xuất
+          <select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as OrderStatus | "")} className="px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary">
+            <option value="">Tất cả</option>
+            {Object.entries(STATUS_CONFIG).map(([k, v]) => (
+              <option key={k} value={k}>{v.label}</option>
+            ))}
+          </select>
+          <input type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary" />
+          <span className="text-muted-foreground text-sm">—</span>
+          <input type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary" />
+          <button onClick={() => { setSearch(""); setStatusFilter(""); setDateFrom(""); setDateTo(""); }} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium border border-border rounded-lg hover:bg-muted/50 transition-colors">
+            <Filter className="w-3.5 h-3.5" /> Lọc
           </button>
         </div>
 
