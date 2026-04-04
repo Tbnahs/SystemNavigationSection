@@ -58,6 +58,8 @@ function fmtMoney(v: number) {
   return v.toLocaleString("vi-VN") + " đ";
 }
 
+const EMPTY_FORM = { tenKH: "", loai: "doanh-nghiep" as LoaiKH, hang: "moi" as HangKH, diaChi: "", sdt: "", email: "", ghiChu: "" };
+
 export default function CRMPage() {
   const [, setLocation] = useLocation();
   const [search, setSearch] = useState("");
@@ -66,9 +68,27 @@ export default function CRMPage() {
   const [sortKey, setSortKey] = useState("tongMua");
   const [sortDir, setSortDir] = useState<"asc"|"desc">("desc");
   const [selected, setSelected] = useState<KhachHang | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [form, setForm] = useState(EMPTY_FORM);
+  const [khachHangs, setKhachHangs] = useState<KhachHang[]>(KH_DATA);
+
+  const handleCreate = () => {
+    if (!form.tenKH.trim()) return;
+    const newId = String(khachHangs.length + 1);
+    const maKH = `KH-${String(khachHangs.length + 1).padStart(3, "0")}`;
+    const newKH: KhachHang = {
+      id: newId, maKH, tenKH: form.tenKH.trim(), loai: form.loai,
+      hang: form.hang, diaChi: form.diaChi, sdt: form.sdt,
+      email: form.email, tongMua: 0, soLanMua: 0,
+      ngayMuaCuoi: "-", ghiChu: form.ghiChu,
+    };
+    setKhachHangs(prev => [newKH, ...prev]);
+    setForm(EMPTY_FORM);
+    setShowCreate(false);
+  };
 
   const filtered = useMemo(() => {
-    let d = KH_DATA;
+    let d = khachHangs;
     if (search) {
       const q = search.toLowerCase();
       d = d.filter(k => k.maKH.toLowerCase().includes(q) || k.tenKH.toLowerCase().includes(q) || k.diaChi.toLowerCase().includes(q));
@@ -81,11 +101,11 @@ export default function CRMPage() {
       if (typeof av === "number" && typeof bv === "number") return sortDir === "asc" ? av - bv : bv - av;
       return sortDir === "asc" ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
     });
-  }, [search, loaiFilter, hangFilter, sortKey, sortDir]);
+  }, [khachHangs, search, loaiFilter, hangFilter, sortKey, sortDir]);
 
-  const totalRevenue = KH_DATA.reduce((s, k) => s + k.tongMua, 0);
-  const vangCount = KH_DATA.filter(k => k.hang === "vang").length;
-  const newCount  = KH_DATA.filter(k => k.hang === "moi").length;
+  const totalRevenue = khachHangs.reduce((s, k) => s + k.tongMua, 0);
+  const vangCount = khachHangs.filter(k => k.hang === "vang").length;
+  const newCount  = khachHangs.filter(k => k.hang === "moi").length;
 
   const SortIcon = ({ col }: { col: string }) =>
     sortKey !== col ? <ChevronUp className="w-3 h-3 opacity-30" /> :
@@ -116,7 +136,7 @@ export default function CRMPage() {
             <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
               <Printer className="w-3.5 h-3.5" /> In
             </button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+            <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
               <Plus className="w-4 h-4" /> Thêm khách hàng
             </button>
           </div>
@@ -125,7 +145,7 @@ export default function CRMPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
         {[
-          { icon: Users,     label: "Tổng khách hàng", value: `${KH_DATA.length} KH`,       sub: "đang quản lý",     color: "text-blue-600 bg-blue-50" },
+          { icon: Users,     label: "Tổng khách hàng", value: `${khachHangs.length} KH`,       sub: "đang quản lý",     color: "text-blue-600 bg-blue-50" },
           { icon: TrendingUp, label: "Doanh thu KH",   value: fmtMoney(totalRevenue),        sub: "tích lũy",         color: "text-emerald-600 bg-emerald-50" },
           { icon: Star,       label: "Hạng Vàng",      value: `${vangCount} KH`,             sub: "khách trung thành",color: "text-yellow-600 bg-yellow-50" },
           { icon: Users,      label: "Khách hàng mới", value: `${newCount} KH`,              sub: "đang tiếp cận",    color: "text-violet-600 bg-violet-50" },
@@ -214,9 +234,67 @@ export default function CRMPage() {
           {filtered.length === 0 && <div className="text-center py-12 text-muted-foreground text-sm">Không tìm thấy khách hàng nào</div>}
         </div>
         <div className="px-4 py-2 border-t border-border">
-          <p className="text-xs text-muted-foreground">Hiển thị {filtered.length} / {KH_DATA.length} khách hàng</p>
+          <p className="text-xs text-muted-foreground">Hiển thị {filtered.length} / {khachHangs.length} khách hàng</p>
         </div>
       </div>
+
+      {showCreate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setShowCreate(false); setForm(EMPTY_FORM); }} />
+          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-lg flex flex-col">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+              <h2 className="text-base font-semibold text-foreground">Thêm khách hàng mới</h2>
+              <button onClick={() => { setShowCreate(false); setForm(EMPTY_FORM); }} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/60">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="px-6 py-5 space-y-4 overflow-y-auto max-h-[70vh]">
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Tên khách hàng <span className="text-red-500">*</span></label>
+                <input value={form.tenKH} onChange={e => setForm(f => ({ ...f, tenKH: e.target.value }))} placeholder="Nhập tên khách hàng hoặc công ty..." className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/40" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1.5">Loại khách hàng</label>
+                  <select value={form.loai} onChange={e => setForm(f => ({ ...f, loai: e.target.value as LoaiKH }))} className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/40">
+                    {Object.entries(LOAI_CFG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1.5">Hạng khách hàng</label>
+                  <select value={form.hang} onChange={e => setForm(f => ({ ...f, hang: e.target.value as HangKH }))} className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/40">
+                    {Object.entries(HANG_CFG).map(([k, v]) => <option key={k} value={k}>{v.label}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Địa chỉ</label>
+                <input value={form.diaChi} onChange={e => setForm(f => ({ ...f, diaChi: e.target.value }))} placeholder="Tỉnh / Thành phố..." className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/40" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1.5">Số điện thoại</label>
+                  <input value={form.sdt} onChange={e => setForm(f => ({ ...f, sdt: e.target.value }))} placeholder="0xxx xxx xxx" className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/40" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1.5">Email</label>
+                  <input value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} placeholder="email@example.com" className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/40" />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-muted-foreground mb-1.5">Ghi chú</label>
+                <textarea value={form.ghiChu} onChange={e => setForm(f => ({ ...f, ghiChu: e.target.value }))} rows={3} placeholder="Thông tin bổ sung, yêu cầu đặc biệt..." className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none" />
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border">
+              <button onClick={() => { setShowCreate(false); setForm(EMPTY_FORM); }} className="px-4 py-2 text-sm font-medium border border-border rounded-lg hover:bg-muted/50 transition-colors">Huỷ</button>
+              <button onClick={handleCreate} disabled={!form.tenKH.trim()} className="px-5 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                Lưu khách hàng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {selected && (
         <div className="fixed inset-0 z-50 flex justify-end">
