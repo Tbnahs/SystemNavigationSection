@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
+import * as XLSX from "xlsx";
 import AppLayout from "@/components/AppLayout";
 import {
   ArrowLeft,
@@ -15,6 +16,10 @@ import {
   TrendingUp,
   Calendar,
   Filter,
+  X,
+  FileSpreadsheet,
+  CheckSquare,
+  Square,
 } from "lucide-react";
 
 const TABS = [
@@ -208,6 +213,102 @@ export default function PurchasePage() {
   const [sortKey, setSortKey] = useState<SortKey>("stt");
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [dateFilter, setDateFilter] = useState("");
+  const [showExportModal, setShowExportModal] = useState(false);
+  const [selectedSheets, setSelectedSheets] = useState<Set<string>>(
+    new Set(["thu-mua", "san-xuat", "dong-goi", "ds-ho-lk", "quy-cach"])
+  );
+
+  const toggleSheet = (id: string) => {
+    setSelectedSheets((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleExport = () => {
+    const wb = XLSX.utils.book_new();
+
+    if (selectedSheets.has("thu-mua")) {
+      const rows = thuMuaData.map((r) => ({
+        STT: r.stt,
+        "Mã hộ": r.maHo,
+        "Tên hộ": r.tenHo,
+        "Địa chỉ": r.diaChi,
+        "Thời gian": r.thoiGian,
+        "Quy cách": r.quyCach,
+        "Khối lượng (kg)": r.khoiLuong,
+        "Đơn giá (đ)": r.donGia,
+        "Thành tiền (đ)": r.thanhTien,
+        "Mã mẻ": r.maME,
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      ws["!cols"] = [8, 10, 20, 12, 14, 14, 14, 14, 16, 14].map((w) => ({ wch: w }));
+      XLSX.utils.book_append_sheet(wb, ws, "Thu mua");
+    }
+
+    if (selectedSheets.has("san-xuat")) {
+      const rows = sanXuatData.map((r) => ({
+        STT: r.stt,
+        "Mã mẻ": r.maME,
+        "Người thực hiện": r.nguoiThucHien,
+        "Thời gian": r.thoiGian,
+        "Địa điểm": r.diaDiem,
+        "Thành phẩm": r.thanhPham,
+        "Mã lô SX": r.maLoSX,
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      XLSX.utils.book_append_sheet(wb, ws, "San xuat");
+    }
+
+    if (selectedSheets.has("dong-goi")) {
+      const rows = dongGoiData.map((r) => ({
+        STT: r.stt,
+        "Mã lô SX": r.maLoSX,
+        "Người thực hiện": r.nguoiThucHien,
+        "Thời gian": r.thoiGian,
+        "Địa điểm": r.diaDiem,
+        "Thành phẩm": r.thanhPham,
+        "Mã đóng gói": r.maDongGoi,
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      XLSX.utils.book_append_sheet(wb, ws, "Dong goi");
+    }
+
+    if (selectedSheets.has("ds-ho-lk")) {
+      const rows = dsHoLKData.map((r) => ({
+        STT: r.stt,
+        "Họ và tên": r.hoDan,
+        "Mã hộ": r.maHo,
+        "Địa chỉ": r.diaChi,
+        "Số điện thoại": r.sdt,
+        "Diện tích (ha)": r.dienTich,
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows);
+      XLSX.utils.book_append_sheet(wb, ws, "DS ho LK");
+    }
+
+    if (selectedSheets.has("quy-cach")) {
+      const rows1 = quyCachData.map((r) => ({
+        STT: r.stt,
+        "Quy cách": r.quyCach,
+        "Đơn giá": r.donGia,
+        "Loại chè": r.loaiChe,
+      }));
+      const ws = XLSX.utils.json_to_sheet(rows1);
+      XLSX.utils.sheet_add_aoa(ws, [[]], { origin: -1 });
+      XLSX.utils.sheet_add_aoa(ws, [["STT", "Đánh giá %", "Đơn giá", "Ghi chú"]], { origin: -1 });
+      tichLuongData.forEach((r) => {
+        XLSX.utils.sheet_add_aoa(ws, [[r.stt, r.danhGia, r.donGia, ""]], { origin: -1 });
+      });
+      XLSX.utils.book_append_sheet(wb, ws, "Quy cach");
+    }
+
+    const date = new Date().toLocaleDateString("vi-VN").replace(/\//g, "-");
+    XLSX.writeFile(wb, `HTX_HongHa_ThuMua_${date}.xlsx`);
+    setShowExportModal(false);
+  };
 
   const totalKhoiLuong = thuMuaData.reduce((s, r) => s + r.khoiLuong, 0);
   const totalThanhTien = thuMuaData.reduce((s, r) => s + r.thanhTien, 0);
@@ -306,7 +407,10 @@ export default function PurchasePage() {
               HTX Hồng Hà · Chè Shan Tuyết Bằng Phúc
             </p>
           </div>
-          <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-lg hover:bg-muted/50 transition-colors">
+          <button
+            onClick={() => setShowExportModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-lg hover:bg-muted/50 transition-colors"
+          >
             <Download className="w-3.5 h-3.5" />
             Xuất Excel
           </button>
@@ -670,6 +774,100 @@ export default function PurchasePage() {
           )}
         </div>
       </div>
+      {/* Export Modal */}
+      {showExportModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            onClick={() => setShowExportModal(false)}
+          />
+          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-sm mx-4 overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+              <div className="flex items-center gap-2">
+                <FileSpreadsheet className="w-4 h-4 text-emerald-600" />
+                <span className="font-semibold text-sm text-foreground">Xuất file Excel</span>
+              </div>
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60 transition-colors"
+              >
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            </div>
+
+            <div className="px-5 py-4">
+              <p className="text-xs text-muted-foreground mb-4">
+                Chọn các sheet muốn xuất vào file Excel. Mỗi sheet sẽ là một trang riêng.
+              </p>
+
+              <div className="space-y-2">
+                {[
+                  { id: "thu-mua", label: "Thu mua", count: `${thuMuaData.length} bản ghi` },
+                  { id: "san-xuat", label: "Sản xuất", count: `${sanXuatData.length} bản ghi` },
+                  { id: "dong-goi", label: "Đóng gói", count: `${dongGoiData.length} lô` },
+                  { id: "ds-ho-lk", label: "DS hộ LK", count: `${dsHoLKData.length} hộ` },
+                  { id: "quy-cach", label: "Quy cách", count: "bảng giá" },
+                ].map((sheet) => {
+                  const checked = selectedSheets.has(sheet.id);
+                  return (
+                    <button
+                      key={sheet.id}
+                      onClick={() => toggleSheet(sheet.id)}
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg border transition-all text-left ${
+                        checked
+                          ? "border-primary/40 bg-primary/5"
+                          : "border-border hover:bg-muted/40"
+                      }`}
+                    >
+                      {checked ? (
+                        <CheckSquare className="w-4 h-4 text-primary shrink-0" />
+                      ) : (
+                        <Square className="w-4 h-4 text-muted-foreground shrink-0" />
+                      )}
+                      <span className={`text-sm font-medium flex-1 ${checked ? "text-foreground" : "text-muted-foreground"}`}>
+                        {sheet.label}
+                      </span>
+                      <span className="text-xs text-muted-foreground">{sheet.count}</span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border">
+                <button
+                  onClick={() => {
+                    const all = new Set(["thu-mua", "san-xuat", "dong-goi", "ds-ho-lk", "quy-cach"]);
+                    setSelectedSheets(selectedSheets.size === 5 ? new Set() : all);
+                  }}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {selectedSheets.size === 5 ? "Bỏ chọn tất cả" : "Chọn tất cả"}
+                </button>
+                <span className="text-xs text-muted-foreground ml-auto">
+                  {selectedSheets.size} sheet được chọn
+                </span>
+              </div>
+            </div>
+
+            <div className="px-5 pb-5 flex gap-2">
+              <button
+                onClick={() => setShowExportModal(false)}
+                className="flex-1 px-4 py-2 text-sm border border-border rounded-lg hover:bg-muted/50 transition-colors"
+              >
+                Hủy
+              </button>
+              <button
+                onClick={handleExport}
+                disabled={selectedSheets.size === 0}
+                className="flex-1 px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-1.5"
+              >
+                <Download className="w-3.5 h-3.5" />
+                Tải xuống
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 }
