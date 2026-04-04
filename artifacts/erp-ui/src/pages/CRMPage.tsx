@@ -4,7 +4,7 @@ import AppLayout from "@/components/AppLayout";
 import {
   ArrowLeft, Search, Filter, Plus, FileText, FileSpreadsheet, Printer,
   ChevronDown, ChevronUp, Users, Star, TrendingUp, MapPin,
-  Phone, Mail, X, Building2, User,
+  Phone, Mail, X, Building2, User, Eye, Edit2, Trash2,
 } from "lucide-react";
 
 type LoaiKH = "doanh-nghiep" | "ca-nhan" | "hop-tac-xa";
@@ -71,6 +71,12 @@ export default function CRMPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [form, setForm] = useState(EMPTY_FORM);
   const [khachHangs, setKhachHangs] = useState<KhachHang[]>(KH_DATA);
+
+  const handleDelete = (id: string) => {
+    if (!window.confirm("Xóa khách hàng này?")) return;
+    setKhachHangs(prev => prev.filter(k => k.id !== id));
+    setSelected(null);
+  };
 
   const handleCreate = () => {
     if (!form.tenKH.trim()) return;
@@ -199,6 +205,7 @@ export default function CRMPage() {
                   </th>
                 ))}
                 <th className="py-2.5 px-4 text-center font-semibold text-xs text-muted-foreground uppercase tracking-wide">Hạng</th>
+                <th className="py-2.5 px-4 text-right font-semibold text-xs text-muted-foreground uppercase tracking-wide">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -225,6 +232,13 @@ export default function CRMPage() {
                       <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${hc.color}`}>
                         {hc.star > 0 && <Star className="w-3 h-3 fill-current" />} {hc.label}
                       </span>
+                    </td>
+                    <td className="py-3 px-4" onClick={e => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-0.5">
+                        <button onClick={() => setSelected(k)} title="Xem" className="p-1.5 rounded-md hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => setSelected(k)} title="Sửa" className="p-1.5 rounded-md hover:bg-blue-50 text-muted-foreground hover:text-blue-600 transition-colors"><Edit2 className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => handleDelete(k.id)} title="Xóa" className="p-1.5 rounded-md hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                      </div>
                     </td>
                   </tr>
                 );

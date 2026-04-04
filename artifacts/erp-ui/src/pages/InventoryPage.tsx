@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import AppLayout from "@/components/AppLayout";
 import {
-  ArrowLeft, Search, Filter, Plus, X,
+  ArrowLeft, Search, Filter, Plus, X, Trash2,
   ChevronDown, ChevronUp, FileText, FileSpreadsheet, Printer,
   Package, TrendingDown, TrendingUp, AlertTriangle, Edit2, Eye,
 } from "lucide-react";
@@ -83,6 +83,12 @@ export default function InventoryPage() {
     }));
     setNhapForm(EMPTY_NHAP);
     setShowNhap(false);
+  };
+
+  const handleDelete = (id: string) => {
+    if (!window.confirm("Xóa mặt hàng này khỏi danh sách?")) return;
+    setStockList(prev => prev.filter(i => i.id !== id));
+    setSelected(null);
   };
 
   const filtered = useMemo(() => {
@@ -195,6 +201,7 @@ export default function InventoryPage() {
                   </th>
                 ))}
                 <th className="py-2.5 px-4 text-right font-semibold text-xs text-muted-foreground uppercase tracking-wide">Trạng thái</th>
+                <th className="py-2.5 px-4 text-right font-semibold text-xs text-muted-foreground uppercase tracking-wide">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -216,6 +223,13 @@ export default function InventoryPage() {
                     <td className="py-3 px-4 text-right text-sm font-semibold text-foreground">{fmtMoney(giaTriTon)} đ</td>
                     <td className="py-3 px-4 text-right">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${sc.color}`}>{sc.label}</span>
+                    </td>
+                    <td className="py-3 px-4" onClick={e => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-0.5">
+                        <button onClick={() => setSelected(item)} title="Xem" className="p-1.5 rounded-md hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => setSelected(item)} title="Sửa" className="p-1.5 rounded-md hover:bg-blue-50 text-muted-foreground hover:text-blue-600 transition-colors"><Edit2 className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => handleDelete(item.id)} title="Xóa" className="p-1.5 rounded-md hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                      </div>
                     </td>
                   </tr>
                 );

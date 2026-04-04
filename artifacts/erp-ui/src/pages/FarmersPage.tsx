@@ -4,7 +4,7 @@ import AppLayout from "@/components/AppLayout";
 import {
   ArrowLeft, Search, Plus, Download, Filter,
   ChevronUp, ChevronDown, Users, MapPin,
-  Phone, Leaf, X, FileSpreadsheet, FileText, Printer,
+  Phone, Leaf, X, FileSpreadsheet, FileText, Printer, Eye, Edit2, Trash2,
 } from "lucide-react";
 
 const dsHoLKData = [
@@ -42,17 +42,27 @@ const zoneColor: Record<string, string> = {
   "Bản Chang": "bg-orange-100 text-orange-700",
 };
 
+type HoDan = typeof dsHoLKData[0];
+
 export default function FarmersPage() {
   const [, setLocation] = useLocation();
   const [search, setSearch] = useState("");
   const [zoneFilter, setZoneFilter] = useState("");
   const [sortKey, setSortKey] = useState("stt");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [farmers, setFarmers] = useState<HoDan[]>(dsHoLKData);
+  const [selected, setSelected] = useState<HoDan | null>(null);
 
-  const uniqueZones = useMemo(() => [...new Set(dsHoLKData.map((r) => r.diaChi))], []);
+  const handleDelete = (maHo: string) => {
+    if (!window.confirm("Xóa hộ liên kết này?")) return;
+    setFarmers(prev => prev.filter(r => r.maHo !== maHo));
+    setSelected(null);
+  };
+
+  const uniqueZones = useMemo(() => [...new Set(farmers.map((r) => r.diaChi))], [farmers]);
 
   const filtered = useMemo(() => {
-    let data = dsHoLKData;
+    let data = farmers;
     if (search) {
       const q = search.toLowerCase();
       data = data.filter((r) =>
@@ -68,7 +78,7 @@ export default function FarmersPage() {
       if (typeof av === "number" && typeof bv === "number") return sortDir === "asc" ? av - bv : bv - av;
       return sortDir === "asc" ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
     });
-  }, [search, zoneFilter, sortKey, sortDir]);
+  }, [farmers, search, zoneFilter, sortKey, sortDir]);
 
   const handleSort = (key: string) => {
     if (sortKey === key) setSortDir((d) => d === "asc" ? "desc" : "asc");
@@ -78,10 +88,10 @@ export default function FarmersPage() {
     sortKey !== col ? <ChevronUp className="w-3 h-3 opacity-30" /> :
     sortDir === "asc" ? <ChevronUp className="w-3 h-3 text-primary" /> : <ChevronDown className="w-3 h-3 text-primary" />;
 
-  const totalDienTich = dsHoLKData.reduce((s, r) => s + r.dienTich, 0);
-  const naHongCount = dsHoLKData.filter((r) => r.diaChi === "Nà Hồng").length;
-  const naBayCount = dsHoLKData.filter((r) => r.diaChi === "Nà Bay").length;
-  const banChangCount = dsHoLKData.filter((r) => r.diaChi === "Bản Chang").length;
+  const totalDienTich = farmers.reduce((s, r) => s + r.dienTich, 0);
+  const naHongCount = farmers.filter((r) => r.diaChi === "Nà Hồng").length;
+  const naBayCount = farmers.filter((r) => r.diaChi === "Nà Bay").length;
+  const banChangCount = farmers.filter((r) => r.diaChi === "Bản Chang").length;
 
   return (
     <AppLayout>
@@ -114,7 +124,7 @@ export default function FarmersPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
         {[
-          { icon: Users,  label: "Tổng nông hộ",  value: `${dsHoLKData.length} hộ`, sub: "liên kết HTX",         color: "text-violet-600 bg-violet-50" },
+          { icon: Users,  label: "Tổng nông hộ",  value: `${farmers.length} hộ`, sub: "liên kết HTX",         color: "text-violet-600 bg-violet-50" },
           { icon: Leaf,   label: "Tổng diện tích", value: `${totalDienTich.toFixed(1)} ha`, sub: "đất chè Shan Tuyết", color: "text-emerald-600 bg-emerald-50" },
           { icon: MapPin, label: "Nà Hồng",        value: `${naHongCount} hộ`,        sub: `+ ${naBayCount} Nà Bay`,  color: "text-blue-600 bg-blue-50" },
           { icon: MapPin, label: "Bản Chang",      value: `${banChangCount} hộ`,       sub: "hộ liên kết",          color: "text-orange-600 bg-orange-50" },
@@ -164,11 +174,12 @@ export default function FarmersPage() {
                     <span className="flex items-center gap-1">{col.label} <SortIcon col={col.key} /></span>
                   </th>
                 ))}
+                <th className="py-2.5 px-3 text-right font-semibold text-xs text-muted-foreground uppercase tracking-wide">Thao tác</th>
               </tr>
             </thead>
             <tbody>
               {filtered.map((row, i) => (
-                <tr key={i} className="border-b border-border/60 hover:bg-muted/20 transition-colors">
+                <tr key={i} className="border-b border-border/60 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => setSelected(row)}>
                   <td className="py-2.5 px-3 text-muted-foreground text-xs">{row.stt}</td>
                   <td className="py-2.5 px-3 font-medium">{row.hoDan}</td>
                   <td className="py-2.5 px-3 font-mono text-xs font-semibold text-primary">{row.maHo}</td>
@@ -187,6 +198,13 @@ export default function FarmersPage() {
                       ? <span className="font-semibold">{row.dienTich.toFixed(1)} ha</span>
                       : <span className="text-muted-foreground">—</span>}
                   </td>
+                  <td className="py-2.5 px-3" onClick={e => e.stopPropagation()}>
+                    <div className="flex items-center justify-end gap-0.5">
+                      <button onClick={() => setSelected(row)} title="Xem" className="p-1.5 rounded-md hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => setSelected(row)} title="Sửa" className="p-1.5 rounded-md hover:bg-blue-50 text-muted-foreground hover:text-blue-600 transition-colors"><Edit2 className="w-3.5 h-3.5" /></button>
+                      <button onClick={() => handleDelete(row.maHo)} title="Xóa" className="p-1.5 rounded-md hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -196,11 +214,49 @@ export default function FarmersPage() {
                 <td className="py-2.5 px-3 text-right font-bold">
                   {filtered.reduce((s, r) => s + r.dienTich, 0).toFixed(1)} ha
                 </td>
+                <td />
               </tr>
             </tfoot>
           </table>
         </div>
       </div>
+      {selected && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setSelected(null)} />
+          <div className="relative bg-white w-full max-w-sm h-full overflow-y-auto shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border sticky top-0 bg-white z-10">
+              <div>
+                <p className="font-semibold text-foreground">{selected.hoDan}</p>
+                <p className="text-xs text-muted-foreground font-mono mt-0.5">{selected.maHo}</p>
+              </div>
+              <button onClick={() => setSelected(null)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/60">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex-1 px-5 py-4 space-y-4">
+              <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold ${zoneColor[selected.diaChi] ?? "bg-gray-100 text-gray-600"}`}>{selected.diaChi}</span>
+              <div className="space-y-2">
+                {[
+                  { icon: Phone, label: "Số điện thoại", value: selected.sdt || "—" },
+                  { icon: MapPin, label: "Địa chỉ / Vùng", value: selected.diaChi },
+                ].map((r, i) => (
+                  <div key={i} className="flex items-start gap-3 p-3 bg-muted/30 rounded-xl">
+                    <r.icon className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" strokeWidth={1.5} />
+                    <div>
+                      <p className="text-xs text-muted-foreground">{r.label}</p>
+                      <p className="text-sm font-medium">{r.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
+                <p className="text-xs text-emerald-700 font-semibold">Diện tích canh tác</p>
+                <p className="text-2xl font-bold text-emerald-700 mt-1">{selected.dienTich > 0 ? selected.dienTich.toFixed(1) + " ha" : "—"}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </AppLayout>
   );
 }

@@ -4,7 +4,7 @@ import AppLayout from "@/components/AppLayout";
 import {
   ArrowLeft, Search, Filter, Plus, FileText, FileSpreadsheet, Printer,
   ChevronDown, ChevronUp, Users, UserCheck, UserX, Clock,
-  Phone, Mail, MapPin, X,
+  Phone, Mail, MapPin, X, Eye, Edit2, Trash2,
 } from "lucide-react";
 
 type TrangThaiNV = "dang-lam" | "nghi-phep" | "nghi-viec";
@@ -59,9 +59,16 @@ export default function HRPage() {
   const [sortKey, setSortKey] = useState("maNV");
   const [sortDir, setSortDir] = useState<"asc"|"desc">("asc");
   const [selected, setSelected] = useState<NhanVien | null>(null);
+  const [nhanVienList, setNhanVienList] = useState<NhanVien[]>(NHAN_VIEN);
+
+  const handleDelete = (id: string) => {
+    if (!window.confirm("Xóa nhân viên này?")) return;
+    setNhanVienList(prev => prev.filter(nv => nv.id !== id));
+    setSelected(null);
+  };
 
   const filtered = useMemo(() => {
-    let d = NHAN_VIEN;
+    let d = nhanVienList;
     if (search) {
       const q = search.toLowerCase();
       d = d.filter(nv => nv.maNV.toLowerCase().includes(q) || nv.hoTen.toLowerCase().includes(q) || nv.chucVu.toLowerCase().includes(q));
@@ -73,11 +80,11 @@ export default function HRPage() {
       if (typeof av === "number" && typeof bv === "number") return sortDir === "asc" ? av - bv : bv - av;
       return sortDir === "asc" ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
     });
-  }, [search, phongBanFilter, sortKey, sortDir]);
+  }, [nhanVienList, search, phongBanFilter, sortKey, sortDir]);
 
-  const activeCount = NHAN_VIEN.filter(nv => nv.trangThai === "dang-lam").length;
-  const leaveCount  = NHAN_VIEN.filter(nv => nv.trangThai === "nghi-phep").length;
-  const totalLuong  = NHAN_VIEN.filter(nv => nv.trangThai !== "nghi-viec").reduce((s, nv) => s + nv.luong, 0);
+  const activeCount = nhanVienList.filter(nv => nv.trangThai === "dang-lam").length;
+  const leaveCount  = nhanVienList.filter(nv => nv.trangThai === "nghi-phep").length;
+  const totalLuong  = nhanVienList.filter(nv => nv.trangThai !== "nghi-viec").reduce((s, nv) => s + nv.luong, 0);
 
   const SortIcon = ({ col }: { col: string }) =>
     sortKey !== col ? <ChevronUp className="w-3 h-3 opacity-30" /> :
@@ -117,7 +124,7 @@ export default function HRPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
         {[
-          { icon: Users,     label: "Tổng nhân viên",  value: `${NHAN_VIEN.length} người`, sub: "biên chế",         color: "text-blue-600 bg-blue-50" },
+          { icon: Users,     label: "Tổng nhân viên",  value: `${nhanVienList.length} người`, sub: "biên chế",         color: "text-blue-600 bg-blue-50" },
           { icon: UserCheck, label: "Đang làm việc",   value: `${activeCount} người`,       sub: "đang hoạt động",   color: "text-emerald-600 bg-emerald-50" },
           { icon: Clock,     label: "Nghỉ phép",       value: `${leaveCount} người`,        sub: "kỳ này",           color: "text-amber-600 bg-amber-50" },
           { icon: Users,     label: "Quỹ lương T4",    value: fmtMoney(totalLuong),         sub: "ước tính",         color: "text-violet-600 bg-violet-50" },
@@ -167,6 +174,7 @@ export default function HRPage() {
                   </th>
                 ))}
                 <th className="py-2.5 px-4 text-center font-semibold text-xs text-muted-foreground uppercase tracking-wide">Trạng thái</th>
+                <th className="py-2.5 px-4 text-right font-semibold text-xs text-muted-foreground uppercase tracking-wide">Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -194,6 +202,13 @@ export default function HRPage() {
                         <Icon className="w-3 h-3" /> {sc.label}
                       </span>
                     </td>
+                    <td className="py-3 px-4" onClick={e => e.stopPropagation()}>
+                      <div className="flex items-center justify-end gap-0.5">
+                        <button onClick={() => setSelected(nv)} title="Xem" className="p-1.5 rounded-md hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => setSelected(nv)} title="Sửa" className="p-1.5 rounded-md hover:bg-blue-50 text-muted-foreground hover:text-blue-600 transition-colors"><Edit2 className="w-3.5 h-3.5" /></button>
+                        <button onClick={() => handleDelete(nv.id)} title="Xóa" className="p-1.5 rounded-md hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                      </div>
+                    </td>
                   </tr>
                 );
               })}
@@ -202,7 +217,7 @@ export default function HRPage() {
           {filtered.length === 0 && <div className="text-center py-12 text-muted-foreground text-sm">Không tìm thấy nhân viên nào</div>}
         </div>
         <div className="px-4 py-2 border-t border-border flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">Hiển thị {filtered.length} / {NHAN_VIEN.length} nhân viên</p>
+          <p className="text-xs text-muted-foreground">Hiển thị {filtered.length} / {nhanVienList.length} nhân viên</p>
         </div>
       </div>
 
