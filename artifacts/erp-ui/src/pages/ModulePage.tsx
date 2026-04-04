@@ -65,6 +65,8 @@ const moduleConfig: Record<
       { id: "hr", icon: Users, nameKey: "submodule.erp.hr", descKey: "submodule.erp.hr.desc" },
       { id: "production", icon: Factory, nameKey: "submodule.erp.production", descKey: "submodule.erp.production.desc" },
       { id: "quality", icon: CheckSquare, nameKey: "submodule.erp.quality", descKey: "submodule.erp.quality.desc" },
+      { id: "farmers", icon: Users, nameKey: "submodule.erp.farmers", descKey: "submodule.erp.farmers.desc" },
+      { id: "packaging", icon: Package, nameKey: "submodule.erp.packaging", descKey: "submodule.erp.packaging.desc" },
       { id: "crm", icon: UserCircle, nameKey: "submodule.erp.crm", descKey: "submodule.erp.crm.desc" },
       { id: "reports", icon: FileBarChart, nameKey: "submodule.erp.reports", descKey: "submodule.erp.reports.desc" },
       { id: "settings", icon: Settings, nameKey: "submodule.erp.settings", descKey: "submodule.erp.settings.desc" },
@@ -153,6 +155,10 @@ export default function ModulePage() {
                   setLocation("/module/erp/production");
                 } else if (moduleId === "erp" && sub.id === "quality") {
                   setLocation("/module/erp/quality");
+                } else if (moduleId === "erp" && sub.id === "farmers") {
+                  setLocation("/module/erp/farmers");
+                } else if (moduleId === "erp" && sub.id === "packaging") {
+                  setLocation("/module/erp/packaging");
                 } else {
                   setLocation(`/module/${moduleId}/${sub.id}`);
                 }

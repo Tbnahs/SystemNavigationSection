@@ -49,6 +49,10 @@ export type TranslationKey =
   | "submodule.erp.production.desc"
   | "submodule.erp.quality"
   | "submodule.erp.quality.desc"
+  | "submodule.erp.farmers"
+  | "submodule.erp.farmers.desc"
+  | "submodule.erp.packaging"
+  | "submodule.erp.packaging.desc"
   | "submodule.erp.crm"
   | "submodule.erp.crm.desc"
   | "submodule.erp.reports"
@@ -144,6 +148,10 @@ const vi: Translations = {
   "submodule.erp.production.desc": "Kế hoạch và sản xuất",
   "submodule.erp.quality": "Chất lượng",
   "submodule.erp.quality.desc": "Quản lý chất lượng sản phẩm",
+  "submodule.erp.farmers": "Hộ dân liên kết",
+  "submodule.erp.farmers.desc": "Danh sách hộ thu mua liên kết HTX",
+  "submodule.erp.packaging": "Đóng gói",
+  "submodule.erp.packaging.desc": "Quản lý lô đóng gói thành phẩm",
   "submodule.erp.crm": "Khách hàng",
   "submodule.erp.crm.desc": "Quan hệ khách hàng",
   "submodule.erp.reports": "Báo cáo",
@@ -270,6 +278,10 @@ const en: Translations = {
   "submodule.farming.inspection.desc": "Quality inspection",
   "submodule.erp.quality": "Quality",
   "submodule.erp.quality.desc": "Product quality management",
+  "submodule.erp.farmers": "Partner Farmers",
+  "submodule.erp.farmers.desc": "Cooperative linked farming households",
+  "submodule.erp.packaging": "Packaging",
+  "submodule.erp.packaging.desc": "Finished goods packaging lots",
   "submodule.iot.sensors": "Sensors",
   "submodule.iot.sensors.desc": "Manage IoT sensors",
   "submodule.iot.alerts": "Alerts",
@@ -366,6 +378,10 @@ const ko: Translations = {
   "submodule.farming.inspection.desc": "품질 검사",
   "submodule.erp.quality": "품질",
   "submodule.erp.quality.desc": "제품 품질 관리",
+  "submodule.erp.farmers": "계약 농가",
+  "submodule.erp.farmers.desc": "협동조합 연계 농가 목록",
+  "submodule.erp.packaging": "포장",
+  "submodule.erp.packaging.desc": "완제품 포장 로트 관리",
   "submodule.iot.sensors": "센서",
   "submodule.iot.sensors.desc": "IoT 센서 관리",
   "submodule.iot.alerts": "경고",
@@ -462,6 +478,10 @@ const ja: Translations = {
   "submodule.farming.inspection.desc": "品質検査",
   "submodule.erp.quality": "品質",
   "submodule.erp.quality.desc": "製品品質管理",
+  "submodule.erp.farmers": "契約農家",
+  "submodule.erp.farmers.desc": "協同組合連携農家リスト",
+  "submodule.erp.packaging": "梱包",
+  "submodule.erp.packaging.desc": "完成品梱包ロット管理",
   "submodule.iot.sensors": "センサー",
   "submodule.iot.sensors.desc": "IoTセンサー管理",
   "submodule.iot.alerts": "警告",
