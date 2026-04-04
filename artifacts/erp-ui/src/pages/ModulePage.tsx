@@ -159,6 +159,18 @@ export default function ModulePage() {
                   setLocation("/module/erp/farmers");
                 } else if (moduleId === "erp" && sub.id === "packaging") {
                   setLocation("/module/erp/packaging");
+                } else if (moduleId === "erp" && sub.id === "inventory") {
+                  setLocation("/module/erp/inventory");
+                } else if (moduleId === "erp" && sub.id === "accounting") {
+                  setLocation("/module/erp/accounting");
+                } else if (moduleId === "erp" && sub.id === "hr") {
+                  setLocation("/module/erp/hr");
+                } else if (moduleId === "erp" && sub.id === "crm") {
+                  setLocation("/module/erp/crm");
+                } else if (moduleId === "erp" && sub.id === "reports") {
+                  setLocation("/module/erp/reports");
+                } else if (moduleId === "erp" && sub.id === "settings") {
+                  setLocation("/module/erp/settings");
                 } else {
                   setLocation(`/module/${moduleId}/${sub.id}`);
                 }

@@ -14,6 +14,12 @@ import ProductionPage from "@/pages/ProductionPage";
 import PackagingPage from "@/pages/PackagingPage";
 import FarmersPage from "@/pages/FarmersPage";
 import QualityPage from "@/pages/QualityPage";
+import InventoryPage from "@/pages/InventoryPage";
+import AccountingPage from "@/pages/AccountingPage";
+import HRPage from "@/pages/HRPage";
+import CRMPage from "@/pages/CRMPage";
+import ReportsPage from "@/pages/ReportsPage";
+import SettingsPage from "@/pages/SettingsPage";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -57,6 +63,24 @@ function Router() {
       </Route>
       <Route path="/module/erp/quality">
         {() => <ProtectedRoute component={QualityPage} />}
+      </Route>
+      <Route path="/module/erp/inventory">
+        {() => <ProtectedRoute component={InventoryPage} />}
+      </Route>
+      <Route path="/module/erp/accounting">
+        {() => <ProtectedRoute component={AccountingPage} />}
+      </Route>
+      <Route path="/module/erp/hr">
+        {() => <ProtectedRoute component={HRPage} />}
+      </Route>
+      <Route path="/module/erp/crm">
+        {() => <ProtectedRoute component={CRMPage} />}
+      </Route>
+      <Route path="/module/erp/reports">
+        {() => <ProtectedRoute component={ReportsPage} />}
+      </Route>
+      <Route path="/module/erp/settings">
+        {() => <ProtectedRoute component={SettingsPage} />}
       </Route>
       <Route path="/module/:moduleId/:subId">
         {() => <ProtectedRoute component={SubModulePage} />}
