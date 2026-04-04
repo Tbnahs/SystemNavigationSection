@@ -144,7 +144,15 @@ export default function ModulePage() {
             <button
               key={sub.id}
               data-testid={`card-submodule-${sub.id}`}
-              onClick={() => setLocation(`/module/${moduleId}/${sub.id}`)}
+              onClick={() => {
+                if (moduleId === "erp" && sub.id === "purchase") {
+                  setLocation("/module/erp/purchase");
+                } else if (moduleId === "erp" && sub.id === "sales") {
+                  setLocation("/module/erp/sales");
+                } else {
+                  setLocation(`/module/${moduleId}/${sub.id}`);
+                }
+              }}
               className="group bg-white border border-border rounded-xl p-4 text-left hover:border-primary/40 hover:shadow-sm active:scale-[0.99] transition-all duration-150 cursor-pointer"
             >
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary/20 transition-colors">
