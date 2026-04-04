@@ -6,7 +6,7 @@ import {
   ArrowLeft, Search, Download, ChevronUp, ChevronDown,
   Users, Leaf, TrendingUp, Calendar, Filter, X,
   CheckSquare, Square, Plus, ChevronRight, MapPin, Phone,
-  FileSpreadsheet, FileText, Printer,
+  FileSpreadsheet, FileText, Printer, Trash2,
 } from "lucide-react";
 
 const thuMuaData = [
@@ -140,6 +140,8 @@ export default function PurchasePage() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
+  const [thuMuaList, setThuMuaList] = useState(thuMuaData);
+
   const [showAddForm, setShowAddForm] = useState(false);
   const [formStep, setFormStep] = useState<"chon-ho" | "nhap-chi-tiet">("chon-ho");
   const [hoSearch, setHoSearch] = useState("");
@@ -207,9 +209,9 @@ export default function PurchasePage() {
     XLSX.writeFile(wb, `HTX_HongHa_ThuMua_${date}.xlsx`);
   };
 
-  const totalKhoiLuong = thuMuaData.reduce((s, r) => s + r.khoiLuong, 0);
-  const totalThanhTien = thuMuaData.reduce((s, r) => s + r.thanhTien, 0);
-  const uniqueHo = new Set(thuMuaData.map((r) => r.maHo)).size;
+  const totalKhoiLuong = thuMuaList.reduce((s, r) => s + r.khoiLuong, 0);
+  const totalThanhTien = thuMuaList.reduce((s, r) => s + r.thanhTien, 0);
+  const uniqueHo = new Set(thuMuaList.map((r) => r.maHo)).size;
 
   const handleSort = (key: SortKey) => {
     if (sortKey === key) setSortDir((d) => d === "asc" ? "desc" : "asc");
@@ -221,13 +223,18 @@ export default function PurchasePage() {
     return sortDir === "asc" ? <ChevronUp className="w-3 h-3 text-primary" /> : <ChevronDown className="w-3 h-3 text-primary" />;
   };
 
-  const uniqueQuyCach = [...new Set(thuMuaData.map((r) => r.quyCach))];
-  const uniqueDates = [...new Set(thuMuaData.map((r) => r.thoiGian))];
+  const uniqueQuyCach = [...new Set(thuMuaList.map((r) => r.quyCach))];
+  const uniqueDates = [...new Set(thuMuaList.map((r) => r.thoiGian))];
 
   const parseDateVN = (s: string) => { const [d, m, y] = s.split("/"); return `${y}-${m}-${d}`; };
 
+  const handleDeleteThuMua = (idx: number) => {
+    if (!window.confirm("Xóa phiếu thu mua này?")) return;
+    setThuMuaList(prev => prev.filter((_, i) => i !== idx));
+  };
+
   const filteredThuMua = useMemo(() => {
-    let data = thuMuaData;
+    let data = thuMuaList;
     if (search) {
       const q = search.toLowerCase();
       data = data.filter(
@@ -247,7 +254,7 @@ export default function PurchasePage() {
       if (typeof av === "number" && typeof bv === "number") return sortDir === "asc" ? av - bv : bv - av;
       return sortDir === "asc" ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
     });
-  }, [search, sortKey, sortDir, dateFrom, dateTo]);
+  }, [thuMuaList, search, sortKey, sortDir, dateFrom, dateTo, quyCachFilter]);
 
   return (
     <AppLayout>
@@ -359,6 +366,7 @@ export default function PurchasePage() {
                     <span className="flex items-center gap-1">{col.label} <SortIcon col={col.key} /></span>
                   </th>
                 ))}
+                <th className="py-2.5 px-2 text-right font-semibold text-xs text-muted-foreground uppercase tracking-wide">Xoá</th>
               </tr>
             </thead>
             <tbody>
@@ -378,6 +386,9 @@ export default function PurchasePage() {
                   <td className="py-2.5 px-2 text-right text-muted-foreground whitespace-nowrap">{row.donGia.toLocaleString("vi-VN")} đ</td>
                   <td className="py-2.5 px-2 text-right font-semibold text-foreground whitespace-nowrap">{formatCurrency(row.thanhTien)}</td>
                   <td className="py-2.5 px-2 font-mono text-xs text-muted-foreground">{row.maME}</td>
+                  <td className="py-2.5 px-2 text-right">
+                    <button onClick={() => handleDeleteThuMua(thuMuaList.findIndex(r => r.maME === row.maME && r.maHo === row.maHo && r.thoiGian === row.thoiGian))} title="Xóa" className="p-1.5 rounded-md hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -389,13 +400,13 @@ export default function PurchasePage() {
                 <td className="py-2.5 px-2 text-right font-bold text-primary whitespace-nowrap">
                   {formatCurrency(filteredThuMua.reduce((s, r) => s + r.thanhTien, 0))}
                 </td>
-                <td />
+                <td colSpan={2} />
               </tr>
             </tfoot>
           </table>
         </div>
         <div className="px-4 py-2 border-t border-border">
-          <p className="text-xs text-muted-foreground">Hiển thị {filteredThuMua.length} / {thuMuaData.length} bản ghi</p>
+          <p className="text-xs text-muted-foreground">Hiển thị {filteredThuMua.length} / {thuMuaList.length} bản ghi</p>
         </div>
       </div>
 
@@ -567,7 +578,28 @@ export default function PurchasePage() {
                   <button onClick={() => setShowAddForm(false)} className="flex-1 px-4 py-2.5 text-sm border border-border rounded-lg hover:bg-muted/50 transition-colors">Hủy</button>
                   <button
                     disabled={!selectedVuon || !formKhoiLuong || parseFloat(formKhoiLuong) <= 0}
-                    onClick={() => { setShowAddForm(false); resetForm(); }}
+                    onClick={() => {
+                      if (!selectedHo || !formKhoiLuong || parseFloat(formKhoiLuong) <= 0) return;
+                      const kl = parseFloat(formKhoiLuong);
+                      const thanhTien = kl * donGiaTinhToan;
+                      const [y, m, d] = formDate.split("-");
+                      const tgVN = `${d}/${m}/${y}`;
+                      const maME = `${selectedHo.maHo}${d}${m}`;
+                      setThuMuaList(prev => [...prev, {
+                        stt: prev.length + 1,
+                        maHo: selectedHo.maHo,
+                        tenHo: selectedHo.hoDan,
+                        diaChi: selectedHo.diaChi,
+                        thoiGian: tgVN,
+                        quyCach: formQuyCach,
+                        khoiLuong: kl,
+                        donGia: donGiaTinhToan,
+                        thanhTien,
+                        maME,
+                      }]);
+                      setShowAddForm(false);
+                      resetForm();
+                    }}
                     className="flex-1 px-4 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     <Plus className="w-4 h-4" /> Tạo phiếu thu mua
