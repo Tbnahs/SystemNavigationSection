@@ -149,6 +149,8 @@ export default function ModulePage() {
                   setLocation("/module/erp/purchase");
                 } else if (moduleId === "erp" && sub.id === "sales") {
                   setLocation("/module/erp/sales");
+                } else if (moduleId === "erp" && sub.id === "production") {
+                  setLocation("/module/erp/production");
                 } else {
                   setLocation(`/module/${moduleId}/${sub.id}`);
                 }

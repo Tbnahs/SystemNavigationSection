@@ -10,6 +10,7 @@ import ModulePage from "@/pages/ModulePage";
 import SubModulePage from "@/pages/SubModulePage";
 import PurchasePage from "@/pages/PurchasePage";
 import SalesPage from "@/pages/SalesPage";
+import ProductionPage from "@/pages/ProductionPage";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -41,6 +42,9 @@ function Router() {
       </Route>
       <Route path="/module/erp/sales">
         {() => <ProtectedRoute component={SalesPage} />}
+      </Route>
+      <Route path="/module/erp/production">
+        {() => <ProtectedRoute component={ProductionPage} />}
       </Route>
       <Route path="/module/:moduleId/:subId">
         {() => <ProtectedRoute component={SubModulePage} />}
