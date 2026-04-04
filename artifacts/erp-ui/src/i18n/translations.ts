@@ -146,7 +146,7 @@ const vi: Translations = {
   "submodule.erp.hr.desc": "Quản lý nhân viên và lương",
   "submodule.erp.production": "Sản xuất",
   "submodule.erp.production.desc": "Kế hoạch và sản xuất",
-  "submodule.erp.quality": "Chất lượng",
+  "submodule.erp.quality": "Quy cách & Tiêu chuẩn",
   "submodule.erp.quality.desc": "Quản lý chất lượng sản phẩm",
   "submodule.erp.farmers": "Hộ dân liên kết",
   "submodule.erp.farmers.desc": "Danh sách hộ thu mua liên kết HTX",
