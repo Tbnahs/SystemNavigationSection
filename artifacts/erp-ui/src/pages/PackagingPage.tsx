@@ -1,0 +1,229 @@
+import { useState, useMemo } from "react";
+import { useLocation } from "wouter";
+import AppLayout from "@/components/AppLayout";
+import {
+  ArrowLeft, Search, Plus, Filter, Download,
+  ChevronUp, ChevronDown, Box, Package,
+  Leaf, FlaskConical, X,
+} from "lucide-react";
+
+const productColor: Record<string, string> = {
+  "Hồng trà":  "bg-rose-100 text-rose-700",
+  "Bạch trà":  "bg-sky-100 text-sky-700",
+  "Chè xanh":  "bg-emerald-100 text-emerald-700",
+};
+
+const dongGoiData = [
+  { stt: 1,  maLoSX: "L013003",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "30/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà",  maDongGoi: "S013003" },
+  { stt: 2,  maLoSX: "L023103",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà",  maDongGoi: "S023103" },
+  { stt: 3,  maLoSX: "L033103",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà",  maDongGoi: "S033103" },
+  { stt: 4,  maLoSX: "L043103",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà",  maDongGoi: "S043103" },
+  { stt: 5,  maLoSX: "L053103",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà",  maDongGoi: "S053103" },
+  { stt: 6,  maLoSX: "L063103",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà",  maDongGoi: "S063103" },
+  { stt: 7,  maLoSX: "L073103",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Bạch trà", maDongGoi: "S073103" },
+  { stt: 8,  maLoSX: "L083103",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "31/03/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Hồng trà",  maDongGoi: "S083103" },
+  { stt: 9,  maLoSX: "L09104",   nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S09104" },
+  { stt: 10, maLoSX: "L010104",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S010104" },
+  { stt: 11, maLoSX: "L011104",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S011104" },
+  { stt: 12, maLoSX: "L012104",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S012104" },
+  { stt: 13, maLoSX: "L013104",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S013104" },
+  { stt: 14, maLoSX: "L014104",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S014104" },
+  { stt: 15, maLoSX: "L015104",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S015104" },
+  { stt: 16, maLoSX: "L016104",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S016104" },
+  { stt: 17, maLoSX: "L017104",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S017104" },
+  { stt: 18, maLoSX: "L018104",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S018104" },
+  { stt: 19, maLoSX: "L019104",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S019104" },
+  { stt: 20, maLoSX: "L020104",  nguoiThucHien: "HTX Hồng Hà", thoiGian: "01/04/2026", diaDiem: "HTX Hồng Hà", thanhPham: "Chè xanh", maDongGoi: "S020104" },
+];
+
+export default function PackagingPage() {
+  const [, setLocation] = useLocation();
+  const [search, setSearch] = useState("");
+  const [productFilter, setProductFilter] = useState("");
+  const [dateFilter, setDateFilter] = useState("");
+  const [sortKey, setSortKey] = useState("stt");
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("asc");
+  const [showCreate, setShowCreate] = useState(false);
+
+  const uniqueDates = useMemo(() => [...new Set(dongGoiData.map((r) => r.thoiGian))].sort(), []);
+  const uniqueProducts = useMemo(() => [...new Set(dongGoiData.map((r) => r.thanhPham))], []);
+
+  const filtered = useMemo(() => {
+    let data = dongGoiData;
+    if (search) {
+      const q = search.toLowerCase();
+      data = data.filter((r) =>
+        r.maLoSX.toLowerCase().includes(q) ||
+        r.maDongGoi.toLowerCase().includes(q) ||
+        r.thanhPham.toLowerCase().includes(q)
+      );
+    }
+    if (productFilter) data = data.filter((r) => r.thanhPham === productFilter);
+    if (dateFilter) data = data.filter((r) => r.thoiGian === dateFilter);
+    return [...data].sort((a, b) => {
+      const av = (a as Record<string, unknown>)[sortKey];
+      const bv = (b as Record<string, unknown>)[sortKey];
+      if (typeof av === "number" && typeof bv === "number") return sortDir === "asc" ? av - bv : bv - av;
+      return sortDir === "asc" ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+    });
+  }, [search, productFilter, dateFilter, sortKey, sortDir]);
+
+  const handleSort = (key: string) => {
+    if (sortKey === key) setSortDir((d) => d === "asc" ? "desc" : "asc");
+    else { setSortKey(key); setSortDir("asc"); }
+  };
+  const SortIcon = ({ col }: { col: string }) =>
+    sortKey !== col ? <ChevronUp className="w-3 h-3 opacity-30" /> :
+    sortDir === "asc" ? <ChevronUp className="w-3 h-3 text-primary" /> : <ChevronDown className="w-3 h-3 text-primary" />;
+
+  const hongTraCount = dongGoiData.filter((r) => r.thanhPham === "Hồng trà").length;
+  const bachTraCount = dongGoiData.filter((r) => r.thanhPham === "Bạch trà").length;
+  const cheXanhCount = dongGoiData.filter((r) => r.thanhPham === "Chè xanh").length;
+
+  return (
+    <AppLayout>
+      <div className="mb-5">
+        <button onClick={() => setLocation("/module/erp")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm transition-colors mb-4">
+          <ArrowLeft className="w-4 h-4" /> Quay lại ERP
+        </button>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Quản lý Đóng gói</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · Lô đóng gói thành phẩm</p>
+          </div>
+          <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+            <Plus className="w-4 h-4" /> Thêm phiếu
+          </button>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        {[
+          { icon: Box,          label: "Tổng lô",    value: `${dongGoiData.length} lô`, sub: "đã đóng gói",     color: "text-violet-600 bg-violet-50" },
+          { icon: FlaskConical, label: "Hồng trà",   value: `${hongTraCount} lô`,       sub: "lô thành phẩm",  color: "text-rose-600 bg-rose-50" },
+          { icon: Package,      label: "Bạch trà",   value: `${bachTraCount} lô`,       sub: "lô thành phẩm",  color: "text-sky-600 bg-sky-50" },
+          { icon: Leaf,         label: "Chè xanh",   value: `${cheXanhCount} lô`,       sub: "lô thành phẩm",  color: "text-emerald-600 bg-emerald-50" },
+        ].map((s, i) => (
+          <div key={i} className="bg-white border border-border rounded-xl p-4 flex items-start gap-3">
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${s.color}`}>
+              <s.icon className="w-4 h-4" strokeWidth={1.5} />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground">{s.label}</p>
+              <p className="text-base font-bold text-foreground">{s.value}</p>
+              <p className="text-xs text-muted-foreground">{s.sub}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Table */}
+      <div className="bg-white border border-border rounded-xl overflow-hidden">
+        <div className="flex items-center gap-2 p-4 border-b border-border flex-wrap">
+          <div className="relative flex-1 min-w-40">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tìm mã lô SX, mã đóng gói..." className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
+          </div>
+          <div className="relative">
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <select value={productFilter} onChange={(e) => setProductFilter(e.target.value)} className="pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
+              <option value="">Tất cả thành phẩm</option>
+              {uniqueProducts.map((p) => <option key={p} value={p}>{p}</option>)}
+            </select>
+          </div>
+          <div className="relative">
+            <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+            <select value={dateFilter} onChange={(e) => setDateFilter(e.target.value)} className="pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
+              <option value="">Tất cả ngày</option>
+              {uniqueDates.map((d) => <option key={d} value={d}>{d}</option>)}
+            </select>
+          </div>
+          <button className="flex items-center gap-1.5 px-3 py-2 text-sm border border-border rounded-lg hover:bg-muted/50">
+            <Download className="w-3.5 h-3.5" /> Xuất
+          </button>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-border bg-muted/30">
+                {[
+                  { key: "stt", label: "STT" },
+                  { key: "maLoSX", label: "Mã lô SX" },
+                  { key: "nguoiThucHien", label: "Người thực hiện" },
+                  { key: "thoiGian", label: "Thời gian" },
+                  { key: "diaDiem", label: "Địa điểm" },
+                  { key: "thanhPham", label: "Thành phẩm" },
+                  { key: "maDongGoi", label: "Mã đóng gói" },
+                ].map((col) => (
+                  <th key={col.key} onClick={() => handleSort(col.key)} className="text-left py-2.5 px-3 font-semibold text-xs text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground select-none whitespace-nowrap">
+                    <span className="flex items-center gap-1">{col.label} <SortIcon col={col.key} /></span>
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((row, i) => (
+                <tr key={i} className="border-b border-border/60 hover:bg-muted/20 transition-colors">
+                  <td className="py-2.5 px-3 text-muted-foreground text-xs">{row.stt}</td>
+                  <td className="py-2.5 px-3 font-mono text-xs font-semibold text-primary">{row.maLoSX}</td>
+                  <td className="py-2.5 px-3">{row.nguoiThucHien}</td>
+                  <td className="py-2.5 px-3 text-muted-foreground whitespace-nowrap">{row.thoiGian}</td>
+                  <td className="py-2.5 px-3 text-muted-foreground">{row.diaDiem}</td>
+                  <td className="py-2.5 px-3">
+                    <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${productColor[row.thanhPham] ?? "bg-gray-100 text-gray-600"}`}>{row.thanhPham}</span>
+                  </td>
+                  <td className="py-2.5 px-3 font-mono text-xs text-muted-foreground">{row.maDongGoi}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          {filtered.length === 0 && <div className="text-center py-12 text-muted-foreground text-sm">Không có bản ghi nào phù hợp</div>}
+        </div>
+        <div className="px-4 py-2 border-t border-border">
+          <p className="text-xs text-muted-foreground">Hiển thị {filtered.length} / {dongGoiData.length} lô đóng gói</p>
+        </div>
+      </div>
+
+      {showCreate && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowCreate(false)} />
+          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md mx-4 overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
+              <div className="flex items-center gap-2"><Plus className="w-4 h-4 text-primary" /><span className="font-semibold text-sm">Thêm phiếu đóng gói</span></div>
+              <button onClick={() => setShowCreate(false)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4 text-muted-foreground" /></button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-xs font-semibold mb-1.5">Mã lô SX <span className="text-red-500">*</span></label>
+                <input type="text" placeholder="Ví dụ: L09104" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 font-mono" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold mb-1.5">Thời gian <span className="text-red-500">*</span></label>
+                  <input type="date" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold mb-1.5">Thành phẩm <span className="text-red-500">*</span></label>
+                  <select className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30">
+                    <option value="">Chọn loại</option>
+                    <option>Chè xanh</option><option>Hồng trà</option><option>Bạch trà</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold mb-1.5">Mã đóng gói <span className="text-red-500">*</span></label>
+                <input type="text" placeholder="Ví dụ: S09104" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 font-mono" />
+              </div>
+            </div>
+            <div className="px-5 pb-5 flex gap-2">
+              <button onClick={() => setShowCreate(false)} className="flex-1 px-4 py-2.5 border border-border rounded-lg text-sm hover:bg-muted/50">Hủy</button>
+              <button onClick={() => setShowCreate(false)} className="flex-1 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 flex items-center justify-center gap-1.5"><Plus className="w-4 h-4" /> Lưu phiếu</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </AppLayout>
+  );
+}

@@ -151,6 +151,8 @@ export default function ModulePage() {
                   setLocation("/module/erp/sales");
                 } else if (moduleId === "erp" && sub.id === "production") {
                   setLocation("/module/erp/production");
+                } else if (moduleId === "erp" && sub.id === "quality") {
+                  setLocation("/module/erp/quality");
                 } else {
                   setLocation(`/module/${moduleId}/${sub.id}`);
                 }
