@@ -104,6 +104,9 @@ export default function FarmersPage() {
             <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
               <Printer className="w-3.5 h-3.5" /> In
             </button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+              <Plus className="w-4 h-4" /> Thêm mới
+            </button>
           </div>
         </div>
       </div>
