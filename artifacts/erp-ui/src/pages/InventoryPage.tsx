@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import AppLayout from "@/components/AppLayout";
 import {
-  ArrowLeft, Search, Filter, Plus,
+  ArrowLeft, Search, Filter, Plus, X,
   ChevronDown, ChevronUp, FileText, FileSpreadsheet, Printer,
   Package, TrendingDown, TrendingUp, AlertTriangle, Edit2, Eye,
 } from "lucide-react";
@@ -52,6 +52,15 @@ function fmtMoney(v: number) {
   return v.toLocaleString("vi-VN");
 }
 
+const EMPTY_NHAP = { maSP: STOCK[0].maSP, soLuong: "", ngayNhap: new Date().toISOString().slice(0, 10), nhaCungCap: "", ghiChu: "" };
+
+function calcTrangThai(tonCuoi: number, tonDau: number): StockItem["trangThai"] {
+  if (tonCuoi <= 0) return "het-hang";
+  const ngưỡng = Math.max(tonDau * 0.15, 50);
+  if (tonCuoi <= ngưỡng) return "sap-het";
+  return "binh-thuong";
+}
+
 export default function InventoryPage() {
   const [, setLocation] = useLocation();
   const [search, setSearch] = useState("");
@@ -59,9 +68,25 @@ export default function InventoryPage() {
   const [sortKey, setSortKey] = useState("maSP");
   const [sortDir, setSortDir] = useState<"asc"|"desc">("asc");
   const [selected, setSelected] = useState<StockItem | null>(null);
+  const [stockList, setStockList] = useState<StockItem[]>(STOCK);
+  const [showNhap, setShowNhap] = useState(false);
+  const [nhapForm, setNhapForm] = useState(EMPTY_NHAP);
+
+  const handleNhapKho = () => {
+    const qty = parseInt(nhapForm.soLuong, 10);
+    if (!qty || qty <= 0) return;
+    setStockList(prev => prev.map(item => {
+      if (item.maSP !== nhapForm.maSP) return item;
+      const newNhap = item.nhapKho + qty;
+      const newTon = item.tonCuoi + qty;
+      return { ...item, nhapKho: newNhap, tonCuoi: newTon, trangThai: calcTrangThai(newTon, item.tonDau) };
+    }));
+    setNhapForm(EMPTY_NHAP);
+    setShowNhap(false);
+  };
 
   const filtered = useMemo(() => {
-    let d = STOCK;
+    let d = stockList;
     if (search) {
       const q = search.toLowerCase();
       d = d.filter(s => s.maSP.toLowerCase().includes(q) || s.tenSP.toLowerCase().includes(q) || s.loai.toLowerCase().includes(q));
@@ -73,11 +98,11 @@ export default function InventoryPage() {
       if (typeof av === "number" && typeof bv === "number") return sortDir === "asc" ? av - bv : bv - av;
       return sortDir === "asc" ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
     });
-  }, [search, nhomFilter, sortKey, sortDir]);
+  }, [stockList, search, nhomFilter, sortKey, sortDir]);
 
-  const totalValue = STOCK.reduce((s, i) => s + i.tonCuoi * i.donGia, 0);
-  const lowStockCount = STOCK.filter(i => i.trangThai === "sap-het").length;
-  const outCount = STOCK.filter(i => i.trangThai === "het-hang").length;
+  const totalValue = stockList.reduce((s, i) => s + i.tonCuoi * i.donGia, 0);
+  const lowStockCount = stockList.filter(i => i.trangThai === "sap-het").length;
+  const outCount = stockList.filter(i => i.trangThai === "het-hang").length;
 
   const SortIcon = ({ col }: { col: string }) =>
     sortKey !== col ? <ChevronUp className="w-3 h-3 opacity-30" /> :
@@ -109,7 +134,7 @@ export default function InventoryPage() {
             <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">
               <Printer className="w-3.5 h-3.5" /> In
             </button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
+            <button onClick={() => setShowNhap(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors">
               <Plus className="w-4 h-4" /> Nhập kho
             </button>
           </div>
@@ -118,7 +143,7 @@ export default function InventoryPage() {
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
         {[
-          { icon: Package,       label: "Tổng mặt hàng",  value: `${STOCK.length} SKU`,         sub: "đang quản lý",      color: "text-blue-600 bg-blue-50" },
+          { icon: Package,       label: "Tổng mặt hàng",  value: `${stockList.length} SKU`,     sub: "đang quản lý",      color: "text-blue-600 bg-blue-50" },
           { icon: TrendingUp,    label: "Giá trị tồn kho", value: fmtMoney(totalValue) + " đ",   sub: "ước tính cuối kỳ",  color: "text-emerald-600 bg-emerald-50" },
           { icon: AlertTriangle, label: "Sắp hết hàng",   value: `${lowStockCount} mặt hàng`,   sub: "cần nhập thêm",     color: "text-amber-600 bg-amber-50" },
           { icon: TrendingDown,  label: "Hết hàng",       value: `${outCount} mặt hàng`,         sub: "tồn kho = 0",       color: "text-red-600 bg-red-50" },
@@ -201,10 +226,74 @@ export default function InventoryPage() {
         </div>
 
         <div className="px-4 py-2 border-t border-border flex items-center justify-between">
-          <p className="text-xs text-muted-foreground">Hiển thị {filtered.length} / {STOCK.length} mặt hàng</p>
+          <p className="text-xs text-muted-foreground">Hiển thị {filtered.length} / {stockList.length} mặt hàng</p>
           <p className="text-xs font-semibold text-foreground">Tổng giá trị tồn: {fmtMoney(filtered.reduce((s, i) => s + i.tonCuoi * i.donGia, 0))} đ</p>
         </div>
       </div>
+
+      {showNhap && (() => {
+        const selItem = stockList.find(s => s.maSP === nhapForm.maSP)!;
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setShowNhap(false); setNhapForm(EMPTY_NHAP); }} />
+            <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md flex flex-col">
+              <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+                <h2 className="text-base font-semibold text-foreground">Phiếu nhập kho</h2>
+                <button onClick={() => { setShowNhap(false); setNhapForm(EMPTY_NHAP); }} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/60">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="px-6 py-5 space-y-4">
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1.5">Sản phẩm <span className="text-red-500">*</span></label>
+                  <select value={nhapForm.maSP} onChange={e => setNhapForm(f => ({ ...f, maSP: e.target.value }))} className="w-full px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/40">
+                    {stockList.map(s => <option key={s.maSP} value={s.maSP}>{s.maSP} – {s.tenSP}</option>)}
+                  </select>
+                  {selItem && (
+                    <div className="mt-2 flex items-center gap-3 px-3 py-2 bg-muted/30 rounded-lg text-xs text-muted-foreground">
+                      <span>Tồn hiện tại: <b className="text-foreground">{fmt(selItem.tonCuoi)} {selItem.donVi}</b></span>
+                      <span className={`ml-auto inline-flex px-2 py-0.5 rounded-full font-medium ${STATUS_CFG[selItem.trangThai].color}`}>{STATUS_CFG[selItem.trangThai].label}</span>
+                    </div>
+                  )}
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">Số lượng nhập <span className="text-red-500">*</span></label>
+                    <div className="relative">
+                      <input type="number" min="1" value={nhapForm.soLuong} onChange={e => setNhapForm(f => ({ ...f, soLuong: e.target.value }))} placeholder="0" className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/40" />
+                      {selItem && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted-foreground">{selItem.donVi}</span>}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1.5">Ngày nhập</label>
+                    <input type="date" value={nhapForm.ngayNhap} onChange={e => setNhapForm(f => ({ ...f, ngayNhap: e.target.value }))} className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/40" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1.5">Nhà cung cấp / Nguồn gốc</label>
+                  <input value={nhapForm.nhaCungCap} onChange={e => setNhapForm(f => ({ ...f, nhaCungCap: e.target.value }))} placeholder="Tên nhà cung cấp hoặc nguồn gốc..." className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/40" />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-muted-foreground mb-1.5">Ghi chú</label>
+                  <textarea value={nhapForm.ghiChu} onChange={e => setNhapForm(f => ({ ...f, ghiChu: e.target.value }))} rows={2} placeholder="Ghi chú thêm..." className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none" />
+                </div>
+                {nhapForm.soLuong && parseInt(nhapForm.soLuong) > 0 && selItem && (
+                  <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 text-sm">
+                    <p className="text-xs text-emerald-700 font-medium mb-1">Sau khi nhập</p>
+                    <p className="font-bold text-emerald-700">{fmt(selItem.tonCuoi + parseInt(nhapForm.soLuong))} {selItem.donVi} tồn kho</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex items-center justify-end gap-3 px-6 py-4 border-t border-border">
+                <button onClick={() => { setShowNhap(false); setNhapForm(EMPTY_NHAP); }} className="px-4 py-2 text-sm font-medium border border-border rounded-lg hover:bg-muted/50 transition-colors">Huỷ</button>
+                <button onClick={handleNhapKho} disabled={!nhapForm.soLuong || parseInt(nhapForm.soLuong) <= 0} className="px-5 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+                  Xác nhận nhập kho
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {selected && (
         <div className="fixed inset-0 z-50 flex justify-end">
