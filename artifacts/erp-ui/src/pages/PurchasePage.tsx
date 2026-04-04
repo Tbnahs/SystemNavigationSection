@@ -573,6 +573,15 @@ export default function PurchasePage() {
                   </button>
                 </>
               )}
+              {activeTab === "san-xuat" && (
+                <button
+                  onClick={() => { resetForm(); setShowAddForm(true); }}
+                  className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap"
+                >
+                  <Plus className="w-4 h-4" />
+                  Thêm phiếu
+                </button>
+              )}
             </div>
           )}
 
