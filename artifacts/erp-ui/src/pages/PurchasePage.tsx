@@ -247,7 +247,7 @@ export default function PurchasePage() {
       if (typeof av === "number" && typeof bv === "number") return sortDir === "asc" ? av - bv : bv - av;
       return sortDir === "asc" ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
     });
-  }, [search, sortKey, sortDir, dateFilter]);
+  }, [search, sortKey, sortDir, dateFrom, dateTo]);
 
   return (
     <AppLayout>
