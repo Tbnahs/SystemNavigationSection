@@ -4,6 +4,8 @@ import {
   Home, BarChart3, Leaf, ScanLine, Settings, TrendingUp,
   ShoppingCart, Truck, Package, DollarSign, Users, Factory,
   UserCircle, FileBarChart, CheckSquare, BookOpen, ChevronDown,
+  QrCode, Link2, Award, Layers, GitBranch, Search,
+  MapPin, Sprout, FlaskConical, Scissors, CloudSun, ClipboardCheck,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import logoImg from "@assets/Logo ESG.png";
@@ -29,23 +31,102 @@ const ERP_SUB_ITEMS = [
   { id: "settings",   icon: Settings,     label: "Cài đặt" },
 ];
 
+const TXNG_SUB_ITEMS = [
+  { id: "qrcode",       icon: QrCode,        label: "Mã QR" },
+  { id: "supplychain",  icon: Link2,         label: "Chuỗi cung ứng" },
+  { id: "certification",icon: Award,         label: "Chứng nhận" },
+  { id: "batch",        icon: Layers,        label: "Lô hàng" },
+  { id: "timeline",     icon: GitBranch,     label: "Lịch sử" },
+  { id: "audit",        icon: Search,        label: "Kiểm toán" },
+];
+
+const FARMING_SUB_ITEMS = [
+  { id: "zones",      icon: MapPin,         label: "Vùng trồng" },
+  { id: "crops",      icon: Sprout,         label: "Cây trồng" },
+  { id: "pesticides", icon: FlaskConical,   label: "Thuốc BVTV" },
+  { id: "harvest",    icon: Scissors,       label: "Thu hoạch" },
+  { id: "weather",    icon: CloudSun,       label: "Thời tiết" },
+  { id: "inspection", icon: ClipboardCheck, label: "Kiểm định" },
+];
+
+/* Shared component: expandable nav item with split click */
+function ExpandableNavItem({
+  href, icon: Icon, label, expanded, onToggle, onNavigate,
+  isActive, subItems, location,
+}: {
+  href: string; icon: React.ElementType; label: string;
+  expanded: boolean; onToggle: () => void; onNavigate: () => void;
+  isActive: boolean; subItems: { id: string; icon: React.ElementType; label: string }[];
+  location: string;
+}) {
+  const subBase = href;
+  return (
+    <div>
+      <div className={`flex items-center rounded-xl text-sm font-medium transition-all ${isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
+        <Link
+          href={href}
+          onClick={onNavigate}
+          className="flex items-center gap-3 flex-1 px-3 py-2.5 min-w-0"
+        >
+          <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
+          <span className="truncate">{label}</span>
+        </Link>
+        <button
+          onClick={onToggle}
+          className="px-2 py-2.5 rounded-r-xl hover:bg-black/5 transition-colors shrink-0"
+          title={expanded ? "Thu gọn" : "Mở rộng"}
+        >
+          <ChevronDown
+            className={`w-3.5 h-3.5 transition-transform duration-200 ${expanded ? "rotate-180" : ""} ${isActive ? "text-primary" : "text-muted-foreground"}`}
+            strokeWidth={2}
+          />
+        </button>
+      </div>
+
+      {expanded && (
+        <div className="mt-0.5 ml-3 pl-3 border-l border-border space-y-0.5">
+          {subItems.map(({ id, icon: SubIcon, label: subLabel }) => {
+            const subHref = `${subBase}/${id}`;
+            const active = location === subHref;
+            return (
+              <Link
+                key={id}
+                href={subHref}
+                onClick={onNavigate}
+                className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all ${
+                  active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                }`}
+              >
+                <SubIcon className={`w-3.5 h-3.5 shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
+                {subLabel}
+              </Link>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function Sidebar({ open, onClose }: SidebarProps) {
   const { t } = useLanguage();
   const [location] = useLocation();
 
-  const isOnErp = location === "/module/erp" || location.startsWith("/module/erp/");
-  const [erpExpanded, setErpExpanded] = useState(isOnErp);
+  const isOnErp     = location === "/module/erp"     || location.startsWith("/module/erp/");
+  const isOnTxng    = location === "/module/txng"    || location.startsWith("/module/txng/");
+  const isOnFarming = location === "/module/farming" || location.startsWith("/module/farming/");
 
-  useEffect(() => {
-    if (isOnErp) setErpExpanded(true);
-  }, [isOnErp]);
+  const [erpExpanded,     setErpExpanded]     = useState(isOnErp);
+  const [txngExpanded,    setTxngExpanded]    = useState(isOnTxng);
+  const [farmingExpanded, setFarmingExpanded] = useState(isOnFarming);
 
-  const topItems = [
-    { href: "/home",          icon: Home,      label: t("nav.home") },
-    { href: "/module/txng",   icon: ScanLine,  label: t("nav.txng") },
-    { href: "/module/farming",icon: Leaf,      label: t("nav.farming") },
-    { href: "/reports",       icon: TrendingUp,label: t("nav.reports") },
-    { href: "/settings",      icon: Settings,  label: t("nav.settings") },
+  useEffect(() => { if (isOnErp)     setErpExpanded(true);     }, [isOnErp]);
+  useEffect(() => { if (isOnTxng)    setTxngExpanded(true);    }, [isOnTxng]);
+  useEffect(() => { if (isOnFarming) setFarmingExpanded(true); }, [isOnFarming]);
+
+  const plainItems = [
+    { href: "/reports",  icon: TrendingUp, label: t("nav.reports")  },
+    { href: "/settings", icon: Settings,   label: t("nav.settings") },
   ];
 
   const isActive = (href: string) =>
@@ -53,19 +134,12 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
 
   return (
     <>
-      {/* Overlay */}
       {open && (
-        <div
-          className="fixed inset-0 bg-black/30 z-20 lg:hidden"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 bg-black/30 z-20 lg:hidden" onClick={onClose} />
       )}
 
-      {/* Sidebar */}
-      <aside
-        className={`fixed left-0 top-16 bottom-0 w-60 bg-white border-r border-border z-20 flex flex-col transition-transform duration-200 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
-      >
-        {/* Logo area */}
+      <aside className={`fixed left-0 top-16 bottom-0 w-60 bg-white border-r border-border z-20 flex flex-col transition-transform duration-200 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
+        {/* Logo */}
         <div className="px-4 py-5 border-b border-border">
           <div className="flex items-center gap-3">
             <img src={logoImg} alt="ESG VALLEY logo" className="w-9 h-9 object-contain" />
@@ -83,75 +157,60 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             href="/home"
             onClick={onClose}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-              isActive("/home")
-                ? "bg-primary/10 text-primary"
-                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              isActive("/home") ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
             <Home className={`w-4 h-4 shrink-0 ${isActive("/home") ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
             {t("nav.home")}
           </Link>
 
-          {/* ERP — click label → navigate, click arrow → toggle sub-menu */}
-          <div>
-            <div className={`flex items-center rounded-xl text-sm font-medium transition-all ${isOnErp ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
-              <Link
-                href="/module/erp"
-                onClick={onClose}
-                className="flex items-center gap-3 flex-1 px-3 py-2.5 min-w-0"
-              >
-                <BarChart3 className={`w-4 h-4 shrink-0 ${isOnErp ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
-                <span className="truncate">{t("nav.erp")}</span>
-              </Link>
-              <button
-                onClick={() => setErpExpanded((v) => !v)}
-                className="px-2 py-2.5 rounded-r-xl hover:bg-black/5 transition-colors shrink-0"
-                title={erpExpanded ? "Thu gọn" : "Mở rộng"}
-              >
-                <ChevronDown
-                  className={`w-3.5 h-3.5 transition-transform duration-200 ${erpExpanded ? "rotate-180" : ""} ${isOnErp ? "text-primary" : "text-muted-foreground"}`}
-                  strokeWidth={2}
-                />
-              </button>
-            </div>
+          {/* ERP */}
+          <ExpandableNavItem
+            href="/module/erp"
+            icon={BarChart3}
+            label={t("nav.erp")}
+            expanded={erpExpanded}
+            onToggle={() => setErpExpanded(v => !v)}
+            onNavigate={onClose}
+            isActive={isOnErp}
+            subItems={ERP_SUB_ITEMS}
+            location={location}
+          />
 
-            {/* Sub-menu */}
-            {erpExpanded && (
-              <div className="mt-0.5 ml-3 pl-3 border-l border-border space-y-0.5">
-                {ERP_SUB_ITEMS.map(({ id, icon: Icon, label }) => {
-                  const href = `/module/erp/${id}`;
-                  const active = location === href;
-                  return (
-                    <Link
-                      key={id}
-                      href={href}
-                      onClick={onClose}
-                      className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all ${
-                        active
-                          ? "bg-primary/10 text-primary"
-                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
-                      }`}
-                    >
-                      <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
-                      {label}
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
+          {/* Truy xuất nguồn gốc */}
+          <ExpandableNavItem
+            href="/module/txng"
+            icon={ScanLine}
+            label={t("nav.txng")}
+            expanded={txngExpanded}
+            onToggle={() => setTxngExpanded(v => !v)}
+            onNavigate={onClose}
+            isActive={isOnTxng}
+            subItems={TXNG_SUB_ITEMS}
+            location={location}
+          />
 
-          {/* Other top-level items */}
-          {topItems.slice(1).map(({ href, icon: Icon, label }) => (
+          {/* Vùng trồng */}
+          <ExpandableNavItem
+            href="/module/farming"
+            icon={Leaf}
+            label={t("nav.farming")}
+            expanded={farmingExpanded}
+            onToggle={() => setFarmingExpanded(v => !v)}
+            onNavigate={onClose}
+            isActive={isOnFarming}
+            subItems={FARMING_SUB_ITEMS}
+            location={location}
+          />
+
+          {/* Plain items */}
+          {plainItems.map(({ href, icon: Icon, label }) => (
             <Link
               key={href}
               href={href}
               onClick={onClose}
-              data-testid={`nav-${href.replace("/", "").replace("/", "-")}`}
               className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                isActive(href)
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                isActive(href) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
               <Icon className={`w-4 h-4 shrink-0 ${isActive(href) ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
