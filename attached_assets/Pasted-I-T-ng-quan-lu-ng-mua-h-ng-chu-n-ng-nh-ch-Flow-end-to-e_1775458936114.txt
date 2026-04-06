@@ -1,0 +1,203 @@
+I. Tổng quan luồng mua hàng (chuẩn ngành chè)
+🔄 Flow end-to-end:
+Nhu cầu → Yêu cầu mua → Chọn nông hộ (Search/QR) → Đơn mua → Nhận hàng → QC → Nhập kho (Batch) → Thanh toán
+
+👉 Điểm khác biệt ngành chè:
+
+Supplier = Nông hộ
+Bắt buộc có:
+Vùng trồng
+Batch nguyên liệu
+Liên kết truy xuất
+🧩 II. Flow chi tiết từng bước
+🔹 1. Phát sinh nhu cầu mua
+Actor:
+Sản xuất / Kế hoạch
+Trigger:
+Thiếu nguyên liệu
+Kế hoạch sản xuất
+Output:
+Nhu cầu:
+Loại chè
+Số lượng
+Thời gian cần
+🔹 2. Tạo Yêu cầu mua (Purchase Request)
+Actor:
+Nhân viên kế hoạch
+Input:
+Loại chè (chè tươi)
+Số lượng
+Ngày cần
+Output:
+Phiếu yêu cầu mua (PR)
+🔹 3. Chọn Nông hộ (🔥 có QR)
+Actor:
+Nhân viên mua hàng
+UI:
+[Nông hộ   🔍 Tìm kiếm        📷 Scan QR]
+🟢 Cách 1: Search
+Gõ tên / SĐT
+Chọn nông hộ
+🟢 Cách 2: Scan QR (recommended)
+Flow:
+Click icon 📷
+Mở camera
+Scan QR nông hộ
+
+Lấy:
+
+farmer_id
+Gọi API → load info
+Output:
+Nông hộ
+Danh sách vùng trồng
+🔹 4. Chọn Vùng trồng
+Vì:
+
+👉 1 nông hộ có nhiều vùng
+
+User chọn:
+Mã vùng
+Diện tích
+Loại chè
+🔹 5. Tạo Đơn mua (Purchase Order)
+Thông tin:
+Mã đơn
+Nông hộ
+Vùng trồng
+Loại chè
+Số lượng
+Giá dự kiến
+Output:
+PO (Purchase Order)
+🔹 6. Nhận nguyên liệu (tại kho / tại vườn)
+Actor:
+Kho / thu mua
+Flow:
+Nông hộ giao chè
+Cân thực tế
+Input:
+Số lượng thực nhận
+Thời gian
+Người giao
+🔹 7. Kiểm tra chất lượng (QC đầu vào)
+Actor:
+QC
+Check:
+Độ tươi
+Độ ẩm
+Lá non/già
+Kết quả:
+✅ Pass:
+
+→ cho nhập kho
+
+❌ Fail:
+Reject
+Hoặc giảm giá
+🔹 8. Nhập kho nguyên liệu (🔥 CRITICAL)
+Actor:
+Kho
+Hệ thống tự sinh:
+
+👉 Batch nguyên liệu
+
+Batch chứa:
+batch_id
+farmer_id
+region_id
+harvest_date
+quantity
+🔥 Ý nghĩa:
+
+👉 Đây là gốc của truy xuất nguồn gốc
+
+🔹 9. Cập nhật tồn kho
+Tăng tồn kho nguyên liệu
+Theo:
+Batch
+Loại chè
+🔹 10. Thanh toán nông hộ
+Actor:
+Kế toán
+Dựa trên:
+Số lượng thực nhận
+Chất lượng
+Output:
+Thanh toán:
+Tiền mặt / chuyển khoản
+Công nợ
+🔗 III. Mapping với hệ thống khác
+Step	Module liên quan
+Nông hộ	Hộ dân
+Vùng trồng	Vùng trồng
+Nhập kho	Kho
+Batch	Sản xuất
+Thanh toán	Kế toán
+QR	Truy xuất
+🧪 IV. Use Case chính
+UC01 – Tạo yêu cầu mua
+UC02 – Chọn nông hộ (Search/QR)
+UC03 – Tạo đơn mua
+UC04 – Nhận hàng
+UC05 – QC đầu vào
+UC06 – Nhập kho (tạo batch)
+UC07 – Thanh toán
+🗂️ V. Data model (chuẩn để dev code)
+Purchase Order
+{
+  "po_id": "PO001",
+  "farmer_id": "FARM01",
+  "region_id": "REG01",
+  "items": [
+    {
+      "material": "Che tuoi",
+      "quantity": 1000,
+      "price": 8000
+    }
+  ],
+  "status": "pending"
+}
+Batch nguyên liệu
+{
+  "batch_id": "RAW001",
+  "farmer_id": "FARM01",
+  "region_id": "REG01",
+  "harvest_date": "2026-04-06",
+  "quantity": 950
+}
+🖥️ VI. UI tổng thể module Mua hàng
+Tabs:
+Yêu cầu mua
+Đơn mua
+Nhập kho
+Nông hộ
+Điểm nổi bật:
+
+👉 Field chọn nông hộ:
+
+Search + QR scan
+🔥 VII. Điểm MUST (bạn nhớ highlight khi đi trình)
+✅ 1. Gắn nông hộ + vùng trồng vào từng lô
+
+→ Không có = fail truy xuất
+
+✅ 2. Batch sinh tại bước nhập kho
+
+→ Đây là root của toàn hệ thống
+
+✅ 3. Scan QR nông hộ
+
+→ Tối ưu thu mua ngoài thực địa
+
+✅ 4. QC đầu vào bắt buộc
+
+→ Ảnh hưởng trực tiếp giá mua + chất lượng
+
+💡 VIII. Nâng cấp xịn (để upsell khách 😏)
+Scan QR → auto fill nông hộ
+Gợi ý giá mua theo lịch sử
+Chấm điểm nông hộ
+Dashboard:
+Sản lượng theo vùng
+Chất lượng theo nông hộ
