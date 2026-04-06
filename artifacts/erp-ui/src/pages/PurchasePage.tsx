@@ -135,7 +135,7 @@ const AREA_COLORS: Record<string, string> = {
 /* ────────── Component ────────── */
 export default function PurchasePage() {
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"po" | "receipt" | "farmers" | "quy-cach">("po");
+  const [activeTab, setActiveTab] = useState<"po" | "receipt" | "farmers" | "quy-cach" | "tong-ket">("po");
   const [search, setSearch]   = useState("");
   const [statusFilter, setStatusFilter] = useState<POStatus | "">("");
   const [diaChi, setDiaChi]   = useState("");
@@ -356,6 +356,7 @@ export default function PurchasePage() {
           { key: "receipt",   label: "Nhận hàng",      count: receipts.length },
           { key: "farmers",   label: "Nông hộ",         count: FARMERS.length },
           { key: "quy-cach",  label: "Quy cách & Giá", count: Object.keys(QUY_CACH_CFG).length },
+          { key: "tong-ket",  label: "Tổng kết",       count: 4 },
         ].map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key as typeof activeTab)}
             className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
@@ -655,6 +656,197 @@ export default function PurchasePage() {
           </div>
         </div>
       )}
+
+      {/* ── Tổng kết Tab ── */}
+      {activeTab === "tong-ket" && (() => {
+        /* aggregate from receipts */
+        const byHo: Record<string, { maHo: string; tenHo: string; diaChi: string; kl: number; tien: number; soPhieu: number }> = {};
+        const byNgay: Record<string, { ngay: string; kl: number; tien: number; soPhieu: number }> = {};
+        const byVung: Record<string, { kl: number; tien: number }> = { "Nà Hồng": { kl:0, tien:0 }, "Nà Bay": { kl:0, tien:0 }, "Bản Chang": { kl:0, tien:0 } };
+        const byQuyCach: Record<string, { kl: number; tien: number }> = {};
+
+        for (const r of receipts) {
+          /* by Ho */
+          if (!byHo[r.maHo]) byHo[r.maHo] = { maHo: r.maHo, tenHo: r.tenHo, diaChi: r.diaChi, kl: 0, tien: 0, soPhieu: 0 };
+          byHo[r.maHo].kl += r.khoiLuong;
+          byHo[r.maHo].tien += r.thanhTien;
+          byHo[r.maHo].soPhieu += 1;
+          /* by Ngay */
+          if (!byNgay[r.ngay]) byNgay[r.ngay] = { ngay: r.ngay, kl: 0, tien: 0, soPhieu: 0 };
+          byNgay[r.ngay].kl += r.khoiLuong;
+          byNgay[r.ngay].tien += r.thanhTien;
+          byNgay[r.ngay].soPhieu += 1;
+          /* by Vung */
+          if (byVung[r.diaChi]) { byVung[r.diaChi].kl += r.khoiLuong; byVung[r.diaChi].tien += r.thanhTien; }
+          /* by QuyCach */
+          if (!byQuyCach[r.quyCach]) byQuyCach[r.quyCach] = { kl: 0, tien: 0 };
+          byQuyCach[r.quyCach].kl += r.khoiLuong;
+          byQuyCach[r.quyCach].tien += r.thanhTien;
+        }
+
+        const hoRows = Object.values(byHo).sort((a,b) => b.kl - a.kl);
+        const ngayRows = Object.values(byNgay).sort((a,b) => a.ngay.localeCompare(b.ngay));
+        const totalKL = receipts.reduce((s,r) => s + r.khoiLuong, 0);
+        const totalTien = receipts.reduce((s,r) => s + r.thanhTien, 0);
+
+        return (
+          <div className="space-y-5">
+            {/* KPI bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: "Tổng KL thu mua", value: fmtKg(totalKL), sub: `${receipts.length} phiếu`, color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+                { label: "Tổng chi phí", value: (totalTien/1e6).toFixed(2)+" tr đ", sub: "nguyên liệu tươi", color: "bg-blue-50 text-blue-700 border-blue-200" },
+                { label: "Số nông hộ", value: `${Object.keys(byHo).length} hộ`, sub: "đã giao nguyên liệu", color: "bg-violet-50 text-violet-700 border-violet-200" },
+                { label: "Ngày thu mua", value: `${ngayRows.length} ngày`, sub: ngayRows.length > 0 ? `${ngayRows[0].ngay} → ${ngayRows[ngayRows.length-1].ngay}` : "—", color: "bg-amber-50 text-amber-700 border-amber-200" },
+              ].map((k,i) => (
+                <div key={i} className={`rounded-xl border p-4 ${k.color}`}>
+                  <p className="text-xs font-medium opacity-75">{k.label}</p>
+                  <p className="text-xl font-bold mt-1">{k.value}</p>
+                  <p className="text-xs opacity-60 mt-0.5">{k.sub}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Tổng kết theo ngày */}
+              <div className="bg-white border border-border rounded-xl overflow-hidden">
+                <div className="px-5 py-3.5 border-b border-border bg-muted/20 flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-sm">Tổng kết theo ngày</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">KL & chi phí từng ngày thu mua</p>
+                  </div>
+                </div>
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-border bg-muted/10">
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Ngày</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Số phiếu</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">KL (kg)</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Thành tiền</th>
+                  </tr></thead>
+                  <tbody className="divide-y divide-border/60">
+                    {ngayRows.map(row => (
+                      <tr key={row.ngay} className="hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 font-medium text-sm">{row.ngay}</td>
+                        <td className="px-4 py-3 text-right text-xs text-muted-foreground">{row.soPhieu}</td>
+                        <td className="px-4 py-3 text-right font-semibold text-emerald-700">{row.kl.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-right font-semibold text-blue-700">{fmt(row.tien)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot><tr className="bg-muted/20 border-t border-border font-bold">
+                    <td className="px-4 py-2.5 text-sm text-muted-foreground">Tổng cộng</td>
+                    <td className="px-4 py-2.5 text-right text-xs">{receipts.length}</td>
+                    <td className="px-4 py-2.5 text-right text-emerald-700">{totalKL.toFixed(2)}</td>
+                    <td className="px-4 py-2.5 text-right text-blue-700">{fmt(totalTien)}</td>
+                  </tr></tfoot>
+                </table>
+              </div>
+
+              {/* Tổng kết theo vùng & quy cách */}
+              <div className="space-y-4">
+                <div className="bg-white border border-border rounded-xl overflow-hidden">
+                  <div className="px-5 py-3.5 border-b border-border bg-muted/20">
+                    <h3 className="font-semibold text-sm">Theo vùng thu mua</h3>
+                  </div>
+                  <table className="w-full text-sm">
+                    <thead><tr className="border-b border-border bg-muted/10">
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Vùng</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">KL (kg)</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Thành tiền</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Tỷ lệ</th>
+                    </tr></thead>
+                    <tbody className="divide-y divide-border/60">
+                      {Object.entries(byVung).filter(([,v]) => v.kl > 0).map(([vung, v]) => (
+                        <tr key={vung} className="hover:bg-muted/20">
+                          <td className="px-4 py-3"><span className={`inline-flex text-xs px-2 py-0.5 rounded-md font-medium ${AREA_COLORS[vung] ?? "bg-gray-100 text-gray-600"}`}>{vung}</span></td>
+                          <td className="px-4 py-3 text-right font-semibold text-emerald-700">{v.kl.toFixed(2)}</td>
+                          <td className="px-4 py-3 text-right font-semibold text-blue-700">{fmt(v.tien)}</td>
+                          <td className="px-4 py-3 text-right text-xs text-muted-foreground">{totalKL > 0 ? ((v.kl/totalKL)*100).toFixed(1) : 0}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="bg-white border border-border rounded-xl overflow-hidden">
+                  <div className="px-5 py-3.5 border-b border-border bg-muted/20">
+                    <h3 className="font-semibold text-sm">Theo quy cách thu hái</h3>
+                  </div>
+                  <table className="w-full text-sm">
+                    <thead><tr className="border-b border-border bg-muted/10">
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Quy cách</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">KL (kg)</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Thành tiền</th>
+                    </tr></thead>
+                    <tbody className="divide-y divide-border/60">
+                      {Object.entries(byQuyCach).sort((a,b) => b[1].kl - a[1].kl).map(([qc, v]) => (
+                        <tr key={qc} className="hover:bg-muted/20">
+                          <td className="px-4 py-3"><span className={`inline-flex text-xs px-2.5 py-0.5 rounded-full border font-medium ${QUY_CACH_CFG[qc]?.color ?? "bg-gray-100 text-gray-600 border-gray-200"}`}>{qc}</span></td>
+                          <td className="px-4 py-3 text-right font-semibold text-emerald-700">{v.kl.toFixed(2)}</td>
+                          <td className="px-4 py-3 text-right font-semibold text-blue-700">{fmt(v.tien)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Tổng kết theo nông hộ */}
+            <div className="bg-white border border-border rounded-xl overflow-hidden">
+              <div className="px-5 py-3.5 border-b border-border bg-muted/20 flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-sm">Tổng kết theo nông hộ</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">Sắp xếp theo khối lượng giao giảm dần</p>
+                </div>
+                <span className="text-xs text-muted-foreground">{hoRows.length} hộ</span>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-border bg-muted/10">
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">STT</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Mã hộ</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Tên hộ</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Vùng</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Số phiếu</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Tổng KL (kg)</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Tổng tiền (đ)</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Tỷ lệ KL</th>
+                  </tr></thead>
+                  <tbody className="divide-y divide-border/60">
+                    {hoRows.map((row, i) => (
+                      <tr key={row.maHo} className="hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-2.5 text-xs text-muted-foreground">{i+1}</td>
+                        <td className="px-4 py-2.5 font-mono text-xs font-semibold text-primary">{row.maHo}</td>
+                        <td className="px-4 py-2.5 font-medium text-sm">{row.tenHo}</td>
+                        <td className="px-4 py-2.5"><span className={`inline-flex text-xs px-1.5 py-0.5 rounded-md font-medium ${AREA_COLORS[row.diaChi] ?? "bg-gray-100 text-gray-600"}`}>{row.diaChi}</span></td>
+                        <td className="px-4 py-2.5 text-right text-xs text-muted-foreground">{row.soPhieu}</td>
+                        <td className="px-4 py-2.5 text-right font-semibold text-emerald-700">{row.kl.toFixed(2)}</td>
+                        <td className="px-4 py-2.5 text-right font-semibold text-blue-700">{fmt(row.tien)}</td>
+                        <td className="px-4 py-2.5 text-right text-xs">
+                          <div className="flex items-center justify-end gap-2">
+                            <div className="h-1.5 w-20 bg-muted rounded-full overflow-hidden">
+                              <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${totalKL > 0 ? (row.kl/totalKL)*100 : 0}%` }} />
+                            </div>
+                            <span className="text-muted-foreground w-9 text-right">{totalKL > 0 ? ((row.kl/totalKL)*100).toFixed(1) : 0}%</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot><tr className="bg-emerald-50/60 border-t-2 border-emerald-200 font-bold text-sm">
+                    <td colSpan={4} className="px-4 py-3 text-muted-foreground">Tổng cộng</td>
+                    <td className="px-4 py-3 text-right text-xs">{receipts.length}</td>
+                    <td className="px-4 py-3 text-right text-emerald-700">{totalKL.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-right text-blue-700">{fmt(totalTien)}</td>
+                    <td className="px-4 py-3 text-right text-muted-foreground text-xs">100%</td>
+                  </tr></tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* ── PO Detail Drawer ── */}
       {selectedPO && (
