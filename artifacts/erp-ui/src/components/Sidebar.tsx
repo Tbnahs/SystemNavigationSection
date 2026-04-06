@@ -1,5 +1,10 @@
+import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
-import { Home, BarChart3, Leaf, ScanLine, Settings, TrendingUp } from "lucide-react"; // Leaf still used in nav
+import {
+  Home, BarChart3, Leaf, ScanLine, Settings, TrendingUp,
+  ShoppingCart, Truck, Package, DollarSign, Users, Factory,
+  UserCircle, FileBarChart, CheckSquare, BookOpen, ChevronDown,
+} from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import logoImg from "@assets/Logo ESG.png";
 
@@ -8,20 +13,43 @@ interface SidebarProps {
   onClose: () => void;
 }
 
+const ERP_SUB_ITEMS = [
+  { id: "sales",      icon: ShoppingCart, label: "Bán hàng" },
+  { id: "purchase",   icon: Truck,        label: "Mua hàng" },
+  { id: "inventory",  icon: Package,      label: "Kho hàng" },
+  { id: "accounting", icon: DollarSign,   label: "Kế toán" },
+  { id: "hr",         icon: Users,        label: "Nhân sự" },
+  { id: "production", icon: Factory,      label: "Sản xuất" },
+  { id: "quality",    icon: CheckSquare,  label: "QC - Chất lượng" },
+  { id: "packaging",  icon: Package,      label: "Đóng gói" },
+  { id: "farmers",    icon: Users,        label: "Hộ dân liên kết" },
+  { id: "crm",        icon: UserCircle,   label: "Khách hàng" },
+  { id: "quy-cach",   icon: BookOpen,     label: "Quy cách & Tiêu chuẩn" },
+  { id: "reports",    icon: FileBarChart, label: "Báo cáo" },
+  { id: "settings",   icon: Settings,     label: "Cài đặt" },
+];
+
 export default function Sidebar({ open, onClose }: SidebarProps) {
   const { t } = useLanguage();
   const [location] = useLocation();
 
-  const navItems = [
-    { href: "/home", icon: Home, label: t("nav.home") },
-    { href: "/module/erp", icon: BarChart3, label: t("nav.erp") },
-    { href: "/module/txng", icon: ScanLine, label: t("nav.txng") },
-    { href: "/module/farming", icon: Leaf, label: t("nav.farming") },
-    { href: "/reports", icon: TrendingUp, label: t("nav.reports") },
-    { href: "/settings", icon: Settings, label: t("nav.settings") },
+  const isOnErp = location === "/module/erp" || location.startsWith("/module/erp/");
+  const [erpExpanded, setErpExpanded] = useState(isOnErp);
+
+  useEffect(() => {
+    if (isOnErp) setErpExpanded(true);
+  }, [isOnErp]);
+
+  const topItems = [
+    { href: "/home",          icon: Home,      label: t("nav.home") },
+    { href: "/module/txng",   icon: ScanLine,  label: t("nav.txng") },
+    { href: "/module/farming",icon: Leaf,      label: t("nav.farming") },
+    { href: "/reports",       icon: TrendingUp,label: t("nav.reports") },
+    { href: "/settings",      icon: Settings,  label: t("nav.settings") },
   ];
 
-  const isActive = (href: string) => location === href || location.startsWith(href + "/");
+  const isActive = (href: string) =>
+    location === href || location.startsWith(href + "/");
 
   return (
     <>
@@ -32,6 +60,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           onClick={onClose}
         />
       )}
+
       {/* Sidebar */}
       <aside
         className={`fixed left-0 top-16 bottom-0 w-60 bg-white border-r border-border z-20 flex flex-col transition-transform duration-200 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}
@@ -48,8 +77,72 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          {navItems.map(({ href, icon: Icon, label }) => (
+        <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
+          {/* Home */}
+          <Link
+            href="/home"
+            onClick={onClose}
+            className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+              isActive("/home")
+                ? "bg-primary/10 text-primary"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
+            }`}
+          >
+            <Home className={`w-4 h-4 shrink-0 ${isActive("/home") ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
+            {t("nav.home")}
+          </Link>
+
+          {/* ERP — expandable */}
+          <div>
+            <button
+              onClick={() => {
+                setErpExpanded((v) => !v);
+                if (!erpExpanded) {
+                  // navigate to ERP overview only if not already there
+                }
+              }}
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                isOnErp
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+              }`}
+            >
+              <BarChart3 className={`w-4 h-4 shrink-0 ${isOnErp ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
+              <span className="flex-1 text-left">{t("nav.erp")}</span>
+              <ChevronDown
+                className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${erpExpanded ? "rotate-180" : ""} ${isOnErp ? "text-primary" : "text-muted-foreground"}`}
+                strokeWidth={2}
+              />
+            </button>
+
+            {/* Sub-menu */}
+            {erpExpanded && (
+              <div className="mt-0.5 ml-3 pl-3 border-l border-border space-y-0.5">
+                {ERP_SUB_ITEMS.map(({ id, icon: Icon, label }) => {
+                  const href = `/module/erp/${id}`;
+                  const active = location === href;
+                  return (
+                    <Link
+                      key={id}
+                      href={href}
+                      onClick={onClose}
+                      className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all ${
+                        active
+                          ? "bg-primary/10 text-primary"
+                          : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
+                      {label}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          {/* Other top-level items */}
+          {topItems.slice(1).map(({ href, icon: Icon, label }) => (
             <Link
               key={href}
               href={href}
@@ -61,7 +154,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
                   : "text-muted-foreground hover:bg-muted hover:text-foreground"
               }`}
             >
-              <Icon className={`w-4.5 h-4.5 shrink-0 ${isActive(href) ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
+              <Icon className={`w-4 h-4 shrink-0 ${isActive(href) ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
               {label}
             </Link>
           ))}
