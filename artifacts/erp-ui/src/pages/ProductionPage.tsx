@@ -8,6 +8,7 @@ import {
   FileSpreadsheet, FileText, Printer, ArrowRight,
 } from "lucide-react";
 import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
+import { TEN_SAN_PHAM, MAU_SAN_PHAM } from "@/constants/products";
 
 type TrangThai = "ke-hoach" | "xuat-nvl" | "dang-che-bien" | "hoan-thanh" | "da-nhap-kho";
 const TT_CFG: Record<TrangThai, { label: string; color: string; step: number }> = {
@@ -22,12 +23,7 @@ const NEXT_STATUS: Record<TrangThai, TrangThai | null> = {
   "dang-che-bien": "hoan-thanh", "hoan-thanh": "da-nhap-kho", "da-nhap-kho": null,
 };
 
-const PRODUCT_COLOR: Record<string, string> = {
-  "Hồng trà": "bg-rose-100 text-rose-700",
-  "Bạch trà": "bg-sky-100 text-sky-700",
-  "Chè xanh": "bg-emerald-100 text-emerald-700",
-  "Phổ nhĩ":  "bg-amber-100 text-amber-700",
-};
+const PRODUCT_COLOR = MAU_SAN_PHAM;
 
 interface LoSX {
   id: string; maLo: string; ngaySX: string; loaiChe: string; soHo: number;
@@ -250,7 +246,7 @@ export default function ProductionPage() {
           <div className="flex items-center gap-2 p-4 border-b border-border flex-wrap">
             <div className="relative flex-1 min-w-40"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Tìm mã lô, loại chè..." className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" /></div>
             {activeTab==="lenh-sx"&&<select value={ttFilter} onChange={e=>setTtFilter(e.target.value as TrangThai|"")} className="px-3 py-2 text-sm border border-border rounded-lg bg-background"><option value="">Tất cả TT</option>{Object.entries(TT_CFG).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}</select>}
-            <select value={loaiFilter} onChange={e=>setLoaiFilter(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background"><option value="">Tất cả loại</option>{["Chè xanh","Hồng trà","Bạch trà","Phổ nhĩ"].map(l=><option key={l} value={l}>{l}</option>)}</select>
+            <select value={loaiFilter} onChange={e=>setLoaiFilter(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background"><option value="">Tất cả loại</option>{TEN_SAN_PHAM.map(l=><option key={l} value={l}>{l}</option>)}</select>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
@@ -351,7 +347,7 @@ export default function ProductionPage() {
           <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md flex flex-col max-h-[85vh]">
             <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0"><div className="flex items-center gap-2"><Factory className="w-4 h-4 text-primary"/><span className="font-semibold text-sm">Tạo lệnh sản xuất mới</span></div><button onClick={()=>setShowCreate(false)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4"/></button></div>
             <div className="overflow-y-auto flex-1 px-5 py-4 space-y-4">
-              <div><label className="block text-xs font-semibold mb-1.5">Loại chè</label><select value={fLoai} onChange={e=>setFLoai(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary bg-white">{["Chè xanh","Hồng trà","Bạch trà","Phổ nhĩ"].map(l=><option key={l} value={l}>{l}</option>)}</select></div>
+              <div><label className="block text-xs font-semibold mb-1.5">Loại chè</label><select value={fLoai} onChange={e=>setFLoai(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary bg-white">{TEN_SAN_PHAM.map(l=><option key={l} value={l}>{l}</option>)}</select></div>
               <div><label className="block text-xs font-semibold mb-1.5">Ngày SX</label><input type="date" value={fNgay} onChange={e=>setFNgay(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg"/></div>
               <div><label className="block text-xs font-semibold mb-1.5">KL nguyên liệu (kg) <span className="text-red-500">*</span></label><input type="number" value={fKLNVL} onChange={e=>setFKLNVL(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg"/></div>
               {fKLNVL&&<div className="bg-muted/20 rounded-xl p-3 text-xs text-muted-foreground"><p className="font-semibold mb-1">Dự kiến thành phẩm:</p><p>{fLoai==="Bạch trà"?`~ ${(parseFloat(fKLNVL)*0.178).toFixed(1)} kg (17.8%)`:`~ ${(parseFloat(fKLNVL)*0.239).toFixed(1)} kg (23.9%)`}</p></div>}

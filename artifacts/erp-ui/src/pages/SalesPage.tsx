@@ -10,6 +10,7 @@ import {
   Receipt, ChevronRight, Warehouse, User, Phone, MapPin, QrCode,
 } from "lucide-react";
 import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
+import { DANH_SACH_SAN_PHAM, MAU_SAN_PHAM as PRODUCT_COLORS_SHARED } from "@/constants/products";
 
 /* ────────────── Types ────────────── */
 type OrderStatus = "bao-gia" | "xac-nhan" | "xuat-kho" | "dang-giao" | "hoan-thanh" | "huy";
@@ -144,14 +145,6 @@ const SEED: SalesOrder[] = [
   },
 ];
 
-const PRODUCTS = [
-  { loai: "Chè xanh",  donGia: 420000,  maLoSX: "L09104"  },
-  { loai: "Hồng trà",  donGia: 850000,  maLoSX: "L013003" },
-  { loai: "Bạch trà",  donGia: 1200000, maLoSX: "L073103" },
-  { loai: "Phổ nhĩ",   donGia: 980000,  maLoSX: "L083103" },
-  { loai: "Chè cổ thụ",donGia: 2500000, maLoSX: "L063103" },
-];
-
 const CUSTOMERS = [
   { id: "C001", name: "Cty TNHH Trà Thái Nguyên",       loai: "dai-ly" as LoaiKhach,    diaChi: "TP. Thái Nguyên",       sdt: "0208 3856 123" },
   { id: "C002", name: "Siêu thị Lotte Mart Hà Nội",      loai: "sieu-thi" as LoaiKhach,  diaChi: "Đống Đa, Hà Nội",       sdt: "024 3562 7890" },
@@ -162,13 +155,13 @@ const CUSTOMERS = [
   { id: "C007", name: "Quán trà Sen – Đỗ Thị Mai",       loai: "le" as LoaiKhach,        diaChi: "Quận 1, TP.HCM",         sdt: "090 3456 789"  },
 ];
 
-const PRODUCT_COLORS: Record<string, string> = {
-  "Chè xanh":   "bg-emerald-100 text-emerald-700",
-  "Hồng trà":   "bg-rose-100 text-rose-700",
-  "Bạch trà":   "bg-sky-100 text-sky-700",
-  "Phổ nhĩ":    "bg-amber-100 text-amber-700",
-  "Chè cổ thụ": "bg-violet-100 text-violet-700",
-};
+const PRODUCTS = DANH_SACH_SAN_PHAM.map((p, i) => ({
+  loai: p.ten,
+  donGia: p.donGia,
+  maLoSX: ["L09104","L013003","L073103","L083103","L063103"][i] ?? "",
+}));
+
+const PRODUCT_COLORS: Record<string, string> = PRODUCT_COLORS_SHARED;
 
 let _nextId = 100;
 const genId = () => String(++_nextId);

@@ -8,6 +8,7 @@ import {
   ShieldCheck, TrendingUp, Layers,
 } from "lucide-react";
 import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
+import { TEN_SAN_PHAM, QUY_CACH_OPTIONS } from "@/constants/products";
 
 type QCStage = "dau-vao" | "san-xuat" | "dau-ra";
 type QCResult = "pass" | "fail" | "reduce" | "pending";
@@ -348,7 +349,7 @@ export default function QualityPage() {
             <div className="overflow-y-auto flex-1 px-5 py-4 space-y-4">
               <div><label className="block text-xs font-semibold mb-1.5">Giai đoạn QC</label>
                 <div className="flex gap-2">{(["dau-vao","san-xuat","dau-ra"] as QCStage[]).map(s=>(
-                  <button key={s} onClick={()=>setFStage(s)} className={`flex-1 py-2 text-xs font-medium rounded-lg border transition-all ${fStage===s?"bg-primary/10 border-primary text-primary":"border-border text-muted-foreground hover:bg-muted/40"}`}>{STAGE_CFG[s].label}</button>
+                  <button key={s} onClick={()=>{ setFStage(s); setFLoai(s === "dau-vao" ? QUY_CACH_OPTIONS[0] : TEN_SAN_PHAM[0]); }} className={`flex-1 py-2 text-xs font-medium rounded-lg border transition-all ${fStage===s?"bg-primary/10 border-primary text-primary":"border-border text-muted-foreground hover:bg-muted/40"}`}>{STAGE_CFG[s].label}</button>
                 ))}</div>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -358,7 +359,7 @@ export default function QualityPage() {
               <div><label className="block text-xs font-semibold mb-1.5">Đối tượng <span className="text-red-500">*</span></label><input value={fDoiTuong} onChange={e=>setFDoiTuong(e.target.value)} placeholder="Tên nông hộ / lô SX..." className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" /></div>
               <div><label className="block text-xs font-semibold mb-1.5">Loại chè</label>
                 <select value={fLoai} onChange={e=>setFLoai(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
-                  {["Chè xanh","Hồng trà","Bạch trà","1 tôm 2 lá","1 tôm","Phổ nhĩ"].map(l=><option key={l} value={l}>{l}</option>)}
+                  {(fStage === "dau-vao" ? QUY_CACH_OPTIONS : TEN_SAN_PHAM).map(l=><option key={l} value={l}>{l}</option>)}
                 </select>
               </div>
               {[{label:"Độ ẩm",val:fDoAm,set:setFDoAm},{label:"Độ non búp",val:fDoNon,set:setFDoNon},{label:"Độ sạch",val:fDoSach,set:setFDoSach}].map((m,i)=>(

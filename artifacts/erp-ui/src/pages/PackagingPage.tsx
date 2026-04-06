@@ -8,13 +8,7 @@ import {
   QrCode, ArrowRight, Layers,
 } from "lucide-react";
 import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
-
-const PRODUCT_COLOR: Record<string, string> = {
-  "Hồng trà": "bg-rose-100 text-rose-700",
-  "Bạch trà": "bg-sky-100 text-sky-700",
-  "Chè xanh": "bg-emerald-100 text-emerald-700",
-  "Phổ nhĩ":  "bg-amber-100 text-amber-700",
-};
+import { TEN_SAN_PHAM, MAU_SAN_PHAM as PRODUCT_COLOR } from "@/constants/products";
 const BAO_BI_OPTIONS = [
   { value: "hop-giay-100g",   label: "Hộp giấy 100g",         kgPerUnit: 0.1  },
   { value: "hop-thiec-250g",  label: "Hộp thiếc 250g",         kgPerUnit: 0.25 },
@@ -190,7 +184,7 @@ export default function PackagingPage() {
         <div className="flex items-center gap-2 p-4 border-b border-border flex-wrap">
           <div className="relative flex-1 min-w-40"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><input value={search} onChange={e=>setSearch(e.target.value)} placeholder="Tìm mã lô, lô SX, sản phẩm..." className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" /></div>
           <select value={ttFilter} onChange={e=>setTtFilter(e.target.value as TrangThai|"")} className="px-3 py-2 text-sm border border-border rounded-lg bg-background"><option value="">Tất cả TT</option>{Object.entries(TT_CFG).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}</select>
-          <select value={spFilter} onChange={e=>setSpFilter(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background"><option value="">Tất cả SP</option>{["Chè xanh","Hồng trà","Bạch trà","Phổ nhĩ"].map(s=><option key={s} value={s}>{s}</option>)}</select>
+          <select value={spFilter} onChange={e=>setSpFilter(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background"><option value="">Tất cả SP</option>{TEN_SAN_PHAM.map(s=><option key={s} value={s}>{s}</option>)}</select>
           <button onClick={()=>{setSearch("");setTtFilter("");setSpFilter("");}} className="flex items-center gap-1.5 px-4 py-2 text-sm border border-border rounded-lg hover:bg-muted/50"><Filter className="w-3.5 h-3.5"/> Lọc</button>
         </div>
         <div className="overflow-x-auto">
@@ -394,7 +388,7 @@ export default function PackagingPage() {
             <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0"><div className="flex items-center gap-2"><Box className="w-4 h-4 text-primary"/><span className="font-semibold text-sm">Tạo lô đóng gói mới</span></div><button onClick={()=>setShowCreate(false)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4"/></button></div>
             <div className="overflow-y-auto flex-1 px-5 py-4 space-y-4">
               <div><label className="block text-xs font-semibold mb-1.5">Mã lô sản xuất <span className="text-red-500">*</span></label><input value={fLoSX} onChange={e=>setFLoSX(e.target.value)} placeholder="L09104, L010104..." className="w-full px-3 py-2.5 text-sm border border-border rounded-lg"/></div>
-              <div><label className="block text-xs font-semibold mb-1.5">Sản phẩm</label><div className="flex flex-wrap gap-2">{["Chè xanh","Hồng trà","Bạch trà","Phổ nhĩ"].map(s=><button key={s} onClick={()=>setFSP(s)} className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all ${fSP===s?"border-primary text-primary bg-primary/10":"border-border text-muted-foreground hover:bg-muted/40"}`}>{s}</button>)}</div></div>
+              <div><label className="block text-xs font-semibold mb-1.5">Sản phẩm</label><div className="flex flex-wrap gap-2">{TEN_SAN_PHAM.map(s=><button key={s} onClick={()=>setFSP(s)} className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all ${fSP===s?"border-primary text-primary bg-primary/10":"border-border text-muted-foreground hover:bg-muted/40"}`}>{s}</button>)}</div></div>
               <div><label className="block text-xs font-semibold mb-1.5">Bao bì</label><select value={fBaoBi} onChange={e=>setFBaoBi(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg">{BAO_BI_OPTIONS.map(b=><option key={b.value} value={b.value}>{b.label}</option>)}</select></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="block text-xs font-semibold mb-1.5">KL đóng gói (kg) <span className="text-red-500">*</span></label><input type="number" value={fKL} onChange={e=>setFKL(e.target.value)} step="0.1" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg"/></div>

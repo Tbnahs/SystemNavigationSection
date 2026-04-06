@@ -6,6 +6,7 @@ import {
   Save, Check, Plus, Trash2, X, Edit2, Key, ChevronRight,
   Leaf, Package, TrendingUp,
 } from "lucide-react";
+import { DANH_SACH_SAN_PHAM } from "@/constants/products";
 
 type TabKey = "doanh-nghiep" | "nguoi-dung" | "danh-muc" | "thong-bao" | "bao-mat";
 
@@ -20,13 +21,7 @@ const INIT_USERS: UserAccount[] = [
   { id:"5", ten:"Phạm Thị Dung",   email:"dung@htxhongha.vn",    vaiTro:"Cán bộ chế biến",  trangThai:"inactive" },
 ];
 
-const INIT_LOAI_CHE: DanhMucLoaiChe[] = [
-  { id:"1", ten:"Chè xanh",      maCode:"CX", donGia:420000,   tyLeKhoHao:23.9, ghiChu:"Tiêu chuẩn OCOP 4 sao" },
-  { id:"2", ten:"Hồng trà",      maCode:"HT", donGia:850000,   tyLeKhoHao:22.0, ghiChu:"Sao vàng, ủ ẩm" },
-  { id:"3", ten:"Bạch trà",      maCode:"BT", donGia:1200000,  tyLeKhoHao:17.8, ghiChu:"Tôm trắng, phơi tự nhiên" },
-  { id:"4", ten:"Phổ nhĩ",       maCode:"PN", donGia:980000,   tyLeKhoHao:24.5, ghiChu:"Lên men ủ ẩm 30 ngày" },
-  { id:"5", ten:"Chè đặc biệt",  maCode:"CD", donGia:2500000,  tyLeKhoHao:18.0, ghiChu:"Cổ thụ 100+ năm" },
-];
+const INIT_LOAI_CHE: DanhMucLoaiChe[] = DANH_SACH_SAN_PHAM;
 
 const VAI_TRO_PERMISSIONS: Record<string, string[]> = {
   "Giám đốc":       ["Toàn quyền hệ thống", "Phê duyệt phiếu kế toán", "Xem báo cáo tổng hợp"],
