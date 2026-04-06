@@ -116,18 +116,36 @@ interface PurchaseOrder {
   nguoiTao: string;
 }
 
+/* ── Quy cách specs (per official price table) ── */
+const QUY_CACH_CFG: Record<string, { loaiChe: string; priceNote: string; color: string; fixedPrice?: number }> = {
+  "1 tôm":        { loaiChe: "Chè xanh",  priceNote: "27,000 – 30,000 đ/kg",   color: "bg-emerald-100 text-emerald-800 border-emerald-300" },
+  "1 tôm 1 lá":   { loaiChe: "Hồng trà",  priceNote: "50,000 đ/kg",            color: "bg-rose-100 text-rose-800 border-rose-300", fixedPrice: 50000 },
+  "1 tôm 2 lá":   { loaiChe: "Bạch trà",  priceNote: "27,000 – 30,000 đ/kg",   color: "bg-sky-100 text-sky-800 border-sky-300" },
+  "2 lá":         { loaiChe: "Chè thường", priceNote: "27,000 đ/kg",            color: "bg-amber-100 text-amber-800 border-amber-300", fixedPrice: 27000 },
+  "Cây di sản":   { loaiChe: "Đặc sản",   priceNote: "40,000 – 60,000 đ/kg",   color: "bg-violet-100 text-violet-800 border-violet-300", fixedPrice: 50000 },
+};
+
+/* Đơn giá theo % chất lượng (áp dụng cho "1 tôm", "1 tôm 2 lá") */
+const QUALITY_PRICE_TABLE = [
+  { min: 70, max: 79, gia: 27000, label: "70–79%" },
+  { min: 80, max: 89, gia: 28000, label: "80–89%" },
+  { min: 90, max: 99, gia: 29000, label: "90–99%" },
+  { min: 100, max: 100, gia: 30000, label: "100%" },
+];
+
 const calcDonGia = (quyCach: string, cl: number) => {
-  if (quyCach === "1 tôm") return 520000;
-  if (cl < 80) return 27000;
-  if (cl < 90) return 28000;
-  if (cl < 100) return 29000;
-  return 30000;
+  const cfg = QUY_CACH_CFG[quyCach];
+  if (cfg?.fixedPrice) return cfg.fixedPrice;
+  if (cl >= 100) return 30000;
+  if (cl >= 90)  return 29000;
+  if (cl >= 80)  return 28000;
+  return 27000;
 };
 
 const PO_SEED: PurchaseOrder[] = [
   { id: "1", maPO: "PO-3003-001", maHo: "NH004", tenHo: "Triệu Văn Thạo",   diaChi: "Nà Hồng", sdt: "0354871949", maVuon: "NH004-V1", tenVuon: "Vườn Nà Hồng 1", ngayTao: "28/03/2026", ngayGiao: "30/03/2026", quyCach: "1 tôm 2 lá", khoiLuongDat: 15.0, khoiLuongNhan: 13.5,  donGia: 27000,  chatLuong: 78, qcResult: "pass",  trangThai: "thanh-toan", thanhToan: "da-thanh-toan", batchId: "RAW-NH004-3003", ghiChu: "",                nguoiTao: "Nguyễn A" },
   { id: "2", maPO: "PO-3103-002", maHo: "NH008", tenHo: "Đồng Thị Khuyết",  diaChi: "Nà Hồng", sdt: "0962041090", maVuon: "NH008-V1", tenVuon: "Vườn Nà Hồng 1", ngayTao: "29/03/2026", ngayGiao: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuongDat: 10.0, khoiLuongNhan: 8.5,   donGia: 28500,  chatLuong: 83, qcResult: "pass",  trangThai: "thanh-toan", thanhToan: "da-thanh-toan", batchId: "RAW-NH008-3103", ghiChu: "",                nguoiTao: "Nguyễn A" },
-  { id: "3", maPO: "PO-3103-003", maHo: "NB010", tenHo: "Mạnh Văn Hồ",      diaChi: "Nà Bay",  sdt: "0349055299", maVuon: "NB010-V1", tenVuon: "Vườn Nà Bay 1",    ngayTao: "29/03/2026", ngayGiao: "31/03/2026", quyCach: "1 tôm",      khoiLuongDat: 3.0,  khoiLuongNhan: 2.5,   donGia: 520000, chatLuong: 98, qcResult: "pass",  trangThai: "nhap-kho",   thanhToan: "mot-phan",    batchId: "RAW-NB010-3103", ghiChu: "1 tôm chất lượng cao", nguoiTao: "Trần B" },
+  { id: "3", maPO: "PO-3103-003", maHo: "NB010", tenHo: "Mạnh Văn Hồ",      diaChi: "Nà Bay",  sdt: "0349055299", maVuon: "NB010-V1", tenVuon: "Vườn Nà Bay 1",    ngayTao: "29/03/2026", ngayGiao: "31/03/2026", quyCach: "1 tôm",      khoiLuongDat: 3.0,  khoiLuongNhan: 2.5,   donGia: 29000,  chatLuong: 98, qcResult: "pass",  trangThai: "nhap-kho",   thanhToan: "mot-phan",    batchId: "RAW-NB010-3103", ghiChu: "1 tôm chất lượng cao (90–99%)", nguoiTao: "Trần B" },
   { id: "4", maPO: "PO-0104-004", maHo: "NB002", tenHo: "Nông Văn Nghiễm",  diaChi: "Nà Bay",  sdt: "0814665955", maVuon: "NB002-V1", tenVuon: "Vườn Nà Bay 1",    ngayTao: "01/04/2026", ngayGiao: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuongDat: 50.0, khoiLuongNhan: 44.0,  donGia: 29000,  chatLuong: 90, qcResult: "pass",  trangThai: "nhap-kho",   thanhToan: "chua",         batchId: "RAW-NB002-0104", ghiChu: "",                nguoiTao: "Nguyễn A" },
   { id: "5", maPO: "PO-0104-005", maHo: "NB013", tenHo: "Triệu Văn Cường",  diaChi: "Nà Bay",  sdt: "",           maVuon: "NB013-V1", tenVuon: "Vườn Nà Bay 1",    ngayTao: "01/04/2026", ngayGiao: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuongDat: 60.0, khoiLuongNhan: 50.0,  donGia: 29000,  chatLuong: 91, qcResult: "pass",  trangThai: "qc",         thanhToan: "chua",         batchId: "",               ghiChu: "",                nguoiTao: "Trần B" },
   { id: "6", maPO: "PO-0304-006", maHo: "NB006", tenHo: "Hoàng Văn Thống",  diaChi: "Nà Bay",  sdt: "0967186387", maVuon: "NB006-V1", tenVuon: "Vườn Nà Bay 1",    ngayTao: "03/04/2026", ngayGiao: "05/04/2026", quyCach: "1 tôm 2 lá", khoiLuongDat: 55.0, khoiLuongNhan: 49.2,  donGia: 29000,  chatLuong: 89, qcResult: "pass",  trangThai: "nhan-hang",  thanhToan: "chua",         batchId: "",               ghiChu: "",                nguoiTao: "Nguyễn A" },
@@ -138,7 +156,7 @@ const PO_SEED: PurchaseOrder[] = [
 /* ────────── Nhận hàng raw records ────────── */
 const RAW_RECEIPTS = [
   { id: 1,  maPO: "PO-3003-001", maHo: "NH004", tenHo: "Triệu Văn Thạo",   diaChi: "Nà Hồng",   ngay: "30/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 13.50, donGia: 27000,  thanhTien: 364500,  batchId: "RAW-NH004-3003" },
-  { id: 2,  maPO: "PO-3103-003", maHo: "NB010", tenHo: "Mạnh Văn Hồ",      diaChi: "Nà Bay",    ngay: "31/03/2026", quyCach: "1 tôm",      khoiLuong: 2.50,  donGia: 520000, thanhTien: 1300000, batchId: "RAW-NB010-3103" },
+  { id: 2,  maPO: "PO-3103-003", maHo: "NB010", tenHo: "Mạnh Văn Hồ",      diaChi: "Nà Bay",    ngay: "31/03/2026", quyCach: "1 tôm",      khoiLuong: 2.50,  donGia: 29000,  thanhTien: 72500,   batchId: "RAW-NB010-3103" },
   { id: 3,  maPO: "PO-3103-002", maHo: "NH008", tenHo: "Đồng Thị Khuyết",  diaChi: "Nà Hồng",   ngay: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 8.50,  donGia: 28500,  thanhTien: 242250,  batchId: "RAW-NH008-3103" },
   { id: 4,  maPO: "PO-0104-004", maHo: "NB002", tenHo: "Nông Văn Nghiễm",  diaChi: "Nà Bay",    ngay: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 44.00, donGia: 29000,  thanhTien: 1276000, batchId: "RAW-NB002-0104" },
   { id: 5,  maPO: "PO-0104-005", maHo: "NB013", tenHo: "Triệu Văn Cường",  diaChi: "Nà Bay",    ngay: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 50.00, donGia: 29000,  thanhTien: 1450000, batchId: "" },
@@ -164,7 +182,7 @@ const AREA_COLORS: Record<string, string> = {
 /* ────────── Component ────────── */
 export default function PurchasePage() {
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"po" | "receipt" | "farmers">("po");
+  const [activeTab, setActiveTab] = useState<"po" | "receipt" | "farmers" | "quy-cach">("po");
   const [search, setSearch]   = useState("");
   const [statusFilter, setStatusFilter] = useState<POStatus | "">("");
   const [diaChi, setDiaChi]   = useState("");
@@ -334,14 +352,15 @@ export default function PurchasePage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-1 mb-4 border-b border-border">
+      <div className="flex items-center gap-1 mb-4 border-b border-border overflow-x-auto">
         {[
-          { key: "po",       label: "Đơn mua (PO)",  count: poList.length },
-          { key: "receipt",  label: "Nhận hàng",      count: receipts.length },
-          { key: "farmers",  label: "Nông hộ",         count: FARMERS.length },
+          { key: "po",        label: "Đơn mua (PO)",  count: poList.length },
+          { key: "receipt",   label: "Nhận hàng",      count: receipts.length },
+          { key: "farmers",   label: "Nông hộ",         count: FARMERS.length },
+          { key: "quy-cach",  label: "Quy cách & Giá", count: Object.keys(QUY_CACH_CFG).length },
         ].map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key as typeof activeTab)}
-            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
             {tab.label}
             <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold ${activeTab === tab.key ? "bg-primary text-white" : "bg-muted text-muted-foreground"}`}>{tab.count}</span>
           </button>
@@ -512,6 +531,110 @@ export default function PurchasePage() {
                 </div>
               );
             })}
+          </div>
+        </div>
+      )}
+
+      {/* ── Quy cách & Giá Tab ── */}
+      {activeTab === "quy-cach" && (
+        <div className="space-y-5">
+          {/* Bảng quy cách + đơn giá */}
+          <div className="bg-white border border-border rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-border bg-muted/20">
+              <h3 className="font-semibold text-sm">Bảng quy cách thu hái & đơn giá</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Ban hành theo quy định thu mua chè Shan Tuyết Bằng Phúc — HTX Hồng Hà</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-muted/10">
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">STT</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Quy cách</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Loại chè</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Đơn giá (đ/kg)</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Ghi chú</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/60">
+                  {Object.entries(QUY_CACH_CFG).map(([q, cfg], i) => (
+                    <tr key={q} className="hover:bg-muted/20 transition-colors">
+                      <td className="px-4 py-3 text-muted-foreground text-xs">{i + 1}</td>
+                      <td className="px-4 py-3 font-bold">{q}</td>
+                      <td className="px-4 py-3">
+                        <span className={`inline-flex text-xs px-2.5 py-1 rounded-lg font-semibold border ${cfg.color}`}>{cfg.loaiChe}</span>
+                      </td>
+                      <td className="px-4 py-3 text-right font-semibold text-primary">{cfg.priceNote}</td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                        {cfg.fixedPrice ? "Giá cố định" : "Tính theo % chất lượng"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* Bảng đơn giá theo % chất lượng */}
+          <div className="bg-white border border-border rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-border bg-muted/20">
+              <h3 className="font-semibold text-sm">Bảng đơn giá theo % chất lượng</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">Áp dụng cho quy cách: <strong>1 tôm</strong> (Chè xanh) và <strong>1 tôm 2 lá</strong> (Bạch trà)</p>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-border bg-muted/10">
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">STT</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">% Đánh giá</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Đơn giá</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Xếp loại</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/60">
+                  {QUALITY_PRICE_TABLE.map((row, i) => (
+                    <tr key={i} className="hover:bg-muted/20 transition-colors">
+                      <td className="px-4 py-3 text-muted-foreground text-xs">{i + 1}</td>
+                      <td className="px-4 py-3 font-semibold">{row.label}</td>
+                      <td className="px-4 py-3 text-right font-bold text-emerald-700">{row.gia.toLocaleString("vi-VN")} đ/kg</td>
+                      <td className="px-4 py-3 text-xs text-muted-foreground">
+                        {i === 0 ? "Đạt cơ bản" : i === 1 ? "Khá" : i === 2 ? "Tốt" : "Xuất sắc"}
+                      </td>
+                    </tr>
+                  ))}
+                  <tr className="hover:bg-muted/20 transition-colors bg-violet-50/60">
+                    <td className="px-4 py-3 text-muted-foreground text-xs">5</td>
+                    <td className="px-4 py-3 font-semibold text-violet-800">Cây di sản</td>
+                    <td className="px-4 py-3 text-right font-bold text-violet-700">40,000 – 60,000 đ/kg</td>
+                    <td className="px-4 py-3 text-xs text-violet-600 font-medium">Đặc sản / Di sản</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          {/* 3 tiêu chuẩn đánh giá từ quy cách */}
+          <div className="bg-white border border-border rounded-xl overflow-hidden">
+            <div className="px-5 py-3.5 border-b border-border bg-muted/20">
+              <h3 className="font-semibold text-sm">Tiêu chuẩn đánh giá chất lượng búp chè</h3>
+              <p className="text-xs text-muted-foreground mt-0.5">3 tiêu chí cốt lõi theo quy cách thu mua</p>
+            </div>
+            <div className="divide-y divide-border/60">
+              {[
+                { stt: "01", tieu: "Độ non, già của búp chè", moTa: "Búp phải non, đúng quy cách cam kết. Không hái già, không lẫn búp đen. Búp 1 tôm: chỉ lấy đỉnh búp cuộn. Tôm 2 lá: 2 lá non đầu tiên.", mau: "bg-emerald-500" },
+                { stt: "02", tieu: "Độ đồng đều khi thu hái",  moTa: "Búp chè đồng đều về kích cỡ và độ trưởng thành. Không lẫn quy cách khác. Tỷ lệ lẫn không được vượt quá 3% theo khối lượng.", mau: "bg-blue-500" },
+                { stt: "03", tieu: "Độ chuẩn chỉ khi thu hái", moTa: "Thu hái đúng kỹ thuật: ngắt sát cuống, không dập nát, không để bị oxy hoá trước khi giao. Vận chuyển trong giỏ thoáng, không nén chặt.", mau: "bg-amber-500" },
+              ].map(item => (
+                <div key={item.stt} className="flex items-start gap-4 px-5 py-4 hover:bg-muted/10 transition-colors">
+                  <div className={`w-8 h-8 rounded-lg ${item.mau} flex items-center justify-center shrink-0 mt-0.5`}>
+                    <span className="text-white text-xs font-bold">{item.stt}</span>
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold">{item.tieu}</p>
+                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{item.moTa}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       )}
@@ -768,12 +891,21 @@ export default function PurchasePage() {
                   {/* Quy cách */}
                   <div>
                     <label className="block text-xs font-semibold mb-1.5">Quy cách hái</label>
-                    <div className="flex gap-2">
-                      {["1 tôm 2 lá","1 tôm"].map(q => (
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                      {Object.entries(QUY_CACH_CFG).map(([q, cfg]) => (
                         <button key={q} onClick={() => setFQuyCach(q)}
-                          className={`flex-1 py-2.5 text-sm font-medium rounded-lg border transition-all ${fQuyCach === q ? "bg-primary/10 border-primary text-primary" : "border-border text-muted-foreground hover:bg-muted/40"}`}>{q}</button>
+                          className={`px-3 py-2.5 text-left rounded-xl border-2 transition-all ${fQuyCach === q ? "border-primary bg-primary/5" : "border-border hover:border-primary/30 hover:bg-muted/30"}`}>
+                          <p className="text-sm font-bold">{q}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">{cfg.loaiChe} · <span className="font-semibold text-primary">{cfg.priceNote}</span></p>
+                        </button>
                       ))}
                     </div>
+                    {fQuyCach && (
+                      <div className={`text-xs px-3 py-2 rounded-lg border ${QUY_CACH_CFG[fQuyCach]?.color ?? "bg-muted/20 border-border"}`}>
+                        <span className="font-semibold">{fQuyCach}</span> → Sản xuất <strong>{QUY_CACH_CFG[fQuyCach]?.loaiChe}</strong> · Giá: {QUY_CACH_CFG[fQuyCach]?.priceNote}
+                        {!QUY_CACH_CFG[fQuyCach]?.fixedPrice && <span className="ml-1 opacity-70">(tính theo % chất lượng bên dưới)</span>}
+                      </div>
+                    )}
                   </div>
 
                   {/* KL + Chat luong */}

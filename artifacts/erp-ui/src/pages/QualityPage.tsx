@@ -34,7 +34,7 @@ interface QCRecord {
 const QC_DATA: QCRecord[] = [
   { id:"1",  maQC:"QC-DV-001", stage:"dau-vao",  batchId:"RAW-NH004-3003", doiTuong:"Triệu Văn Thạo",   loaiChe:"1 tôm 2 lá", ngay:"30/03/2026", doAm:78, doNon:82, doSach:90, tongDiem:78, ketQua:"pass",    donGiaThucTe:27000,  nguoiKT:"Nguyễn A", ghiChu:"" },
   { id:"2",  maQC:"QC-DV-002", stage:"dau-vao",  batchId:"RAW-NH008-3103", doiTuong:"Đồng Thị Khuyết", loaiChe:"1 tôm 2 lá", ngay:"31/03/2026", doAm:83, doNon:87, doSach:92, tongDiem:83, ketQua:"pass",    donGiaThucTe:28500,  nguoiKT:"Nguyễn A", ghiChu:"" },
-  { id:"3",  maQC:"QC-DV-003", stage:"dau-vao",  batchId:"RAW-NB010-3103", doiTuong:"Mạnh Văn Hồ",     loaiChe:"1 tôm",      ngay:"31/03/2026", doAm:98, doNon:99, doSach:98, tongDiem:98, ketQua:"pass",    donGiaThucTe:520000, nguoiKT:"Trần B",   ghiChu:"Chất lượng cao" },
+  { id:"3",  maQC:"QC-DV-003", stage:"dau-vao",  batchId:"RAW-NB010-3103", doiTuong:"Mạnh Văn Hồ",     loaiChe:"1 tôm",      ngay:"31/03/2026", doAm:98, doNon:99, doSach:98, tongDiem:98, ketQua:"pass",    donGiaThucTe:29000,  nguoiKT:"Trần B",   ghiChu:"1 tôm chất lượng cao (90–99%)" },
   { id:"4",  maQC:"QC-DV-004", stage:"dau-vao",  batchId:"RAW-NB002-0104", doiTuong:"Nông Văn Nghiễm", loaiChe:"1 tôm 2 lá", ngay:"01/04/2026", doAm:90, doNon:91, doSach:88, tongDiem:90, ketQua:"pass",    donGiaThucTe:29000,  nguoiKT:"Nguyễn A", ghiChu:"" },
   { id:"5",  maQC:"QC-DV-005", stage:"dau-vao",  batchId:"RAW-NB013-0104", doiTuong:"Triệu Văn Cường", loaiChe:"1 tôm 2 lá", ngay:"01/04/2026", doAm:91, doNon:89, doSach:87, tongDiem:89, ketQua:"pass",    donGiaThucTe:29000,  nguoiKT:"Trần B",   ghiChu:"" },
   { id:"6",  maQC:"QC-DV-006", stage:"dau-vao",  batchId:"RAW-NB006-0304", doiTuong:"Hoàng Văn Thống", loaiChe:"1 tôm 2 lá", ngay:"03/04/2026", doAm:89, doNon:86, doSach:85, tongDiem:87, ketQua:"reduce",  donGiaThucTe:28000,  nguoiKT:"Nguyễn A", ghiChu:"Lẫn lá già" },
@@ -48,13 +48,16 @@ const QC_DATA: QCRecord[] = [
 ];
 
 const TIEU_CHUAN = [
-  { tieu: "Độ ẩm lý tưởng",           moTa: "70–80% cho QC đầu vào, ≤5% cho thành phẩm đã sấy",         lv: "high" },
-  { tieu: "Độ non búp",                moTa: "Búp phải non, chưa mở lá hoàn toàn, màu xanh non đặc trưng", lv: "high" },
-  { tieu: "Đồng đều quy cách",         moTa: "1 tôm / 1 tôm 1 lá / 1 tôm 2 lá — đúng như cam kết",        lv: "high" },
-  { tieu: "Không lẫn tạp chất",        moTa: "Không có đất, đá, cành già, côn trùng",                       lv: "high" },
-  { tieu: "Màu sắc sau chế biến",      moTa: "Hồng trà: nâu đỏ. Bạch trà: trắng xanh. Chè xanh: xanh sẫm",lv: "med" },
-  { tieu: "Hương thơm",                moTa: "Đặc trưng của vùng Shan Tuyết Bằng Phúc, không mốc",          lv: "med" },
-  { tieu: "Tỷ lệ thu hồi",             moTa: "Chè xanh/Hồng trà: 22–24%. Bạch trà: 17–18%",               lv: "low" },
+  /* ── Tiêu chuẩn từ bảng Quy cách chính thức ── */
+  { tieu: "Độ non, già của búp chè",          moTa: "Búp phải non, đúng quy cách được chỉ định (1 tôm / 1 tôm 1 lá / 1 tôm 2 lá / 2 lá). Không hái già, không lẫn búp già đen.",         lv: "high" },
+  { tieu: "Độ đồng đều khi thu hái",          moTa: "Búp chè đồng đều về kích cỡ và độ trưởng thành. Không lẫn quy cách, tỷ lệ lẫn không quá 3%.",  lv: "high" },
+  { tieu: "Độ chuẩn chỉ khi thu hái",         moTa: "Thu hái đúng kỹ thuật: ngắt sát cuống, không dập nát, không bị oxy hóa trước khi giao. Vận chuyển trong giỏ thoáng.",              lv: "high" },
+  /* ── Tiêu chuẩn bổ sung ── */
+  { tieu: "Độ ẩm lý tưởng",                   moTa: "70–80% cho QC đầu vào (chè tươi), ≤5% cho thành phẩm đã sấy", lv: "high" },
+  { tieu: "Không lẫn tạp chất",               moTa: "Không có đất, đá, cành già, côn trùng. Đánh giá trực quan 100% mẫu", lv: "high" },
+  { tieu: "Màu sắc sau chế biến",             moTa: "Hồng trà: nâu đỏ. Bạch trà: trắng xanh. Chè xanh: xanh sẫm",    lv: "med" },
+  { tieu: "Hương thơm đặc trưng",             moTa: "Đặc trưng của vùng Shan Tuyết Bằng Phúc, không mốc, không lạ",   lv: "med" },
+  { tieu: "Tỷ lệ thu hồi",                    moTa: "Chè xanh/Hồng trà: 22–24%. Bạch trà: 17–18%",                    lv: "low" },
 ];
 
 let _nid = 300;
