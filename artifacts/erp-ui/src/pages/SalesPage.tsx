@@ -86,7 +86,23 @@ export default function SalesPage() {
 
   const { salesOrders: orders, setSalesOrders: setOrders, availableLotsForSales } = useERP();
   const [selected, setSelected]   = useState<SalesOrder | null>(null);
+  const [drawerMode, setDrawerMode] = useState<"view" | "edit">("view");
+  const [editVanDon, setEditVanDon] = useState("");
+  const [editGhiChu, setEditGhiChu] = useState("");
   const [showCreate, setShowCreate] = useState(false);
+
+  const openDrawer = (order: SalesOrder, mode: "view" | "edit") => {
+    setSelected(order);
+    setDrawerMode(mode);
+    setEditVanDon(order.maVanDon ?? "");
+    setEditGhiChu(order.ghiChu ?? "");
+  };
+
+  const saveEdit = () => {
+    if (!selected) return;
+    setOrders(prev => prev.map(o => o.id === selected.id ? { ...o, maVanDon: editVanDon, ghiChu: editGhiChu } : o));
+    setDrawerMode("view");
+  };
 
   /* create form state */
   const [fCust, setFCust]         = useState("");
@@ -459,7 +475,7 @@ export default function SalesPage() {
                   const tc = THANH_TOAN_CFG[order.thanhToan];
                   const lk = LOAI_KHACH_CFG[order.loaiKhach];
                   return (
-                    <tr key={order.id} className="border-b border-border/60 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => setSelected(order)}>
+                    <tr key={order.id} className="border-b border-border/60 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => openDrawer(order, "view")}>
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span className="font-mono text-xs font-semibold text-primary">{order.maDon}</span>
@@ -477,7 +493,8 @@ export default function SalesPage() {
                       <td className="py-3 px-4"><span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${tc.color}`}>{tc.label}</span></td>
                       <td className="py-3 px-4" onClick={e => e.stopPropagation()}>
                         <div className="flex items-center justify-end gap-0.5">
-                          <button onClick={() => setSelected(order)} title="Xem" className="p-1.5 rounded-md hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => openDrawer(order, "view")} title="Xem" className="p-1.5 rounded-md hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors"><Eye className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => openDrawer(order, "edit")} title="Chỉnh sửa" className="p-1.5 rounded-md hover:bg-blue-50 text-muted-foreground hover:text-blue-600 transition-colors"><Edit2 className="w-3.5 h-3.5" /></button>
                           <button onClick={() => handleDelete(order.id)} title="Xóa" className="p-1.5 rounded-md hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                         </div>
                       </td>
@@ -503,7 +520,13 @@ export default function SalesPage() {
           <div className="relative bg-white w-full max-w-xl h-full overflow-y-auto shadow-2xl flex flex-col">
             <div className="flex items-center justify-between px-5 py-4 border-b border-border sticky top-0 bg-white z-10">
               <div>
-                <span className="font-mono text-sm font-bold text-primary">{selected.maDon}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-sm font-bold text-primary">{selected.maDon}</span>
+                  {drawerMode === "edit"
+                    ? <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200"><Edit2 className="w-2.5 h-2.5" />Chỉnh sửa</span>
+                    : <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-gray-100 text-gray-600"><Eye className="w-2.5 h-2.5" />Chỉ xem</span>
+                  }
+                </div>
                 <p className="text-xs text-muted-foreground mt-0.5">Tạo bởi {selected.nguoiTao} · {selected.ngayDat}</p>
               </div>
               <button onClick={() => setSelected(null)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4" /></button>
@@ -512,7 +535,10 @@ export default function SalesPage() {
             <div className="flex-1 px-5 py-4 space-y-5">
               {/* Status stepper */}
               <div>
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Luồng trạng thái</p>
+                <div className="flex items-center justify-between mb-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Luồng trạng thái</p>
+                  {drawerMode === "view" && <span className="text-[10px] text-muted-foreground italic">Chỉ xem – nhấn Chỉnh sửa để thay đổi</span>}
+                </div>
                 <div className="flex items-center gap-0.5">
                   {STATUS_FLOW.map((s, i) => {
                     const sc = STATUS_CFG[s];
@@ -521,8 +547,10 @@ export default function SalesPage() {
                     const isCurrent = selected.trangThai === s;
                     return (
                       <div key={s} className="flex items-center flex-1">
-                        <button onClick={() => handleStatusChange(selected.id, s)}
-                          className={`flex flex-col items-center gap-0.5 flex-1 py-1.5 px-1 rounded-lg transition-all ${isCurrent ? "bg-primary/10 border border-primary/30" : isActive ? "bg-muted/50" : "opacity-40 hover:opacity-70"}`}>
+                        <button
+                          onClick={() => drawerMode === "edit" && handleStatusChange(selected.id, s)}
+                          disabled={drawerMode === "view"}
+                          className={`flex flex-col items-center gap-0.5 flex-1 py-1.5 px-1 rounded-lg transition-all ${isCurrent ? "bg-primary/10 border border-primary/30" : isActive ? "bg-muted/50" : "opacity-40"} ${drawerMode === "edit" && !isCurrent ? "hover:opacity-70 cursor-pointer" : drawerMode === "view" ? "cursor-default" : ""}`}>
                           <sc.icon className={`w-3.5 h-3.5 ${isCurrent ? "text-primary" : isActive ? "text-foreground" : "text-muted-foreground"}`} />
                           <span className={`text-[10px] font-medium text-center leading-tight ${isCurrent ? "text-primary" : "text-muted-foreground"}`}>{sc.label}</span>
                         </button>
@@ -530,8 +558,10 @@ export default function SalesPage() {
                       </div>
                     );
                   })}
-                  <button onClick={() => handleStatusChange(selected.id, "huy")}
-                    className={`ml-1 flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-all ${selected.trangThai === "huy" ? "bg-red-50 border border-red-200" : "opacity-40 hover:opacity-80"}`}>
+                  <button
+                    onClick={() => drawerMode === "edit" && handleStatusChange(selected.id, "huy")}
+                    disabled={drawerMode === "view"}
+                    className={`ml-1 flex flex-col items-center gap-0.5 px-2 py-1.5 rounded-lg transition-all ${selected.trangThai === "huy" ? "bg-red-50 border border-red-200" : "opacity-40"} ${drawerMode === "edit" ? "hover:opacity-80 cursor-pointer" : "cursor-default"}`}>
                     <XCircle className={`w-3.5 h-3.5 ${selected.trangThai === "huy" ? "text-red-500" : "text-muted-foreground"}`} />
                     <span className="text-[10px] text-muted-foreground">Hủy</span>
                   </button>
@@ -543,8 +573,10 @@ export default function SalesPage() {
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Thanh toán</p>
                 <div className="flex gap-2">
                   {(["chua","mot-phan","da-thanh-toan"] as ThanhToanStatus[]).map(s => (
-                    <button key={s} onClick={() => handleThanhToanChange(selected.id, s)}
-                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded-lg border transition-all ${selected.thanhToan === s ? `${THANH_TOAN_CFG[s].color} border-current` : "border-border text-muted-foreground hover:bg-muted/40"}`}>
+                    <button key={s}
+                      onClick={() => drawerMode === "edit" && handleThanhToanChange(selected.id, s)}
+                      disabled={drawerMode === "view"}
+                      className={`flex-1 px-2 py-1.5 text-xs font-medium rounded-lg border transition-all ${selected.thanhToan === s ? `${THANH_TOAN_CFG[s].color} border-current` : "border-border text-muted-foreground"} ${drawerMode === "edit" ? "hover:bg-muted/40 cursor-pointer" : "cursor-default"}`}>
                       {THANH_TOAN_CFG[s].label}
                     </button>
                   ))}
@@ -556,6 +588,25 @@ export default function SalesPage() {
                   </div>
                 )}
               </div>
+
+              {/* Edit-only fields */}
+              {drawerMode === "edit" && (
+                <div className="space-y-3 bg-blue-50/60 border border-blue-100 rounded-xl p-4">
+                  <p className="text-xs font-semibold text-blue-700 uppercase tracking-wide">Cập nhật thông tin giao hàng</p>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">Mã vận đơn</label>
+                    <input value={editVanDon} onChange={e => setEditVanDon(e.target.value)}
+                      placeholder="VD: GHTK-20260406-HN..."
+                      className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white font-mono" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-muted-foreground mb-1">Ghi chú</label>
+                    <textarea value={editGhiChu} onChange={e => setEditGhiChu(e.target.value)}
+                      rows={2} placeholder="Ghi chú nội bộ..."
+                      className="w-full px-3 py-2 text-sm border border-border rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary/30 bg-white" />
+                  </div>
+                </div>
+              )}
 
               {/* Customer */}
               <div className="bg-muted/30 rounded-xl p-4 space-y-2">
@@ -686,8 +737,23 @@ export default function SalesPage() {
             </div>
 
             <div className="px-5 pb-5 pt-3 border-t border-border flex gap-2 shrink-0">
-              <button className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 border border-border rounded-lg text-sm hover:bg-muted/50 transition-colors"><Download className="w-3.5 h-3.5" /> In phiếu</button>
-              <button onClick={() => handleDelete(selected.id)} className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"><Trash2 className="w-3.5 h-3.5" /> Xóa</button>
+              {drawerMode === "view" ? (
+                <>
+                  <button className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 border border-border rounded-lg text-sm hover:bg-muted/50 transition-colors"><Download className="w-3.5 h-3.5" /> In phiếu</button>
+                  <button onClick={() => { setDrawerMode("edit"); setEditVanDon(selected.maVanDon ?? ""); setEditGhiChu(selected.ghiChu ?? ""); }}
+                    className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
+                    <Edit2 className="w-3.5 h-3.5" /> Chỉnh sửa
+                  </button>
+                </>
+              ) : (
+                <>
+                  <button onClick={() => setDrawerMode("view")} className="flex-1 px-4 py-2.5 text-sm border border-border rounded-lg hover:bg-muted/50 transition-colors">Hủy bỏ</button>
+                  <button onClick={saveEdit} className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 bg-emerald-600 text-white rounded-lg text-sm font-semibold hover:bg-emerald-700 transition-colors">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Lưu thay đổi
+                  </button>
+                  <button onClick={() => handleDelete(selected.id)} className="flex items-center justify-center gap-1.5 px-3 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-sm hover:bg-red-100 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
+                </>
+              )}
             </div>
           </div>
         </div>
