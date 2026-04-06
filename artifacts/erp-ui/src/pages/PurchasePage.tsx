@@ -682,7 +682,7 @@ export default function PurchasePage() {
                   )}
                 </div>
                 <div className="flex-1 overflow-y-auto divide-y divide-border">
-                  {filteredHoSearch.map(h => (
+                  {filteredHo.map(h => (
                     <button key={h.maHo} onClick={() => { setSelHo(h); const vs = ZONES[h.maHo]; setSelVuon(vs?.[0]?.maVuon ?? ""); }}
                       className={`w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors text-left ${selHo?.maHo === h.maHo ? "bg-primary/5 border-l-2 border-primary" : ""}`}>
                       <div className="flex items-center gap-3">
