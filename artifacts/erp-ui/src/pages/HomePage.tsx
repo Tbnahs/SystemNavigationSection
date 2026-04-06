@@ -1,6 +1,7 @@
 import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useERP } from "@/contexts/ERPContext";
 import AppLayout from "@/components/AppLayout";
 import {
   BarChart3,
@@ -42,12 +43,6 @@ const modules = [
   },
 ];
 
-const stats = [
-  { icon: TrendingUp, label: "home.totalRevenue", value: "4.2 tỷ", change: "+12%" },
-  { icon: ShoppingCart, label: "home.activeOrders", value: "1,247", change: "+5%" },
-  { icon: ScanLine, label: "home.tracedProducts", value: "8,392", change: "+23%" },
-  { icon: Package, label: "home.farmingAreas", value: "342 ha", change: "+8%" },
-];
 
 const activities = [
   { icon: CheckCircle2, ok: true, text: "Lô hàng VCC-2024-089 đã được xác nhận truy xuất", time: "5 phút trước" },
@@ -57,12 +52,26 @@ const activities = [
   { icon: CheckCircle2, ok: true, text: "Đơn hàng #DH-20240401 đã giao thành công", time: "5 giờ trước" },
 ];
 
+function fmtCur(v: number) {
+  if (v >= 1_000_000_000) return (v / 1_000_000_000).toFixed(1) + " tỷ";
+  if (v >= 1_000_000)     return (v / 1_000_000).toFixed(0) + " tr";
+  return v.toLocaleString("vi-VN") + " đ";
+}
+
 export default function HomePage() {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [, setLocation] = useLocation();
+  const { summary } = useERP();
 
   const firstName = user?.name?.split(" ").pop() || "bạn";
+
+  const stats = [
+    { icon: TrendingUp,  label: "home.totalRevenue",    value: fmtCur(summary.totalSalesRevenue),       change: `${summary.completedSales} đơn HT` },
+    { icon: ShoppingCart,label: "home.activeOrders",    value: String(summary.totalSalesOrders),        change: `${summary.activePOs} PO đang xử lý` },
+    { icon: Package,     label: "home.tracedProducts",  value: `${summary.totalPurchaseKg.toFixed(0)} kg`, change: `${summary.totalProductionBatches} lô SX` },
+    { icon: ScanLine,    label: "home.farmingAreas",    value: `${summary.pendingPackaging} lô ĐG`,     change: `${summary.totalSalesOrders} đơn bán` },
+  ];
 
   return (
     <AppLayout>

@@ -7,16 +7,11 @@ import {
   CheckCircle2, Clock, XCircle, Eye, Trash2, X, BadgeDollarSign, Users,
 } from "lucide-react";
 import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
+import { useERP, Phieu } from "@/contexts/ERPContext";
 
 type PhieuType = "thu" | "chi";
 type PhuongThuc = "Tiền mặt" | "Chuyển khoản" | "Ví điện tử";
 type TrangThai = "da-duyet" | "cho-duyet" | "tu-choi";
-
-interface Phieu {
-  id: string; maPhieu: string; loai: PhieuType; doiTuong: string;
-  danhMuc: string; soTien: number; ngay: string; phuongThuc: PhuongThuc;
-  trangThai: TrangThai; ghiChu: string; nguoiTao: string;
-}
 
 const TT_CFG = {
   "da-duyet": { label: "Đã duyệt",  color: "bg-emerald-100 text-emerald-700", icon: CheckCircle2 },
@@ -24,23 +19,6 @@ const TT_CFG = {
   "tu-choi":  { label: "Từ chối",   color: "bg-red-100 text-red-600",         icon: XCircle },
 };
 
-const PHIEU_DATA: Phieu[] = [
-  { id:"1",  maPhieu:"PT-0401", loai:"thu", doiTuong:"Cty TNHH Trà Thái Nguyên",     danhMuc:"Doanh thu bán hàng",  soTien:23000000,  ngay:"2026-03-26", phuongThuc:"Chuyển khoản", trangThai:"da-duyet",  ghiChu:"ĐH-2604-001", nguoiTao:"Nguyễn A" },
-  { id:"2",  maPhieu:"PT-0402", loai:"thu", doiTuong:"HTX Chè Tân Cương",             danhMuc:"Doanh thu bán hàng",  soTien:21000000,  ngay:"2026-03-28", phuongThuc:"Chuyển khoản", trangThai:"da-duyet",  ghiChu:"ĐH-2804-002", nguoiTao:"Trần B" },
-  { id:"3",  maPhieu:"PT-0403", loai:"thu", doiTuong:"Cty CP XNK Hà Nội",             danhMuc:"Doanh thu bán hàng",  soTien:45900000,  ngay:"2026-04-01", phuongThuc:"Chuyển khoản", trangThai:"cho-duyet", ghiChu:"ĐH-0104-003", nguoiTao:"Nguyễn A" },
-  { id:"4",  maPhieu:"PT-0404", loai:"thu", doiTuong:"Siêu thị Lotte Mart",           danhMuc:"Doanh thu bán hàng",  soTien:19800000,  ngay:"2026-04-02", phuongThuc:"Chuyển khoản", trangThai:"cho-duyet", ghiChu:"ĐH-0204-004", nguoiTao:"Trần B" },
-  { id:"5",  maPhieu:"PT-0405", loai:"thu", doiTuong:"Hỗ trợ OCOP tỉnh Hà Giang",   danhMuc:"Hỗ trợ nhà nước",     soTien:30000000,  ngay:"2026-04-01", phuongThuc:"Chuyển khoản", trangThai:"da-duyet",  ghiChu:"Hỗ trợ vùng NL", nguoiTao:"Nguyễn A" },
-  { id:"6",  maPhieu:"PT-0406", loai:"thu", doiTuong:"Quán trà Sen – Đỗ Thị Mai",    danhMuc:"Doanh thu bán hàng",  soTien:3800000,   ngay:"2026-04-03", phuongThuc:"Tiền mặt",    trangThai:"cho-duyet", ghiChu:"ĐH-0304-005", nguoiTao:"Nguyễn A" },
-  { id:"7",  maPhieu:"PC-0401", loai:"chi", doiTuong:"Hộ dân – Triệu Văn Thạo",      danhMuc:"Thu mua nguyên liệu", soTien:364500,    ngay:"2026-03-30", phuongThuc:"Tiền mặt",    trangThai:"da-duyet",  ghiChu:"PO-3003-001", nguoiTao:"Lê C" },
-  { id:"8",  maPhieu:"PC-0402", loai:"chi", doiTuong:"Hộ dân – Mạnh Văn Hồ",         danhMuc:"Thu mua nguyên liệu", soTien:1300000,   ngay:"2026-03-31", phuongThuc:"Tiền mặt",    trangThai:"da-duyet",  ghiChu:"PO-3103-003", nguoiTao:"Lê C" },
-  { id:"9",  maPhieu:"PC-0403", loai:"chi", doiTuong:"Nhân viên HTX (12 người)",      danhMuc:"Lương tháng 3/2026",  soTien:52000000,  ngay:"2026-03-31", phuongThuc:"Chuyển khoản", trangThai:"da-duyet",  ghiChu:"Lương + phụ cấp", nguoiTao:"Nguyễn A" },
-  { id:"10", maPhieu:"PC-0404", loai:"chi", doiTuong:"Cty in ấn Hà Giang",            danhMuc:"Bao bì đóng gói",     soTien:8500000,   ngay:"2026-04-01", phuongThuc:"Chuyển khoản", trangThai:"da-duyet",  ghiChu:"Đặt hàng bao bì Q2", nguoiTao:"Trần B" },
-  { id:"11", maPhieu:"PC-0405", loai:"chi", doiTuong:"Hộ dân – Nông Văn Nghiễm",     danhMuc:"Thu mua nguyên liệu", soTien:1276000,   ngay:"2026-04-01", phuongThuc:"Tiền mặt",    trangThai:"cho-duyet", ghiChu:"PO-0104-004", nguoiTao:"Lê C" },
-  { id:"12", maPhieu:"PC-0406", loai:"chi", doiTuong:"Điện lực Hà Giang",             danhMuc:"Điện sản xuất",       soTien:3200000,   ngay:"2026-03-28", phuongThuc:"Chuyển khoản", trangThai:"da-duyet",  ghiChu:"Điện tháng 3", nguoiTao:"Nguyễn A" },
-  { id:"13", maPhieu:"PC-0407", loai:"chi", doiTuong:"Nhiên liệu vận chuyển",          danhMuc:"Vận hành",            soTien:4500000,   ngay:"2026-04-03", phuongThuc:"Tiền mặt",    trangThai:"cho-duyet", ghiChu:"Xăng dầu T4", nguoiTao:"Trần B" },
-  { id:"14", maPhieu:"PC-0408", loai:"chi", doiTuong:"Bảo dưỡng máy sao chè",         danhMuc:"Bảo trì thiết bị",    soTien:6800000,   ngay:"2026-03-20", phuongThuc:"Tiền mặt",    trangThai:"da-duyet",  ghiChu:"Thay phụ tùng", nguoiTao:"Lê C" },
-  { id:"15", maPhieu:"PC-0409", loai:"chi", doiTuong:"Kiểm định VSATTP",               danhMuc:"Pháp lý",             soTien:5000000,   ngay:"2026-03-15", phuongThuc:"Chuyển khoản", trangThai:"tu-choi",   ghiChu:"Gia hạn giấy phép", nguoiTao:"Nguyễn A" },
-];
 
 const CONG_NO_KH = [
   { maKH:"KH-003", tenKH:"Cty CP XNK Hà Nội",         tongTien:45900000,  daThu:0,        conNo:45900000,  hanTT:"10/04/2026" },
@@ -70,7 +48,7 @@ export default function AccountingPage() {
   const [ttFilter, setTtFilter] = useState<TrangThai | "">("");
   const [sortKey, setSortKey] = useState("ngay");
   const [sortDir, setSortDir] = useState<"asc"|"desc">("desc");
-  const [phieuList, setPhieuList] = useState<Phieu[]>(PHIEU_DATA);
+  const { accountingEntries: phieuList, setAccountingEntries: setPhieuList } = useERP();
   const [selected, setSelected] = useState<Phieu | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [fLoai, setFLoai] = useState<PhieuType>("thu"); const [fDoiTuong, setFDoiTuong] = useState("");

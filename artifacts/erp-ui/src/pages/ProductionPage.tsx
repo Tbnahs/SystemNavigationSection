@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 import { TEN_SAN_PHAM, MAU_SAN_PHAM } from "@/constants/products";
+import { useERP, LoSX } from "@/contexts/ERPContext";
 
 type TrangThai = "ke-hoach" | "xuat-nvl" | "dang-che-bien" | "hoan-thanh" | "da-nhap-kho";
 const TT_CFG: Record<TrangThai, { label: string; color: string; step: number }> = {
@@ -25,33 +26,6 @@ const NEXT_STATUS: Record<TrangThai, TrangThai | null> = {
 
 const PRODUCT_COLOR = MAU_SAN_PHAM;
 
-interface LoSX {
-  id: string; maLo: string; ngaySX: string; loaiChe: string; soHo: number;
-  klNVL: number; klTP: number; tyLeKhoHao: number; trangThai: TrangThai;
-  cacMaBatch: string[]; batchTP: string; ghiChu: string;
-}
-
-const LOSX_DATA: LoSX[] = [
-  { id:"1",  maLo:"L013003",  ngaySX:"30/03/2026", loaiChe:"Hồng trà",  soHo:2, klNVL:25.5,  klTP:5.6,  tyLeKhoHao:22.0, trangThai:"da-nhap-kho",   cacMaBatch:["RAW-NH004-3003","RAW-NB002-3003"], batchTP:"L013003",  ghiChu:"" },
-  { id:"2",  maLo:"L023103",  ngaySX:"31/03/2026", loaiChe:"Hồng trà",  soHo:3, klNVL:27.5,  klTP:6.1,  tyLeKhoHao:22.2, trangThai:"da-nhap-kho",   cacMaBatch:["RAW-NH001-3103","RAW-NH002-3103","RAW-NH008-3103"], batchTP:"L023103",  ghiChu:"" },
-  { id:"3",  maLo:"L033103",  ngaySX:"31/03/2026", loaiChe:"Hồng trà",  soHo:2, klNVL:28.5,  klTP:6.3,  tyLeKhoHao:22.1, trangThai:"da-nhap-kho",   cacMaBatch:["RAW-NH009-3103","RAW-NH004-3103"], batchTP:"L033103",  ghiChu:"" },
-  { id:"4",  maLo:"L043103",  ngaySX:"31/03/2026", loaiChe:"Hồng trà",  soHo:2, klNVL:22.0,  klTP:4.8,  tyLeKhoHao:21.8, trangThai:"da-nhap-kho",   cacMaBatch:["RAW-NH006-3103","RAW-NH007-3103"], batchTP:"L043103",  ghiChu:"" },
-  { id:"5",  maLo:"L053103",  ngaySX:"31/03/2026", loaiChe:"Hồng trà",  soHo:1, klNVL:22.0,  klTP:4.8,  tyLeKhoHao:21.8, trangThai:"da-nhap-kho",   cacMaBatch:["RAW-NH007-3103"],                  batchTP:"L053103",  ghiChu:"" },
-  { id:"6",  maLo:"L063103",  ngaySX:"31/03/2026", loaiChe:"Hồng trà",  soHo:2, klNVL:18.5,  klTP:4.1,  tyLeKhoHao:22.2, trangThai:"da-nhap-kho",   cacMaBatch:["RAW-NB009-3103","RAW-NB010-3103"], batchTP:"L063103",  ghiChu:"" },
-  { id:"7",  maLo:"L073103",  ngaySX:"31/03/2026", loaiChe:"Bạch trà",  soHo:4, klNVL:9.5,   klTP:1.7,  tyLeKhoHao:17.9, trangThai:"da-nhap-kho",   cacMaBatch:["RAW-NB010-3103","RAW-NB001-3103","RAW-NB002-3103","RAW-NB007-3103"], batchTP:"L073103", ghiChu:"Tôm trắng đặc sản" },
-  { id:"8",  maLo:"L083103",  ngaySX:"31/03/2026", loaiChe:"Hồng trà",  soHo:1, klNVL:9.3,   klTP:2.0,  tyLeKhoHao:21.5, trangThai:"da-nhap-kho",   cacMaBatch:["RAW-NH010-3103"],                  batchTP:"L083103",  ghiChu:"" },
-  { id:"9",  maLo:"L09104",   ngaySX:"01/04/2026", loaiChe:"Chè xanh",  soHo:2, klNVL:24.7,  klTP:5.9,  tyLeKhoHao:23.9, trangThai:"hoan-thanh",    cacMaBatch:["RAW-NH001-0104","RAW-NH004-0104"], batchTP:"L09104",   ghiChu:"" },
-  { id:"10", maLo:"L010104",  ngaySX:"01/04/2026", loaiChe:"Chè xanh",  soHo:3, klNVL:31.5,  klTP:7.5,  tyLeKhoHao:23.8, trangThai:"hoan-thanh",    cacMaBatch:["RAW-NB011-0104","RAW-NB012-0104","RAW-NB010-0104"], batchTP:"L010104", ghiChu:"" },
-  { id:"11", maLo:"L011104",  ngaySX:"01/04/2026", loaiChe:"Chè xanh",  soHo:2, klNVL:55.2,  klTP:13.2, tyLeKhoHao:23.9, trangThai:"hoan-thanh",    cacMaBatch:["RAW-NB013-0104","RAW-NB002-0104"], batchTP:"L011104",  ghiChu:"" },
-  { id:"12", maLo:"L012104",  ngaySX:"01/04/2026", loaiChe:"Chè xanh",  soHo:2, klNVL:45.0,  klTP:10.8, tyLeKhoHao:24.0, trangThai:"hoan-thanh",    cacMaBatch:["RAW-NB004-0104","RAW-NB001-0104"], batchTP:"L012104",  ghiChu:"" },
-  { id:"13", maLo:"L013104",  ngaySX:"01/04/2026", loaiChe:"Chè xanh",  soHo:1, klNVL:23.8,  klTP:5.7,  tyLeKhoHao:24.0, trangThai:"hoan-thanh",    cacMaBatch:["RAW-NB006-0104"],                  batchTP:"L013104",  ghiChu:"" },
-  { id:"14", maLo:"L014104",  ngaySX:"01/04/2026", loaiChe:"Chè xanh",  soHo:3, klNVL:26.4,  klTP:0,    tyLeKhoHao:0,    trangThai:"dang-che-bien", cacMaBatch:["RAW-NH007-0104","RAW-NH003-0104","RAW-NH010-0104"], batchTP:"",        ghiChu:"" },
-  { id:"15", maLo:"L015104",  ngaySX:"01/04/2026", loaiChe:"Chè xanh",  soHo:1, klNVL:11.7,  klTP:0,    tyLeKhoHao:0,    trangThai:"dang-che-bien", cacMaBatch:["RAW-BC003-0104"],                  batchTP:"",         ghiChu:"" },
-  { id:"16", maLo:"L016104",  ngaySX:"01/04/2026", loaiChe:"Chè xanh",  soHo:2, klNVL:25.5,  klTP:0,    tyLeKhoHao:0,    trangThai:"xuat-nvl",      cacMaBatch:["RAW-NH006-0104","RAW-NH008-0104"], batchTP:"",         ghiChu:"" },
-  { id:"17", maLo:"L017104",  ngaySX:"01/04/2026", loaiChe:"Chè xanh",  soHo:1, klNVL:34.5,  klTP:0,    tyLeKhoHao:0,    trangThai:"xuat-nvl",      cacMaBatch:["RAW-NB009-0104"],                  batchTP:"",         ghiChu:"" },
-  { id:"18", maLo:"L018104",  ngaySX:"02/04/2026", loaiChe:"Phổ nhĩ",   soHo:2, klNVL:22.0,  klTP:0,    tyLeKhoHao:0,    trangThai:"ke-hoach",      cacMaBatch:[],                                  batchTP:"",         ghiChu:"Kế hoạch tháng 4" },
-  { id:"19", maLo:"L019104",  ngaySX:"03/04/2026", loaiChe:"Bạch trà",  soHo:2, klNVL:8.0,   klTP:0,    tyLeKhoHao:0,    trangThai:"ke-hoach",      cacMaBatch:[],                                  batchTP:"",         ghiChu:"Theo đơn KH-003" },
-];
 
 const STEPS = ["Kế hoạch","Xuất NVL","Đang SX","Hoàn thành","Nhập kho"];
 
@@ -66,7 +40,7 @@ export default function ProductionPage() {
   const [loaiFilter, setLoaiFilter] = useState("");
   const [sortKey, setSortKey] = useState("ngaySX");
   const [sortDir, setSortDir] = useState<"asc"|"desc">("desc");
-  const [loList, setLoList] = useState<LoSX[]>(LOSX_DATA);
+  const { productionBatches: loList, setProductionBatches: setLoList } = useERP();
   const [selected, setSelected] = useState<LoSX | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [fLoai, setFLoai] = useState("Chè xanh"); const [fNgay, setFNgay] = useState(new Date().toISOString().slice(0,10));

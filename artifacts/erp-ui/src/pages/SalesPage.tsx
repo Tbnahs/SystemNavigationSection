@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 import { DANH_SACH_SAN_PHAM, MAU_SAN_PHAM as PRODUCT_COLORS_SHARED } from "@/constants/products";
+import { useERP, SalesOrder, OrderLine } from "@/contexts/ERPContext";
 
 /* ────────────── Types ────────────── */
 type OrderStatus = "bao-gia" | "xac-nhan" | "xuat-kho" | "dang-giao" | "hoan-thanh" | "huy";
@@ -41,37 +42,8 @@ const LOAI_KHACH_CFG: Record<LoaiKhach, { label: string; color: string }> = {
 
 const STATUS_FLOW: OrderStatus[] = ["bao-gia", "xac-nhan", "xuat-kho", "dang-giao", "hoan-thanh"];
 
-interface OrderLine {
-  sanPham: string;
-  loai: string;
-  soLuong: number;
-  donVi: string;
-  donGia: number;
-  thanhTien: number;
-  maLoSX: string;
-}
-
-interface SalesOrder {
-  id: string;
-  maDon: string;
-  loaiKhach: LoaiKhach;
-  khachHang: string;
-  diaChi: string;
-  sdt: string;
-  ngayDat: string;
-  ngayGiao: string;
-  trangThai: OrderStatus;
-  thanhToan: ThanhToanStatus;
-  sanPhams: OrderLine[];
-  tongTien: number;
-  daThanhToan: number;
-  ghiChu: string;
-  nguoiTao: string;
-  maVanDon: string;
-}
-
-/* ────────────── Seed data ────────────── */
-const SEED: SalesOrder[] = [
+/* ────────────── Seed data (moved to ERPContext) ────────────── */
+const SEED_UNUSED: SalesOrder[] = [
   {
     id: "1", maDon: "SO-2603-001", loaiKhach: "dai-ly",
     khachHang: "Cty TNHH Trà Thái Nguyên", diaChi: "TP. Thái Nguyên", sdt: "0208 3856 123",
@@ -185,7 +157,7 @@ export default function SalesPage() {
   const [sortKey, setSortKey]     = useState("ngayDat");
   const [sortDir, setSortDir]     = useState<"asc" | "desc">("desc");
 
-  const [orders, setOrders]       = useState<SalesOrder[]>(SEED);
+  const { salesOrders: orders, setSalesOrders: setOrders, availableLotsForSales } = useERP();
   const [selected, setSelected]   = useState<SalesOrder | null>(null);
   const [showCreate, setShowCreate] = useState(false);
 

@@ -1,9 +1,10 @@
 import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
+import { useERP, PurchaseOrder, RawReceipt } from "@/contexts/ERPContext";
 import AppLayout from "@/components/AppLayout";
 import {
-  ArrowLeft, Search, ChevronUp, ChevronDown, Users, Leaf,
+  ArrowLeft, ArrowRight, Search, ChevronUp, ChevronDown, Users, Leaf,
   TrendingUp, Filter, X, Plus, MapPin, Phone, FileSpreadsheet,
   FileText, Printer, Trash2, Eye, CheckCircle2, Clock, Truck,
   Package, QrCode, ChevronRight, Warehouse, BadgeDollarSign,
@@ -91,31 +92,6 @@ const ZONES: Record<string, { maVuon: string; tenVuon: string; dienTich: number 
   BC003: [{ maVuon: "BC003-V1", tenVuon: "Vườn Bản Chang 1", dienTich: 0.5 }],
 };
 
-/* ────────── Purchase Order data ────────── */
-interface PurchaseOrder {
-  id: string;
-  maPO: string;
-  maHo: string;
-  tenHo: string;
-  diaChi: string;
-  sdt: string;
-  maVuon: string;
-  tenVuon: string;
-  ngayTao: string;
-  ngayGiao: string;
-  quyCach: string;
-  khoiLuongDat: number;
-  khoiLuongNhan: number;
-  donGia: number;
-  chatLuong: number;
-  qcResult: QCResult;
-  trangThai: POStatus;
-  thanhToan: ThanhToan;
-  batchId: string;
-  ghiChu: string;
-  nguoiTao: string;
-}
-
 /* ── Quy cách specs (per official price table) ── */
 const QUY_CACH_CFG: Record<string, { loaiChe: string; priceNote: string; color: string; fixedPrice?: number }> = {
   "1 tôm":        { loaiChe: "Chè xanh",  priceNote: "27,000 – 30,000 đ/kg",   color: "bg-emerald-100 text-emerald-800 border-emerald-300" },
@@ -142,30 +118,7 @@ const calcDonGia = (quyCach: string, cl: number) => {
   return 27000;
 };
 
-const PO_SEED: PurchaseOrder[] = [
-  { id: "1", maPO: "PO-3003-001", maHo: "NH004", tenHo: "Triệu Văn Thạo",   diaChi: "Nà Hồng", sdt: "0354871949", maVuon: "NH004-V1", tenVuon: "Vườn Nà Hồng 1", ngayTao: "28/03/2026", ngayGiao: "30/03/2026", quyCach: "1 tôm 2 lá", khoiLuongDat: 15.0, khoiLuongNhan: 13.5,  donGia: 27000,  chatLuong: 78, qcResult: "pass",  trangThai: "thanh-toan", thanhToan: "da-thanh-toan", batchId: "RAW-NH004-3003", ghiChu: "",                nguoiTao: "Nguyễn A" },
-  { id: "2", maPO: "PO-3103-002", maHo: "NH008", tenHo: "Đồng Thị Khuyết",  diaChi: "Nà Hồng", sdt: "0962041090", maVuon: "NH008-V1", tenVuon: "Vườn Nà Hồng 1", ngayTao: "29/03/2026", ngayGiao: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuongDat: 10.0, khoiLuongNhan: 8.5,   donGia: 28500,  chatLuong: 83, qcResult: "pass",  trangThai: "thanh-toan", thanhToan: "da-thanh-toan", batchId: "RAW-NH008-3103", ghiChu: "",                nguoiTao: "Nguyễn A" },
-  { id: "3", maPO: "PO-3103-003", maHo: "NB010", tenHo: "Mạnh Văn Hồ",      diaChi: "Nà Bay",  sdt: "0349055299", maVuon: "NB010-V1", tenVuon: "Vườn Nà Bay 1",    ngayTao: "29/03/2026", ngayGiao: "31/03/2026", quyCach: "1 tôm",      khoiLuongDat: 3.0,  khoiLuongNhan: 2.5,   donGia: 29000,  chatLuong: 98, qcResult: "pass",  trangThai: "nhap-kho",   thanhToan: "mot-phan",    batchId: "RAW-NB010-3103", ghiChu: "1 tôm chất lượng cao (90–99%)", nguoiTao: "Trần B" },
-  { id: "4", maPO: "PO-0104-004", maHo: "NB002", tenHo: "Nông Văn Nghiễm",  diaChi: "Nà Bay",  sdt: "0814665955", maVuon: "NB002-V1", tenVuon: "Vườn Nà Bay 1",    ngayTao: "01/04/2026", ngayGiao: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuongDat: 50.0, khoiLuongNhan: 44.0,  donGia: 29000,  chatLuong: 90, qcResult: "pass",  trangThai: "nhap-kho",   thanhToan: "chua",         batchId: "RAW-NB002-0104", ghiChu: "",                nguoiTao: "Nguyễn A" },
-  { id: "5", maPO: "PO-0104-005", maHo: "NB013", tenHo: "Triệu Văn Cường",  diaChi: "Nà Bay",  sdt: "",           maVuon: "NB013-V1", tenVuon: "Vườn Nà Bay 1",    ngayTao: "01/04/2026", ngayGiao: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuongDat: 60.0, khoiLuongNhan: 50.0,  donGia: 29000,  chatLuong: 91, qcResult: "pass",  trangThai: "qc",         thanhToan: "chua",         batchId: "",               ghiChu: "",                nguoiTao: "Trần B" },
-  { id: "6", maPO: "PO-0304-006", maHo: "NB006", tenHo: "Hoàng Văn Thống",  diaChi: "Nà Bay",  sdt: "0967186387", maVuon: "NB006-V1", tenVuon: "Vườn Nà Bay 1",    ngayTao: "03/04/2026", ngayGiao: "05/04/2026", quyCach: "1 tôm 2 lá", khoiLuongDat: 55.0, khoiLuongNhan: 49.2,  donGia: 29000,  chatLuong: 89, qcResult: "pass",  trangThai: "nhan-hang",  thanhToan: "chua",         batchId: "",               ghiChu: "",                nguoiTao: "Nguyễn A" },
-  { id: "7", maPO: "PO-0404-007", maHo: "NH009", tenHo: "Hạ Văn Thắng",     diaChi: "Nà Hồng", sdt: "0337318858", maVuon: "NH009-V2", tenVuon: "Vườn Nà Hồng 2",  ngayTao: "04/04/2026", ngayGiao: "06/04/2026", quyCach: "1 tôm 2 lá", khoiLuongDat: 20.0, khoiLuongNhan: 0,     donGia: 29000,  chatLuong: 92, qcResult: "pending", trangThai: "dat-hang",   thanhToan: "chua",         batchId: "",               ghiChu: "Dự kiến thu buổi sáng", nguoiTao: "Trần B" },
-  { id: "8", maPO: "PO-0504-008", maHo: "BC002", tenHo: "Triệu Văn Dựng",   diaChi: "Bản Chang", sdt: "0343233785", maVuon: "BC002-V1", tenVuon: "Vườn Bản Chang 1", ngayTao: "05/04/2026", ngayGiao: "07/04/2026", quyCach: "1 tôm 2 lá", khoiLuongDat: 25.0, khoiLuongNhan: 0,     donGia: 28000,  chatLuong: 85, qcResult: "pending", trangThai: "yeu-cau",    thanhToan: "chua",         batchId: "",               ghiChu: "",                nguoiTao: "Nguyễn A" },
-];
 
-/* ────────── Nhận hàng raw records ────────── */
-const RAW_RECEIPTS = [
-  { id: 1,  maPO: "PO-3003-001", maHo: "NH004", tenHo: "Triệu Văn Thạo",   diaChi: "Nà Hồng",   ngay: "30/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 13.50, donGia: 27000,  thanhTien: 364500,  batchId: "RAW-NH004-3003" },
-  { id: 2,  maPO: "PO-3103-003", maHo: "NB010", tenHo: "Mạnh Văn Hồ",      diaChi: "Nà Bay",    ngay: "31/03/2026", quyCach: "1 tôm",      khoiLuong: 2.50,  donGia: 29000,  thanhTien: 72500,   batchId: "RAW-NB010-3103" },
-  { id: 3,  maPO: "PO-3103-002", maHo: "NH008", tenHo: "Đồng Thị Khuyết",  diaChi: "Nà Hồng",   ngay: "31/03/2026", quyCach: "1 tôm 2 lá", khoiLuong: 8.50,  donGia: 28500,  thanhTien: 242250,  batchId: "RAW-NH008-3103" },
-  { id: 4,  maPO: "PO-0104-004", maHo: "NB002", tenHo: "Nông Văn Nghiễm",  diaChi: "Nà Bay",    ngay: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 44.00, donGia: 29000,  thanhTien: 1276000, batchId: "RAW-NB002-0104" },
-  { id: 5,  maPO: "PO-0104-005", maHo: "NB013", tenHo: "Triệu Văn Cường",  diaChi: "Nà Bay",    ngay: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 50.00, donGia: 29000,  thanhTien: 1450000, batchId: "" },
-  { id: 6,  maPO: "PO-0304-006", maHo: "NB006", tenHo: "Hoàng Văn Thống",  diaChi: "Nà Bay",    ngay: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 49.20, donGia: 29000,  thanhTien: 1426800, batchId: "" },
-  { id: 7,  maPO: "",            maHo: "NH001", tenHo: "Hoàng Thị Luyến",  diaChi: "Nà Hồng",   ngay: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 3.20,  donGia: 29000,  thanhTien: 92800,   batchId: "" },
-  { id: 8,  maPO: "",            maHo: "NH007", tenHo: "Hoàng Văn Tuấn",   diaChi: "Nà Hồng",   ngay: "01/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 11.50, donGia: 28000,  thanhTien: 322000,  batchId: "" },
-  { id: 9,  maPO: "",            maHo: "BC001", tenHo: "Hoàng Phúc Khôi",  diaChi: "Bản Chang",  ngay: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 12.40, donGia: 28000,  thanhTien: 347200,  batchId: "" },
-  { id: 10, maPO: "",            maHo: "NB004", tenHo: "Triệu Văn Mỹ",     diaChi: "Nà Bay",    ngay: "03/04/2026", quyCach: "1 tôm 2 lá", khoiLuong: 21.50, donGia: 29000,  thanhTien: 623500,  batchId: "" },
-];
 
 let _nextId = 200;
 const genId = () => String(++_nextId);
@@ -191,8 +144,7 @@ export default function PurchasePage() {
   const [sortKey, setSortKey]   = useState("ngayTao");
   const [sortDir, setSortDir]   = useState<"asc"|"desc">("desc");
 
-  const [poList, setPoList]     = useState<PurchaseOrder[]>(PO_SEED);
-  const [receipts]              = useState(RAW_RECEIPTS);
+  const { purchaseOrders: poList, setPurchaseOrders: setPoList, rawReceipts: receipts } = useERP();
   const [selectedPO, setSelectedPO] = useState<PurchaseOrder | null>(null);
   const [showCreate, setShowCreate] = useState(false);
 

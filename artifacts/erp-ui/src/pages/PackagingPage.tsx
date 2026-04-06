@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 import { TEN_SAN_PHAM, MAU_SAN_PHAM as PRODUCT_COLOR } from "@/constants/products";
+import { useERP, LoDG } from "@/contexts/ERPContext";
 const BAO_BI_OPTIONS = [
   { value: "hop-giay-100g",   label: "Hộp giấy 100g",         kgPerUnit: 0.1  },
   { value: "hop-thiec-250g",  label: "Hộp thiếc 250g",         kgPerUnit: 0.25 },
@@ -29,29 +30,6 @@ const NEXT_TT: Record<TrangThai, TrangThai|null> = {
 };
 const STEPS_DG = ["Chờ đóng gói","Đang đóng gói","Hoàn thành","Đã xuất kho"];
 
-interface LoDG {
-  id: string; maDG: string; maLoSX: string; thoiGian: string; thanhPham: string;
-  loaiBaoBi: string; klDG: number; soSP: number; trangThai: TrangThai;
-  qrCode: string; nguoiTao: string; ghiChu: string;
-}
-
-const initData: LoDG[] = [
-  { id:"1",  maDG:"S013003",  maLoSX:"L013003",  thoiGian:"30/03/2026", thanhPham:"Hồng trà",  loaiBaoBi:"hop-thiec-250g",  klDG:5.5,  soSP:22,  trangThai:"da-xuat-kho",   qrCode:"QR-S013003", nguoiTao:"HTX Hồng Hà", ghiChu:"" },
-  { id:"2",  maDG:"S023103",  maLoSX:"L023103",  thoiGian:"31/03/2026", thanhPham:"Hồng trà",  loaiBaoBi:"hop-thiec-250g",  klDG:6.0,  soSP:24,  trangThai:"da-xuat-kho",   qrCode:"QR-S023103", nguoiTao:"HTX Hồng Hà", ghiChu:"" },
-  { id:"3",  maDG:"S033103",  maLoSX:"L033103",  thoiGian:"31/03/2026", thanhPham:"Hồng trà",  loaiBaoBi:"hop-thiec-250g",  klDG:6.2,  soSP:25,  trangThai:"da-xuat-kho",   qrCode:"QR-S033103", nguoiTao:"HTX Hồng Hà", ghiChu:"" },
-  { id:"4",  maDG:"S043103",  maLoSX:"L043103",  thoiGian:"31/03/2026", thanhPham:"Hồng trà",  loaiBaoBi:"hop-giay-100g",   klDG:4.7,  soSP:47,  trangThai:"da-xuat-kho",   qrCode:"QR-S043103", nguoiTao:"HTX Hồng Hà", ghiChu:"" },
-  { id:"5",  maDG:"S053103",  maLoSX:"L053103",  thoiGian:"31/03/2026", thanhPham:"Hồng trà",  loaiBaoBi:"hop-giay-100g",   klDG:4.7,  soSP:47,  trangThai:"da-xuat-kho",   qrCode:"QR-S053103", nguoiTao:"HTX Hồng Hà", ghiChu:"" },
-  { id:"6",  maDG:"S063103",  maLoSX:"L063103",  thoiGian:"31/03/2026", thanhPham:"Hồng trà",  loaiBaoBi:"hop-giay-100g",   klDG:4.0,  soSP:40,  trangThai:"da-xuat-kho",   qrCode:"QR-S063103", nguoiTao:"HTX Hồng Hà", ghiChu:"" },
-  { id:"7",  maDG:"S073103",  maLoSX:"L073103",  thoiGian:"31/03/2026", thanhPham:"Bạch trà",  loaiBaoBi:"tui-kraft-50g",   klDG:1.65, soSP:33,  trangThai:"da-xuat-kho",   qrCode:"QR-S073103", nguoiTao:"HTX Hồng Hà", ghiChu:"Tôm trắng đặc sản" },
-  { id:"8",  maDG:"S083103",  maLoSX:"L083103",  thoiGian:"31/03/2026", thanhPham:"Hồng trà",  loaiBaoBi:"tui-kraft-50g",   klDG:1.95, soSP:39,  trangThai:"da-xuat-kho",   qrCode:"QR-S083103", nguoiTao:"HTX Hồng Hà", ghiChu:"" },
-  { id:"9",  maDG:"S09104",   maLoSX:"L09104",   thoiGian:"01/04/2026", thanhPham:"Chè xanh",  loaiBaoBi:"hop-giay-100g",   klDG:5.8,  soSP:58,  trangThai:"hoan-thanh",    qrCode:"QR-S09104",  nguoiTao:"HTX Hồng Hà", ghiChu:"" },
-  { id:"10", maDG:"S010104",  maLoSX:"L010104",  thoiGian:"01/04/2026", thanhPham:"Chè xanh",  loaiBaoBi:"hop-giay-100g",   klDG:7.4,  soSP:74,  trangThai:"hoan-thanh",    qrCode:"QR-S010104", nguoiTao:"HTX Hồng Hà", ghiChu:"" },
-  { id:"11", maDG:"S011104",  maLoSX:"L011104",  thoiGian:"01/04/2026", thanhPham:"Chè xanh",  loaiBaoBi:"tui-bulk-1kg",    klDG:13.0, soSP:13,  trangThai:"hoan-thanh",    qrCode:"QR-S011104", nguoiTao:"HTX Hồng Hà", ghiChu:"Xuất bulk cho NPP" },
-  { id:"12", maDG:"S012104",  maLoSX:"L012104",  thoiGian:"01/04/2026", thanhPham:"Chè xanh",  loaiBaoBi:"tui-bulk-1kg",    klDG:10.5, soSP:11,  trangThai:"hoan-thanh",    qrCode:"QR-S012104", nguoiTao:"HTX Hồng Hà", ghiChu:"" },
-  { id:"13", maDG:"S013104",  maLoSX:"L013104",  thoiGian:"02/04/2026", thanhPham:"Chè xanh",  loaiBaoBi:"hop-qua-tang",    klDG:5.5,  soSP:28,  trangThai:"dang-dong-goi", qrCode:"",           nguoiTao:"HTX Hồng Hà", ghiChu:"Đơn Lotte Mart" },
-  { id:"14", maDG:"S014104",  maLoSX:"L09104",   thoiGian:"02/04/2026", thanhPham:"Chè xanh",  loaiBaoBi:"hop-giay-100g",   klDG:0.8,  soSP:8,   trangThai:"cho-dong-goi",  qrCode:"",           nguoiTao:"HTX Hồng Hà", ghiChu:"" },
-  { id:"15", maDG:"S015104",  maLoSX:"L073103",  thoiGian:"03/04/2026", thanhPham:"Bạch trà",  loaiBaoBi:"hop-qua-tang",    klDG:0.3,  soSP:2,   trangThai:"cho-dong-goi",  qrCode:"",           nguoiTao:"HTX Hồng Hà", ghiChu:"Đơn đặc biệt KH-003" },
-];
 
 let _nid = 900;
 const genId = () => String(++_nid);
@@ -63,7 +41,7 @@ export default function PackagingPage() {
   const [spFilter, setSpFilter] = useState("");
   const [sortKey, setSortKey] = useState("thoiGian");
   const [sortDir, setSortDir] = useState<"asc"|"desc">("desc");
-  const [loList, setLoList] = useState<LoDG[]>(initData);
+  const { packagingLots: loList, setPackagingLots: setLoList, availableProductionBatches } = useERP();
   const [selected, setSelected] = useState<LoDG | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showQR, setShowQR] = useState<string|null>(null);
@@ -387,7 +365,20 @@ export default function PackagingPage() {
           <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md flex flex-col max-h-[88vh]">
             <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0"><div className="flex items-center gap-2"><Box className="w-4 h-4 text-primary"/><span className="font-semibold text-sm">Tạo lô đóng gói mới</span></div><button onClick={()=>setShowCreate(false)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4"/></button></div>
             <div className="overflow-y-auto flex-1 px-5 py-4 space-y-4">
-              <div><label className="block text-xs font-semibold mb-1.5">Mã lô sản xuất <span className="text-red-500">*</span></label><input value={fLoSX} onChange={e=>setFLoSX(e.target.value)} placeholder="L09104, L010104..." className="w-full px-3 py-2.5 text-sm border border-border rounded-lg"/></div>
+              <div>
+                <label className="block text-xs font-semibold mb-1.5">Lô sản xuất <span className="text-red-500">*</span></label>
+                <select value={fLoSX} onChange={e=>{
+                  const lo = availableProductionBatches.find(b=>b.maLo===e.target.value);
+                  setFLoSX(e.target.value);
+                  if (lo) setFSP(lo.loaiChe);
+                }} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
+                  <option value="">-- Chọn lô sản xuất --</option>
+                  {availableProductionBatches.map(b=>(
+                    <option key={b.maLo} value={b.maLo}>{b.maLo} · {b.loaiChe} · {b.klTP} kg · {b.ngaySX}</option>
+                  ))}
+                </select>
+                {availableProductionBatches.length === 0 && <p className="text-xs text-amber-600 mt-1">Chưa có lô sản xuất hoàn thành. Hoàn tất lệnh sản xuất trước.</p>}
+              </div>
               <div><label className="block text-xs font-semibold mb-1.5">Sản phẩm</label><select value={fSP} onChange={e=>setFSP(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">{TEN_SAN_PHAM.map(s=><option key={s} value={s}>{s}</option>)}</select></div>
               <div><label className="block text-xs font-semibold mb-1.5">Bao bì</label><select value={fBaoBi} onChange={e=>setFBaoBi(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg">{BAO_BI_OPTIONS.map(b=><option key={b.value} value={b.value}>{b.label}</option>)}</select></div>
               <div className="grid grid-cols-2 gap-3">
