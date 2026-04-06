@@ -6,6 +6,7 @@ import {
   TrendingUp, TrendingDown, ShoppingCart, Package,
   Users, Scale, Leaf, BarChart2, PieChart, Activity, QrCode, Layers,
 } from "lucide-react";
+import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 
 type TabKey = "tong-hop" | "thu-mua" | "ban-hang" | "san-xuat" | "truy-xuat";
 
@@ -117,6 +118,28 @@ export default function ReportsPage() {
   const [, setLocation] = useLocation();
   const [activeTab, setActiveTab] = useState<TabKey>("tong-hop");
 
+  const handleExportExcel = () => exportToExcel(
+    [
+      { header: "Tháng", key: "thang", width: 12 },
+      { header: "Thu mua (triệu đ)", key: "thuMua", width: 20 },
+      { header: "Bán hàng (triệu đ)", key: "banHang", width: 20 },
+    ],
+    MONTHLY_REVENUE as unknown as Record<string, unknown>[],
+    "BaoCao_HTXHongHa"
+  );
+
+  const handleExportPDF = () => exportToPDF(
+    "Báo cáo Doanh thu HTX Hồng Hà",
+    "Hệ thống Truy xuất nguồn gốc Chè Quân Chu · Tổng hợp 6 tháng gần nhất",
+    [
+      { header: "Tháng", key: "thang", width: 20 },
+      { header: "Thu mua (triệu đ)", key: "thuMua", width: 30 },
+      { header: "Bán hàng (triệu đ)", key: "banHang", width: 30 },
+    ],
+    MONTHLY_REVENUE as unknown as Record<string, unknown>[],
+    "BaoCao_HTXHongHa"
+  );
+
   const TABS: { key: TabKey; label: string; icon: React.ComponentType<{className?: string}> }[] = [
     { key: "tong-hop",  label: "Tổng hợp",       icon: BarChart2 },
     { key: "thu-mua",   label: "Thu mua",          icon: Scale },
@@ -132,8 +155,8 @@ export default function ReportsPage() {
         <div className="flex items-center justify-between">
           <div><h1 className="text-xl font-bold">Báo cáo & Phân tích</h1><p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · Sản phẩm → Batch → Nông hộ · Báo cáo OCOP</p></div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
+            <button onClick={handleExportExcel} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
+            <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
             <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium border border-border rounded-lg hover:bg-muted/50"><Printer className="w-3.5 h-3.5" /> In</button>
           </div>
         </div>

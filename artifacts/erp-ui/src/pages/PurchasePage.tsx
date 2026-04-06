@@ -1,6 +1,6 @@
 import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
-import * as XLSX from "xlsx";
+import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 import AppLayout from "@/components/AppLayout";
 import {
   ArrowLeft, Search, ChevronUp, ChevronDown, Users, Leaf,
@@ -272,12 +272,42 @@ export default function PurchasePage() {
     if (selectedPO?.id === id) setSelectedPO(null);
   };
 
-  const handleExport = () => {
-    const wb = XLSX.utils.book_new();
-    const rows = receipts.map(r => ({ "Mã hộ": r.maHo, "Tên hộ": r.tenHo, "Ngày": r.ngay, "Quy cách": r.quyCach, "KL (kg)": r.khoiLuong, "Đơn giá": r.donGia, "Thành tiền": r.thanhTien }));
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(rows), "Nhận hàng");
-    XLSX.writeFile(wb, `HTX_HongHa_ThuMua_${new Date().toLocaleDateString("vi-VN").replace(/\//g,"-")}.xlsx`);
-  };
+  const handleExportPDF = () => exportToPDF(
+    "Danh sách Phiếu Thu mua",
+    `HTX Hồng Hà · ${poList.length} phiếu thu mua nguyên liệu`,
+    [
+      { header: "Mã PO", key: "maPO", width: 16 },
+      { header: "Nông hộ", key: "tenHo", width: 32 },
+      { header: "Vườn", key: "tenVuon", width: 20 },
+      { header: "Ngày tạo", key: "ngayTao", width: 16 },
+      { header: "Ngày giao", key: "ngayGiao", width: 16 },
+      { header: "KL đặt (kg)", key: "khoiLuongDat", width: 16 },
+      { header: "KL nhận (kg)", key: "khoiLuongNhan", width: 16 },
+      { header: "Đơn giá (đ)", key: "donGia", width: 16 },
+      { header: "Trạng thái", key: "trangThai", width: 16 },
+    ],
+    poList as unknown as Record<string, unknown>[],
+    "ThuMua_HTXHongHa"
+  );
+
+  const handleExport = () => exportToExcel(
+    [
+      { header: "Mã PO", key: "maPO", width: 16 },
+      { header: "Mã hộ", key: "maHo", width: 10 },
+      { header: "Tên hộ", key: "tenHo", width: 28 },
+      { header: "Vùng", key: "diaChi", width: 14 },
+      { header: "Quy cách", key: "quyCach", width: 16 },
+      { header: "Ngày tạo", key: "ngayTao", width: 14 },
+      { header: "Ngày giao", key: "ngayGiao", width: 14 },
+      { header: "KL đặt (kg)", key: "khoiLuongDat", width: 14 },
+      { header: "KL nhận (kg)", key: "khoiLuongNhan", width: 14 },
+      { header: "Đơn giá (đ)", key: "donGia", width: 14 },
+      { header: "Trạng thái", key: "trangThai", width: 14 },
+      { header: "Ghi chú", key: "ghiChu", width: 28 },
+    ],
+    poList as unknown as Record<string, unknown>[],
+    "ThuMua_HTXHongHa"
+  );
 
   const parseDateVN = (s: string) => { const [d,m,y] = s.split("/"); return `${y}-${m}-${d}`; };
   const handleSort = (k: string) => {
@@ -329,7 +359,7 @@ export default function PurchasePage() {
           </div>
           <div className="flex items-center gap-2">
             <button onClick={handleExport} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors"><FileText className="w-3.5 h-3.5" /> PDF</button>
+            <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors"><FileText className="w-3.5 h-3.5" /> PDF</button>
             <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"><Printer className="w-3.5 h-3.5" /> In</button>
             <button onClick={() => { setShowCreate(true); resetForm(); }} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap"><Plus className="w-4 h-4" /> Tạo đơn mua</button>
           </div>

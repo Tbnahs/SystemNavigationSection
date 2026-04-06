@@ -5,8 +5,9 @@ import {
   ArrowLeft, Search, Filter, Plus, X, Trash2, Eye,
   Package, TrendingDown, TrendingUp, AlertTriangle,
   ChevronDown, ChevronUp, FileSpreadsheet, FileText, Printer,
-  Warehouse, ArrowUpDown, Layers, QrCode, MapPin,
+  Warehouse, ArrowUpDown, Layers, QrCode, MapPin, Pencil,
 } from "lucide-react";
+import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 
 type TonStatus = "binh-thuong" | "sap-het" | "het-hang";
 const STATUS_CFG: Record<TonStatus, { label: string; color: string }> = {
@@ -90,6 +91,7 @@ export default function InventoryPage() {
   const [stockList, setStockList] = useState<StockItem[]>(STOCK);
   const [batchSearch, setBatchSearch] = useState("");
   const [selected, setSelected] = useState<StockItem | null>(null);
+  const [editTarget, setEditTarget] = useState<StockItem | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [fTen, setFTen] = useState(""); const [fNhom, setFNhom] = useState("Nguyên liệu");
   const [fDonVi, setFDonVi] = useState("kg"); const [fDonGia, setFDonGia] = useState("");
@@ -100,18 +102,70 @@ export default function InventoryPage() {
     sortKey !== col ? <ChevronUp className="w-3 h-3 opacity-30" /> :
     sortDir === "asc" ? <ChevronUp className="w-3 h-3 text-primary" /> : <ChevronDown className="w-3 h-3 text-primary" />;
 
+  const openCreate = () => {
+    setEditTarget(null); setFTen(""); setFNhom("Nguyên liệu"); setFDonVi("kg");
+    setFDonGia(""); setFTonDau(""); setFKho("Kho NL");
+    setShowCreate(true);
+  };
+  const openEdit = (s: StockItem) => {
+    setEditTarget(s); setFTen(s.tenSP); setFNhom(s.nhom); setFDonVi(s.donVi);
+    setFDonGia(String(s.donGia)); setFTonDau(String(s.tonCuoi)); setFKho(s.kho);
+    setShowCreate(true);
+  };
+
   const handleCreate = () => {
     if (!fTen) return;
-    const nhomMap: Record<string,string> = { "Nguyên liệu": "NL", "Thành phẩm": "TP", "Bao bì": "PK", "Vật tư": "VT" };
-    const newItem: StockItem = { id: genId(), maSP: `${nhomMap[fNhom] ?? "VT"}-${String(stockList.length+1).padStart(3,"0")}`, tenSP: fTen, nhom: fNhom, loai: fNhom, donVi: fDonVi, tonDau: parseFloat(fTonDau)||0, nhapKho:0, xuatKho:0, tonCuoi: parseFloat(fTonDau)||0, donGia: parseFloat(fDonGia)||0, trangThai:"binh-thuong", kho: fKho };
-    setStockList(prev => [...prev, newItem]);
-    setShowCreate(false); setFTen(""); setFTonDau(""); setFDonGia("");
+    if (editTarget) {
+      const updated: StockItem = { ...editTarget, tenSP: fTen, nhom: fNhom, loai: fNhom, donVi: fDonVi, donGia: parseFloat(fDonGia)||0, kho: fKho, tonCuoi: parseFloat(fTonDau)||editTarget.tonCuoi };
+      setStockList(prev => prev.map(s => s.id === editTarget.id ? updated : s));
+      if (selected?.id === editTarget.id) setSelected(updated);
+    } else {
+      const nhomMap: Record<string,string> = { "Nguyên liệu": "NL", "Thành phẩm": "TP", "Bao bì": "PK", "Vật tư": "VT" };
+      const newItem: StockItem = { id: genId(), maSP: `${nhomMap[fNhom] ?? "VT"}-${String(stockList.length+1).padStart(3,"0")}`, tenSP: fTen, nhom: fNhom, loai: fNhom, donVi: fDonVi, tonDau: parseFloat(fTonDau)||0, nhapKho:0, xuatKho:0, tonCuoi: parseFloat(fTonDau)||0, donGia: parseFloat(fDonGia)||0, trangThai:"binh-thuong", kho: fKho };
+      setStockList(prev => [...prev, newItem]);
+    }
+    setShowCreate(false); setEditTarget(null); setFTen(""); setFTonDau(""); setFDonGia("");
   };
   const handleDelete = (id: string) => {
     if (!window.confirm("Xóa mặt hàng?")) return;
     setStockList(prev => prev.filter(s => s.id !== id));
     if (selected?.id === id) setSelected(null);
   };
+
+  const handleExportExcel = () => exportToExcel(
+    [
+      { header: "Mã SP", key: "maSP", width: 12 },
+      { header: "Tên hàng", key: "tenSP", width: 28 },
+      { header: "Nhóm", key: "nhom", width: 14 },
+      { header: "Kho", key: "kho", width: 12 },
+      { header: "ĐVT", key: "donVi", width: 8 },
+      { header: "Tồn đầu", key: "tonDau", width: 10 },
+      { header: "Nhập kho", key: "nhapKho", width: 10 },
+      { header: "Xuất kho", key: "xuatKho", width: 10 },
+      { header: "Tồn cuối", key: "tonCuoi", width: 10 },
+      { header: "Đơn giá", key: "donGia", width: 14 },
+      { header: "Trạng thái", key: "trangThai", width: 14 },
+    ],
+    stockList as unknown as Record<string, unknown>[],
+    "TonKho_HTXHongHa"
+  );
+
+  const handleExportPDF = () => exportToPDF(
+    "Báo cáo Tồn kho",
+    `HTX Hồng Hà · ${stockList.length} mặt hàng · Tổng giá trị: ${totalVal.toLocaleString("vi-VN")} đ`,
+    [
+      { header: "Mã SP", key: "maSP", width: 16 },
+      { header: "Tên hàng", key: "tenSP", width: 40 },
+      { header: "Nhóm", key: "nhom", width: 20 },
+      { header: "Kho", key: "kho", width: 16 },
+      { header: "ĐVT", key: "donVi", width: 10 },
+      { header: "Tồn cuối", key: "tonCuoi", width: 16 },
+      { header: "Đơn giá", key: "donGia", width: 18 },
+      { header: "Trạng thái", key: "trangThai", width: 20 },
+    ],
+    stockList as unknown as Record<string, unknown>[],
+    "TonKho_HTXHongHa"
+  );
 
   const filteredStock = useMemo(() => {
     let data = stockList;
@@ -150,9 +204,9 @@ export default function InventoryPage() {
         <div className="flex items-center justify-between">
           <div><h1 className="text-xl font-bold">Quản lý Kho hàng</h1><p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · Nhập kho → Lưu batch → Xuất kho → Kiểm kê</p></div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
-            <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"><Plus className="w-4 h-4" /> Thêm hàng</button>
+            <button onClick={handleExportExcel} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
+            <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
+            <button onClick={openCreate} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"><Plus className="w-4 h-4" /> Thêm hàng</button>
           </div>
         </div>
       </div>
@@ -236,6 +290,7 @@ export default function InventoryPage() {
                       <td className="py-3 px-4" onClick={e=>e.stopPropagation()}>
                         <div className="flex items-center justify-end gap-0.5">
                           <button onClick={()=>setSelected(s)} className="p-1.5 rounded-md hover:bg-muted/60 text-muted-foreground"><Eye className="w-3.5 h-3.5" /></button>
+                          <button onClick={()=>openEdit(s)} className="p-1.5 rounded-md hover:bg-primary/10 text-muted-foreground hover:text-primary"><Pencil className="w-3.5 h-3.5" /></button>
                           <button onClick={()=>handleDelete(s.id)} className="p-1.5 rounded-md hover:bg-red-50 text-muted-foreground hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button>
                         </div>
                       </td>
@@ -364,35 +419,38 @@ export default function InventoryPage() {
               <div className="flex items-center justify-between px-4 py-3 bg-muted/20 rounded-xl"><span className="text-sm text-muted-foreground">Đơn giá</span><span className="font-bold text-primary">{selected.donGia.toLocaleString("vi-VN")} đ/{selected.donVi}</span></div>
               <div className="flex items-center justify-between px-4 py-3 bg-emerald-50 rounded-xl border border-emerald-200"><span className="text-sm text-muted-foreground">Giá trị tồn kho</span><span className="font-bold text-emerald-700">{fmtMoney(selected.tonCuoi * selected.donGia)} tr đ</span></div>
             </div>
-            <div className="px-5 pb-5 pt-3 border-t border-border shrink-0">
-              <button onClick={()=>handleDelete(selected.id)} className="w-full flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-sm font-medium hover:bg-red-100"><Trash2 className="w-3.5 h-3.5" /> Xóa mặt hàng</button>
+            <div className="px-5 pb-5 pt-3 border-t border-border flex gap-2 shrink-0">
+              <button onClick={()=>{setSelected(null); openEdit(selected);}} className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-lg text-sm font-medium hover:bg-primary/20"><Pencil className="w-3.5 h-3.5" /> Sửa</button>
+              <button onClick={()=>handleDelete(selected.id)} className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-sm font-medium hover:bg-red-100"><Trash2 className="w-3.5 h-3.5" /></button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Create modal */}
+      {/* Create / Edit modal */}
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={()=>setShowCreate(false)} />
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={()=>{setShowCreate(false); setEditTarget(null);}} />
           <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md flex flex-col max-h-[85vh]">
             <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
-              <div className="flex items-center gap-2"><Package className="w-4 h-4 text-primary" /><span className="font-semibold text-sm">Thêm mặt hàng mới</span></div>
-              <button onClick={()=>setShowCreate(false)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4" /></button>
+              <div className="flex items-center gap-2"><Package className="w-4 h-4 text-primary" /><span className="font-semibold text-sm">{editTarget ? `Sửa mặt hàng · ${editTarget.maSP}` : "Thêm mặt hàng mới"}</span></div>
+              <button onClick={()=>{setShowCreate(false); setEditTarget(null);}} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4" /></button>
             </div>
             <div className="overflow-y-auto flex-1 px-5 py-4 space-y-4">
               <div><label className="block text-xs font-semibold mb-1.5">Tên hàng <span className="text-red-500">*</span></label><input value={fTen} onChange={e=>setFTen(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" /></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="block text-xs font-semibold mb-1.5">Nhóm hàng</label><select value={fNhom} onChange={e=>setFNhom(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg">{["Nguyên liệu","Thành phẩm","Bao bì","Vật tư"].map(n=><option key={n} value={n}>{n}</option>)}</select></div>
                 <div><label className="block text-xs font-semibold mb-1.5">Đơn vị</label><select value={fDonVi} onChange={e=>setFDonVi(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg">{["kg","cái","tờ","lít"].map(d=><option key={d} value={d}>{d}</option>)}</select></div>
-                <div><label className="block text-xs font-semibold mb-1.5">Tồn ban đầu</label><input type="number" value={fTonDau} onChange={e=>setFTonDau(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
+                <div><label className="block text-xs font-semibold mb-1.5">{editTarget ? "Tồn cuối (kg)" : "Tồn ban đầu"}</label><input type="number" value={fTonDau} onChange={e=>setFTonDau(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
                 <div><label className="block text-xs font-semibold mb-1.5">Đơn giá (đ)</label><input type="number" value={fDonGia} onChange={e=>setFDonGia(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
               </div>
               <div><label className="block text-xs font-semibold mb-1.5">Kho lưu trữ</label><select value={fKho} onChange={e=>setFKho(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg">{["Kho NL","Kho TP","Kho PK","Kho VT"].map(k=><option key={k} value={k}>{k}</option>)}</select></div>
             </div>
             <div className="px-5 pb-5 pt-3 border-t border-border flex gap-2 shrink-0">
-              <button onClick={()=>setShowCreate(false)} className="flex-1 px-4 py-2.5 text-sm border border-border rounded-lg hover:bg-muted/50">Hủy</button>
-              <button onClick={handleCreate} disabled={!fTen} className="flex-1 px-4 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-40 flex items-center justify-center gap-2"><Plus className="w-4 h-4" /> Thêm</button>
+              <button onClick={()=>{setShowCreate(false); setEditTarget(null);}} className="flex-1 px-4 py-2.5 text-sm border border-border rounded-lg hover:bg-muted/50">Hủy</button>
+              <button onClick={handleCreate} disabled={!fTen} className="flex-1 px-4 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-40 flex items-center justify-center gap-2">
+                {editTarget ? <><Pencil className="w-4 h-4" /> Lưu thay đổi</> : <><Plus className="w-4 h-4" /> Thêm</>}
+              </button>
             </div>
           </div>
         </div>

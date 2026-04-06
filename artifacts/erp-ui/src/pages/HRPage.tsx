@@ -6,6 +6,7 @@ import {
   ChevronDown, ChevronUp, Users, UserCheck, UserX, Clock,
   Phone, Mail, MapPin, X, Eye, Edit2, Trash2,
 } from "lucide-react";
+import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 
 type TrangThaiNV = "dang-lam" | "nghi-phep" | "nghi-viec";
 
@@ -67,6 +68,38 @@ export default function HRPage() {
     setSelected(null);
   };
 
+  const handleExportExcel = () => exportToExcel(
+    [
+      { header: "Mã NV", key: "maNV", width: 10 },
+      { header: "Họ tên", key: "hoTen", width: 26 },
+      { header: "Phòng ban", key: "phongBan", width: 20 },
+      { header: "Chức vụ", key: "chucVu", width: 24 },
+      { header: "SĐT", key: "sdt", width: 16 },
+      { header: "Email", key: "email", width: 30 },
+      { header: "Ngày vào", key: "ngayVao", width: 14 },
+      { header: "Lương (đ)", key: "luong", width: 14 },
+      { header: "Trạng thái", key: "trangThai", width: 14 },
+    ],
+    nhanVienList as unknown as Record<string, unknown>[],
+    "NhanVien_HTXHongHa"
+  );
+
+  const handleExportPDF = () => exportToPDF(
+    "Danh sách Nhân viên",
+    `HTX Hồng Hà · ${nhanVienList.length} nhân viên`,
+    [
+      { header: "Mã NV", key: "maNV", width: 14 },
+      { header: "Họ tên", key: "hoTen", width: 36 },
+      { header: "Phòng ban", key: "phongBan", width: 26 },
+      { header: "Chức vụ", key: "chucVu", width: 30 },
+      { header: "SĐT", key: "sdt", width: 22 },
+      { header: "Lương (đ)", key: "luong", width: 18 },
+      { header: "Trạng thái", key: "trangThai", width: 18 },
+    ],
+    nhanVienList as unknown as Record<string, unknown>[],
+    "NhanVien_HTXHongHa"
+  );
+
   const filtered = useMemo(() => {
     let d = nhanVienList;
     if (search) {
@@ -106,10 +139,10 @@ export default function HRPage() {
             <p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · Hồ sơ nhân viên</p>
           </div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors">
+            <button onClick={handleExportExcel} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors">
               <FileSpreadsheet className="w-3.5 h-3.5" /> Excel
             </button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors">
+            <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors">
               <FileText className="w-3.5 h-3.5" /> PDF
             </button>
             <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors">

@@ -7,6 +7,7 @@ import {
   Clock, CheckCircle2, Layers, QrCode, TrendingUp,
   FileSpreadsheet, FileText, Printer, ArrowRight,
 } from "lucide-react";
+import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 
 type TrangThai = "ke-hoach" | "xuat-nvl" | "dang-che-bien" | "hoan-thanh" | "da-nhap-kho";
 const TT_CFG: Record<TrangThai, { label: string; color: string; step: number }> = {
@@ -107,6 +108,38 @@ export default function ProductionPage() {
     if (selected?.id === id) setSelected(null);
   };
 
+  const handleExportExcel = () => exportToExcel(
+    [
+      { header: "Mã lô", key: "maLo", width: 16 },
+      { header: "Ngày SX", key: "ngaySX", width: 14 },
+      { header: "Loại chè", key: "loaiChe", width: 16 },
+      { header: "Số hộ", key: "soHo", width: 10 },
+      { header: "KL NVL (kg)", key: "klNVL", width: 14 },
+      { header: "KL TP (kg)", key: "klTP", width: 14 },
+      { header: "Tỷ lệ KH (%)", key: "tyLeKhoHao", width: 14 },
+      { header: "Trạng thái", key: "trangThai", width: 16 },
+      { header: "Ghi chú", key: "ghiChu", width: 28 },
+    ],
+    loList as unknown as Record<string, unknown>[],
+    "SanXuat_HTXHongHa"
+  );
+
+  const handleExportPDF = () => exportToPDF(
+    "Danh sách Lệnh Sản xuất",
+    `HTX Hồng Hà · ${loList.length} lệnh sản xuất`,
+    [
+      { header: "Mã lô", key: "maLo", width: 20 },
+      { header: "Ngày SX", key: "ngaySX", width: 18 },
+      { header: "Loại chè", key: "loaiChe", width: 22 },
+      { header: "KL NVL (kg)", key: "klNVL", width: 18 },
+      { header: "KL TP (kg)", key: "klTP", width: 18 },
+      { header: "Tỷ lệ KH (%)", key: "tyLeKhoHao", width: 18 },
+      { header: "Trạng thái", key: "trangThai", width: 22 },
+    ],
+    loList as unknown as Record<string, unknown>[],
+    "SanXuat_HTXHongHa"
+  );
+
   const filtered = useMemo(() => {
     let data = activeTab === "ke-hoach" ? loList.filter(l => l.trangThai === "ke-hoach") : loList;
     if (activeTab === "batch-tp") data = loList.filter(l => l.batchTP);
@@ -132,8 +165,8 @@ export default function ProductionPage() {
         <div className="flex items-center justify-between">
           <div><h1 className="text-xl font-bold">Sản xuất (Chế biến chè)</h1><p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · Kế hoạch → Lệnh SX → Xuất NVL → Chế biến → Nhập TP</p></div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
+            <button onClick={handleExportExcel} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
+            <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
             <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"><Plus className="w-4 h-4" /> Lệnh SX mới</button>
           </div>
         </div>

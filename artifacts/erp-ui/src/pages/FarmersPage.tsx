@@ -5,8 +5,9 @@ import {
   ArrowLeft, Search, Plus, Filter, X, Trash2, Eye,
   Users, MapPin, Phone, Leaf, FileSpreadsheet, FileText,
   QrCode, TrendingUp, CheckCircle2, Clock, Star,
-  ChevronUp, ChevronDown,
+  ChevronUp, ChevronDown, Pencil,
 } from "lucide-react";
+import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 
 const AREA_COLORS: Record<string, string> = {
   "Nà Hồng":   "bg-emerald-100 text-emerald-700",
@@ -66,9 +67,12 @@ export default function FarmersPage() {
   const [farmers, setFarmers] = useState<Farmer[]>(FARMERS);
   const [selected, setSelected] = useState<Farmer | null>(null);
   const [showCreate, setShowCreate] = useState(false);
+  const [editTarget, setEditTarget] = useState<Farmer | null>(null);
   const [fTen, setFTen] = useState(""); const [fDia, setFDia] = useState("Nà Hồng");
   const [fSdt, setFSdt] = useState(""); const [fDT, setFDT] = useState("0.5");
   const [fNam, setFNam] = useState("2024"); const [fNote, setFNote] = useState("");
+  const [fCCCD, setFCCCD] = useState(""); const [fVuon, setFVuon] = useState("1");
+  const [fDiemCL, setFDiemCL] = useState("0"); const [fKL, setFKL] = useState("0");
   const [showQR, setShowQR] = useState<string | null>(null);
 
   const handleSort = (k: string) => { if (sortKey === k) setSortDir(d => d==="asc"?"desc":"asc"); else { setSortKey(k); setSortDir("asc"); } };
@@ -76,18 +80,74 @@ export default function FarmersPage() {
     sortKey !== col ? <ChevronUp className="w-3 h-3 opacity-30" /> :
     sortDir === "asc" ? <ChevronUp className="w-3 h-3 text-primary" /> : <ChevronDown className="w-3 h-3 text-primary" />;
 
+  const openCreate = () => {
+    setEditTarget(null); setFTen(""); setFDia("Nà Hồng"); setFSdt(""); setFDT("0.5");
+    setFNam("2024"); setFNote(""); setFCCCD(""); setFVuon("1"); setFDiemCL("0"); setFKL("0");
+    setShowCreate(true);
+  };
+  const openEdit = (f: Farmer) => {
+    setEditTarget(f); setFTen(f.tenHo); setFDia(f.diaChi); setFSdt(f.sdt); setFDT(String(f.dienTich));
+    setFNam(String(f.namThamGia)); setFNote(f.ghiChu); setFCCCD(f.cccd); setFVuon(String(f.soVuon));
+    setFDiemCL(String(f.diemCL)); setFKL(String(f.tongKLDaGiao));
+    setShowCreate(true);
+  };
   const handleCreate = () => {
     if (!fTen) return;
-    const vungCode = fDia === "Nà Hồng" ? "NH" : fDia === "Nà Bay" ? "NB" : "BC";
-    const existingInZone = farmers.filter(f => f.maHo.startsWith(vungCode)).length;
-    const newF: Farmer = { id: genId(), maHo: `${vungCode}${String(existingInZone+1).padStart(3,"0")}`, tenHo: fTen, diaChi: fDia, sdt: fSdt, cccd: "", dienTich: parseFloat(fDT)||0.5, soVuon: 1, namThamGia: parseInt(fNam)||2024, tongKLDaGiao: 0, diemCL: 0, ghiChu: fNote };
-    setFarmers(prev => [...prev, newF]);
-    setShowCreate(false); setFTen(""); setFSdt(""); setFNote("");
+    if (editTarget) {
+      const updated: Farmer = { ...editTarget, tenHo: fTen, diaChi: fDia, sdt: fSdt, cccd: fCCCD, dienTich: parseFloat(fDT)||0.5, soVuon: parseInt(fVuon)||1, namThamGia: parseInt(fNam)||2024, tongKLDaGiao: parseFloat(fKL)||0, diemCL: parseInt(fDiemCL)||0, ghiChu: fNote };
+      setFarmers(prev => prev.map(f => f.id === editTarget.id ? updated : f));
+      if (selected?.id === editTarget.id) setSelected(updated);
+    } else {
+      const vungCode = fDia === "Nà Hồng" ? "NH" : fDia === "Nà Bay" ? "NB" : "BC";
+      const existingInZone = farmers.filter(f => f.maHo.startsWith(vungCode)).length;
+      const newF: Farmer = { id: genId(), maHo: `${vungCode}${String(existingInZone+1).padStart(3,"0")}`, tenHo: fTen, diaChi: fDia, sdt: fSdt, cccd: fCCCD, dienTich: parseFloat(fDT)||0.5, soVuon: parseInt(fVuon)||1, namThamGia: parseInt(fNam)||2024, tongKLDaGiao: parseFloat(fKL)||0, diemCL: parseInt(fDiemCL)||0, ghiChu: fNote };
+      setFarmers(prev => [...prev, newF]);
+    }
+    setShowCreate(false); setEditTarget(null);
   };
   const handleDelete = (id: string) => {
     if (!window.confirm("Xóa hộ nông dân này?")) return;
     setFarmers(prev => prev.filter(f => f.id !== id));
     if (selected?.id === id) setSelected(null);
+  };
+
+  const handleExportExcel = () => {
+    exportToExcel(
+      [
+        { header: "Mã hộ", key: "maHo", width: 10 },
+        { header: "Họ và tên", key: "tenHo", width: 22 },
+        { header: "Vùng trồng", key: "diaChi", width: 14 },
+        { header: "SĐT", key: "sdt", width: 14 },
+        { header: "CCCD", key: "cccd", width: 14 },
+        { header: "Diện tích (ha)", key: "dienTich", width: 14 },
+        { header: "Số vườn", key: "soVuon", width: 10 },
+        { header: "Năm tham gia", key: "namThamGia", width: 14 },
+        { header: "KL đã giao (kg)", key: "tongKLDaGiao", width: 16 },
+        { header: "Điểm CL (%)", key: "diemCL", width: 12 },
+        { header: "Ghi chú", key: "ghiChu", width: 28 },
+      ],
+      farmers as unknown as Record<string, unknown>[],
+      "DanhSachHoDan_HTXHongHa"
+    );
+  };
+
+  const handleExportPDF = () => {
+    exportToPDF(
+      "Danh Sách Hộ Nông Dân",
+      `HTX Hồng Hà · ${farmers.length} hộ liên kết · 3 vùng trồng Shan Tuyết`,
+      [
+        { header: "Mã hộ", key: "maHo", width: 14 },
+        { header: "Họ và tên", key: "tenHo", width: 36 },
+        { header: "Vùng", key: "diaChi", width: 20 },
+        { header: "SĐT", key: "sdt", width: 24 },
+        { header: "DT (ha)", key: "dienTich", width: 14 },
+        { header: "KL (kg)", key: "tongKLDaGiao", width: 16 },
+        { header: "CL%", key: "diemCL", width: 10 },
+        { header: "Ghi chú", key: "ghiChu", width: 36 },
+      ],
+      farmers as unknown as Record<string, unknown>[],
+      "DanhSachHoDan_HTXHongHa"
+    );
   };
 
   const filtered = useMemo(() => {
@@ -112,9 +172,9 @@ export default function FarmersPage() {
         <div className="flex items-center justify-between">
           <div><h1 className="text-xl font-bold">Quản lý Hộ dân</h1><p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · {farmers.length} hộ liên kết · 3 vùng trồng Shan Tuyết</p></div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
-            <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"><Plus className="w-4 h-4" /> Thêm hộ</button>
+            <button onClick={handleExportExcel} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
+            <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
+            <button onClick={openCreate} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"><Plus className="w-4 h-4" /> Thêm hộ</button>
           </div>
         </div>
       </div>
@@ -219,7 +279,8 @@ export default function FarmersPage() {
               {selected.ghiChu && <div className="bg-muted/20 rounded-xl p-3"><p className="text-xs text-muted-foreground">Ghi chú</p><p className="text-sm italic mt-0.5">{selected.ghiChu}</p></div>}
             </div>
             <div className="px-5 pb-5 pt-3 border-t border-border flex gap-2 shrink-0">
-              <button className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 border border-border rounded-lg text-sm hover:bg-muted/50"><QrCode className="w-3.5 h-3.5" /> In QR</button>
+              <button className="flex items-center justify-center gap-1.5 px-3 py-2.5 border border-border rounded-lg text-sm hover:bg-muted/50"><QrCode className="w-3.5 h-3.5" /> In QR</button>
+              <button onClick={()=>{setSelected(null); openEdit(selected);}} className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 bg-primary/10 text-primary border border-primary/20 rounded-lg text-sm hover:bg-primary/20"><Pencil className="w-3.5 h-3.5" /> Sửa</button>
               <button onClick={()=>handleDelete(selected.id)} className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-sm hover:bg-red-100"><Trash2 className="w-3.5 h-3.5" /></button>
             </div>
           </div>
@@ -241,25 +302,36 @@ export default function FarmersPage() {
         </div>
       )}
 
-      {/* Create modal */}
+      {/* Create / Edit modal */}
       {showCreate && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={()=>setShowCreate(false)} />
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={()=>{setShowCreate(false); setEditTarget(null);}} />
           <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-md flex flex-col max-h-[88vh]">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0"><div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /><span className="font-semibold text-sm">Thêm hộ nông dân</span></div><button onClick={()=>setShowCreate(false)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4" /></button></div>
-            <div className="overflow-y-auto flex-1 px-5 py-4 space-y-4">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+              <div className="flex items-center gap-2"><Users className="w-4 h-4 text-primary" /><span className="font-semibold text-sm">{editTarget ? `Sửa thông tin · ${editTarget.maHo}` : "Thêm hộ nông dân"}</span></div>
+              <button onClick={()=>{setShowCreate(false); setEditTarget(null);}} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4" /></button>
+            </div>
+            <div className="overflow-y-auto flex-1 px-5 py-4 space-y-3">
               <div><label className="block text-xs font-semibold mb-1.5">Họ và tên <span className="text-red-500">*</span></label><input value={fTen} onChange={e=>setFTen(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" /></div>
               <div className="grid grid-cols-2 gap-3">
                 <div><label className="block text-xs font-semibold mb-1.5">Vùng trồng</label><select value={fDia} onChange={e=>setFDia(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg">{["Nà Hồng","Nà Bay","Bản Chang"].map(z=><option key={z} value={z}>{z}</option>)}</select></div>
                 <div><label className="block text-xs font-semibold mb-1.5">SĐT</label><input value={fSdt} onChange={e=>setFSdt(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
+                <div><label className="block text-xs font-semibold mb-1.5">CCCD</label><input value={fCCCD} onChange={e=>setFCCCD(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
                 <div><label className="block text-xs font-semibold mb-1.5">Diện tích (ha)</label><input type="number" value={fDT} onChange={e=>setFDT(e.target.value)} step="0.1" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
+                <div><label className="block text-xs font-semibold mb-1.5">Số vườn</label><input type="number" value={fVuon} onChange={e=>setFVuon(e.target.value)} min="1" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
                 <div><label className="block text-xs font-semibold mb-1.5">Năm tham gia</label><input type="number" value={fNam} onChange={e=>setFNam(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
+                {editTarget && <>
+                  <div><label className="block text-xs font-semibold mb-1.5">KL đã giao (kg)</label><input type="number" value={fKL} onChange={e=>setFKL(e.target.value)} step="0.1" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
+                  <div><label className="block text-xs font-semibold mb-1.5">Điểm CL (%)</label><input type="number" value={fDiemCL} onChange={e=>setFDiemCL(e.target.value)} min="0" max="100" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
+                </>}
               </div>
               <div><label className="block text-xs font-semibold mb-1.5">Ghi chú</label><textarea value={fNote} onChange={e=>setFNote(e.target.value)} rows={2} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg resize-none" /></div>
             </div>
             <div className="px-5 pb-5 pt-3 border-t border-border flex gap-2 shrink-0">
-              <button onClick={()=>setShowCreate(false)} className="flex-1 px-4 py-2.5 text-sm border border-border rounded-lg hover:bg-muted/50">Hủy</button>
-              <button onClick={handleCreate} disabled={!fTen} className="flex-1 px-4 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-40 flex items-center justify-center gap-2"><Plus className="w-4 h-4" /> Thêm hộ</button>
+              <button onClick={()=>{setShowCreate(false); setEditTarget(null);}} className="flex-1 px-4 py-2.5 text-sm border border-border rounded-lg hover:bg-muted/50">Hủy</button>
+              <button onClick={handleCreate} disabled={!fTen} className="flex-1 px-4 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-40 flex items-center justify-center gap-2">
+                {editTarget ? <><Pencil className="w-4 h-4" /> Lưu thay đổi</> : <><Plus className="w-4 h-4" /> Thêm hộ</>}
+              </button>
             </div>
           </div>
         </div>

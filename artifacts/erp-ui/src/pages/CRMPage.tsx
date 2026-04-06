@@ -7,6 +7,7 @@ import {
   Phone, Mail, X, Building2, User, Eye, Trash2,
   ShoppingCart, Clock, CheckCircle2,
 } from "lucide-react";
+import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 
 type LoaiKH = "doanh-nghiep" | "ca-nhan" | "hop-tac-xa";
 type HangKH = "vang" | "bac" | "dong" | "moi";
@@ -84,6 +85,39 @@ export default function CRMPage() {
     setKhList(prev => [...prev, newKH]);
     setShowCreate(false); setFTen(""); setFDia(""); setFSdt(""); setFEmail(""); setFNote("");
   };
+  const handleExportExcel = () => exportToExcel(
+    [
+      { header: "Mã KH", key: "maKH", width: 12 },
+      { header: "Tên khách hàng", key: "tenKH", width: 30 },
+      { header: "Loại", key: "loai", width: 16 },
+      { header: "Hạng", key: "hang", width: 10 },
+      { header: "Địa chỉ", key: "diaChi", width: 28 },
+      { header: "SĐT", key: "sdt", width: 16 },
+      { header: "Email", key: "email", width: 28 },
+      { header: "Tổng mua (đ)", key: "tongMua", width: 18 },
+      { header: "Số lần mua", key: "soLanMua", width: 14 },
+      { header: "Ngày mua cuối", key: "ngayMuaCuoi", width: 16 },
+    ],
+    khList as unknown as Record<string, unknown>[],
+    "KhachHang_HTXHongHa"
+  );
+
+  const handleExportPDF = () => exportToPDF(
+    "Danh sách Khách hàng",
+    `HTX Hồng Hà · ${khList.length} khách hàng`,
+    [
+      { header: "Mã KH", key: "maKH", width: 16 },
+      { header: "Tên khách hàng", key: "tenKH", width: 40 },
+      { header: "Loại", key: "loai", width: 20 },
+      { header: "Hạng", key: "hang", width: 14 },
+      { header: "SĐT", key: "sdt", width: 22 },
+      { header: "Tổng mua (đ)", key: "tongMua", width: 22 },
+      { header: "Số lần mua", key: "soLanMua", width: 16 },
+    ],
+    khList as unknown as Record<string, unknown>[],
+    "KhachHang_HTXHongHa"
+  );
+
   const handleDelete = (id: string) => {
     if (!window.confirm("Xóa khách hàng này?")) return;
     setKhList(prev => prev.filter(k => k.id !== id));
@@ -113,8 +147,8 @@ export default function CRMPage() {
         <div className="flex items-center justify-between">
           <div><h1 className="text-xl font-bold">Quản lý Khách hàng (CRM)</h1><p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · Tạo KH → Giao dịch → Theo dõi → Phân hạng</p></div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
+            <button onClick={handleExportExcel} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
+            <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
             <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"><Plus className="w-4 h-4" /> Thêm KH</button>
           </div>
         </div>

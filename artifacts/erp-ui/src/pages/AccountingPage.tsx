@@ -6,6 +6,7 @@ import {
   ChevronDown, ChevronUp, TrendingUp, TrendingDown, Wallet, PiggyBank,
   CheckCircle2, Clock, XCircle, Eye, Trash2, X, BadgeDollarSign, Users,
 } from "lucide-react";
+import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 
 type PhieuType = "thu" | "chi";
 type PhuongThuc = "Tiền mặt" | "Chuyển khoản" | "Ví điện tử";
@@ -95,6 +96,38 @@ export default function AccountingPage() {
     if (selected?.id === id) setSelected(null);
   };
 
+  const handleExportExcel = () => exportToExcel(
+    [
+      { header: "Mã phiếu", key: "maPhieu", width: 14 },
+      { header: "Loại", key: "loai", width: 8 },
+      { header: "Đối tượng", key: "doiTuong", width: 32 },
+      { header: "Danh mục", key: "danhMuc", width: 24 },
+      { header: "Số tiền (đ)", key: "soTien", width: 16 },
+      { header: "Ngày", key: "ngay", width: 14 },
+      { header: "Phương thức", key: "phuongThuc", width: 16 },
+      { header: "Trạng thái", key: "trangThai", width: 14 },
+      { header: "Ghi chú", key: "ghiChu", width: 24 },
+      { header: "Người tạo", key: "nguoiTao", width: 16 },
+    ],
+    phieuList as unknown as Record<string, unknown>[],
+    "KeToan_HTXHongHa"
+  );
+
+  const handleExportPDF = () => exportToPDF(
+    "Danh sách Phiếu Kế toán",
+    `HTX Hồng Hà · ${phieuList.length} phiếu thu/chi`,
+    [
+      { header: "Mã phiếu", key: "maPhieu", width: 18 },
+      { header: "Loại", key: "loai", width: 10 },
+      { header: "Đối tượng", key: "doiTuong", width: 44 },
+      { header: "Số tiền (đ)", key: "soTien", width: 20 },
+      { header: "Ngày", key: "ngay", width: 18 },
+      { header: "Trạng thái", key: "trangThai", width: 18 },
+    ],
+    phieuList as unknown as Record<string, unknown>[],
+    "KeToan_HTXHongHa"
+  );
+
   const filtered = useMemo(() => {
     let data = phieuList;
     if (search) { const q = search.toLowerCase(); data = data.filter(p => p.maPhieu.toLowerCase().includes(q) || p.doiTuong.toLowerCase().includes(q)); }
@@ -119,8 +152,8 @@ export default function AccountingPage() {
         <div className="flex items-center justify-between">
           <div><h1 className="text-xl font-bold">Kế toán</h1><p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · Ghi nhận → Công nợ → Thanh toán → Báo cáo</p></div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
+            <button onClick={handleExportExcel} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
+            <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
             <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"><Plus className="w-4 h-4" /> Tạo phiếu</button>
           </div>
         </div>

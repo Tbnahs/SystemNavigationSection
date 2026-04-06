@@ -7,6 +7,7 @@ import {
   Clock, CheckCircle2, Truck, FileSpreadsheet, FileText,
   QrCode, ArrowRight, Layers,
 } from "lucide-react";
+import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 
 const PRODUCT_COLOR: Record<string, string> = {
   "Hồng trà": "bg-rose-100 text-rose-700",
@@ -106,6 +107,40 @@ export default function PackagingPage() {
     if (selected?.id === id) setSelected(null);
   };
 
+  const handleExportExcel = () => exportToExcel(
+    [
+      { header: "Mã đóng gói", key: "maDG", width: 16 },
+      { header: "Mã lô SX", key: "maLoSX", width: 16 },
+      { header: "Thành phẩm", key: "thanhPham", width: 18 },
+      { header: "Thời gian", key: "thoiGian", width: 14 },
+      { header: "KL đóng gói (kg)", key: "klDG", width: 18 },
+      { header: "Số sản phẩm", key: "soSP", width: 14 },
+      { header: "Bao bì", key: "loaiBaoBi", width: 16 },
+      { header: "Trạng thái", key: "trangThai", width: 16 },
+      { header: "QR Code", key: "qrCode", width: 16 },
+      { header: "Ghi chú", key: "ghiChu", width: 28 },
+    ],
+    loList as unknown as Record<string, unknown>[],
+    "DongGoi_HTXHongHa"
+  );
+
+  const handleExportPDF = () => exportToPDF(
+    "Danh sách Lô Đóng gói",
+    `HTX Hồng Hà · ${loList.length} lô đóng gói`,
+    [
+      { header: "Mã DG", key: "maDG", width: 18 },
+      { header: "Mã lô SX", key: "maLoSX", width: 18 },
+      { header: "Thành phẩm", key: "thanhPham", width: 24 },
+      { header: "Thời gian", key: "thoiGian", width: 18 },
+      { header: "KL (kg)", key: "klDG", width: 14 },
+      { header: "Số SP", key: "soSP", width: 12 },
+      { header: "Bao bì", key: "loaiBaoBi", width: 20 },
+      { header: "Trạng thái", key: "trangThai", width: 20 },
+    ],
+    loList as unknown as Record<string, unknown>[],
+    "DongGoi_HTXHongHa"
+  );
+
   const filtered = useMemo(() => {
     let data = loList;
     if (search) { const q = search.toLowerCase(); data = data.filter(l => l.maDG.toLowerCase().includes(q) || l.maLoSX.toLowerCase().includes(q) || l.thanhPham.toLowerCase().includes(q)); }
@@ -130,8 +165,8 @@ export default function PackagingPage() {
         <div className="flex items-center justify-between">
           <div><h1 className="text-xl font-bold">Đóng gói</h1><p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · Nhận TP → Đóng gói → Gán QR → Nhập kho · QR trace đến nông hộ</p></div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
+            <button onClick={handleExportExcel} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
+            <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
             <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"><Plus className="w-4 h-4" /> Lô đóng gói mới</button>
           </div>
         </div>

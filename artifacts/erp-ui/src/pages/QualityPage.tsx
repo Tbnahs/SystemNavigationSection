@@ -7,6 +7,7 @@ import {
   FlaskConical, Package, ChevronDown, ChevronUp, FileSpreadsheet, Printer,
   ShieldCheck, TrendingUp, Layers,
 } from "lucide-react";
+import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
 
 type QCStage = "dau-vao" | "san-xuat" | "dau-ra";
 type QCResult = "pass" | "fail" | "reduce" | "pending";
@@ -104,6 +105,41 @@ export default function QualityPage() {
     if (selected?.id === id) setSelected(null);
   };
 
+  const handleExportExcel = () => exportToExcel(
+    [
+      { header: "Mã QC", key: "maQC", width: 14 },
+      { header: "Giai đoạn", key: "stage", width: 14 },
+      { header: "Batch ID", key: "batchId", width: 18 },
+      { header: "Đối tượng", key: "doiTuong", width: 28 },
+      { header: "Loại chè", key: "loaiChe", width: 14 },
+      { header: "Ngày KT", key: "ngay", width: 14 },
+      { header: "Độ ẩm (%)", key: "doAm", width: 12 },
+      { header: "Độ non (%)", key: "doNon", width: 12 },
+      { header: "Độ sạch (%)", key: "doSach", width: 12 },
+      { header: "Tổng điểm", key: "tongDiem", width: 12 },
+      { header: "Kết quả", key: "ketQua", width: 12 },
+      { header: "Ghi chú", key: "ghiChu", width: 24 },
+    ],
+    qcList as unknown as Record<string, unknown>[],
+    "KiemTraChatLuong_HTXHongHa"
+  );
+
+  const handleExportPDF = () => exportToPDF(
+    "Danh sách Phiếu Kiểm tra Chất lượng",
+    `HTX Hồng Hà · ${qcList.length} phiếu QC`,
+    [
+      { header: "Mã QC", key: "maQC", width: 18 },
+      { header: "Giai đoạn", key: "stage", width: 18 },
+      { header: "Batch ID", key: "batchId", width: 24 },
+      { header: "Loại chè", key: "loaiChe", width: 18 },
+      { header: "Ngày KT", key: "ngay", width: 16 },
+      { header: "Tổng điểm", key: "tongDiem", width: 16 },
+      { header: "Kết quả", key: "ketQua", width: 16 },
+    ],
+    qcList as unknown as Record<string, unknown>[],
+    "KiemTraChatLuong_HTXHongHa"
+  );
+
   const tabData = useMemo(() => {
     let data = activeTab === "tieu-chuan" ? [] : qcList.filter(r => r.stage === activeTab);
     if (search) { const q = search.toLowerCase(); data = data.filter(r => r.maQC.toLowerCase().includes(q) || r.batchId.toLowerCase().includes(q) || r.doiTuong.toLowerCase().includes(q)); }
@@ -122,8 +158,8 @@ export default function QualityPage() {
         <div className="flex items-center justify-between">
           <div><h1 className="text-xl font-bold">Quản lý Chất lượng (QC)</h1><p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · QC Đầu vào → QC Sản xuất → QC Đầu ra</p></div>
           <div className="flex items-center gap-2">
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
+            <button onClick={handleExportExcel} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
+            <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100"><FileText className="w-3.5 h-3.5" /> PDF</button>
             <button onClick={() => setShowCreate(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90"><Plus className="w-4 h-4" /> Tạo phiếu QC</button>
           </div>
         </div>
