@@ -322,7 +322,14 @@ export default function FarmersPage() {
                 <div><label className="block text-xs font-semibold mb-1.5">Năm tham gia</label><input type="number" value={fNam} onChange={e=>setFNam(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
                 {editTarget && <>
                   <div><label className="block text-xs font-semibold mb-1.5">KL đã giao (kg)</label><input type="number" value={fKL} onChange={e=>setFKL(e.target.value)} step="0.1" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
-                  <div><label className="block text-xs font-semibold mb-1.5">Điểm CL (%)</label><input type="number" value={fDiemCL} onChange={e=>setFDiemCL(e.target.value)} min="0" max="100" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
+                  <div>
+                    <label className="block text-xs font-semibold mb-1.5">Điểm CL <span className="text-primary font-bold">({fDiemCL}%)</span></label>
+                    <div className="flex items-center gap-2">
+                      <button type="button" onClick={()=>setFDiemCL(String(Math.max(0,parseInt(fDiemCL)||0)-1))} className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-muted/50 text-lg font-bold shrink-0 active:scale-95 transition-transform">−</button>
+                      <input type="number" min={0} max={100} value={fDiemCL} onChange={e=>setFDiemCL(String(Math.min(100,Math.max(0,Number(e.target.value)||0))))} className="flex-1 text-center px-2 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
+                      <button type="button" onClick={()=>setFDiemCL(String(Math.min(100,parseInt(fDiemCL)||0)+1))} className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-muted/50 text-lg font-bold shrink-0 active:scale-95 transition-transform">+</button>
+                    </div>
+                  </div>
                 </>}
               </div>
               <div><label className="block text-xs font-semibold mb-1.5">Ghi chú</label><textarea value={fNote} onChange={e=>setFNote(e.target.value)} rows={2} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg resize-none" /></div>
