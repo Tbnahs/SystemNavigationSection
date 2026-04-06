@@ -92,28 +92,28 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             {t("nav.home")}
           </Link>
 
-          {/* ERP — expandable */}
+          {/* ERP — click label → navigate, click arrow → toggle sub-menu */}
           <div>
-            <button
-              onClick={() => {
-                setErpExpanded((v) => !v);
-                if (!erpExpanded) {
-                  // navigate to ERP overview only if not already there
-                }
-              }}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                isOnErp
-                  ? "bg-primary/10 text-primary"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-            >
-              <BarChart3 className={`w-4 h-4 shrink-0 ${isOnErp ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
-              <span className="flex-1 text-left">{t("nav.erp")}</span>
-              <ChevronDown
-                className={`w-3.5 h-3.5 shrink-0 transition-transform duration-200 ${erpExpanded ? "rotate-180" : ""} ${isOnErp ? "text-primary" : "text-muted-foreground"}`}
-                strokeWidth={2}
-              />
-            </button>
+            <div className={`flex items-center rounded-xl text-sm font-medium transition-all ${isOnErp ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
+              <Link
+                href="/module/erp"
+                onClick={onClose}
+                className="flex items-center gap-3 flex-1 px-3 py-2.5 min-w-0"
+              >
+                <BarChart3 className={`w-4 h-4 shrink-0 ${isOnErp ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
+                <span className="truncate">{t("nav.erp")}</span>
+              </Link>
+              <button
+                onClick={() => setErpExpanded((v) => !v)}
+                className="px-2 py-2.5 rounded-r-xl hover:bg-black/5 transition-colors shrink-0"
+                title={erpExpanded ? "Thu gọn" : "Mở rộng"}
+              >
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${erpExpanded ? "rotate-180" : ""} ${isOnErp ? "text-primary" : "text-muted-foreground"}`}
+                  strokeWidth={2}
+                />
+              </button>
+            </div>
 
             {/* Sub-menu */}
             {erpExpanded && (
