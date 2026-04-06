@@ -22,7 +22,7 @@ const modules = [
     nameKey: "module.erp" as const,
     descKey: "module.erp.desc" as const,
     href: "/module/erp",
-    count: "10",
+    count: "13",
   },
   {
     id: "txng",
