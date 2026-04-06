@@ -14,6 +14,7 @@ import ProductionPage from "@/pages/ProductionPage";
 import PackagingPage from "@/pages/PackagingPage";
 import FarmersPage from "@/pages/FarmersPage";
 import QualityPage from "@/pages/QualityPage";
+import QuyCachPage from "@/pages/QuyCachPage";
 import InventoryPage from "@/pages/InventoryPage";
 import AccountingPage from "@/pages/AccountingPage";
 import HRPage from "@/pages/HRPage";
@@ -63,6 +64,9 @@ function Router() {
       </Route>
       <Route path="/module/erp/quality">
         {() => <ProtectedRoute component={QualityPage} />}
+      </Route>
+      <Route path="/module/erp/quy-cach">
+        {() => <ProtectedRoute component={QuyCachPage} />}
       </Route>
       <Route path="/module/erp/inventory">
         {() => <ProtectedRoute component={InventoryPage} />}

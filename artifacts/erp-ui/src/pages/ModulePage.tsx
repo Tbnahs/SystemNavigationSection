@@ -35,6 +35,7 @@ import {
   Activity,
   BarChart2,
   CheckSquare,
+  BookOpen,
 } from "lucide-react";
 
 interface SubModule {
@@ -65,6 +66,7 @@ const moduleConfig: Record<
       { id: "hr", icon: Users, nameKey: "submodule.erp.hr", descKey: "submodule.erp.hr.desc" },
       { id: "production", icon: Factory, nameKey: "submodule.erp.production", descKey: "submodule.erp.production.desc" },
       { id: "quality", icon: CheckSquare, nameKey: "submodule.erp.quality", descKey: "submodule.erp.quality.desc" },
+      { id: "quy-cach", icon: BookOpen, nameKey: "submodule.erp.quy-cach", descKey: "submodule.erp.quy-cach.desc" },
       { id: "farmers", icon: Users, nameKey: "submodule.erp.farmers", descKey: "submodule.erp.farmers.desc" },
       { id: "packaging", icon: Package, nameKey: "submodule.erp.packaging", descKey: "submodule.erp.packaging.desc" },
       { id: "crm", icon: UserCircle, nameKey: "submodule.erp.crm", descKey: "submodule.erp.crm.desc" },
@@ -155,6 +157,8 @@ export default function ModulePage() {
                   setLocation("/module/erp/production");
                 } else if (moduleId === "erp" && sub.id === "quality") {
                   setLocation("/module/erp/quality");
+                } else if (moduleId === "erp" && sub.id === "quy-cach") {
+                  setLocation("/module/erp/quy-cach");
                 } else if (moduleId === "erp" && sub.id === "farmers") {
                   setLocation("/module/erp/farmers");
                 } else if (moduleId === "erp" && sub.id === "packaging") {

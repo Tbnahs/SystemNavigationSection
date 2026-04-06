@@ -49,6 +49,8 @@ export type TranslationKey =
   | "submodule.erp.production.desc"
   | "submodule.erp.quality"
   | "submodule.erp.quality.desc"
+  | "submodule.erp.quy-cach"
+  | "submodule.erp.quy-cach.desc"
   | "submodule.erp.farmers"
   | "submodule.erp.farmers.desc"
   | "submodule.erp.packaging"
@@ -146,8 +148,10 @@ const vi: Translations = {
   "submodule.erp.hr.desc": "Quản lý nhân viên và lương",
   "submodule.erp.production": "Sản xuất",
   "submodule.erp.production.desc": "Kế hoạch và sản xuất",
-  "submodule.erp.quality": "Quy cách & Tiêu chuẩn",
-  "submodule.erp.quality.desc": "Quản lý chất lượng sản phẩm",
+  "submodule.erp.quality": "QC - Chất lượng",
+  "submodule.erp.quality.desc": "Kiểm tra & quản lý chất lượng sản phẩm",
+  "submodule.erp.quy-cach": "Quy cách & Tiêu chuẩn",
+  "submodule.erp.quy-cach.desc": "Bảng quy cách thu hái và đơn giá thu mua",
   "submodule.erp.farmers": "Hộ dân liên kết",
   "submodule.erp.farmers.desc": "Danh sách hộ thu mua liên kết HTX",
   "submodule.erp.packaging": "Đóng gói",
@@ -276,8 +280,10 @@ const en: Translations = {
   "submodule.farming.weather.desc": "Weather forecast and monitoring",
   "submodule.farming.inspection": "Inspection",
   "submodule.farming.inspection.desc": "Quality inspection",
-  "submodule.erp.quality": "Quality",
-  "submodule.erp.quality.desc": "Product quality management",
+  "submodule.erp.quality": "QC - Quality",
+  "submodule.erp.quality.desc": "Inspect & manage product quality",
+  "submodule.erp.quy-cach": "Standards & Pricing",
+  "submodule.erp.quy-cach.desc": "Harvest grade specs and purchase prices",
   "submodule.erp.farmers": "Partner Farmers",
   "submodule.erp.farmers.desc": "Cooperative linked farming households",
   "submodule.erp.packaging": "Packaging",
@@ -376,8 +382,10 @@ const ko: Translations = {
   "submodule.farming.weather.desc": "날씨 예보 및 모니터링",
   "submodule.farming.inspection": "검사",
   "submodule.farming.inspection.desc": "품질 검사",
-  "submodule.erp.quality": "품질",
-  "submodule.erp.quality.desc": "제품 품질 관리",
+  "submodule.erp.quality": "QC - 품질",
+  "submodule.erp.quality.desc": "제품 품질 검사 및 관리",
+  "submodule.erp.quy-cach": "등급 & 기준",
+  "submodule.erp.quy-cach.desc": "수확 등급 사양 및 구매 가격",
   "submodule.erp.farmers": "계약 농가",
   "submodule.erp.farmers.desc": "협동조합 연계 농가 목록",
   "submodule.erp.packaging": "포장",
@@ -476,8 +484,10 @@ const ja: Translations = {
   "submodule.farming.weather.desc": "天気予報とモニタリング",
   "submodule.farming.inspection": "検査",
   "submodule.farming.inspection.desc": "品質検査",
-  "submodule.erp.quality": "品質",
-  "submodule.erp.quality.desc": "製品品質管理",
+  "submodule.erp.quality": "QC - 品質",
+  "submodule.erp.quality.desc": "製品品質検査・管理",
+  "submodule.erp.quy-cach": "規格・基準",
+  "submodule.erp.quy-cach.desc": "収穫規格仕様と買取価格",
   "submodule.erp.farmers": "契約農家",
   "submodule.erp.farmers.desc": "協同組合連携農家リスト",
   "submodule.erp.packaging": "梱包",
