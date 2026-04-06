@@ -272,42 +272,58 @@ export default function PurchasePage() {
     if (selectedPO?.id === id) setSelectedPO(null);
   };
 
-  const handleExportPDF = () => exportToPDF(
-    "Danh sách Phiếu Thu mua",
-    `HTX Hồng Hà · ${poList.length} phiếu thu mua nguyên liệu`,
-    [
-      { header: "Mã PO", key: "maPO", width: 16 },
-      { header: "Nông hộ", key: "tenHo", width: 32 },
-      { header: "Vườn", key: "tenVuon", width: 20 },
-      { header: "Ngày tạo", key: "ngayTao", width: 16 },
-      { header: "Ngày giao", key: "ngayGiao", width: 16 },
-      { header: "KL đặt (kg)", key: "khoiLuongDat", width: 16 },
-      { header: "KL nhận (kg)", key: "khoiLuongNhan", width: 16 },
-      { header: "Đơn giá (đ)", key: "donGia", width: 16 },
-      { header: "Trạng thái", key: "trangThai", width: 16 },
-    ],
-    poList as unknown as Record<string, unknown>[],
-    "ThuMua_HTXHongHa"
-  );
+  const handleExportPDF = () => {
+    const rows = poList.map(po => ({
+      ...po,
+      thanhTien: po.khoiLuongNhan * po.donGia,
+    }));
+    exportToPDF(
+      "Danh sách Phiếu Thu mua",
+      `HTX Hồng Hà · ${poList.length} phiếu thu mua nguyên liệu`,
+      [
+        { header: "Mã PO",         key: "maPO",           width: 16 },
+        { header: "Mã hộ",         key: "maHo",           width: 10 },
+        { header: "Tên hộ",        key: "tenHo",          width: 28 },
+        { header: "Địa chỉ",       key: "diaChi",         width: 14 },
+        { header: "Ngày giao",     key: "ngayGiao",       width: 14 },
+        { header: "Quy cách",      key: "quyCach",        width: 16 },
+        { header: "KL đặt (kg)",   key: "khoiLuongDat",   width: 14 },
+        { header: "KL nhận (kg)",  key: "khoiLuongNhan",  width: 14 },
+        { header: "Đơn giá (đ)",   key: "donGia",         width: 14 },
+        { header: "Thành tiền (đ)",key: "thanhTien",      width: 16 },
+        { header: "Mã mẻ",         key: "batchId",        width: 18 },
+        { header: "Trạng thái",    key: "trangThai",      width: 14 },
+      ],
+      rows as unknown as Record<string, unknown>[],
+      "ThuMua_HTXHongHa"
+    );
+  };
 
-  const handleExport = () => exportToExcel(
-    [
-      { header: "Mã PO", key: "maPO", width: 16 },
-      { header: "Mã hộ", key: "maHo", width: 10 },
-      { header: "Tên hộ", key: "tenHo", width: 28 },
-      { header: "Vùng", key: "diaChi", width: 14 },
-      { header: "Quy cách", key: "quyCach", width: 16 },
-      { header: "Ngày tạo", key: "ngayTao", width: 14 },
-      { header: "Ngày giao", key: "ngayGiao", width: 14 },
-      { header: "KL đặt (kg)", key: "khoiLuongDat", width: 14 },
-      { header: "KL nhận (kg)", key: "khoiLuongNhan", width: 14 },
-      { header: "Đơn giá (đ)", key: "donGia", width: 14 },
-      { header: "Trạng thái", key: "trangThai", width: 14 },
-      { header: "Ghi chú", key: "ghiChu", width: 28 },
-    ],
-    poList as unknown as Record<string, unknown>[],
-    "ThuMua_HTXHongHa"
-  );
+  const handleExport = () => {
+    const rows = poList.map(po => ({
+      ...po,
+      thanhTien: po.khoiLuongNhan * po.donGia,
+    }));
+    exportToExcel(
+      [
+        { header: "Mã PO",          key: "maPO",           width: 16 },
+        { header: "Mã hộ",          key: "maHo",           width: 10 },
+        { header: "Tên hộ",         key: "tenHo",          width: 28 },
+        { header: "Địa chỉ",        key: "diaChi",         width: 14 },
+        { header: "Ngày giao",      key: "ngayGiao",       width: 14 },
+        { header: "Quy cách",       key: "quyCach",        width: 16 },
+        { header: "KL đặt (kg)",    key: "khoiLuongDat",   width: 14 },
+        { header: "KL nhận (kg)",   key: "khoiLuongNhan",  width: 14 },
+        { header: "Đơn giá (đ)",    key: "donGia",         width: 14 },
+        { header: "Thành tiền (đ)", key: "thanhTien",      width: 16 },
+        { header: "Mã mẻ",          key: "batchId",        width: 18 },
+        { header: "Trạng thái",     key: "trangThai",      width: 14 },
+        { header: "Ghi chú",        key: "ghiChu",         width: 28 },
+      ],
+      rows as unknown as Record<string, unknown>[],
+      "ThuMua_HTXHongHa"
+    );
+  };
 
   const parseDateVN = (s: string) => { const [d,m,y] = s.split("/"); return `${y}-${m}-${d}`; };
   const handleSort = (k: string) => {
@@ -424,10 +440,17 @@ export default function PurchasePage() {
             <table className="w-full text-sm">
               <thead><tr className="border-b border-border bg-muted/30">
                 {[
-                  { key:"maPO", label:"Mã PO" }, { key:"tenHo", label:"Nông hộ" },
-                  { key:"maVuon", label:"Vùng trồng" }, { key:"ngayTao", label:"Ngày tạo" },
-                  { key:"khoiLuongDat", label:"KL đặt (kg)" }, { key:"khoiLuongNhan", label:"KL nhận (kg)" },
-                  { key:"trangThai", label:"Trạng thái" }, { key:"qcResult", label:"QC" },
+                  { key:"maPO",           label:"Mã PO" },
+                  { key:"tenHo",          label:"Nông hộ" },
+                  { key:"ngayGiao",       label:"Ngày giao" },
+                  { key:"quyCach",        label:"Quy cách" },
+                  { key:"khoiLuongDat",   label:"KL đặt (kg)" },
+                  { key:"khoiLuongNhan",  label:"KL nhận (kg)" },
+                  { key:"donGia",         label:"Đơn giá (đ)" },
+                  { key:"thanhTien",      label:"Thành tiền (đ)" },
+                  { key:"batchId",        label:"Mã mẻ" },
+                  { key:"trangThai",      label:"Trạng thái" },
+                  { key:"qcResult",       label:"QC" },
                 ].map(col => (
                   <th key={col.key} onClick={() => handleSort(col.key)} className="text-left py-2.5 px-4 font-semibold text-xs text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground select-none whitespace-nowrap">
                     <span className="flex items-center gap-1">{col.label} <SortIcon col={col.key} /></span>
@@ -440,17 +463,26 @@ export default function PurchasePage() {
                   const sc = PO_STATUS_CFG[po.trangThai];
                   const Ic = sc.icon;
                   const qc = QC_CFG[po.qcResult];
+                  const thanhTien = po.khoiLuongNhan * po.donGia;
                   return (
                     <tr key={po.id} className="border-b border-border/60 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => setSelectedPO(po)}>
                       <td className="py-3 px-4"><span className="font-mono text-xs font-semibold text-primary">{po.maPO}</span></td>
                       <td className="py-3 px-4">
                         <p className="font-medium text-sm">{po.tenHo}</p>
-                        <span className={`inline-flex text-xs px-1.5 py-0.5 rounded-md font-medium ${AREA_COLORS[po.diaChi] ?? "bg-gray-100 text-gray-600"}`}>{po.diaChi}</span>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <span className="font-mono text-xs text-muted-foreground">{po.maHo}</span>
+                          <span className={`inline-flex text-xs px-1.5 py-0.5 rounded-md font-medium ${AREA_COLORS[po.diaChi] ?? "bg-gray-100 text-gray-600"}`}>{po.diaChi}</span>
+                        </div>
                       </td>
-                      <td className="py-3 px-4 text-xs text-muted-foreground">{po.maVuon}</td>
-                      <td className="py-3 px-4 text-xs text-muted-foreground whitespace-nowrap">{po.ngayTao}</td>
+                      <td className="py-3 px-4 text-xs text-muted-foreground whitespace-nowrap">{po.ngayGiao || po.ngayTao}</td>
+                      <td className="py-3 px-4">
+                        {po.quyCach ? <span className={`inline-flex text-xs px-2 py-0.5 rounded-full border font-medium ${QUY_CACH_CFG[po.quyCach]?.color ?? "bg-gray-100 text-gray-600 border-gray-200"}`}>{po.quyCach}</span> : <span className="text-muted-foreground text-xs">—</span>}
+                      </td>
                       <td className="py-3 px-4 font-medium text-sm">{po.khoiLuongDat}</td>
                       <td className="py-3 px-4 text-sm">{po.khoiLuongNhan > 0 ? <span className="font-semibold text-emerald-700">{po.khoiLuongNhan}</span> : <span className="text-muted-foreground">—</span>}</td>
+                      <td className="py-3 px-4 text-xs text-right">{po.donGia.toLocaleString("vi-VN")}</td>
+                      <td className="py-3 px-4 text-sm text-right">{thanhTien > 0 ? <span className="font-semibold text-emerald-700">{fmt(thanhTien)}</span> : <span className="text-muted-foreground">—</span>}</td>
+                      <td className="py-3 px-4">{po.batchId ? <span className="font-mono text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md">{po.batchId}</span> : <span className="text-xs text-muted-foreground">—</span>}</td>
                       <td className="py-3 px-4"><span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${sc.color}`}><Ic className="w-3 h-3" />{sc.label}</span></td>
                       <td className="py-3 px-4"><span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${qc.color}`}>{qc.label}</span></td>
                       <td className="py-3 px-4" onClick={e => e.stopPropagation()}>
@@ -466,9 +498,12 @@ export default function PurchasePage() {
             </table>
             {filteredPO.length === 0 && <div className="text-center py-12 text-muted-foreground text-sm">Không có đơn mua nào</div>}
           </div>
-          <div className="px-4 py-2 border-t border-border flex items-center justify-between">
+          <div className="px-4 py-2 border-t border-border flex items-center justify-between bg-muted/10">
             <p className="text-xs text-muted-foreground">Hiển thị {filteredPO.length} / {poList.length} đơn</p>
-            <p className="text-xs font-semibold">KL: {filteredPO.reduce((s,o) => s+o.khoiLuongNhan, 0).toFixed(1)} kg nhận · {filteredPO.reduce((s,o) => s+o.khoiLuongDat, 0).toFixed(1)} kg đặt</p>
+            <div className="flex items-center gap-4">
+              <p className="text-xs font-semibold">KL nhận: <span className="text-emerald-700">{filteredPO.reduce((s,o) => s+o.khoiLuongNhan, 0).toFixed(1)} kg</span></p>
+              <p className="text-xs font-semibold">Tổng tiền: <span className="text-emerald-700">{fmt(filteredPO.reduce((s,o) => s + o.khoiLuongNhan * o.donGia, 0))}</span></p>
+            </div>
           </div>
         </div>
       )}
