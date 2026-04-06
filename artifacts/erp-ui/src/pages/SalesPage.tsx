@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
 import AppLayout from "@/components/AppLayout";
 import {
@@ -162,7 +162,14 @@ export default function SalesPage() {
   const [showCreate, setShowCreate] = useState(false);
 
   /* create form state */
-  const [fCust, setFCust]   = useState("");
+  const [fCust, setFCust]         = useState("");
+  const [fCustSearch, setFCustSearch] = useState("");
+  const [showCustDrop, setShowCustDrop] = useState(false);
+  const [showQrScanner, setShowQrScanner] = useState(false);
+  const [qrInput, setQrInput]     = useState("");
+  const [qrError, setQrError]     = useState("");
+  const [qrScanning, setQrScanning] = useState(false);
+  const custRef = useRef<HTMLDivElement>(null);
   const [fDate, setFDate]   = useState(new Date().toISOString().slice(0, 10));
   const [fDeliv, setFDeliv] = useState("");
   const [fNote, setFNote]   = useState("");
@@ -171,6 +178,55 @@ export default function SalesPage() {
   ]);
 
   const selectedCust = CUSTOMERS.find(c => c.id === fCust);
+
+  /* close customer dropdown when clicking outside */
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (custRef.current && !custRef.current.contains(e.target as Node)) setShowCustDrop(false);
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const custFiltered = useMemo(() => {
+    const q = fCustSearch.toLowerCase();
+    return CUSTOMERS.filter(c =>
+      c.name.toLowerCase().includes(q) ||
+      c.sdt.includes(q) ||
+      c.diaChi.toLowerCase().includes(q) ||
+      c.id.toLowerCase().includes(q)
+    );
+  }, [fCustSearch]);
+
+  const selectCust = (id: string) => {
+    const c = CUSTOMERS.find(x => x.id === id);
+    setFCust(id);
+    setFCustSearch(c?.name ?? "");
+    setShowCustDrop(false);
+  };
+
+  const resetCustSearch = () => { setFCust(""); setFCustSearch(""); };
+
+  const handleQrScan = () => {
+    setQrError("");
+    setQrScanning(true);
+    setTimeout(() => {
+      setQrScanning(false);
+      const q = qrInput.trim().toUpperCase();
+      const match = CUSTOMERS.find(c =>
+        c.id === q ||
+        c.id.replace("C","KH-00") === q ||
+        q === c.id.replace("C0","KH-0").replace("C","KH-")
+      ) ?? CUSTOMERS.find(c => c.name.toLowerCase().includes(qrInput.toLowerCase()));
+      if (match) {
+        selectCust(match.id);
+        setShowQrScanner(false);
+        setQrInput("");
+      } else {
+        setQrError("Không tìm thấy khách hàng. Thử lại mã KH (vd: C001, KH-001)");
+      }
+    }, 800);
+  };
 
   const addLine   = () => setFLines(prev => [...prev, { loai: "Chè xanh", soLuong: "", donGia: "420000", maLoSX: "L09104" }]);
   const removeLine = (i: number) => setFLines(prev => prev.filter((_, idx) => idx !== i));
@@ -216,7 +272,7 @@ export default function SalesPage() {
     };
     setOrders(prev => [newOrder, ...prev]);
     setShowCreate(false);
-    setFCust(""); setFDate(new Date().toISOString().slice(0,10)); setFDeliv(""); setFNote("");
+    setFCust(""); setFCustSearch(""); setFDate(new Date().toISOString().slice(0,10)); setFDeliv(""); setFNote("");
     setFLines([{ loai: "Chè xanh", soLuong: "", donGia: "420000", maLoSX: "L09104" }]);
   };
 
@@ -655,21 +711,134 @@ export default function SalesPage() {
             </div>
 
             <div className="overflow-y-auto flex-1 px-5 py-4 space-y-4">
-              {/* Customer */}
-              <div>
+              {/* Customer — searchable combobox + QR */}
+              <div ref={custRef}>
                 <label className="block text-xs font-semibold mb-1.5">Khách hàng <span className="text-red-500">*</span></label>
-                <select value={fCust} onChange={e => setFCust(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary/30">
-                  <option value="">-- Chọn khách hàng --</option>
-                  {CUSTOMERS.map(c => <option key={c.id} value={c.id}>{c.name} ({LOAI_KHACH_CFG[c.loai].label})</option>)}
-                </select>
+                <div className="flex gap-2">
+                  {/* Combobox */}
+                  <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground pointer-events-none" />
+                    <input
+                      value={fCustSearch}
+                      onChange={e => { setFCustSearch(e.target.value); setFCust(""); setShowCustDrop(true); }}
+                      onFocus={() => setShowCustDrop(true)}
+                      placeholder="Tìm tên, SĐT, địa chỉ..."
+                      className={`w-full pl-9 pr-8 py-2.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30 ${fCust ? "border-primary bg-primary/5" : "border-border bg-background"}`}
+                    />
+                    {fCust && (
+                      <button onClick={resetCustSearch} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                        <X className="w-3.5 h-3.5" />
+                      </button>
+                    )}
+
+                    {/* Dropdown list */}
+                    {showCustDrop && (
+                      <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-white border border-border rounded-xl shadow-xl overflow-hidden max-h-52 overflow-y-auto">
+                        {custFiltered.length === 0 ? (
+                          <p className="px-4 py-3 text-xs text-muted-foreground">Không tìm thấy khách hàng</p>
+                        ) : custFiltered.map(c => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onMouseDown={() => selectCust(c.id)}
+                            className={`w-full text-left px-4 py-2.5 hover:bg-primary/5 transition-colors flex items-start gap-3 ${fCust === c.id ? "bg-primary/10" : ""}`}
+                          >
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium truncate">{c.name}</p>
+                              <p className="text-xs text-muted-foreground flex items-center gap-1.5 mt-0.5">
+                                <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${LOAI_KHACH_CFG[c.loai].color}`}>{LOAI_KHACH_CFG[c.loai].label}</span>
+                                <Phone className="w-3 h-3" />{c.sdt}
+                              </p>
+                            </div>
+                            {fCust === c.id && <CheckCircle2 className="w-4 h-4 text-primary shrink-0 mt-0.5" />}
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* QR scan button */}
+                  <button
+                    type="button"
+                    onClick={() => { setShowQrScanner(true); setQrInput(""); setQrError(""); }}
+                    className="w-11 h-[42px] flex items-center justify-center border border-border rounded-lg hover:bg-primary/5 hover:border-primary transition-colors shrink-0 text-muted-foreground hover:text-primary"
+                    title="Quét mã QR khách hàng"
+                  >
+                    <QrCode className="w-4 h-4" />
+                  </button>
+                </div>
+
+                {/* Selected customer info */}
                 {selectedCust && (
-                  <div className="mt-1.5 px-3 py-2 bg-muted/30 rounded-lg flex items-center gap-2 text-xs text-muted-foreground">
-                    <MapPin className="w-3 h-3 shrink-0" />{selectedCust.diaChi}
-                    <span className="ml-1">·</span>
-                    <Phone className="w-3 h-3 shrink-0" />{selectedCust.sdt}
+                  <div className="mt-1.5 px-3 py-2 bg-primary/5 border border-primary/20 rounded-lg flex items-center gap-3 text-xs">
+                    <div className="flex-1 flex items-center gap-3 text-muted-foreground">
+                      <span className="flex items-center gap-1"><MapPin className="w-3 h-3 shrink-0" />{selectedCust.diaChi}</span>
+                      <span className="flex items-center gap-1"><Phone className="w-3 h-3 shrink-0" />{selectedCust.sdt}</span>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold ${LOAI_KHACH_CFG[selectedCust.loai].color}`}>{LOAI_KHACH_CFG[selectedCust.loai].label}</span>
                   </div>
                 )}
               </div>
+
+              {/* QR Scanner modal */}
+              {showQrScanner && (
+                <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+                  <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setShowQrScanner(false)} />
+                  <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-sm p-5 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2"><QrCode className="w-4 h-4 text-primary" /><span className="font-semibold text-sm">Quét mã QR Khách hàng</span></div>
+                      <button onClick={() => setShowQrScanner(false)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4" /></button>
+                    </div>
+
+                    {/* Viewfinder */}
+                    <div className="relative w-full aspect-square bg-black rounded-xl overflow-hidden flex items-center justify-center">
+                      <div className="absolute inset-0 bg-gradient-to-br from-black via-gray-900 to-black opacity-90" />
+                      <div className="relative z-10 w-44 h-44">
+                        {/* Corner brackets */}
+                        {[["top-0 left-0","border-t-2 border-l-2"],["top-0 right-0","border-t-2 border-r-2"],["bottom-0 left-0","border-b-2 border-l-2"],["bottom-0 right-0","border-b-2 border-r-2"]].map(([pos, cls], i) => (
+                          <div key={i} className={`absolute w-8 h-8 border-primary ${pos} ${cls}`} />
+                        ))}
+                        {/* Scan line */}
+                        <div className="absolute inset-x-0 top-1/2 h-0.5 bg-primary/80 animate-pulse" />
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <QrCode className="w-16 h-16 text-white/20" />
+                        </div>
+                      </div>
+                      <p className="absolute bottom-3 text-xs text-white/60">Đưa mã QR vào khung</p>
+                    </div>
+
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground text-center">Hoặc nhập mã khách hàng / tên để tra cứu</p>
+                      <div className="flex gap-2">
+                        <input
+                          value={qrInput}
+                          onChange={e => { setQrInput(e.target.value); setQrError(""); }}
+                          onKeyDown={e => e.key === "Enter" && handleQrScan()}
+                          placeholder="C001 / KH-001 / Tên KH..."
+                          className="flex-1 px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"
+                          autoFocus
+                        />
+                        <button
+                          onClick={handleQrScan}
+                          disabled={!qrInput || qrScanning}
+                          className="px-4 py-2 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-40 transition-colors"
+                        >
+                          {qrScanning ? "..." : "Tìm"}
+                        </button>
+                      </div>
+                      {qrError && <p className="text-xs text-red-500 text-center">{qrError}</p>}
+                      <div className="grid grid-cols-3 gap-1.5 pt-1">
+                        {CUSTOMERS.map(c => (
+                          <button key={c.id} type="button" onMouseDown={() => { selectCust(c.id); setShowQrScanner(false); }}
+                            className="text-[10px] px-2 py-1.5 border border-border rounded-lg hover:bg-primary/5 hover:border-primary text-left truncate transition-colors">
+                            <span className="font-mono text-primary">{c.id}</span><br /><span className="text-muted-foreground">{c.name.split(" ").slice(-1)}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* Dates */}
               <div className="grid grid-cols-2 gap-3">
