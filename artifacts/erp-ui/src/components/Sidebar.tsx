@@ -1,6 +1,7 @@
 import { useLocation, Link } from "wouter";
-import { Home, BarChart3, Leaf, ScanLine, Settings, TrendingUp } from "lucide-react";
+import { Home, BarChart3, Leaf, ScanLine, Settings, TrendingUp } from "lucide-react"; // Leaf still used in nav
 import { useLanguage } from "@/contexts/LanguageContext";
+import logoImg from "@assets/Logo ESG.png";
 
 interface SidebarProps {
   open: boolean;
@@ -38,9 +39,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         {/* Logo area */}
         <div className="px-4 py-5 border-b border-border">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-primary rounded-xl flex items-center justify-center shadow-sm">
-              <Leaf className="w-5 h-5 text-white" strokeWidth={1.5} />
-            </div>
+            <img src={logoImg} alt="ESG VALLEY logo" className="w-9 h-9 object-contain" />
             <div>
               <p className="font-bold text-foreground text-sm">ESG VALLEY</p>
               <p className="text-xs text-muted-foreground">v2.0.1</p>
