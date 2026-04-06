@@ -1,0 +1,204 @@
+📦 I. KHO HÀNG (INVENTORY) – “TRÁI TIM HỆ THỐNG”
+🔄 Flow tổng:
+Nhập kho → Lưu batch → Xuất kho → Chuyển kho → Kiểm kê
+🧩 Flow chi tiết
+🔹 1. Nhập kho
+Từ:
+Mua hàng (nguyên liệu)
+Sản xuất (thành phẩm)
+Sinh:
+Batch
+🔹 2. Lưu trữ
+Theo:
+Kho
+Vị trí (bin)
+Batch
+🔹 3. Xuất kho
+Cho:
+Sản xuất
+Bán hàng
+
+👉 Phải chọn:
+
+Batch (FIFO/FEFO)
+🔹 4. Chuyển kho
+Kho A → Kho B
+🔹 5. Kiểm kê
+So sánh:
+Thực tế vs hệ thống
+🧪 Use case
+UC01: Nhập kho
+UC02: Xuất kho
+UC03: Chuyển kho
+UC04: Kiểm kê
+🔥 MUST
+Quản lý batch
+Tracking hạn sử dụng
+
+Liên kết:
+
+Batch → Nông hộ → Vùng trồng
+🏭 II. SẢN XUẤT (MANUFACTURING)
+🔄 Flow tổng:
+Kế hoạch → Lệnh sản xuất → Xuất NVL → Sản xuất → Nhập TP
+🧩 Flow chi tiết
+🔹 1. Kế hoạch sản xuất
+Dựa vào:
+Đơn hàng
+Forecast
+🔹 2. Lệnh sản xuất
+Chỉ định:
+Nguyên liệu
+Số lượng
+🔹 3. Xuất nguyên liệu
+Lấy từ kho
+Theo batch
+🔹 4. Sản xuất (process chè)
+Làm héo
+Vò
+Sấy
+Phân loại
+🔹 5. Nhập kho thành phẩm
+Sinh:
+Batch thành phẩm
+🧪 Use case
+UC01: Tạo lệnh SX
+UC02: Xuất NVL
+UC03: Ghi nhận sản xuất
+UC04: Nhập TP
+🔥 MUST
+
+👉 Mapping:
+
+Batch TP → Batch NVL → Nông hộ
+
+👉 Đây là xương sống truy xuất
+
+✅ III. CHẤT LƯỢNG (QC)
+🔄 Flow:
+QC đầu vào → QC trong SX → QC đầu ra
+🧩 Chi tiết
+🔹 QC đầu vào
+Check nguyên liệu từ nông hộ
+🔹 QC trong sản xuất
+Check từng công đoạn
+🔹 QC đầu ra
+Check thành phẩm
+🧪 Use case
+UC01: QC nguyên liệu
+UC02: QC sản xuất
+UC03: QC thành phẩm
+🔥 MUST
+Gắn QC vào batch
+Fail → reject hoặc downgrade
+👨‍🌾 IV. HỘ DÂN (FARMER MANAGEMENT)
+🔄 Flow:
+Tạo nông hộ → Gán vùng trồng → Theo dõi sản lượng
+🧩 Chi tiết
+🔹 Quản lý thông tin
+Tên
+SĐT
+CCCD
+🔹 Gắn vùng trồng
+1 nông hộ → nhiều vùng
+🔹 Theo dõi
+Lịch sử bán chè
+Chất lượng
+🧪 Use case
+UC01: Tạo nông hộ
+UC02: Cập nhật
+UC03: Xem lịch sử
+🔥 MUST
+
+👉 Mỗi nông hộ có:
+
+QR code riêng
+📦 V. ĐÓNG GÓI (PACKAGING)
+🔄 Flow:
+Nhận TP → Đóng gói → Gán QR → Nhập kho
+🧩 Chi tiết
+🔹 Nhận thành phẩm
+Theo batch
+🔹 Đóng gói
+Túi / hộp
+🔹 Gán QR
+
+👉 Mapping:
+
+QR → Thành phẩm → Batch → Nông hộ
+🧪 Use case
+UC01: Đóng gói
+UC02: In QR
+UC03: Nhập kho
+🔥 MUST
+QR unique
+Trace được full chain
+👥 VI. KHÁCH HÀNG (CRM)
+🔄 Flow:
+Tạo KH → Giao dịch → Theo dõi → Phân loại
+🧩 Chi tiết
+🔹 Quản lý khách
+Đại lý
+Siêu thị
+Xuất khẩu
+🔹 Theo dõi
+Lịch sử mua
+Doanh thu
+🧪 Use case
+UC01: Tạo KH
+UC02: Update
+UC03: Xem lịch sử
+🔥 MUST
+Link với Sales
+Phân loại khách
+💰 VII. KẾ TOÁN (ACCOUNTING)
+🔄 Flow:
+Ghi nhận → Công nợ → Thanh toán → Báo cáo
+🧩 Chi tiết
+🔹 Công nợ
+Phải thu (khách)
+Phải trả (nông hộ)
+🔹 Chi phí
+Nguyên liệu
+Sản xuất
+🧪 Use case
+UC01: Ghi nhận giao dịch
+UC02: Thanh toán
+UC03: Báo cáo
+🔥 MUST
+Sync với:
+Sales
+Procurement
+📊 VIII. BÁO CÁO (REPORT)
+🔄 Flow:
+Thu thập dữ liệu → Tổng hợp → Dashboard
+🧩 Báo cáo chính
+Doanh thu
+Tồn kho
+Sản lượng
+Theo vùng trồng
+🔥 MUST
+
+👉 Có report:
+
+Sản phẩm → Batch → Nông hộ
+⚙️ IX. CÀI ĐẶT (SETTINGS)
+🔄 Flow:
+Cấu hình → Phân quyền → Master data
+🧩 Chi tiết
+🔹 Master data
+Loại chè
+Quy trình
+Định mức (BOM)
+🔹 Phân quyền
+Admin
+Kho
+Kế toán
+🔥 MUST
+Role-based access
+🔥 X. BIG PICTURE (cái này bạn đem đi trình là win 🏆)
+Nông hộ → Mua hàng → Kho (Batch) → Sản xuất → Đóng gói → Bán hàng → Khách hàng
+
+👉 Và mỗi bước đều giữ:
+
+Batch + QR + Traceability
