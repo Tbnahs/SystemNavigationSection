@@ -1,0 +1,154 @@
+🛒 1. Flow nghiệp vụ Bán hàng (chuẩn cho ngành chè)
+🔄 Flow tổng:
+
+Khách hàng → Báo giá → Đơn hàng → Xuất kho → Giao hàng → Thanh toán
+
+📊 2. Flow chi tiết (áp vào chè)
+🔹 Bước 1: Tạo khách hàng
+Loại:
+Đại lý
+Siêu thị
+Xuất khẩu
+Thông tin:
+Tên
+SĐT
+Địa chỉ
+Loại khách
+
+👉 Mapping:
+
+Lưu trong module Khách hàng (CRM)
+🔹 Bước 2: Báo giá (Quotation)
+Chọn sản phẩm:
+Trà xanh
+Trà ô long
+Trà túi lọc
+Giá:
+Theo mùa
+Theo số lượng
+
+👉 Output:
+
+File báo giá / record hệ thống
+🔹 Bước 3: Tạo Đơn hàng (Sales Order)
+Thông tin:
+Mã đơn
+Khách hàng
+Danh sách sản phẩm
+Số lượng
+Giá
+
+👉 System check:
+
+Có đủ hàng trong kho không?
+🔹 Bước 4: Xuất kho
+
+👉 Trigger:
+
+Khi đơn hàng được duyệt
+
+👉 Flow:
+
+Chọn kho thành phẩm
+Trừ tồn kho theo batch
+
+🔥 Quan trọng:
+
+Phải biết xuất từ batch nào → để truy xuất nguồn gốc
+🔹 Bước 5: Giao hàng
+Giao nội bộ / đơn vị vận chuyển
+Có thể có:
+Mã vận đơn
+Trạng thái giao
+🔹 Bước 6: Thanh toán
+Tiền mặt / chuyển khoản
+Công nợ (B2B)
+
+👉 Mapping:
+
+Sync sang Kế toán
+🧩 3. Mapping với các module khác
+Sales	Liên kết
+Đơn hàng	Kho
+Khách hàng	CRM
+Giá	Kế toán
+Batch	Sản xuất
+QR	Truy xuất
+🧪 4. Use Case chính (cho BA viết tài liệu)
+UC01 – Tạo đơn hàng
+Actor: Sales
+Input: Khách + sản phẩm
+Output: Sales Order
+UC02 – Kiểm tra tồn kho
+Actor: System
+Logic:
+Nếu đủ → OK
+Không đủ → cảnh báo
+UC03 – Xuất kho
+Actor: Kho
+Output:
+Phiếu xuất
+Trừ tồn
+UC04 – Giao hàng
+Actor: Kho / vận chuyển
+Output:
+Trạng thái: Delivered
+UC05 – Thanh toán
+Actor: Kế toán
+Output:
+Paid / Unpaid
+🗂️ 5. Data model (quan trọng cho dev)
+Sales Order
+{
+  "order_id": "SO001",
+  "customer_id": "CUS01",
+  "items": [
+    {
+      "product_id": "TRA001",
+      "quantity": 100,
+      "price": 50000,
+      "batch_id": "BATCH01"
+    }
+  ],
+  "status": "pending"
+}
+🖥️ 6. UI gợi ý (theo hình bạn đang có)
+
+👉 Khi click Bán hàng:
+
+Dashboard:
+Tổng đơn hôm nay
+Doanh thu
+Đơn chưa giao
+Tabs:
+Danh sách đơn hàng
+Tạo đơn
+Báo giá
+Công nợ
+🔥 7. Điểm MUST có cho ngành chè (rất quan trọng)
+✅ 1. Theo dõi batch
+Mỗi sản phẩm phải biết:
+Sản xuất từ lô nào
+Lô đó từ vùng nào
+✅ 2. Giá linh hoạt
+Theo:
+Mùa vụ
+Chất lượng chè
+✅ 3. Liên kết truy xuất nguồn gốc
+
+👉 Khi bán hàng:
+
+Gán QR cho sản phẩm
+
+Link:
+
+Thành phẩm → Batch → Nông hộ
+💡 8. Nâng cấp xịn (để ghi điểm với khách)
+Đơn hàng → auto suggest batch (FIFO / FEFO)
+Cảnh báo tồn kho thấp
+Dashboard realtime
+Theo dõi doanh thu theo loại trà
+🎯 Tóm lại
+
+👉 Sales không chỉ là bán
+👉 Nó là điểm nối giữa sản xuất – kho – kế toán – truy xuất
