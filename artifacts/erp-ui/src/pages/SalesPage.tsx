@@ -138,6 +138,14 @@ const PRODUCT_COLORS: Record<string, string> = PRODUCT_COLORS_SHARED;
 let _nextId = 100;
 const genId = () => String(++_nextId);
 
+/* ── Danh mục sản phẩm website ── */
+const WEB_PRODUCTS = [
+  { id:"wp1", ten:"Bạch Trà Shan Tuyết Đặc Biệt", loai:"Bạch trà",    gia:1_200_000, tag:"Cao cấp",    moTa:"Búp trà trắng nguyên vẹn, thu hái bằng tay",       color:"from-stone-50 to-stone-100",   badge:"bg-violet-100 text-violet-700" },
+  { id:"wp2", ten:"Hồng Trà Shan Bằng Phúc",      loai:"Hồng trà",    gia:850_000,   tag:"Bán chạy",  moTa:"Lên men tự nhiên, hương mật ong đặc trưng",        color:"from-amber-50 to-orange-50",   badge:"bg-amber-100 text-amber-700" },
+  { id:"wp3", ten:"Chè Xanh Nguyên Búp",           loai:"Chè xanh",    gia:420_000,   tag:"Phổ thông", moTa:"Chè 1 tôm 2 lá, sấy lửa than truyền thống",      color:"from-emerald-50 to-green-50",  badge:"bg-emerald-100 text-emerald-700" },
+  { id:"wp4", ten:"Trà Túi Lọc Shan Tuyết",        loai:"Trà túi lọc", gia:280_000,   tag:"Tiện lợi",  moTa:"20 túi/hộp, phù hợp văn phòng & gia đình",       color:"from-blue-50 to-sky-50",       badge:"bg-blue-100 text-blue-700" },
+];
+
 function fmt(v: number) { return v.toLocaleString("vi-VN") + " đ"; }
 function fmtShort(v: number) {
   if (v >= 1_000_000_000) return (v / 1_000_000_000).toFixed(1) + " tỷ";
@@ -148,7 +156,14 @@ function fmtShort(v: number) {
 /* ────────────── Component ────────────── */
 export default function SalesPage() {
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"don-hang" | "bao-gia" | "cong-no">("don-hang");
+  const [activeTab, setActiveTab] = useState<"don-hang" | "bao-gia" | "cong-no" | "website">("don-hang");
+  /* ── Website simulator state ── */
+  const [wCart, setWCart]     = useState<{id:string;ten:string;loai:string;gia:number;sl:number}[]>([]);
+  const [wStep, setWStep]     = useState<"shop"|"checkout"|"success">("shop");
+  const [wName, setWName]     = useState(""); const [wPhone, setWPhone] = useState("");
+  const [wAddr, setWAddr]     = useState(""); const [wNote, setWNote]   = useState("");
+  const [newWebCount, setNewWebCount] = useState(0);
+  const [wOrderId, setWOrderId] = useState("");
   const [search, setSearch]       = useState("");
   const [statusFilter, setStatusFilter] = useState<OrderStatus | "">("");
   const [loaiFilter, setLoaiFilter]     = useState<LoaiKhach | "">("");
@@ -275,6 +290,48 @@ export default function SalesPage() {
     setFCust(""); setFCustSearch(""); setFDate(new Date().toISOString().slice(0,10)); setFDeliv(""); setFNote("");
     setFLines([{ loai: "Chè xanh", soLuong: "", donGia: "420000", maLoSX: "L09104" }]);
   };
+
+  /* ── Website helpers ── */
+  const wTotal = wCart.reduce((s,i) => s + i.gia * i.sl, 0);
+  const wTotalItems = wCart.reduce((s,i) => s + i.sl, 0);
+  const wAddToCart = (p: typeof WEB_PRODUCTS[0]) => {
+    setWCart(prev => {
+      const ex = prev.find(x => x.id === p.id);
+      if (ex) return prev.map(x => x.id === p.id ? {...x, sl: x.sl+1} : x);
+      return [...prev, {id:p.id, ten:p.ten, loai:p.loai, gia:p.gia, sl:1}];
+    });
+  };
+  const wChangeQty = (id: string, delta: number) => {
+    setWCart(prev => prev.map(x => x.id === id ? {...x, sl: Math.max(0, x.sl+delta)} : x).filter(x => x.sl > 0));
+  };
+  const handleWebOrder = () => {
+    if (!wName || !wPhone || wCart.length === 0) return;
+    const today = new Date();
+    const d = String(today.getDate()).padStart(2,"0");
+    const m = String(today.getMonth()+1).padStart(2,"0");
+    const y = today.getFullYear();
+    const newId = genId();
+    const maDon = `WEB-${d}${m}-${String(orders.length+1).padStart(3,"0")}`;
+    const newOrder: SalesOrder = {
+      id: newId, maDon,
+      loaiKhach: "le", khachHang: wName,
+      diaChi: wAddr || "Chưa cung cấp", sdt: wPhone,
+      ngayDat: `${d}/${m}/${y}`, ngayGiao: "",
+      trangThai: "bao-gia", thanhToan: "chua", daThanhToan: 0, maVanDon: "",
+      nguoiTao: "Website", ghiChu: wNote, nguon: "web",
+      sanPhams: wCart.map(c => ({
+        sanPham: "Chè Shan Tuyết Bằng Phúc", loai: c.loai,
+        soLuong: c.sl, donVi: "kg", donGia: c.gia,
+        thanhTien: c.gia * c.sl, maLoSX: "WEB",
+      })),
+      tongTien: wTotal,
+    };
+    setOrders(prev => [newOrder, ...prev]);
+    setNewWebCount(n => n + 1);
+    setWOrderId(maDon);
+    setWStep("success");
+  };
+  const wReset = () => { setWCart([]); setWStep("shop"); setWName(""); setWPhone(""); setWAddr(""); setWNote(""); };
 
   const handleStatusChange = (id: string, s: OrderStatus) => {
     setOrders(prev => prev.map(o => o.id !== id ? o : { ...o, trangThai: s }));
@@ -417,14 +474,16 @@ export default function SalesPage() {
       {/* Tabs */}
       <div className="flex items-center gap-1 mb-4 border-b border-border">
         {[
-          { key: "don-hang", label: "Đơn hàng",  count: orders.filter(o => o.trangThai !== "bao-gia").length },
-          { key: "bao-gia",  label: "Báo giá",    count: quotaCount },
-          { key: "cong-no",  label: "Công nợ",    count: congNoData.length },
+          { key: "don-hang", label: "Đơn hàng",  count: orders.filter(o => o.trangThai !== "bao-gia").length, badge: null },
+          { key: "bao-gia",  label: "Báo giá",    count: quotaCount, badge: null },
+          { key: "cong-no",  label: "Công nợ",    count: congNoData.length, badge: null },
+          { key: "website",  label: "Website",     count: orders.filter(o => o.nguon === "web").length, badge: newWebCount > 0 && activeTab !== "website" ? newWebCount : null },
         ].map(tab => (
-          <button key={tab.key} onClick={() => setActiveTab(tab.key as typeof activeTab)}
-            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+          <button key={tab.key} onClick={() => { setActiveTab(tab.key as typeof activeTab); if (tab.key === "website") setNewWebCount(0); }}
+            className={`relative flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${activeTab === tab.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
             {tab.label}
             <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold ${activeTab === tab.key ? "bg-primary text-white" : "bg-muted text-muted-foreground"}`}>{tab.count}</span>
+            {tab.badge && <span className="absolute -top-1 -right-1 inline-flex items-center justify-center w-4 h-4 rounded-full bg-red-500 text-white text-[10px] font-bold animate-pulse">{tab.badge}</span>}
           </button>
         ))}
       </div>
@@ -518,7 +577,12 @@ export default function SalesPage() {
                   const lk = LOAI_KHACH_CFG[order.loaiKhach];
                   return (
                     <tr key={order.id} className="border-b border-border/60 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => setSelected(order)}>
-                      <td className="py-3 px-4"><span className="font-mono text-xs font-semibold text-primary">{order.maDon}</span></td>
+                      <td className="py-3 px-4">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="font-mono text-xs font-semibold text-primary">{order.maDon}</span>
+                          {order.nguon === "web" && <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-md text-[10px] font-bold bg-blue-100 text-blue-700 border border-blue-200">🌐 WEB</span>}
+                        </div>
+                      </td>
                       <td className="py-3 px-4">
                         <p className="font-medium text-foreground text-sm">{order.khachHang}</p>
                         <span className={`inline-flex text-xs px-1.5 py-0.5 rounded-md font-medium ${lk.color}`}>{lk.label}</span>
@@ -544,6 +608,198 @@ export default function SalesPage() {
           <div className="px-4 py-2 border-t border-border flex items-center justify-between">
             <p className="text-xs text-muted-foreground">Hiển thị {filtered.length} / {orders.length} đơn</p>
             <p className="text-xs font-semibold">Tổng: {fmt(filtered.filter(o => o.trangThai !== "huy").reduce((s, o) => s + o.tongTien, 0))}</p>
+          </div>
+        </div>
+      )}
+
+      {/* ── Website Simulator ── */}
+      {activeTab === "website" && (
+        <div className="space-y-3">
+          {/* Browser chrome */}
+          <div className="bg-white border border-border rounded-xl overflow-hidden shadow-sm">
+            {/* Title bar */}
+            <div className="bg-gray-100 border-b border-gray-200 px-3 py-2 flex items-center gap-3">
+              <div className="flex items-center gap-1.5">
+                <div className="w-3 h-3 rounded-full bg-red-400" />
+                <div className="w-3 h-3 rounded-full bg-yellow-400" />
+                <div className="w-3 h-3 rounded-full bg-green-400" />
+              </div>
+              <div className="flex-1 bg-white border border-gray-200 rounded-md px-3 py-1 flex items-center gap-2">
+                <span className="text-green-600 text-xs">🔒</span>
+                <span className="text-xs text-gray-600 font-mono">chehonghavietnam.vn/order</span>
+              </div>
+              <span className="text-xs text-muted-foreground px-2 py-1 bg-blue-50 text-blue-600 rounded-md font-medium border border-blue-200">Giả lập marketing website</span>
+            </div>
+
+            {/* Website content */}
+            <div className="bg-gradient-to-b from-emerald-950 to-emerald-900">
+              {/* Website nav */}
+              <div className="flex items-center justify-between px-8 py-3 border-b border-white/10">
+                <div className="flex items-center gap-2">
+                  <div className="w-7 h-7 rounded-full bg-emerald-400/20 border border-emerald-400/40 flex items-center justify-center text-sm">🍃</div>
+                  <div>
+                    <p className="text-white font-bold text-sm leading-tight">HTX Hồng Hà</p>
+                    <p className="text-emerald-300 text-[10px]">Chè Shan Tuyết Bằng Phúc · Quân Chu</p>
+                  </div>
+                </div>
+                <div className="hidden sm:flex items-center gap-5 text-xs text-emerald-200">
+                  {["Giới thiệu","Sản phẩm","Vùng trồng","Liên hệ"].map(n => (
+                    <span key={n} className="hover:text-white cursor-pointer transition-colors">{n}</span>
+                  ))}
+                </div>
+                <button
+                  onClick={() => wStep === "shop" && wTotalItems > 0 && setWStep("checkout")}
+                  className="relative flex items-center gap-1.5 px-3 py-1.5 bg-emerald-400 text-emerald-950 rounded-lg text-xs font-bold hover:bg-emerald-300 transition-colors">
+                  🛒 Giỏ hàng
+                  {wTotalItems > 0 && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 rounded-full bg-red-500 text-white text-[10px] flex items-center justify-center font-bold">{wTotalItems}</span>}
+                </button>
+              </div>
+
+              {/* Hero */}
+              <div className="px-8 py-6 text-center">
+                <p className="text-emerald-300 text-xs uppercase tracking-widest mb-1">Chứng nhận OCOP 5 sao</p>
+                <h2 className="text-white text-2xl font-bold mb-1">Chè Shan Tuyết Quân Chu</h2>
+                <p className="text-emerald-200 text-sm">Vùng núi cao 1.200m · Không phân bón hóa học · Thu hái thủ công</p>
+              </div>
+            </div>
+
+            {/* Product + Cart/Checkout area */}
+            {wStep === "success" ? (
+              <div className="bg-white px-8 py-12 text-center">
+                <div className="w-16 h-16 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-4 text-3xl">✅</div>
+                <h3 className="text-xl font-bold text-foreground mb-2">Đặt hàng thành công!</h3>
+                <p className="text-muted-foreground text-sm mb-1">Mã đơn: <span className="font-mono font-bold text-primary">{wOrderId}</span></p>
+                <p className="text-muted-foreground text-sm mb-6">HTX sẽ liên hệ xác nhận đơn trong 24h. Cảm ơn bạn đã tin tưởng!</p>
+                <div className="flex items-center justify-center gap-3">
+                  <button onClick={wReset} className="px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-medium hover:bg-emerald-700 transition-colors">Đặt thêm</button>
+                  <button onClick={() => { wReset(); setActiveTab("bao-gia"); }} className="px-5 py-2 bg-blue-50 text-blue-700 border border-blue-200 rounded-lg text-sm font-medium hover:bg-blue-100 transition-colors">Xem trong ERP →</button>
+                </div>
+              </div>
+            ) : wStep === "checkout" ? (
+              <div className="bg-white grid grid-cols-1 md:grid-cols-2 gap-0">
+                {/* Order summary */}
+                <div className="border-r border-border p-6 bg-muted/10">
+                  <p className="text-sm font-bold mb-4">🛒 Đơn hàng của bạn</p>
+                  <div className="space-y-3 mb-4">
+                    {wCart.map(item => (
+                      <div key={item.id} className="flex items-center justify-between gap-3">
+                        <div className="flex-1">
+                          <p className="text-sm font-medium leading-tight">{item.ten}</p>
+                          <p className="text-xs text-muted-foreground">{item.loai} · {fmt(item.gia)}/kg</p>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => wChangeQty(item.id, -1)} className="w-6 h-6 rounded-md border border-border text-xs hover:bg-muted flex items-center justify-center font-bold">−</button>
+                          <span className="w-6 text-center text-sm font-semibold">{item.sl}</span>
+                          <button onClick={() => wChangeQty(item.id, 1)} className="w-6 h-6 rounded-md border border-border text-xs hover:bg-muted flex items-center justify-center font-bold">+</button>
+                        </div>
+                        <p className="text-sm font-bold w-24 text-right">{fmt(item.gia * item.sl)}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="border-t border-border pt-3 flex justify-between">
+                    <p className="font-semibold">Tổng cộng</p>
+                    <p className="font-bold text-emerald-700 text-lg">{fmt(wTotal)}</p>
+                  </div>
+                  <button onClick={() => setWStep("shop")} className="mt-4 text-xs text-muted-foreground hover:text-foreground underline">← Tiếp tục mua hàng</button>
+                </div>
+                {/* Form */}
+                <div className="p-6 space-y-4">
+                  <p className="text-sm font-bold">📋 Thông tin giao hàng</p>
+                  <div>
+                    <label className="text-xs text-muted-foreground font-medium block mb-1">Họ tên *</label>
+                    <input value={wName} onChange={e => setWName(e.target.value)} placeholder="Nguyễn Văn A" className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground font-medium block mb-1">Số điện thoại *</label>
+                    <input value={wPhone} onChange={e => setWPhone(e.target.value)} placeholder="0912 345 678" className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground font-medium block mb-1">Địa chỉ giao hàng</label>
+                    <input value={wAddr} onChange={e => setWAddr(e.target.value)} placeholder="Số nhà, đường, quận/huyện, tỉnh/thành" className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500" />
+                  </div>
+                  <div>
+                    <label className="text-xs text-muted-foreground font-medium block mb-1">Ghi chú</label>
+                    <textarea value={wNote} onChange={e => setWNote(e.target.value)} placeholder="Giao giờ hành chính, gọi trước khi giao..." rows={2} className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-emerald-500 resize-none" />
+                  </div>
+                  <button
+                    onClick={handleWebOrder}
+                    disabled={!wName || !wPhone}
+                    className="w-full py-3 bg-emerald-600 text-white rounded-lg font-bold text-sm hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors">
+                    Đặt hàng ngay 🛒
+                  </button>
+                  <p className="text-[10px] text-muted-foreground text-center">Đơn sẽ được gửi vào hệ thống ERP của HTX Hồng Hà ngay lập tức</p>
+                </div>
+              </div>
+            ) : (
+              /* Product shop grid */
+              <div className="bg-white p-6">
+                <p className="text-sm font-bold mb-1 text-foreground">Sản phẩm nổi bật</p>
+                <p className="text-xs text-muted-foreground mb-4">Chọn sản phẩm và thêm vào giỏ hàng</p>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                  {WEB_PRODUCTS.map(p => {
+                    const inCart = wCart.find(x => x.id === p.id);
+                    return (
+                      <div key={p.id} className={`relative rounded-xl bg-gradient-to-br ${p.color} border border-border overflow-hidden hover:shadow-md transition-all group`}>
+                        <div className="p-4">
+                          <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold ${p.badge} mb-2`}>{p.tag}</span>
+                          <p className="font-bold text-sm text-foreground leading-tight mb-1">{p.ten}</p>
+                          <p className="text-[10px] text-muted-foreground mb-3 leading-snug">{p.moTa}</p>
+                          <p className="text-sm font-bold text-emerald-700">{fmt(p.gia)}<span className="text-xs font-normal text-muted-foreground">/kg</span></p>
+                        </div>
+                        <div className="px-4 pb-4">
+                          {inCart ? (
+                            <div className="flex items-center justify-between gap-2">
+                              <div className="flex items-center gap-1">
+                                <button onClick={() => wChangeQty(p.id, -1)} className="w-7 h-7 rounded-md bg-white border border-border text-sm font-bold hover:bg-muted flex items-center justify-center">−</button>
+                                <span className="w-6 text-center text-sm font-bold">{inCart.sl}</span>
+                                <button onClick={() => wChangeQty(p.id, 1)} className="w-7 h-7 rounded-md bg-white border border-border text-sm font-bold hover:bg-muted flex items-center justify-center">+</button>
+                              </div>
+                              <span className="text-xs font-bold text-emerald-700">{fmt(inCart.sl * p.gia)}</span>
+                            </div>
+                          ) : (
+                            <button onClick={() => wAddToCart(p)} className="w-full py-2 bg-emerald-600 text-white rounded-lg text-xs font-bold hover:bg-emerald-700 transition-colors">+ Giỏ hàng</button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+                {wTotalItems > 0 && (
+                  <div className="mt-5 flex items-center justify-between bg-emerald-50 border border-emerald-200 rounded-xl px-5 py-3">
+                    <div>
+                      <p className="text-sm font-bold text-emerald-800">{wTotalItems} sản phẩm đã chọn</p>
+                      <p className="text-xs text-emerald-600">Tổng: {fmt(wTotal)}</p>
+                    </div>
+                    <button onClick={() => setWStep("checkout")} className="px-5 py-2 bg-emerald-600 text-white rounded-lg text-sm font-bold hover:bg-emerald-700 transition-colors">
+                      Tiến hành đặt hàng →
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Website footer */}
+            <div className="bg-emerald-950 px-8 py-4">
+              <div className="flex items-center justify-between flex-wrap gap-2">
+                <p className="text-emerald-400 text-xs">© 2025 HTX Hồng Hà · Chứng nhận OCOP 5 sao · Bằng Phúc, Quân Chu, Đại Từ, Thái Nguyên</p>
+                <div className="flex items-center gap-3 text-emerald-500 text-xs">
+                  <span>📞 0912.345.678</span>
+                  <span>📧 honghatea@gmail.com</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ERP notice */}
+          <div className="bg-blue-50 border border-blue-200 rounded-xl px-4 py-3 flex items-start gap-3">
+            <span className="text-blue-500 text-lg mt-0.5">ℹ️</span>
+            <div>
+              <p className="text-sm font-semibold text-blue-800">Kết nối trực tiếp với ERP</p>
+              <p className="text-xs text-blue-600 mt-0.5">
+                Đơn đặt từ website sẽ tự động tạo trong hệ thống với trạng thái <strong>Báo giá</strong>, nguồn gốc <strong>🌐 WEB</strong>.
+                Nhân viên xem và duyệt đơn trong tab <strong>Đơn hàng</strong> hoặc <strong>Báo giá</strong>.
+              </p>
+            </div>
           </div>
         </div>
       )}

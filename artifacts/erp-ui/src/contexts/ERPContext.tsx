@@ -47,6 +47,7 @@ export interface SalesOrder {
   trangThai: OrderStatus; thanhToan: ThanhToanSO;
   sanPhams: OrderLine[]; tongTien: number; daThanhToan: number;
   ghiChu: string; nguoiTao: string; maVanDon: string;
+  nguon?: "web" | "admin";
 }
 
 export type TonStatus = "binh-thuong"|"sap-het"|"het-hang";
