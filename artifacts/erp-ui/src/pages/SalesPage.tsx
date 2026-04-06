@@ -7,7 +7,7 @@ import {
   CheckCircle2, Clock, Truck, XCircle, AlertCircle,
   TrendingUp, ShoppingBag, Package, BadgeDollarSign,
   X, Trash2, Edit2, FileSpreadsheet, Printer, Download,
-  Receipt, ChevronRight, Warehouse, User, Phone, MapPin,
+  Receipt, ChevronRight, Warehouse, User, Phone, MapPin, QrCode,
 } from "lucide-react";
 
 /* ────────────── Types ────────────── */
@@ -579,23 +579,51 @@ export default function SalesPage() {
               <div>
                 <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Sản phẩm & Lô sản xuất</p>
                 <div className="space-y-2">
-                  {selected.sanPhams.map((sp, i) => (
-                    <div key={i} className="border border-border rounded-xl p-3">
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2">
-                          <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${PRODUCT_COLORS[sp.loai] ?? "bg-gray-100 text-gray-600"}`}>{sp.loai}</span>
-                          <span className="text-xs text-muted-foreground">{sp.sanPham}</span>
+                  {selected.sanPhams.map((sp, i) => {
+                    const LOSX_QR_MAP: Record<string,{maDG:string,qr:string}> = {
+                      "L013003":{maDG:"S013003",qr:"QR-S013003"},
+                      "L023103":{maDG:"S023103",qr:"QR-S023103"},
+                      "L033103":{maDG:"S033103",qr:"QR-S033103"},
+                      "L043103":{maDG:"S043103",qr:"QR-S043103"},
+                      "L053103":{maDG:"S053103",qr:"QR-S053103"},
+                      "L063103":{maDG:"S063103",qr:"QR-S063103"},
+                      "L073103":{maDG:"S073103",qr:"QR-S073103"},
+                      "L083103":{maDG:"S083103",qr:"QR-S083103"},
+                      "L09104": {maDG:"S09104", qr:"QR-S09104"},
+                      "L010104":{maDG:"S010104",qr:"QR-S010104"},
+                      "L011104":{maDG:"S011104",qr:"QR-S011104"},
+                      "L012104":{maDG:"S012104",qr:"QR-S012104"},
+                      "L013104":{maDG:"S013104",qr:"QR-S013104"},
+                    };
+                    const pkg = LOSX_QR_MAP[sp.maLoSX];
+                    return (
+                      <div key={i} className="border border-border rounded-xl p-3">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <div className="flex items-center gap-2">
+                            <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${PRODUCT_COLORS[sp.loai] ?? "bg-gray-100 text-gray-600"}`}>{sp.loai}</span>
+                            <span className="text-xs text-muted-foreground">{sp.sanPham}</span>
+                          </div>
+                          <span className="font-bold text-sm">{fmt(sp.thanhTien)}</span>
                         </div>
-                        <span className="font-bold text-sm">{fmt(sp.thanhTien)}</span>
+                        <div className="flex items-center justify-between text-xs text-muted-foreground">
+                          <span>{sp.soLuong} {sp.donVi} × {sp.donGia.toLocaleString("vi-VN")} đ/kg</span>
+                          <span className="flex items-center gap-1 font-mono bg-muted/50 px-2 py-0.5 rounded-md">
+                            <Package className="w-3 h-3" /> {sp.maLoSX}
+                          </span>
+                        </div>
+                        {pkg && (
+                          <div className="mt-2 pt-2 border-t border-border/60 flex items-center justify-between">
+                            <div className="flex items-center gap-1.5 text-xs">
+                              <QrCode className="w-3 h-3 text-violet-500" />
+                              <span className="text-muted-foreground">Lô ĐG:</span>
+                              <span className="font-mono font-semibold text-violet-700">{pkg.maDG}</span>
+                            </div>
+                            <span className="font-mono text-[10px] bg-violet-50 border border-violet-200 text-violet-600 px-2 py-0.5 rounded-md">{pkg.qr}</span>
+                          </div>
+                        )}
                       </div>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground">
-                        <span>{sp.soLuong} {sp.donVi} × {sp.donGia.toLocaleString("vi-VN")} đ/kg</span>
-                        <span className="flex items-center gap-1 font-mono bg-muted/50 px-2 py-0.5 rounded-md">
-                          <Package className="w-3 h-3" /> {sp.maLoSX}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
 

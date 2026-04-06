@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useLocation } from "wouter";
 import AppLayout from "@/components/AppLayout";
 import {
@@ -51,6 +51,66 @@ const THU_MUA_TOP = [
 function fmtMoney(v: number) {
   if (v >= 1_000_000) return (v / 1_000_000).toFixed(0) + " tr";
   return v.toLocaleString("vi-VN");
+}
+
+const TRACE_DB: Record<string, { sp: string; loSX: string; rawBatches: string[]; farmers: string[]; vung: string; khach: string }> = {
+  "QR-S013003": { sp:"Chè xanh 500g", loSX:"L013003", rawBatches:["RAW-NH004-3003","RAW-NB002-3003"], farmers:["NH004","NB002"], vung:"Nà Hồng + Nà Bay", khach:"Cty Trà Hà Nội" },
+  "QR-S023103": { sp:"Hồng trà 100g", loSX:"L023103", rawBatches:["RAW-NH001-3103","RAW-NH002-3103","RAW-NH008-3103"], farmers:["NH001","NH002","NH008"], vung:"Nà Hồng", khach:"Siêu thị BigC" },
+  "QR-S033103": { sp:"Bạch trà 50g",  loSX:"L033103", rawBatches:["RAW-NH009-3103","RAW-NH004-3103"], farmers:["NH009","NH004"], vung:"Nà Hồng", khach:"KH Nhật Bản" },
+  "QR-S043103": { sp:"Chè xanh 1kg",  loSX:"L043103", rawBatches:["RAW-NH006-3103","RAW-NH007-3103"], farmers:["NH006","NH007"], vung:"Nà Hồng", khach:"Spa Lotus" },
+  "QR-S073103": { sp:"Chè xanh 100g", loSX:"L073103", rawBatches:["RAW-NB010-3103","RAW-NB001-3103","RAW-NB002-3103","RAW-NB007-3103"], farmers:["NB010","NB001","NB002","NB007"], vung:"Nà Bay", khach:"Hội OCOP" },
+  "QR-S09104":  { sp:"Hồng trà 200g", loSX:"L09104",  rawBatches:["RAW-NH001-0104","RAW-NH004-0104"], farmers:["NH001","NH004"], vung:"Nà Hồng", khach:"Cty XK Bắc Hà" },
+  "QR-S010104": { sp:"Chè xanh 500g", loSX:"L010104", rawBatches:["RAW-NB011-0104","RAW-NB012-0104","RAW-NB010-0104"], farmers:["NB011","NB012","NB010"], vung:"Nà Bay", khach:"Siêu thị AEON" },
+};
+
+function TraceSearch() {
+  const [query, setQuery] = useState("");
+  const result = useMemo(() => {
+    if (!query.trim()) return null;
+    const q = query.trim().toUpperCase();
+    const key = Object.keys(TRACE_DB).find(k => k.toUpperCase().includes(q) || TRACE_DB[k].loSX.toUpperCase().includes(q) || TRACE_DB[k].rawBatches.some(b=>b.toUpperCase().includes(q)));
+    return key ? { key, ...TRACE_DB[key] } : null;
+  }, [query]);
+  return (
+    <div className="bg-white border border-border rounded-xl p-5">
+      <p className="text-sm font-semibold mb-3 flex items-center gap-2"><QrCode className="w-4 h-4 text-primary"/> Tra cứu truy xuất theo QR / Batch / Mã lô</p>
+      <div className="relative mb-4">
+        <QrCode className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground"/>
+        <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Nhập QR code (QR-S013003), mã lô SX (L023103), hoặc batch RAW (RAW-NH004-3003)..."
+          className="w-full pl-9 pr-3 py-2.5 text-sm border border-border rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30"/>
+      </div>
+      {query.trim() && !result && (
+        <div className="text-center py-6 text-muted-foreground text-sm">Không tìm thấy thông tin truy xuất cho "<span className="font-mono">{query}</span>"</div>
+      )}
+      {result && (
+        <div className="space-y-3">
+          <p className="text-xs text-muted-foreground">Kết quả cho: <span className="font-mono font-semibold text-primary">{result.key}</span></p>
+          <div className="flex flex-wrap items-start gap-2 text-xs">
+            {[
+              { label:"Sản phẩm", val:result.sp, color:"bg-violet-50 border-violet-200 text-violet-800" },
+              { label:"Lô SX", val:result.loSX, color:"bg-primary/10 border-primary/30 text-primary" },
+              { label:"RAW Batch NVL", val:result.rawBatches.join(", "), color:"bg-blue-50 border-blue-200 text-blue-800" },
+              { label:"Nông hộ", val:result.farmers.join(", "), color:"bg-emerald-50 border-emerald-200 text-emerald-800" },
+              { label:"Vùng trồng", val:result.vung, color:"bg-amber-50 border-amber-200 text-amber-800" },
+              { label:"Khách hàng", val:result.khach, color:"bg-gray-50 border-gray-200 text-gray-800" },
+            ].map((step,si)=>(
+              <div key={si} className="flex items-center gap-1.5">
+                {si>0&&<span className="text-muted-foreground text-xs">→</span>}
+                <div className={`border px-3 py-2 rounded-xl ${step.color}`}>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide opacity-70 mb-0.5">{step.label}</p>
+                  <p className="font-bold text-xs">{step.val}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <p className="text-[10px] text-emerald-700 font-medium">✓ Chuỗi truy xuất hoàn chỉnh · Nguồn gốc: Shan Tuyết Bằng Phúc, Hà Giang</p>
+        </div>
+      )}
+      {!query.trim() && (
+        <p className="text-xs text-muted-foreground text-center py-2">Thử tìm: <span className="font-mono text-primary cursor-pointer hover:underline" onClick={()=>setQuery("QR-S023103")}>QR-S023103</span> · <span className="font-mono text-primary cursor-pointer hover:underline" onClick={()=>setQuery("RAW-NH001")}>RAW-NH001</span> · <span className="font-mono text-primary cursor-pointer hover:underline" onClick={()=>setQuery("L09104")}>L09104</span></p>
+      )}
+    </div>
+  );
 }
 
 export default function ReportsPage() {
@@ -266,6 +326,8 @@ export default function ReportsPage() {
             <QrCode className="w-5 h-5 text-amber-700 shrink-0 mt-0.5"/>
             <div><p className="text-sm font-semibold text-amber-900">Hệ thống Truy xuất Nguồn gốc</p><p className="text-xs text-amber-700 mt-1">Mỗi sản phẩm đều có thể truy ngược về: Lô đóng gói → Lô sản xuất → Batch NVL → Nông hộ → Vùng trồng cụ thể</p></div>
           </div>
+          {/* QR / Batch search */}
+          <TraceSearch />
           <div className="bg-white border border-border rounded-xl overflow-hidden">
             <div className="px-4 py-3 border-b border-border bg-muted/20"><p className="text-sm font-semibold">Chain truy xuất theo sản phẩm đã xuất kho</p></div>
             <div className="divide-y divide-border">

@@ -1,0 +1,160 @@
+✅ 1. Những phần đã KHỚP chuẩn
+🔗 Flow end-to-end
+Nông hộ → Mua hàng → Kho → Sản xuất → Đóng gói → Bán hàng
+
+👉 Flow này là chuẩn textbook + thực chiến
+
+✅ Batch logic
+Batch nguyên liệu ✔️
+Batch thành phẩm ✔️
+Mapping batch xuyên suốt ✔️
+
+👉 Đây là xương sống truy xuất → bạn làm đúng rồi 👍
+
+✅ QR integration
+QR nông hộ ✔️
+QR sản phẩm ✔️
+Scan → gọi API ✔️
+
+👉 Chuẩn luôn, deploy ngoài thực địa dùng được
+
+⚠️ 2. Những chỗ CHƯA KHỚP (quan trọng)
+❌ 1. Thiếu “bridge” giữa Batch nguyên liệu ↔ Batch thành phẩm
+
+Hiện bạn đang có:
+
+Batch nguyên liệu (RAW)
+Batch thành phẩm (FG)
+
+👉 Nhưng thiếu:
+
+RAW_BATCH → PRODUCTION → FG_BATCH
+🔥 Fix:
+
+Phải có bảng trung gian kiểu:
+
+Production Batch Mapping:
+- raw_batch_id
+- fg_batch_id
+- quantity_used
+
+👉 Không có cái này:
+→ truy xuất sẽ bị đứt đoạn
+
+❌ 2. Chưa lock vùng trồng tại thời điểm mua
+
+Hiện:
+
+Chọn nông hộ
+Chọn vùng trồng
+
+👉 Nhưng chưa rõ:
+
+Có lưu snapshot không?
+🔥 Fix:
+
+Khi tạo PO phải lưu:
+
+farmer_id
+region_id
++ snapshot info (optional)
+
+👉 Vì:
+
+Vùng trồng có thể thay đổi theo thời gian
+❌ 3. Kho chưa tách rõ loại kho
+
+Hiện bạn có “Kho” chung chung
+
+🔥 Fix:
+
+Phải tách:
+
+Kho nguyên liệu
+Kho bán thành phẩm
+Kho thành phẩm
+
+👉 Nếu không:
+→ flow sản xuất sẽ rối
+
+❌ 4. QC chưa gắn chặt với Batch
+
+Hiện:
+
+Có QC
+
+👉 Nhưng chưa nói rõ:
+
+QC gắn vào đâu
+🔥 Fix:
+QC → batch_id
+
+👉 Ví dụ:
+
+QC nguyên liệu → RAW_BATCH
+QC thành phẩm → FG_BATCH
+❌ 5. Packaging chưa nối ngược về production
+
+Hiện:
+
+Đóng gói → QR → Thành phẩm
+
+👉 Nhưng thiếu:
+
+FG_BATCH → Packaging → Product Unit (QR)
+🔥 Fix:
+1 FG batch → nhiều QR sản phẩm
+❌ 6. Sales chưa gắn QR / batch khi bán
+
+Hiện:
+
+Bán hàng có batch ✔️
+
+👉 Nhưng chưa rõ:
+
+Có xuất theo QR không?
+🔥 Fix:
+Khi bán:
+Chọn batch
+(optional) chọn QR cụ thể
+❌ 7. Thiếu “Traceability layer” (quan trọng nè)
+
+Hiện bạn đang để:
+
+ERP = xử lý hết
+
+👉 Nhưng best practice:
+
+ERP = data source
+Trace system = hiển thị truy xuất
+🔥 Fix:
+
+Tách logic:
+
+ERP: quản lý
+Trace: hiển thị cho user scan QR
+🧠 3. Check lại chuỗi truy xuất (cực quan trọng)
+
+Bạn phải đảm bảo query này chạy được:
+
+👉 Scan QR sản phẩm → ra:
+
+QR → Thành phẩm → FG_BATCH
+→ Production → RAW_BATCH
+→ Nông hộ → Vùng trồng
+Nếu thiếu 1 link:
+
+👉 = FAIL truy xuất
+
+🔥 4. Tổng kết (đi trình kiểu xịn)
+👉 Hiện tại:
+Kiến trúc: ✅ OK
+Flow: ✅ OK
+Logic: ⚠️ thiếu liên kết sâu
+👉 Cần bổ sung:
+Mapping RAW ↔ FG batch
+QC gắn batch
+Packaging mapping
+Sales gắn batch/QR
+Tách kho rõ ràng
+Snapshot vùng trồng

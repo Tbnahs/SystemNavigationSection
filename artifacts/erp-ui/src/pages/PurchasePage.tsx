@@ -622,6 +622,28 @@ export default function PurchasePage() {
                 </div>
               )}
 
+              {/* Trace chain snapshot */}
+              <div className="bg-gradient-to-br from-emerald-50 to-blue-50 border border-emerald-200 rounded-xl p-4">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Chuỗi truy xuất nguồn gốc (Snapshot)</p>
+                <div className="flex items-start gap-1.5 flex-wrap text-xs">
+                  {[
+                    { label:"Nông hộ", val:`${selectedPO.tenHo} (${selectedPO.maHo})`, color:"bg-emerald-100 border-emerald-300 text-emerald-800" },
+                    { label:"Vùng trồng", val:selectedPO.diaChi, color:"bg-blue-100 border-blue-300 text-blue-800" },
+                    { label:"Vườn cụ thể", val:`${selectedPO.maVuon}`, color:"bg-violet-100 border-violet-300 text-violet-800" },
+                    { label:"Batch RAW", val:selectedPO.batchId||"Chưa tạo", color:selectedPO.batchId?"bg-amber-100 border-amber-300 text-amber-800":"bg-gray-100 border-gray-300 text-gray-600" },
+                  ].map((step,si)=>(
+                    <div key={si} className="flex items-center gap-1">
+                      {si>0&&<ArrowRight className="w-3 h-3 text-muted-foreground shrink-0"/>}
+                      <div className={`border px-2.5 py-1.5 rounded-lg ${step.color}`}>
+                        <p className="font-semibold text-[10px] uppercase tracking-wide opacity-70">{step.label}</p>
+                        <p className="font-bold text-xs mt-0.5">{step.val}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2.5">✓ Thông tin vùng trồng đã được lưu snapshot tại thời điểm tạo đơn mua</p>
+              </div>
+
               {selectedPO.ghiChu && (
                 <div className="px-4 py-3 bg-muted/20 rounded-xl">
                   <p className="text-xs text-muted-foreground">Ghi chú</p>

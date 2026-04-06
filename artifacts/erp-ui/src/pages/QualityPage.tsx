@@ -239,6 +239,41 @@ export default function QualityPage() {
                   <div><p className="text-xs text-muted-foreground">Người KT</p><p className="font-medium">{selected.nguoiKT || "—"}</p></div>
                 </div>
               </div>
+              {/* Batch type + link section */}
+              {(() => {
+                const isRaw = selected.batchId.startsWith("RAW-");
+                const isFG  = selected.batchId.startsWith("FG-") || selected.batchId.startsWith("L") || selected.batchId.startsWith("S");
+                const parts = selected.batchId.split("-");
+                const maHo  = isRaw && parts.length >= 2 ? parts[1] : null;
+                return (
+                  <div className={`rounded-xl p-4 border ${isRaw ? "bg-blue-50 border-blue-200" : "bg-emerald-50 border-emerald-200"}`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className={`text-xs font-bold px-2 py-0.5 rounded font-mono ${isRaw ? "bg-blue-200 text-blue-800" : "bg-emerald-200 text-emerald-800"}`}>
+                        {isRaw ? "RAW Batch" : isFG ? "FG Batch" : "Batch"}
+                      </span>
+                      <p className="text-xs font-semibold">{isRaw ? "Nguyên liệu tươi đầu vào" : "Thành phẩm sau chế biến"}</p>
+                    </div>
+                    {isRaw && maHo && (
+                      <div className="space-y-1 text-xs">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-muted-foreground">Nông hộ:</span>
+                          <span className="font-mono font-semibold text-primary">{maHo}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-muted-foreground">Vùng:</span>
+                          <span className="font-medium">
+                            {maHo.startsWith("NH") ? "Nà Hồng" : maHo.startsWith("NB") ? "Nà Bay" : "Bản Chang"}
+                          </span>
+                        </div>
+                        <p className="text-[10px] text-blue-600 mt-1.5">QC này kiểm tra NVL trước khi nhập kho → ảnh hưởng trực tiếp tới giá thu mua</p>
+                      </div>
+                    )}
+                    {!isRaw && (
+                      <p className="text-xs text-emerald-700">QC này kiểm tra thành phẩm sau chế biến → quyết định cho phép đóng gói / xuất kho</p>
+                    )}
+                  </div>
+                );
+              })()}
               {selected.tongDiem > 0 && (
                 <div className="grid grid-cols-3 gap-2">
                   {[{label:"Độ ẩm",val:selected.doAm},{label:"Độ non",val:selected.doNon},{label:"Độ sạch",val:selected.doSach}].map((m,i)=>(

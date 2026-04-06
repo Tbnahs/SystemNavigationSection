@@ -193,6 +193,22 @@ export default function InventoryPage() {
             <select value={statusFilter} onChange={e=>setStatusFilter(e.target.value as TonStatus|"")} className="px-3 py-2 text-sm border border-border rounded-lg bg-background"><option value="">Tất cả TT</option>{Object.entries(STATUS_CFG).map(([k,v])=><option key={k} value={k}>{v.label}</option>)}</select>
             <button onClick={()=>{setSearch("");setNhomFilter("");setStatusFilter("");}} className="flex items-center gap-1.5 px-4 py-2 text-sm border border-border rounded-lg hover:bg-muted/50"><Filter className="w-3.5 h-3.5" /> Lọc</button>
           </div>
+          {/* Warehouse quick-filter chips */}
+          <div className="flex items-center gap-2 px-4 py-2.5 border-b border-border bg-muted/10 overflow-x-auto">
+            <span className="text-xs text-muted-foreground shrink-0">Lọc kho:</span>
+            {[
+              { kho:"", label:"Tất cả",  color:"border-border" },
+              { kho:"Kho NL", label:"🌿 Kho NL (Nguyên liệu)",  color:"border-emerald-300 bg-emerald-50 text-emerald-700" },
+              { kho:"Kho TP", label:"📦 Kho TP (Thành phẩm)",   color:"border-violet-300 bg-violet-50 text-violet-700" },
+              { kho:"Kho PK", label:"🎁 Kho PK (Bao bì)",        color:"border-blue-300 bg-blue-50 text-blue-700" },
+              { kho:"Kho VT", label:"🔧 Kho VT (Vật tư)",        color:"border-amber-300 bg-amber-50 text-amber-700" },
+            ].map(opt=>(
+              <button key={opt.kho} onClick={()=>setNhomFilter(opt.kho===""?"":opt.kho==="Kho NL"?"Nguyên liệu":opt.kho==="Kho TP"?"Thành phẩm":opt.kho==="Kho PK"?"Bao bì":"Vật tư")}
+                className={`px-3 py-1 text-xs font-medium rounded-full border whitespace-nowrap transition-all shrink-0 ${(opt.kho===""&&nhomFilter==="")||(opt.kho==="Kho NL"&&nhomFilter==="Nguyên liệu")||(opt.kho==="Kho TP"&&nhomFilter==="Thành phẩm")||(opt.kho==="Kho PK"&&nhomFilter==="Bao bì")||(opt.kho==="Kho VT"&&nhomFilter==="Vật tư")?"ring-2 ring-primary/40 "+opt.color:opt.color+" hover:opacity-80"}`}>
+                {opt.label} <span className="ml-1 opacity-60">({stockList.filter(s=>opt.kho===("")||s.kho===opt.kho).length})</span>
+              </button>
+            ))}
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-border bg-muted/30">
@@ -286,29 +302,44 @@ export default function InventoryPage() {
       {/* Batch tracker tab */}
       {activeTab === "batch" && (
         <div>
-          <div className="relative mb-4"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><input value={batchSearch} onChange={e=>setBatchSearch(e.target.value)} placeholder="Tìm batch ID, nông hộ, vùng..." className="w-full pl-9 pr-3 py-2.5 text-sm border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-primary bg-white" /></div>
+          <div className="relative mb-3"><Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" /><input value={batchSearch} onChange={e=>setBatchSearch(e.target.value)} placeholder="Tìm batch ID, nông hộ, vùng..." className="w-full pl-9 pr-3 py-2.5 text-sm border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-primary bg-white" /></div>
+          {/* Batch type legend */}
+          <div className="flex items-center gap-3 mb-3 text-xs">
+            <span className="text-muted-foreground">Phân loại:</span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 font-medium border border-blue-200">📥 RAW batch – Nguyên liệu tươi từ nông hộ</span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 font-medium border border-emerald-200">📦 FG batch – Thành phẩm sau chế biến</span>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {filteredBatch.map(b => (
-              <div key={b.id} className="bg-white border border-border rounded-xl p-4 hover:border-primary/30 hover:shadow-sm transition-all">
-                <div className="flex items-start justify-between mb-3">
-                  <div><p className="font-mono text-sm font-bold text-primary">{b.batchId}</p><p className="text-xs text-muted-foreground mt-0.5">{b.ngayNhap}</p></div>
-                  <span className={`inline-flex text-xs px-2 py-0.5 rounded-full font-medium ${b.tonCon > 0 ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>{b.tonCon > 0 ? `Còn ${b.tonCon} kg` : "Đã dùng hết"}</span>
+            {filteredBatch.map(b => {
+              const isRaw = b.batchId.startsWith("RAW-");
+              return (
+                <div key={b.id} className={`bg-white border rounded-xl p-4 hover:shadow-sm transition-all ${isRaw ? "border-blue-200 hover:border-blue-300" : "border-emerald-200 hover:border-emerald-300"}`}>
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-0.5">
+                        <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded font-mono ${isRaw ? "bg-blue-100 text-blue-700" : "bg-emerald-100 text-emerald-700"}`}>{isRaw ? "RAW" : "FG"}</span>
+                        <p className="font-mono text-sm font-bold text-primary">{b.batchId}</p>
+                      </div>
+                      <p className="text-xs text-muted-foreground">{b.ngayNhap}</p>
+                    </div>
+                    <span className={`inline-flex text-xs px-2 py-0.5 rounded-full font-medium ${b.tonCon > 0 ? "bg-emerald-100 text-emerald-700" : "bg-gray-100 text-gray-500"}`}>{b.tonCon > 0 ? `Còn ${b.tonCon} kg` : "Đã dùng hết"}</span>
+                  </div>
+                  <div className="space-y-1.5 text-xs">
+                    <div className="flex items-center gap-1.5"><Package className="w-3 h-3 text-muted-foreground" /><span className="text-muted-foreground">Loại:</span> <span className="font-medium">{b.loaiHang}</span></div>
+                    <div className="flex items-center gap-1.5"><Layers className="w-3 h-3 text-muted-foreground" /><span className="text-muted-foreground">Nhập:</span> <span className="font-semibold">{b.soLuong} kg</span></div>
+                    {b.maHo !== "multi" && <>
+                      <div className="flex items-center gap-1.5"><QrCode className="w-3 h-3 text-muted-foreground" /><span className="font-mono text-primary">{b.maHo}</span> · <span className="font-medium">{b.tenHo}</span></div>
+                      <div className="flex items-center gap-1.5"><MapPin className="w-3 h-3 text-muted-foreground" /><span className={`inline-flex text-xs px-1.5 py-0.5 rounded-md font-medium ${AREA_COLORS[b.vung] ?? "bg-gray-100 text-gray-600"}`}>{b.vung}</span></div>
+                    </>}
+                    {b.maHo === "multi" && <div className="flex items-center gap-1.5"><Layers className="w-3 h-3 text-muted-foreground" /><span className="text-muted-foreground">Từ nhiều nông hộ (FG batch)</span></div>}
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-border/60 flex items-center justify-between">
+                    <span className="text-xs text-muted-foreground">Hạn sử dụng</span>
+                    <span className="text-xs font-semibold">{b.hanSD}</span>
+                  </div>
                 </div>
-                <div className="space-y-1.5 text-xs">
-                  <div className="flex items-center gap-1.5"><Package className="w-3 h-3 text-muted-foreground" /><span className="text-muted-foreground">Loại:</span> <span className="font-medium">{b.loaiHang}</span></div>
-                  <div className="flex items-center gap-1.5"><Layers className="w-3 h-3 text-muted-foreground" /><span className="text-muted-foreground">Nhập:</span> <span className="font-semibold">{b.soLuong} kg</span></div>
-                  {b.maHo !== "multi" && <>
-                    <div className="flex items-center gap-1.5"><QrCode className="w-3 h-3 text-muted-foreground" /><span className="font-mono text-primary">{b.maHo}</span> · <span className="font-medium">{b.tenHo}</span></div>
-                    <div className="flex items-center gap-1.5"><MapPin className="w-3 h-3 text-muted-foreground" /><span className={`inline-flex text-xs px-1.5 py-0.5 rounded-md font-medium ${AREA_COLORS[b.vung] ?? "bg-gray-100 text-gray-600"}`}>{b.vung}</span></div>
-                  </>}
-                  {b.maHo === "multi" && <div className="flex items-center gap-1.5"><Layers className="w-3 h-3 text-muted-foreground" /><span className="text-muted-foreground">Từ nhiều nông hộ</span></div>}
-                </div>
-                <div className="mt-3 pt-3 border-t border-border/60 flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground">Hạn sử dụng</span>
-                  <span className="text-xs font-semibold">{b.hanSD}</span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

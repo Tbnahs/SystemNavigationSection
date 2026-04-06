@@ -244,6 +244,81 @@ export default function PackagingPage() {
               ) : (
                 <div className="border-2 border-dashed border-muted rounded-xl p-4 text-center text-xs text-muted-foreground">QR sẽ được gán khi hoàn thành đóng gói</div>
               )}
+              {/* Full trace chain */}
+              {(() => {
+                const LOSX_RAW_MAP: Record<string,string[]> = {
+                  "L013003":["RAW-NH004-3003","RAW-NB002-3003"],
+                  "L023103":["RAW-NH001-3103","RAW-NH002-3103","RAW-NH008-3103"],
+                  "L033103":["RAW-NH009-3103","RAW-NH004-3103"],
+                  "L043103":["RAW-NH006-3103","RAW-NH007-3103"],
+                  "L053103":["RAW-NH007-3103"],
+                  "L063103":["RAW-NB009-3103","RAW-NB010-3103"],
+                  "L073103":["RAW-NB010-3103","RAW-NB001-3103","RAW-NB002-3103","RAW-NB007-3103"],
+                  "L083103":["RAW-NH010-3103"],
+                  "L09104": ["RAW-NH001-0104","RAW-NH004-0104"],
+                  "L010104":["RAW-NB011-0104","RAW-NB012-0104","RAW-NB010-0104"],
+                  "L011104":["RAW-NB013-0104","RAW-NB002-0104"],
+                  "L012104":["RAW-NB004-0104","RAW-NB001-0104"],
+                  "L013104":["RAW-NB006-0104"],
+                };
+                const rawBatches = LOSX_RAW_MAP[selected.maLoSX] ?? [];
+                const farmerCodes = [...new Set(rawBatches.map(b=>{ const p=b.split("-"); return p.length>=2?p[1]:""; }).filter(Boolean))];
+                const regions = [...new Set(farmerCodes.map(c=>c.startsWith("NH")?"Nà Hồng":c.startsWith("NB")?"Nà Bay":"Bản Chang"))];
+                return (
+                  <div className="rounded-xl border border-violet-200 bg-violet-50 p-4">
+                    <p className="text-xs font-semibold text-violet-900 uppercase tracking-wide mb-3">Chuỗi truy xuất đầy đủ</p>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-violet-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">1</span>
+                        <div className="flex-1 bg-white rounded-lg px-3 py-1.5 border border-violet-200">
+                          <span className="text-muted-foreground">Lô đóng gói: </span>
+                          <span className="font-mono font-bold text-violet-700">{selected.maDG}</span>
+                          {selected.qrCode && <span className="ml-2 font-mono text-xs text-violet-500">· {selected.qrCode}</span>}
+                        </div>
+                      </div>
+                      <div className="ml-2.5 w-px h-3 bg-violet-300"/>
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-primary text-white flex items-center justify-center text-[10px] font-bold shrink-0">2</span>
+                        <div className="flex-1 bg-white rounded-lg px-3 py-1.5 border border-primary/30">
+                          <span className="text-muted-foreground">Lô sản xuất: </span>
+                          <span className="font-mono font-bold text-primary">{selected.maLoSX}</span>
+                          <span className="ml-1 text-muted-foreground">· {selected.thanhPham}</span>
+                        </div>
+                      </div>
+                      <div className="ml-2.5 w-px h-3 bg-blue-300"/>
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-blue-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">3</span>
+                        <div className="flex-1 bg-white rounded-lg px-3 py-1.5 border border-blue-200">
+                          <span className="text-muted-foreground">RAW batch NVL: </span>
+                          {rawBatches.length > 0
+                            ? rawBatches.map(b=><span key={b} className="font-mono text-[10px] bg-blue-100 text-blue-700 border border-blue-200 px-1 py-0.5 rounded mr-1">{b}</span>)
+                            : <span className="text-muted-foreground italic">Không rõ</span>}
+                        </div>
+                      </div>
+                      {farmerCodes.length > 0 && <>
+                        <div className="ml-2.5 w-px h-3 bg-emerald-300"/>
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[10px] font-bold shrink-0">4</span>
+                          <div className="flex-1 bg-white rounded-lg px-3 py-1.5 border border-emerald-200">
+                            <span className="text-muted-foreground">Nông hộ: </span>
+                            {farmerCodes.map(c=><span key={c} className="font-mono text-[10px] bg-emerald-100 text-emerald-800 border border-emerald-200 px-1 py-0.5 rounded mr-1">{c}</span>)}
+                            <span className="text-muted-foreground ml-1">· </span>
+                            {regions.map(r=><span key={r} className="text-xs font-medium text-emerald-700 mr-1">{r}</span>)}
+                          </div>
+                        </div>
+                      </>}
+                      <div className="ml-2.5 w-px h-3 bg-amber-300"/>
+                      <div className="flex items-center gap-2">
+                        <span className="w-5 h-5 rounded-full bg-amber-500 text-white flex items-center justify-center text-[10px] font-bold shrink-0">5</span>
+                        <div className="flex-1 bg-white rounded-lg px-3 py-1.5 border border-amber-200">
+                          <span className="text-muted-foreground">Vùng trồng: </span>
+                          <span className="font-medium text-amber-800">Shan Tuyết Bằng Phúc, Hà Giang</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
               {selected.ghiChu&&<div className="bg-muted/20 rounded-xl p-3"><p className="text-xs text-muted-foreground">Ghi chú</p><p className="text-sm italic mt-0.5">{selected.ghiChu}</p></div>}
               {NEXT_TT[selected.trangThai]&&(
                 <button onClick={()=>{handleAdvance(selected.id);setSelected(prev=>prev?{...loList.find(l=>l.id===prev.id)!}:null);}} className="w-full py-2.5 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary/90 flex items-center justify-center gap-2"><ArrowRight className="w-4 h-4"/>Chuyển: {TT_CFG[NEXT_TT[selected.trangThai]!].label}</button>

@@ -168,27 +168,49 @@ export default function ProductionPage() {
 
       {/* Batch TP tab */}
       {activeTab === "batch-tp" ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {filtered.map(lo => (
-            <div key={lo.id} className="bg-white border border-border rounded-xl p-4 hover:border-primary/30 hover:shadow-sm transition-all cursor-pointer" onClick={()=>setSelected(lo)}>
-              <div className="flex items-start justify-between mb-3">
-                <div><p className="font-mono text-sm font-bold text-primary">{lo.batchTP}</p><p className="text-xs text-muted-foreground mt-0.5">{lo.ngaySX}</p></div>
-                <span className={`inline-flex text-xs px-2 py-0.5 rounded-full font-medium ${PRODUCT_COLOR[lo.loaiChe]??""}`}>{lo.loaiChe}</span>
-              </div>
-              <div className="space-y-1.5 text-xs">
-                <div className="flex items-center justify-between"><span className="text-muted-foreground">NVL đầu vào</span><span className="font-semibold">{lo.klNVL} kg</span></div>
-                <div className="flex items-center justify-between"><span className="text-muted-foreground">Thành phẩm</span><span className="font-bold text-emerald-700">{lo.klTP} kg</span></div>
-                <div className="flex items-center justify-between"><span className="text-muted-foreground">Tỷ lệ thu hồi</span><span className="font-semibold">{lo.tyLeKhoHao}%</span></div>
-              </div>
-              <div className="mt-3 pt-3 border-t border-border/60">
-                <p className="text-xs text-muted-foreground mb-1">Batch NVL nguồn gốc</p>
-                <div className="flex flex-wrap gap-1">
-                  {lo.cacMaBatch.slice(0,2).map(b=><span key={b} className="font-mono text-xs bg-muted/50 px-1.5 py-0.5 rounded-md">{b}</span>)}
-                  {lo.cacMaBatch.length>2&&<span className="text-xs text-muted-foreground">+{lo.cacMaBatch.length-2}</span>}
-                </div>
-              </div>
+        <div className="space-y-4">
+          <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 flex items-start gap-3">
+            <Layers className="w-5 h-5 text-blue-700 shrink-0 mt-0.5"/>
+            <div>
+              <p className="text-sm font-semibold text-blue-900">Bảng liên kết Batch NVL → Batch Thành phẩm</p>
+              <p className="text-xs text-blue-700 mt-0.5">Mỗi dòng thể hiện mapping đầy đủ: RAW batch nguồn gốc → Lô chế biến → FG batch thành phẩm. Đây là xương sống truy xuất nguồn gốc.</p>
             </div>
-          ))}
+          </div>
+          <div className="bg-white border border-border rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead><tr className="border-b border-border bg-muted/30">
+                  {["Batch FG (TP)","Lô SX","Loại chè","Batch NVL (RAW) nguồn gốc","NVL (kg)","TP (kg)","Thu hồi","# Hộ"].map((h,i)=>(
+                    <th key={i} className="text-left py-2.5 px-4 font-semibold text-xs text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</th>
+                  ))}
+                </tr></thead>
+                <tbody>
+                  {filtered.map(lo=>(
+                    <tr key={lo.id} className="border-b border-border/60 hover:bg-muted/20 cursor-pointer" onClick={()=>setSelected(lo)}>
+                      <td className="py-3 px-4"><span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md">{lo.batchTP}</span></td>
+                      <td className="py-3 px-4"><span className="font-mono text-xs font-semibold text-primary">{lo.maLo}</span></td>
+                      <td className="py-3 px-4"><span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${PRODUCT_COLOR[lo.loaiChe]??""}`}>{lo.loaiChe}</span></td>
+                      <td className="py-3 px-4">
+                        <div className="flex flex-wrap gap-1">
+                          {lo.cacMaBatch.slice(0,2).map(b=><span key={b} className="font-mono text-xs bg-blue-50 border border-blue-200 text-blue-700 px-1.5 py-0.5 rounded-md">{b}</span>)}
+                          {lo.cacMaBatch.length>2&&<span className="text-xs text-muted-foreground font-medium bg-muted/50 px-1.5 py-0.5 rounded-md">+{lo.cacMaBatch.length-2} batch</span>}
+                          {lo.cacMaBatch.length===0&&<span className="text-xs text-muted-foreground">—</span>}
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-sm font-medium">{lo.klNVL} kg</td>
+                      <td className="py-3 px-4"><span className="font-bold text-emerald-700">{lo.klTP} kg</span></td>
+                      <td className="py-3 px-4"><span className="font-semibold text-violet-700">{lo.tyLeKhoHao}%</span></td>
+                      <td className="py-3 px-4 text-sm text-center">{lo.soHo}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <div className="px-4 py-2 border-t border-border flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">{filtered.length} lô · {filtered.reduce((s,l)=>s+l.cacMaBatch.length,0)} RAW batch nguồn gốc</p>
+              <p className="text-xs font-semibold">NVL: {filtered.reduce((s,l)=>s+l.klNVL,0).toFixed(1)} kg → TP: {filtered.reduce((s,l)=>s+l.klTP,0).toFixed(1)} kg</p>
+            </div>
+          </div>
         </div>
       ) : (
         <div className="bg-white border border-border rounded-xl overflow-hidden">
