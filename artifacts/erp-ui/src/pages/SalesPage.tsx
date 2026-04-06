@@ -42,88 +42,14 @@ const LOAI_KHACH_CFG: Record<LoaiKhach, { label: string; color: string }> = {
 
 const STATUS_FLOW: OrderStatus[] = ["bao-gia", "xac-nhan", "xuat-kho", "dang-giao", "hoan-thanh"];
 
-/* ────────────── Seed data (moved to ERPContext) ────────────── */
-const SEED_UNUSED: SalesOrder[] = [
-  {
-    id: "1", maDon: "SO-2603-001", loaiKhach: "dai-ly",
-    khachHang: "Cty TNHH Trà Thái Nguyên", diaChi: "TP. Thái Nguyên", sdt: "0208 3856 123",
-    ngayDat: "26/03/2026", ngayGiao: "02/04/2026", trangThai: "hoan-thanh",
-    thanhToan: "da-thanh-toan", daThanhToan: 23000000, maVanDon: "VD-2026-0312",
-    nguoiTao: "Nguyễn Văn A", ghiChu: "Giao hàng nguyên kiện, có xe tải",
-    sanPhams: [
-      { sanPham: "Chè Shan Tuyết Bằng Phúc", loai: "Hồng trà",  soLuong: 20, donVi: "kg", donGia: 850000,  thanhTien: 17000000, maLoSX: "L013003" },
-      { sanPham: "Chè Shan Tuyết Bằng Phúc", loai: "Bạch trà",  soLuong: 5,  donVi: "kg", donGia: 1200000, thanhTien: 6000000,  maLoSX: "L073103" },
-    ],
-    tongTien: 23000000,
-  },
-  {
-    id: "2", maDon: "SO-2803-002", loaiKhach: "sieu-thi",
-    khachHang: "Siêu thị Lotte Mart Hà Nội", diaChi: "Đống Đa, Hà Nội", sdt: "024 3562 7890",
-    ngayDat: "28/03/2026", ngayGiao: "08/04/2026", trangThai: "dang-giao",
-    thanhToan: "mot-phan", daThanhToan: 10000000, maVanDon: "VD-2026-0401",
-    nguoiTao: "Trần Thị B", ghiChu: "Yêu cầu đóng gói hộp quà tặng",
-    sanPhams: [
-      { sanPham: "Chè Shan Tuyết Bằng Phúc", loai: "Bạch trà",  soLuong: 8,  donVi: "kg", donGia: 1200000, thanhTien: 9600000,  maLoSX: "L073103" },
-      { sanPham: "Chè Shan Tuyết Bằng Phúc", loai: "Hồng trà",  soLuong: 12, donVi: "kg", donGia: 850000,  thanhTien: 10200000, maLoSX: "L043103" },
-    ],
-    tongTien: 19800000,
-  },
-  {
-    id: "3", maDon: "SO-0104-003", loaiKhach: "xuat-khau",
-    khachHang: "Cty CP Xuất nhập khẩu Hà Nội", diaChi: "Hà Nội", sdt: "024 3825 6789",
-    ngayDat: "01/04/2026", ngayGiao: "10/04/2026", trangThai: "xuat-kho",
-    thanhToan: "chua", daThanhToan: 0, maVanDon: "",
-    nguoiTao: "Nguyễn Văn A", ghiChu: "Đơn xuất khẩu, cần giấy OCOP + CO/CQ",
-    sanPhams: [
-      { sanPham: "Chè Shan Tuyết Bằng Phúc", loai: "Hồng trà",  soLuong: 30, donVi: "kg", donGia: 850000,  thanhTien: 25500000, maLoSX: "L023103" },
-      { sanPham: "Chè Shan Tuyết Bằng Phúc", loai: "Bạch trà",  soLuong: 10, donVi: "kg", donGia: 1200000, thanhTien: 12000000, maLoSX: "L073103" },
-      { sanPham: "Chè Shan Tuyết Bằng Phúc", loai: "Chè xanh",  soLuong: 20, donVi: "kg", donGia: 420000,  thanhTien: 8400000,  maLoSX: "L09104"  },
-    ],
-    tongTien: 45900000,
-  },
-  {
-    id: "4", maDon: "SO-0204-004", loaiKhach: "sieu-thi",
-    khachHang: "WinMart Hà Nội (3 cửa hàng)", diaChi: "Cầu Giấy, Hà Nội", sdt: "024 3901 2345",
-    ngayDat: "02/04/2026", ngayGiao: "09/04/2026", trangThai: "xac-nhan",
-    thanhToan: "chua", daThanhToan: 0, maVanDon: "",
-    nguoiTao: "Trần Thị B", ghiChu: "",
-    sanPhams: [
-      { sanPham: "Chè Shan Tuyết Bằng Phúc", loai: "Chè xanh", soLuong: 50, donVi: "kg", donGia: 420000,  thanhTien: 21000000, maLoSX: "L010104" },
-    ],
-    tongTien: 21000000,
-  },
-  {
-    id: "5", maDon: "SO-0304-005", loaiKhach: "le",
-    khachHang: "Quán trà Sen – Đỗ Thị Mai", diaChi: "Quận 1, TP.HCM", sdt: "090 3456 789",
-    ngayDat: "03/04/2026", ngayGiao: "12/04/2026", trangThai: "bao-gia",
-    thanhToan: "chua", daThanhToan: 0, maVanDon: "",
-    nguoiTao: "Lê Văn C", ghiChu: "Khách hàng mới, thử nghiệm",
-    sanPhams: [
-      { sanPham: "Chè Shan Tuyết Bằng Phúc", loai: "Chè xanh", soLuong: 5, donVi: "kg", donGia: 420000,  thanhTien: 2100000,  maLoSX: "L011104" },
-      { sanPham: "Chè Shan Tuyết Bằng Phúc", loai: "Hồng trà", soLuong: 2, donVi: "kg", donGia: 850000,  thanhTien: 1700000,  maLoSX: "L033103" },
-    ],
-    tongTien: 3800000,
-  },
-  {
-    id: "6", maDon: "SO-0304-006", loaiKhach: "dai-ly",
-    khachHang: "NPP Hoàng Phát – Bắc Giang", diaChi: "Bắc Giang", sdt: "0204 3987 654",
-    ngayDat: "03/04/2026", ngayGiao: "09/04/2026", trangThai: "bao-gia",
-    thanhToan: "chua", daThanhToan: 0, maVanDon: "",
-    nguoiTao: "Nguyễn Văn A", ghiChu: "Bulk cho đại lý, giá sỉ",
-    sanPhams: [
-      { sanPham: "Chè Shan Tuyết Bằng Phúc", loai: "Chè xanh", soLuong: 100, donVi: "kg", donGia: 380000, thanhTien: 38000000, maLoSX: "L012104" },
-    ],
-    tongTien: 38000000,
-  },
-];
 
 const CUSTOMERS = [
-  { id: "C001", name: "Cty TNHH Trà Thái Nguyên",       loai: "dai-ly" as LoaiKhach,    diaChi: "TP. Thái Nguyên",       sdt: "0208 3856 123" },
-  { id: "C002", name: "Siêu thị Lotte Mart Hà Nội",      loai: "sieu-thi" as LoaiKhach,  diaChi: "Đống Đa, Hà Nội",       sdt: "024 3562 7890" },
-  { id: "C003", name: "Cty CP XNK Hà Nội",               loai: "xuat-khau" as LoaiKhach, diaChi: "Hà Nội",                 sdt: "024 3825 6789" },
-  { id: "C004", name: "WinMart Hà Nội",                  loai: "sieu-thi" as LoaiKhach,  diaChi: "Cầu Giấy, Hà Nội",      sdt: "024 3901 2345" },
-  { id: "C005", name: "NPP Hoàng Phát – Bắc Giang",      loai: "dai-ly" as LoaiKhach,    diaChi: "Bắc Giang",              sdt: "0204 3987 654" },
-  { id: "C006", name: "HTX Chè Tân Cương",               loai: "dai-ly" as LoaiKhach,    diaChi: "Tân Cương, Thái Nguyên", sdt: "0208 3777 456" },
+  { id: "C001", name: "Cty TNHH Trà Thái Nguyên",       loai: "dai-ly" as LoaiKhach,    diaChi: "TP. Thái Nguyên",       sdt: "0208 3856 123", mst: "0102376801" },
+  { id: "C002", name: "Siêu thị Lotte Mart Hà Nội",      loai: "sieu-thi" as LoaiKhach,  diaChi: "Đống Đa, Hà Nội",       sdt: "024 3562 7890", mst: "0101684601" },
+  { id: "C003", name: "Cty CP XNK Hà Nội",               loai: "xuat-khau" as LoaiKhach, diaChi: "Hà Nội",                 sdt: "024 3825 6789", mst: "0104384101" },
+  { id: "C004", name: "WinMart Hà Nội",                  loai: "sieu-thi" as LoaiKhach,  diaChi: "Cầu Giấy, Hà Nội",      sdt: "024 3901 2345", mst: "0100686209" },
+  { id: "C005", name: "NPP Hoàng Phát – Bắc Giang",      loai: "dai-ly" as LoaiKhach,    diaChi: "Bắc Giang",              sdt: "0204 3987 654", mst: "0201234501" },
+  { id: "C006", name: "HTX Chè Tân Cương",               loai: "dai-ly" as LoaiKhach,    diaChi: "Tân Cương, Thái Nguyên", sdt: "0208 3777 456", mst: "0402789001" },
   { id: "C007", name: "Quán trà Sen – Đỗ Thị Mai",       loai: "le" as LoaiKhach,        diaChi: "Quận 1, TP.HCM",         sdt: "090 3456 789"  },
 ];
 
@@ -171,9 +97,13 @@ export default function SalesPage() {
   const [qrError, setQrError]     = useState("");
   const [qrScanning, setQrScanning] = useState(false);
   const custRef = useRef<HTMLDivElement>(null);
-  const [fDate, setFDate]   = useState(new Date().toISOString().slice(0, 10));
-  const [fDeliv, setFDeliv] = useState("");
-  const [fNote, setFNote]   = useState("");
+  const [fDate, setFDate]         = useState(new Date().toISOString().slice(0, 10));
+  const [fDeliv, setFDeliv]       = useState("");
+  const [fNote, setFNote]         = useState("");
+  const [fChietKhau, setFChietKhau] = useState("0");
+  const [fVat, setFVat]           = useState("10");
+  const [fDieuKhoan, setFDieuKhoan] = useState("COD");
+  const [fDonViVC, setFDonViVC]   = useState("GHTK");
   const [fLines, setFLines] = useState<{ loai: string; soLuong: string; donGia: string; maLoSX: string }[]>([
     { loai: "Chè xanh", soLuong: "", donGia: "420000", maLoSX: "L09104" },
   ]);
@@ -243,7 +173,11 @@ export default function SalesPage() {
     }));
   };
 
-  const fTotal = fLines.reduce((s, l) => s + (parseFloat(l.soLuong) || 0) * (parseFloat(l.donGia) || 0), 0);
+  const fSubtotal   = fLines.reduce((s, l) => s + (parseFloat(l.soLuong) || 0) * (parseFloat(l.donGia) || 0), 0);
+  const fDiscount   = fSubtotal * (parseFloat(fChietKhau) || 0) / 100;
+  const fAfterDisc  = fSubtotal - fDiscount;
+  const fVatAmount  = fAfterDisc * (parseFloat(fVat) || 0) / 100;
+  const fTotal      = fAfterDisc + fVatAmount;
 
   const handleCreate = () => {
     if (!fCust || fLines.every(l => !l.soLuong || parseFloat(l.soLuong) <= 0)) return;
@@ -263,17 +197,23 @@ export default function SalesPage() {
       id: genId(),
       maDon: `SO-${d}${m}-${String(orders.length + 1).padStart(3, "0")}`,
       loaiKhach: cust.loai,
-      khachHang: cust.name, diaChi: cust.diaChi, sdt: cust.sdt,
+      khachHang: cust.name, diaChi: cust.diaChi, sdt: cust.sdt, mst: cust.mst,
       ngayDat:  `${d}/${m}/${y}`,
       ngayGiao: fDeliv ? `${dd}/${dm}/${dy}` : "",
       trangThai: "bao-gia",
       thanhToan: "chua", daThanhToan: 0, maVanDon: "",
+      chietKhau: parseFloat(fChietKhau) || 0,
+      vat: parseFloat(fVat) || 0,
+      dieuKhoanTT: fDieuKhoan,
+      donViVC: fDonViVC,
       nguoiTao: "Admin", ghiChu: fNote,
       sanPhams, tongTien: fTotal,
     };
     setOrders(prev => [newOrder, ...prev]);
     setShowCreate(false);
-    setFCust(""); setFCustSearch(""); setFDate(new Date().toISOString().slice(0,10)); setFDeliv(""); setFNote("");
+    setFCust(""); setFCustSearch("");
+    setFDate(new Date().toISOString().slice(0,10)); setFDeliv(""); setFNote("");
+    setFChietKhau("0"); setFVat("10"); setFDieuKhoan("COD"); setFDonViVC("GHTK");
     setFLines([{ loai: "Chè xanh", soLuong: "", donGia: "420000", maLoSX: "L09104" }]);
   };
 
@@ -690,13 +630,58 @@ export default function SalesPage() {
                 </div>
               </div>
 
-              {/* Total */}
-              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-semibold text-emerald-800">Tổng giá trị đơn hàng</span>
-                  <span className="text-xl font-bold text-emerald-700">{fmt(selected.tongTien)}</span>
-                </div>
-                {selected.ghiChu && <p className="text-xs text-emerald-600 mt-1.5 italic">Ghi chú: {selected.ghiChu}</p>}
+              {/* Delivery & Terms */}
+              <div className="grid grid-cols-2 gap-3">
+                {selected.dieuKhoanTT && (
+                  <div className="bg-muted/30 rounded-xl p-3">
+                    <p className="text-xs text-muted-foreground mb-0.5">Điều khoản TT</p>
+                    <p className="text-sm font-semibold">{selected.dieuKhoanTT}</p>
+                  </div>
+                )}
+                {selected.donViVC && (
+                  <div className="bg-muted/30 rounded-xl p-3">
+                    <p className="text-xs text-muted-foreground mb-0.5">Đơn vị vận chuyển</p>
+                    <p className="text-sm font-semibold">{selected.donViVC}</p>
+                  </div>
+                )}
+                {selected.mst && (
+                  <div className="bg-muted/30 rounded-xl p-3 col-span-2">
+                    <p className="text-xs text-muted-foreground mb-0.5">Mã số thuế (MST)</p>
+                    <p className="text-sm font-mono font-semibold">{selected.mst}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Total breakdown */}
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-1.5">
+                {(() => {
+                  const subtotal = selected.sanPhams.reduce((s, sp) => s + sp.thanhTien, 0);
+                  const disc     = subtotal * (selected.chietKhau || 0) / 100;
+                  const afterDisc = subtotal - disc;
+                  const vatAmt   = afterDisc * (selected.vat || 0) / 100;
+                  return (
+                    <>
+                      <div className="flex items-center justify-between text-sm text-emerald-700">
+                        <span>Tạm tính</span><span>{fmt(subtotal)}</span>
+                      </div>
+                      {disc > 0 && (
+                        <div className="flex items-center justify-between text-sm text-red-600">
+                          <span>Chiết khấu ({selected.chietKhau}%)</span><span>– {fmt(disc)}</span>
+                        </div>
+                      )}
+                      {vatAmt > 0 && (
+                        <div className="flex items-center justify-between text-sm text-emerald-600">
+                          <span>VAT ({selected.vat}%)</span><span>+ {fmt(vatAmt)}</span>
+                        </div>
+                      )}
+                      <div className="flex items-center justify-between pt-1.5 border-t border-emerald-200">
+                        <span className="text-sm font-semibold text-emerald-800">Tổng thanh toán</span>
+                        <span className="text-xl font-bold text-emerald-700">{fmt(selected.tongTien)}</span>
+                      </div>
+                    </>
+                  );
+                })()}
+                {selected.ghiChu && <p className="text-xs text-emerald-600 mt-1 italic">Ghi chú: {selected.ghiChu}</p>}
               </div>
             </div>
 
@@ -888,10 +873,61 @@ export default function SalesPage() {
                 </div>
               </div>
 
-              {fTotal > 0 && (
-                <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-emerald-800">Tổng giá trị</span>
-                  <span className="text-xl font-bold text-emerald-700">{fmt(fTotal)}</span>
+              {/* Discount, VAT, Payment terms, Shipping */}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold mb-1.5">Chiết khấu (%)</label>
+                  <input type="number" value={fChietKhau} onChange={e => setFChietKhau(e.target.value)} min="0" max="100" step="0.5" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold mb-1.5">VAT (%)</label>
+                  <select value={fVat} onChange={e => setFVat(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
+                    <option value="0">0% (Miễn thuế)</option>
+                    <option value="5">5%</option>
+                    <option value="10">10%</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold mb-1.5">Điều khoản thanh toán</label>
+                  <select value={fDieuKhoan} onChange={e => setFDieuKhoan(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
+                    <option value="COD">COD – Thu hộ</option>
+                    <option value="Trả ngay">Trả ngay</option>
+                    <option value="Trả trước 50%">Trả trước 50%</option>
+                    <option value="NET15">NET 15</option>
+                    <option value="NET30">NET 30</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold mb-1.5">Đơn vị vận chuyển</label>
+                  <select value={fDonViVC} onChange={e => setFDonViVC(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
+                    <option value="">— Chưa xác định —</option>
+                    <option value="GHTK">GHTK</option>
+                    <option value="GHN">GHN</option>
+                    <option value="Viettel Post">Viettel Post</option>
+                    <option value="Nội bộ">Nội bộ</option>
+                  </select>
+                </div>
+              </div>
+
+              {fSubtotal > 0 && (
+                <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-4 py-3 space-y-1.5">
+                  <div className="flex items-center justify-between text-sm text-emerald-700">
+                    <span>Tạm tính</span><span>{fmt(fSubtotal)}</span>
+                  </div>
+                  {fDiscount > 0 && (
+                    <div className="flex items-center justify-between text-sm text-red-600">
+                      <span>Chiết khấu ({fChietKhau}%)</span><span>– {fmt(fDiscount)}</span>
+                    </div>
+                  )}
+                  {fVatAmount > 0 && (
+                    <div className="flex items-center justify-between text-sm text-emerald-600">
+                      <span>VAT ({fVat}%)</span><span>+ {fmt(fVatAmount)}</span>
+                    </div>
+                  )}
+                  <div className="flex items-center justify-between pt-1.5 border-t border-emerald-200">
+                    <span className="font-semibold text-emerald-800">Tổng thanh toán</span>
+                    <span className="text-xl font-bold text-emerald-700">{fmt(fTotal)}</span>
+                  </div>
                 </div>
               )}
 
