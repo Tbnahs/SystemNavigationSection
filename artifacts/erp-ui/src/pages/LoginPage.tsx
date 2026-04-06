@@ -8,7 +8,7 @@ import logoImg from "@assets/Logo ESG.png";
 import teaHillImg from "@assets/Nền_login_1775103618613.jpg";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("admin@agrierp.vn");
+  const [email, setEmail] = useState("admin@esgvalley.com");
   const [password, setPassword] = useState("password");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -96,11 +96,11 @@ export default function LoginPage() {
               <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
                 <Leaf className="w-5 h-5 text-primary" strokeWidth={1.5} />
               </div>
-              <span className="font-semibold text-foreground">ESG VELLAY</span>
+              <span className="font-semibold text-foreground">ESG VALLEY</span>
             </div>
 
             <div className="mb-8">
-              <img src={logoImg} alt="ESG VELLAY logo" className="w-28 h-28 object-contain mb-5 mx-auto" />
+              <img src={logoImg} alt="ESG VALLEY logo" className="w-28 h-28 object-contain mb-5 mx-auto" />
               <h2 className="text-2xl font-bold text-foreground mb-1">{t("login.title")}</h2>
               <p className="text-muted-foreground text-sm">{t("login.subtitle")}</p>
             </div>

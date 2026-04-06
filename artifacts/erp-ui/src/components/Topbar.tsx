@@ -47,7 +47,7 @@ export default function Topbar({ onMenuToggle, menuOpen }: TopbarProps) {
         <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center">
           <span className="text-white text-xs font-bold">A</span>
         </div>
-        <span className="font-semibold text-sm text-foreground">ESG VELLAY</span>
+        <span className="font-semibold text-sm text-foreground">ESG VALLEY</span>
       </div>
 
       {/* Search */}

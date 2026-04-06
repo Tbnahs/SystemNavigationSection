@@ -42,7 +42,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
               <Leaf className="w-5 h-5 text-white" strokeWidth={1.5} />
             </div>
             <div>
-              <p className="font-bold text-foreground text-sm">ESG VELLAY</p>
+              <p className="font-bold text-foreground text-sm">ESG VALLEY</p>
               <p className="text-xs text-muted-foreground">v2.0.1</p>
             </div>
           </div>
