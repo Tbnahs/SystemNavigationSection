@@ -60,7 +60,7 @@ const genId = () => String(++_nid);
 
 export default function CRMPage() {
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"khach-hang" | "giao-dich" | "phan-hang">("khach-hang");
+  const [activeTab, setActiveTab] = useState<"khach-hang" | "giao-dich">("khach-hang");
   const [search, setSearch] = useState("");
   const [hangFilter, setHangFilter] = useState<HangKH | "">("");
   const [loaiFilter, setLoaiFilter] = useState<LoaiKH | "">("");
@@ -135,7 +135,7 @@ export default function CRMPage() {
       </div>
 
       <div className="flex items-center gap-1 mb-4 border-b border-border">
-        {[{key:"khach-hang",label:"Khách hàng",count:khList.length},{key:"giao-dich",label:"Giao dịch gần đây",count:ORDERS_SAMPLE.length},{key:"phan-hang",label:"Phân hạng",count:4}].map(tab=>(
+        {[{key:"khach-hang",label:"Khách hàng",count:khList.length},{key:"giao-dich",label:"Giao dịch gần đây",count:ORDERS_SAMPLE.length}].map(tab=>(
           <button key={tab.key} onClick={()=>setActiveTab(tab.key as typeof activeTab)}
             className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors ${activeTab===tab.key?"border-primary text-primary":"border-transparent text-muted-foreground hover:text-foreground"}`}>
             {tab.label}<span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold ${activeTab===tab.key?"bg-primary text-white":"bg-muted text-muted-foreground"}`}>{tab.count}</span>
@@ -214,31 +214,6 @@ export default function CRMPage() {
         </div>
       )}
 
-      {activeTab === "phan-hang" && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {(["vang","bac","dong","moi"] as HangKH[]).map(h => {
-            const hc = HANG_CFG[h]; const inHang = khList.filter(k=>k.hang===h);
-            const total = inHang.reduce((s,k)=>s+k.tongMua,0);
-            return (
-              <div key={h} className={`bg-white border border-border rounded-xl p-5 ${h==="vang"?"border-yellow-200":""}`}>
-                <div className="flex items-center gap-2 mb-3">
-                  <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-semibold ${hc.color}`}>{hc.label}</span>
-                  <div className="flex gap-0.5">{[1,2,3].map(s=><Star key={s} className={`w-3 h-3 ${s<=hc.stars?"text-amber-500 fill-amber-500":"text-muted-foreground"}`}/>)}</div>
-                </div>
-                <p className="text-3xl font-black text-foreground mb-1">{inHang.length}</p>
-                <p className="text-xs text-muted-foreground mb-3">khách hàng</p>
-                <div className="pt-3 border-t border-border/60">
-                  <p className="text-xs text-muted-foreground">Tổng doanh thu</p>
-                  <p className="font-bold text-emerald-700">{total>0?fmtMoney(total):"—"}</p>
-                </div>
-                <div className="mt-2 space-y-1 max-h-24 overflow-y-auto">
-                  {inHang.map(k=><p key={k.id} className="text-xs text-muted-foreground truncate">{k.tenKH}</p>)}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
 
       {/* Detail drawer */}
       {selected && (
