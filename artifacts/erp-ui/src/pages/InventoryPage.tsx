@@ -444,7 +444,7 @@ export default function InventoryPage() {
                 <div><label className="block text-xs font-semibold mb-1.5">{editTarget ? "Tồn cuối (kg)" : "Tồn ban đầu"}</label><input type="number" value={fTonDau} onChange={e=>setFTonDau(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
                 <div><label className="block text-xs font-semibold mb-1.5">Đơn giá (đ)</label><input type="number" value={fDonGia} onChange={e=>setFDonGia(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
               </div>
-              <div><label className="block text-xs font-semibold mb-1.5">Kho lưu trữ</label><select value={fKho} onChange={e=>setFKho(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg">{["Kho NL","Kho TP","Kho PK","Kho VT"].map(k=><option key={k} value={k}>{k}</option>)}</select></div>
+              <div><label className="block text-xs font-semibold mb-1.5">Kho lưu trữ</label><select value={fKho} onChange={e=>setFKho(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg">{[{v:"Kho NL",l:"Kho Nguyên liệu"},{v:"Kho TP",l:"Kho Thành phẩm"},{v:"Kho PK",l:"Kho Bao bì"},{v:"Kho VT",l:"Kho Vật tư"}].map(k=><option key={k.v} value={k.v}>{k.l}</option>)}</select></div>
             </div>
             <div className="px-5 pb-5 pt-3 border-t border-border flex gap-2 shrink-0">
               <button onClick={()=>{setShowCreate(false); setEditTarget(null);}} className="flex-1 px-4 py-2.5 text-sm border border-border rounded-lg hover:bg-muted/50">Hủy</button>
