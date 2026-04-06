@@ -363,7 +363,14 @@ export default function QualityPage() {
                 </select>
               </div>
               {[{label:"Độ ẩm",val:fDoAm,set:setFDoAm},{label:"Độ non búp",val:fDoNon,set:setFDoNon},{label:"Độ sạch",val:fDoSach,set:setFDoSach}].map((m,i)=>(
-                <div key={i}><label className="block text-xs font-semibold mb-1.5">{m.label}: <span className="text-primary">{m.val}%</span></label><input type="range" min={60} max={100} value={m.val} onChange={e=>m.set(+e.target.value)} className="w-full accent-primary" /></div>
+                <div key={i}>
+                  <label className="block text-xs font-semibold mb-1.5">{m.label} <span className="text-primary font-bold">{m.val}%</span></label>
+                  <div className="flex items-center gap-2">
+                    <button type="button" onClick={()=>m.set(Math.max(60,m.val-1))} className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-muted/50 text-lg font-bold shrink-0 active:scale-95 transition-transform">−</button>
+                    <input type="number" min={60} max={100} value={m.val} onChange={e=>m.set(Math.min(100,Math.max(60,Number(e.target.value)||60)))} className="flex-1 text-center px-2 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
+                    <button type="button" onClick={()=>m.set(Math.min(100,m.val+1))} className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-muted/50 text-lg font-bold shrink-0 active:scale-95 transition-transform">+</button>
+                  </div>
+                </div>
               ))}
               <div className={`px-4 py-3 rounded-xl border text-center ${calcKQ(fDoAm,fDoNon,fDoSach)==="pass"?"bg-emerald-50 border-emerald-200":calcKQ(fDoAm,fDoNon,fDoSach)==="reduce"?"bg-amber-50 border-amber-200":"bg-red-50 border-red-200"}`}>
                 <p className="text-xs text-muted-foreground">Dự kiến kết quả</p>

@@ -945,8 +945,12 @@ export default function PurchasePage() {
                       <input type="number" value={fKL} onChange={e => setFKL(e.target.value)} placeholder="0.00" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
                     </div>
                     <div>
-                      <label className="block text-xs font-semibold mb-1.5">Chất lượng ({fCL}%)</label>
-                      <input type="range" min={70} max={100} value={fCL} onChange={e => setFCL(+e.target.value)} className="w-full mt-3 accent-primary" />
+                      <label className="block text-xs font-semibold mb-1.5">Chất lượng <span className="text-primary font-bold">({fCL}%)</span></label>
+                      <div className="flex items-center gap-2 mt-1">
+                        <button type="button" onClick={()=>setFCL(Math.max(70,fCL-1))} className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-muted/50 text-lg font-bold shrink-0 active:scale-95 transition-transform">−</button>
+                        <input type="number" min={70} max={100} value={fCL} onChange={e=>setFCL(Math.min(100,Math.max(70,Number(e.target.value)||70)))} className="flex-1 text-center px-2 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
+                        <button type="button" onClick={()=>setFCL(Math.min(100,fCL+1))} className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-muted/50 text-lg font-bold shrink-0 active:scale-95 transition-transform">+</button>
+                      </div>
                     </div>
                   </div>
 
