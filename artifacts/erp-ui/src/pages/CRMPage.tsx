@@ -154,7 +154,7 @@ export default function CRMPage() {
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead><tr className="border-b border-border bg-muted/30">
-                {[{k:"maKH",l:"Mã KH"},{k:"tenKH",l:"Tên khách hàng"},{k:"loaiKH",l:"Loại"},{k:"diaChi",l:"Địa chỉ"},{k:"sdt",l:"SĐT"},{k:"soLanMua",l:"Số đơn"},{k:"tongMua",l:"Doanh thu"},{k:"hang",l:"Hạng"}].map(col=>(
+                {[{k:"maKH",l:"Mã KH"},{k:"tenKH",l:"Tên khách hàng"},{k:"loaiKH",l:"Loại"},{k:"diaChi",l:"Địa chỉ"},{k:"sdt",l:"SĐT"},{k:"soLanMua",l:"Số đơn"},{k:"tongMua",l:"Doanh thu"}].map(col=>(
                   <th key={col.k} onClick={()=>handleSort(col.k)} className="text-left py-2.5 px-4 font-semibold text-xs text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground whitespace-nowrap">
                     <span className="flex items-center gap-1">{col.l} <SortIcon col={col.k} /></span>
                   </th>
@@ -173,11 +173,6 @@ export default function CRMPage() {
                       <td className="py-3 px-4 text-xs">{k.sdt||"—"}</td>
                       <td className="py-3 px-4 text-sm font-medium">{k.soLanMua}</td>
                       <td className="py-3 px-4 font-semibold text-emerald-700">{k.tongMua>0?fmtMoney(k.tongMua):"—"}</td>
-                      <td className="py-3 px-4">
-                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${hc.color}`}>
-                          {[1,2,3].map(s=><Star key={s} className={`w-2.5 h-2.5 ${s<=hc.stars?"fill-current":""}`}/>)} {hc.label}
-                        </span>
-                      </td>
                       <td className="py-3 px-4" onClick={e=>e.stopPropagation()}>
                         <div className="flex items-center justify-end gap-0.5">
                           <button onClick={()=>setSelected(k)} className="p-1.5 rounded-md hover:bg-muted/60 text-muted-foreground"><Eye className="w-3.5 h-3.5" /></button>
