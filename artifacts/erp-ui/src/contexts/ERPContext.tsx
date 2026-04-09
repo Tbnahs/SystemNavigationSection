@@ -11,7 +11,7 @@ export interface PurchaseOrder {
   quyCach: string; khoiLuongDat: number; khoiLuongNhan: number;
   donGia: number; chatLuong: number; qcResult: QCResult;
   trangThai: POStatus; thanhToan: ThanhToanPO;
-  batchId: string; ghiChu: string; nguoiTao: string;
+  maMeThuMua: string; batchId: string; ghiChu: string; nguoiTao: string;
 }
 
 export interface RawReceipt {
@@ -24,14 +24,18 @@ export type ProdStatus = "ke-hoach"|"xuat-nvl"|"dang-che-bien"|"hoan-thanh"|"da-
 export interface LoSX {
   id: string; maLo: string; ngaySX: string; loaiChe: string; soHo: number;
   klNVL: number; klTP: number; tyLeKhoHao: number; trangThai: ProdStatus;
-  cacMaBatch: string[]; batchTP: string; ghiChu: string;
+  cacMaBatch: string[]; batchTP: string;
+  nguoiThucHien: string; diaDiemThucHien: string;
+  ghiChu: string;
 }
 
 export type PackStatus = "cho-dong-goi"|"dang-dong-goi"|"hoan-thanh"|"da-xuat-kho";
 export interface LoDG {
   id: string; maDG: string; maLoSX: string; thoiGian: string; thanhPham: string;
   loaiBaoBi: string; klDG: number; soSP: number; trangThai: PackStatus;
-  qrCode: string; nguoiTao: string; ghiChu: string;
+  qrCode: string; nguoiTao: string;
+  nguoiThucHien: string; diaDiemThucHien: string;
+  ghiChu: string;
 }
 
 export type OrderStatus = "bao-gia"|"xac-nhan"|"xuat-kho"|"dang-giao"|"hoan-thanh"|"huy";
@@ -77,14 +81,14 @@ export interface Phieu {
 
 /* ───────────────────────── Seed Data ───────────────────────── */
 const PO_SEED: PurchaseOrder[] = [
-  { id:"1", maPO:"PO-3003-001", maHo:"NH004", tenHo:"Triệu Văn Thạo",   diaChi:"Nà Hồng", sdt:"0354871949", maVuon:"NH004-V1", tenVuon:"Vườn Nà Hồng 1", ngayTao:"28/03/2026", ngayGiao:"30/03/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:15.0, khoiLuongNhan:13.5, donGia:27000, chatLuong:78, qcResult:"pass", trangThai:"thanh-toan", thanhToan:"da-thanh-toan", batchId:"RAW-NH004-3003", ghiChu:"", nguoiTao:"Nguyễn A" },
-  { id:"2", maPO:"PO-3103-002", maHo:"NH008", tenHo:"Đồng Thị Khuyết",  diaChi:"Nà Hồng", sdt:"0962041090", maVuon:"NH008-V1", tenVuon:"Vườn Nà Hồng 1", ngayTao:"29/03/2026", ngayGiao:"31/03/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:10.0, khoiLuongNhan:8.5,  donGia:28500, chatLuong:83, qcResult:"pass", trangThai:"thanh-toan", thanhToan:"da-thanh-toan", batchId:"RAW-NH008-3103", ghiChu:"", nguoiTao:"Nguyễn A" },
-  { id:"3", maPO:"PO-3103-003", maHo:"NB010", tenHo:"Mạnh Văn Hồ",      diaChi:"Nà Bay",  sdt:"0349055299", maVuon:"NB010-V1", tenVuon:"Vườn Nà Bay 1",   ngayTao:"29/03/2026", ngayGiao:"31/03/2026", quyCach:"1 tôm",      khoiLuongDat:3.0,  khoiLuongNhan:2.5,  donGia:29000, chatLuong:98, qcResult:"pass", trangThai:"nhap-kho",   thanhToan:"mot-phan",    batchId:"RAW-NB010-3103", ghiChu:"1 tôm CL cao", nguoiTao:"Trần B" },
-  { id:"4", maPO:"PO-0104-004", maHo:"NB002", tenHo:"Nông Văn Nghiễm",  diaChi:"Nà Bay",  sdt:"0814665955", maVuon:"NB002-V1", tenVuon:"Vườn Nà Bay 1",   ngayTao:"01/04/2026", ngayGiao:"03/04/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:50.0, khoiLuongNhan:44.0, donGia:29000, chatLuong:90, qcResult:"pass", trangThai:"nhap-kho",   thanhToan:"chua",         batchId:"RAW-NB002-0104", ghiChu:"", nguoiTao:"Nguyễn A" },
-  { id:"5", maPO:"PO-0104-005", maHo:"NB013", tenHo:"Triệu Văn Cường",  diaChi:"Nà Bay",  sdt:"",           maVuon:"NB013-V1", tenVuon:"Vườn Nà Bay 1",   ngayTao:"01/04/2026", ngayGiao:"03/04/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:60.0, khoiLuongNhan:50.0, donGia:29000, chatLuong:91, qcResult:"pass", trangThai:"qc",         thanhToan:"chua",         batchId:"",               ghiChu:"", nguoiTao:"Trần B" },
-  { id:"6", maPO:"PO-0304-006", maHo:"NB006", tenHo:"Hoàng Văn Thống",  diaChi:"Nà Bay",  sdt:"0967186387", maVuon:"NB006-V1", tenVuon:"Vườn Nà Bay 1",   ngayTao:"03/04/2026", ngayGiao:"05/04/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:55.0, khoiLuongNhan:49.2, donGia:29000, chatLuong:89, qcResult:"pass", trangThai:"nhan-hang",  thanhToan:"chua",         batchId:"",               ghiChu:"", nguoiTao:"Nguyễn A" },
-  { id:"7", maPO:"PO-0404-007", maHo:"NH009", tenHo:"Hạ Văn Thắng",     diaChi:"Nà Hồng", sdt:"0337318858", maVuon:"NH009-V2", tenVuon:"Vườn Nà Hồng 2", ngayTao:"04/04/2026", ngayGiao:"06/04/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:20.0, khoiLuongNhan:0,    donGia:29000, chatLuong:92, qcResult:"pending", trangThai:"dat-hang", thanhToan:"chua",       batchId:"",               ghiChu:"Dự kiến buổi sáng", nguoiTao:"Trần B" },
-  { id:"8", maPO:"PO-0504-008", maHo:"BC002", tenHo:"Triệu Văn Dựng",   diaChi:"Bản Chang", sdt:"0343233785", maVuon:"BC002-V1", tenVuon:"Vườn Bản Chang 1", ngayTao:"05/04/2026", ngayGiao:"07/04/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:25.0, khoiLuongNhan:0, donGia:28000, chatLuong:85, qcResult:"pending", trangThai:"yeu-cau", thanhToan:"chua",       batchId:"",               ghiChu:"", nguoiTao:"Nguyễn A" },
+  { id:"1", maPO:"PO-3003-001", maHo:"NH004", tenHo:"Triệu Văn Thạo",   diaChi:"Nà Hồng", sdt:"0354871949", maVuon:"NH004-V1", tenVuon:"Vườn Nà Hồng 1", ngayTao:"28/03/2026", ngayGiao:"30/03/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:15.0, khoiLuongNhan:13.5, donGia:27000, chatLuong:78, qcResult:"pass", trangThai:"thanh-toan", thanhToan:"da-thanh-toan", maMeThuMua:"ME-NH004-2803", batchId:"RAW-NH004-3003", ghiChu:"", nguoiTao:"Nguyễn A" },
+  { id:"2", maPO:"PO-3103-002", maHo:"NH008", tenHo:"Đồng Thị Khuyết",  diaChi:"Nà Hồng", sdt:"0962041090", maVuon:"NH008-V1", tenVuon:"Vườn Nà Hồng 1", ngayTao:"29/03/2026", ngayGiao:"31/03/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:10.0, khoiLuongNhan:8.5,  donGia:28500, chatLuong:83, qcResult:"pass", trangThai:"thanh-toan", thanhToan:"da-thanh-toan", maMeThuMua:"ME-NH008-2903", batchId:"RAW-NH008-3103", ghiChu:"", nguoiTao:"Nguyễn A" },
+  { id:"3", maPO:"PO-3103-003", maHo:"NB010", tenHo:"Mạnh Văn Hồ",      diaChi:"Nà Bay",  sdt:"0349055299", maVuon:"NB010-V1", tenVuon:"Vườn Nà Bay 1",   ngayTao:"29/03/2026", ngayGiao:"31/03/2026", quyCach:"1 tôm",      khoiLuongDat:3.0,  khoiLuongNhan:2.5,  donGia:29000, chatLuong:98, qcResult:"pass", trangThai:"nhap-kho",   thanhToan:"mot-phan",    maMeThuMua:"ME-NB010-2903", batchId:"RAW-NB010-3103", ghiChu:"1 tôm CL cao", nguoiTao:"Trần B" },
+  { id:"4", maPO:"PO-0104-004", maHo:"NB002", tenHo:"Nông Văn Nghiễm",  diaChi:"Nà Bay",  sdt:"0814665955", maVuon:"NB002-V1", tenVuon:"Vườn Nà Bay 1",   ngayTao:"01/04/2026", ngayGiao:"03/04/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:50.0, khoiLuongNhan:44.0, donGia:29000, chatLuong:90, qcResult:"pass", trangThai:"nhap-kho",   thanhToan:"chua",         maMeThuMua:"ME-NB002-0104", batchId:"RAW-NB002-0104", ghiChu:"", nguoiTao:"Nguyễn A" },
+  { id:"5", maPO:"PO-0104-005", maHo:"NB013", tenHo:"Triệu Văn Cường",  diaChi:"Nà Bay",  sdt:"",           maVuon:"NB013-V1", tenVuon:"Vườn Nà Bay 1",   ngayTao:"01/04/2026", ngayGiao:"03/04/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:60.0, khoiLuongNhan:50.0, donGia:29000, chatLuong:91, qcResult:"pass", trangThai:"qc",         thanhToan:"chua",         maMeThuMua:"ME-NB013-0104", batchId:"",               ghiChu:"", nguoiTao:"Trần B" },
+  { id:"6", maPO:"PO-0304-006", maHo:"NB006", tenHo:"Hoàng Văn Thống",  diaChi:"Nà Bay",  sdt:"0967186387", maVuon:"NB006-V1", tenVuon:"Vườn Nà Bay 1",   ngayTao:"03/04/2026", ngayGiao:"05/04/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:55.0, khoiLuongNhan:49.2, donGia:29000, chatLuong:89, qcResult:"pass", trangThai:"nhan-hang",  thanhToan:"chua",         maMeThuMua:"ME-NB006-0304", batchId:"",               ghiChu:"", nguoiTao:"Nguyễn A" },
+  { id:"7", maPO:"PO-0404-007", maHo:"NH009", tenHo:"Hạ Văn Thắng",     diaChi:"Nà Hồng", sdt:"0337318858", maVuon:"NH009-V2", tenVuon:"Vườn Nà Hồng 2", ngayTao:"04/04/2026", ngayGiao:"06/04/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:20.0, khoiLuongNhan:0,    donGia:29000, chatLuong:92, qcResult:"pending", trangThai:"dat-hang", thanhToan:"chua",       maMeThuMua:"ME-NH009-0404", batchId:"",               ghiChu:"Dự kiến buổi sáng", nguoiTao:"Trần B" },
+  { id:"8", maPO:"PO-0504-008", maHo:"BC002", tenHo:"Triệu Văn Dựng",   diaChi:"Bản Chang", sdt:"0343233785", maVuon:"BC002-V1", tenVuon:"Vườn Bản Chang 1", ngayTao:"05/04/2026", ngayGiao:"07/04/2026", quyCach:"1 tôm 2 lá", khoiLuongDat:25.0, khoiLuongNhan:0, donGia:28000, chatLuong:85, qcResult:"pending", trangThai:"yeu-cau", thanhToan:"chua",       maMeThuMua:"ME-BC002-0504", batchId:"",               ghiChu:"", nguoiTao:"Nguyễn A" },
 ];
 
 const RAW_RECEIPTS_SEED: RawReceipt[] = [
@@ -278,8 +282,12 @@ const ERPContext = createContext<ERPContextType | null>(null);
 export function ERPProvider({ children }: { children: ReactNode }) {
   const [purchaseOrders, setPurchaseOrders] = useState<PurchaseOrder[]>(PO_SEED);
   const [rawReceipts, setRawReceipts]       = useState<RawReceipt[]>(RAW_RECEIPTS_SEED);
-  const [productionBatches, setProductionBatches] = useState<LoSX[]>(LOSX_SEED);
-  const [packagingLots, setPackagingLots]   = useState<LoDG[]>(LODG_SEED);
+  const [productionBatches, setProductionBatches] = useState<LoSX[]>(
+    LOSX_SEED.map(lo => ({ nguoiThucHien: "HTX Hồng Hà", diaDiemThucHien: "Nhà máy Bằng Phúc", ...lo }))
+  );
+  const [packagingLots, setPackagingLots]   = useState<LoDG[]>(
+    LODG_SEED.map(lo => ({ nguoiThucHien: "HTX Hồng Hà", diaDiemThucHien: "Xưởng đóng gói HTX", ...lo }))
+  );
   const [salesOrders, setSalesOrders]       = useState<SalesOrder[]>(SALES_SEED);
   const [accountingEntries, setAccountingEntries] = useState<Phieu[]>(PHIEU_SEED);
 
@@ -330,7 +338,8 @@ export function ERPProvider({ children }: { children: ReactNode }) {
       if (po.id !== poId) return po;
       if (po.trangThai !== "qc") return po;
       const batchId = po.batchId || `RAW-${po.maHo}-${po.ngayGiao.replace(/\//g, "").slice(0, 6)}`;
-      return { ...po, trangThai: "nhap-kho", batchId };
+      const maMeThuMua = po.maMeThuMua || `ME-${po.maHo}-${po.ngayTao.replace(/\//g, "").slice(0, 4)}`;
+      return { ...po, trangThai: "nhap-kho", batchId, maMeThuMua };
     }));
   };
 
