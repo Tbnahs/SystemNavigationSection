@@ -181,6 +181,7 @@ export default function PurchasePage() {
     if (!selHo || !fKL) return;
     const vuon = zonesOfSel.find(v => v.maVuon === selVuon) ?? zonesOfSel[0];
     const [y, m, d] = fDate.split("-");
+    const maMeThuMua = `ME-${selHo.maHo}-${d}${m}`;
     const newPO: PurchaseOrder = {
       id: genId(),
       maPO: `PO-${d}${m}-${String(poList.length + 1).padStart(3,"0")}`,
@@ -189,7 +190,7 @@ export default function PurchasePage() {
       ngayTao: `${d}/${m}/${y}`, ngayGiao: fGiao ? (() => { const [gy,gm,gd] = fGiao.split("-"); return `${gd}/${gm}/${gy}`; })() : "",
       quyCach: fQuyCach, khoiLuongDat: parseFloat(fKL), khoiLuongNhan: 0,
       donGia: fDonGia, chatLuong: fCL, qcResult: "pending",
-      trangThai: "yeu-cau", thanhToan: "chua", batchId: "", ghiChu: fNote, nguoiTao: "Admin",
+      trangThai: "yeu-cau", thanhToan: "chua", maMeThuMua, batchId: "", ghiChu: fNote, nguoiTao: "Admin",
     };
     setPoList(prev => [newPO, ...prev]);
     setShowCreate(false); resetForm();
@@ -399,7 +400,7 @@ export default function PurchasePage() {
                   { key:"khoiLuongNhan",  label:"KL nhận (kg)" },
                   { key:"donGia",         label:"Đơn giá (đ)" },
                   { key:"thanhTien",      label:"Thành tiền (đ)" },
-                  { key:"batchId",        label:"Mã mẻ" },
+                  { key:"maMeThuMua",     label:"Mã mẻ thu mua" },
                   { key:"trangThai",      label:"Trạng thái" },
                   { key:"qcResult",       label:"QC" },
                 ].map(col => (
@@ -433,7 +434,7 @@ export default function PurchasePage() {
                       <td className="py-3 px-4 text-sm">{po.khoiLuongNhan > 0 ? <span className="font-semibold text-emerald-700">{po.khoiLuongNhan}</span> : <span className="text-muted-foreground">—</span>}</td>
                       <td className="py-3 px-4 text-xs text-right">{po.donGia.toLocaleString("vi-VN")}</td>
                       <td className="py-3 px-4 text-sm text-right">{thanhTien > 0 ? <span className="font-semibold text-emerald-700">{fmt(thanhTien)}</span> : <span className="text-muted-foreground">—</span>}</td>
-                      <td className="py-3 px-4">{po.batchId ? <span className="font-mono text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md">{po.batchId}</span> : <span className="text-xs text-muted-foreground">—</span>}</td>
+                      <td className="py-3 px-4">{po.maMeThuMua ? <span className="font-mono text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md">{po.maMeThuMua}</span> : <span className="text-xs text-muted-foreground">—</span>}</td>
                       <td className="py-3 px-4"><span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${sc.color}`}><Ic className="w-3 h-3" />{sc.label}</span></td>
                       <td className="py-3 px-4"><span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${qc.color}`}>{qc.label}</span></td>
                       <td className="py-3 px-4" onClick={e => e.stopPropagation()}>
@@ -789,19 +790,27 @@ export default function PurchasePage() {
                 <span className="text-lg font-bold text-primary">{fmt(selectedPO.donGia)}/kg</span>
               </div>
 
-              {/* Batch */}
+              {/* Mã mẻ thu mua */}
+              <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+                <Package className="w-5 h-5 text-emerald-600 shrink-0" />
+                <div>
+                  <p className="text-xs text-emerald-600 font-semibold">Mã mẻ thu mua (gốc truy xuất)</p>
+                  <p className="font-mono text-sm font-bold text-emerald-800">{selectedPO.maMeThuMua || `ME-${selectedPO.maHo}-${selectedPO.ngayTao.split("/").slice(0,2).join("")}`}</p>
+                </div>
+              </div>
+              {/* Batch RAW */}
               {selectedPO.batchId ? (
-                <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl">
-                  <Package className="w-5 h-5 text-emerald-600 shrink-0" />
+                <div className="flex items-center gap-3 px-4 py-3 bg-blue-50 border border-blue-200 rounded-xl">
+                  <Package className="w-5 h-5 text-blue-600 shrink-0" />
                   <div>
-                    <p className="text-xs text-emerald-600 font-semibold">Batch nguyên liệu (gốc truy xuất)</p>
-                    <p className="font-mono text-sm font-bold text-emerald-800">{selectedPO.batchId}</p>
+                    <p className="text-xs text-blue-600 font-semibold">Batch nguyên liệu (nhập kho)</p>
+                    <p className="font-mono text-sm font-bold text-blue-800">{selectedPO.batchId}</p>
                   </div>
                 </div>
               ) : (
                 <div className="flex items-center gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl">
                   <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
-                  <p className="text-xs text-amber-700">Batch sẽ được tạo tự động khi chuyển sang bước <strong>Nhập kho</strong></p>
+                  <p className="text-xs text-amber-700">Batch RAW sẽ được tạo tự động khi chuyển sang bước <strong>Nhập kho</strong></p>
                 </div>
               )}
 
@@ -813,6 +822,7 @@ export default function PurchasePage() {
                     { label:"Nông hộ", val:`${selectedPO.tenHo} (${selectedPO.maHo})`, color:"bg-emerald-100 border-emerald-300 text-emerald-800" },
                     { label:"Vùng trồng", val:selectedPO.diaChi, color:"bg-blue-100 border-blue-300 text-blue-800" },
                     { label:"Vườn cụ thể", val:`${selectedPO.maVuon}`, color:"bg-violet-100 border-violet-300 text-violet-800" },
+                    { label:"Mã mẻ thu mua", val:selectedPO.maMeThuMua||`ME-${selectedPO.maHo}-${selectedPO.ngayTao.split("/").slice(0,2).join("")}`, color:"bg-emerald-100 border-emerald-300 text-emerald-800" },
                     { label:"Batch RAW", val:selectedPO.batchId||"Chưa tạo", color:selectedPO.batchId?"bg-amber-100 border-amber-300 text-amber-800":"bg-gray-100 border-gray-300 text-gray-600" },
                   ].map((step,si)=>(
                     <div key={si} className="flex items-center gap-1">

@@ -45,6 +45,8 @@ export default function ProductionPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [fLoai, setFLoai] = useState("Chè xanh"); const [fNgay, setFNgay] = useState(new Date().toISOString().slice(0,10));
   const [fKLNVL, setFKLNVL] = useState(""); const [fNote, setFNote] = useState("");
+  const [fNguoiTH, setFNguoiTH] = useState("HTX Hồng Hà");
+  const [fDiaDiem, setFDiaDiem] = useState("Nhà máy Bằng Phúc");
 
   const handleSort = (k: string) => { if (sortKey===k) setSortDir(d=>d==="asc"?"desc":"asc"); else { setSortKey(k); setSortDir("desc"); } };
   const SortIcon = ({ col }: { col: string }) =>
@@ -68,9 +70,9 @@ export default function ProductionPage() {
     const [y,m,d] = fNgay.split("-");
     const id = genId();
     const maLo = `L0${id}${d}${m.slice(-1)}`;
-    const newLo: LoSX = { id, maLo, ngaySX: `${d}/${m}/${y}`, loaiChe: fLoai, soHo: 0, klNVL: parseFloat(fKLNVL)||0, klTP: 0, tyLeKhoHao: 0, trangThai: "ke-hoach", cacMaBatch: [], batchTP: "", ghiChu: fNote };
+    const newLo: LoSX = { id, maLo, ngaySX: `${d}/${m}/${y}`, loaiChe: fLoai, soHo: 0, klNVL: parseFloat(fKLNVL)||0, klTP: 0, tyLeKhoHao: 0, trangThai: "ke-hoach", cacMaBatch: [], batchTP: "", nguoiThucHien: fNguoiTH, diaDiemThucHien: fDiaDiem, ghiChu: fNote };
     setLoList(prev => [newLo, ...prev]);
-    setShowCreate(false); setFKLNVL(""); setFNote("");
+    setShowCreate(false); setFKLNVL(""); setFNote(""); setFNguoiTH("HTX Hồng Hà"); setFDiaDiem("Nhà máy Bằng Phúc");
   };
   const handleDelete = (id: string) => {
     if (!window.confirm("Xóa lệnh sản xuất?")) return;
@@ -303,6 +305,13 @@ export default function ProductionPage() {
                 </div>
               )}
               {selected.batchTP&&<div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3"><p className="text-xs text-muted-foreground">Batch thành phẩm</p><p className="font-mono font-bold text-emerald-700 mt-0.5">{selected.batchTP}</p></div>}
+              {(selected.nguoiThucHien||selected.diaDiemThucHien)&&(
+                <div className="bg-muted/20 rounded-xl p-3 space-y-1">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Thực hiện</p>
+                  {selected.nguoiThucHien&&<div className="flex justify-between text-sm"><span className="text-muted-foreground">Người thực hiện</span><span className="font-medium">{selected.nguoiThucHien}</span></div>}
+                  {selected.diaDiemThucHien&&<div className="flex justify-between text-sm"><span className="text-muted-foreground">Địa điểm SX</span><span className="font-medium">{selected.diaDiemThucHien}</span></div>}
+                </div>
+              )}
               {selected.ghiChu&&<div className="bg-muted/20 rounded-xl p-3"><p className="text-xs text-muted-foreground">Ghi chú</p><p className="text-sm italic mt-0.5">{selected.ghiChu}</p></div>}
               {NEXT_STATUS[selected.trangThai]&&(
                 <button onClick={()=>{handleAdvance(selected.id);setSelected(prev=>prev?{...loList.find(l=>l.id===prev.id)!}:null);}} className="w-full py-2.5 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary/90 flex items-center justify-center gap-2"><ArrowRight className="w-4 h-4"/> Chuyển: {TT_CFG[NEXT_STATUS[selected.trangThai]!].label}</button>
@@ -325,6 +334,10 @@ export default function ProductionPage() {
               <div><label className="block text-xs font-semibold mb-1.5">Ngày SX</label><input type="date" value={fNgay} onChange={e=>setFNgay(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg"/></div>
               <div><label className="block text-xs font-semibold mb-1.5">KL nguyên liệu (kg) <span className="text-red-500">*</span></label><input type="number" value={fKLNVL} onChange={e=>setFKLNVL(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg"/></div>
               {fKLNVL&&<div className="bg-muted/20 rounded-xl p-3 text-xs text-muted-foreground"><p className="font-semibold mb-1">Dự kiến thành phẩm:</p><p>{fLoai==="Bạch trà"?`~ ${(parseFloat(fKLNVL)*0.178).toFixed(1)} kg (17.8%)`:`~ ${(parseFloat(fKLNVL)*0.239).toFixed(1)} kg (23.9%)`}</p></div>}
+              <div className="grid grid-cols-2 gap-3">
+                <div><label className="block text-xs font-semibold mb-1.5">Người thực hiện</label><input value={fNguoiTH} onChange={e=>setFNguoiTH(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"/></div>
+                <div><label className="block text-xs font-semibold mb-1.5">Địa điểm SX</label><input value={fDiaDiem} onChange={e=>setFDiaDiem(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary"/></div>
+              </div>
               <div><label className="block text-xs font-semibold mb-1.5">Ghi chú</label><textarea value={fNote} onChange={e=>setFNote(e.target.value)} rows={2} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg resize-none"/></div>
             </div>
             <div className="px-5 pb-5 pt-3 border-t border-border flex gap-2 shrink-0">
