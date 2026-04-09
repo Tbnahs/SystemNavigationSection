@@ -249,7 +249,10 @@ export default function FarmersPage() {
                 <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center shrink-0"><Users className="w-6 h-6 text-primary" /></div>
                 <div>
                   <p className="text-lg font-bold">{selected.tenHo}</p>
-                  <span className={`inline-flex text-xs px-2 py-0.5 rounded-full font-medium ${AREA_COLORS[selected.diaChi] ?? "bg-gray-100 text-gray-600"}`}>{selected.diaChi}</span>
+                  <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                    <span className={`inline-flex text-xs px-2 py-0.5 rounded-full font-medium ${AREA_COLORS[selected.diaChi] ?? "bg-gray-100 text-gray-600"}`}>{selected.diaChi}</span>
+                    <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-full font-medium"><MapPin className="w-2.5 h-2.5"/>Vùng GPS</span>
+                  </div>
                   <div className="flex items-center gap-0.5 mt-1">{[1,2,3].map(s=><Star key={s} className={`w-3.5 h-3.5 ${s<=starCount(selected.diemCL)?"text-amber-500 fill-amber-500":"text-muted-foreground"}`} />)}<span className="text-xs text-muted-foreground ml-1">{selected.diemCL}% chất lượng</span></div>
                 </div>
               </div>
@@ -314,7 +317,14 @@ export default function FarmersPage() {
             <div className="overflow-y-auto flex-1 px-5 py-4 space-y-3">
               <div><label className="block text-xs font-semibold mb-1.5">Họ và tên <span className="text-red-500">*</span></label><input value={fTen} onChange={e=>setFTen(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" /></div>
               <div className="grid grid-cols-2 gap-3">
-                <div><label className="block text-xs font-semibold mb-1.5">Vùng trồng</label><select value={fDia} onChange={e=>setFDia(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg">{["Nà Hồng","Nà Bay","Bản Chang"].map(z=><option key={z} value={z}>{z}</option>)}</select></div>
+                <div>
+                  <label className="flex items-center gap-1.5 text-xs font-semibold mb-1.5">
+                    Vùng trồng
+                    <span className="inline-flex items-center gap-0.5 text-[10px] px-1.5 py-0.5 bg-blue-50 text-blue-600 border border-blue-200 rounded-full font-medium"><MapPin className="w-2.5 h-2.5"/>GPS</span>
+                  </label>
+                  <select value={fDia} onChange={e=>setFDia(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg">{["Nà Hồng","Nà Bay","Bản Chang"].map(z=><option key={z} value={z}>{z}</option>)}</select>
+                  <p className="text-[10px] text-blue-500 mt-1">Vùng trồng từ hệ thống GPS/GIS ngoài — chỉ chọn, không nhập tay.</p>
+                </div>
                 <div><label className="block text-xs font-semibold mb-1.5">SĐT</label><input value={fSdt} onChange={e=>setFSdt(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
                 <div><label className="block text-xs font-semibold mb-1.5">CCCD</label><input value={fCCCD} onChange={e=>setFCCCD(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
                 <div><label className="block text-xs font-semibold mb-1.5">Diện tích (ha)</label><input type="number" value={fDT} onChange={e=>setFDT(e.target.value)} step="0.1" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg" /></div>
