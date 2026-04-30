@@ -1,35 +1,18 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   Search, Plus, Filter, Download, MoreHorizontal, ChevronDown, X, Upload,
   Building2, Users, Package, Sprout, Leaf, Bell,
-  Pencil, Eye, MapPin, ArrowLeft, ArrowRight, LayoutGrid,
+  Pencil, Eye, MapPin, ArrowLeft, ArrowRight, LayoutGrid, Loader2,
 } from "lucide-react";
+import {
+  fetchEnterprises, fetchEnterpriseStats, createEnterprise,
+  type Enterprise,
+} from "@/lib/api";
 
-type DN = {
-  id: string;
-  mst: string;
-  ten: string;
-  tenHienThi: string;
-  daiDien: string;
-  sdt: string;
-  diaChi: string;
-  modules: ("ERP" | "TXNG" | "VT")[];
-  status: "active" | "pending" | "locked";
-  logoColor: string;
-};
-
-const DATA: DN[] = [
-  { id: "1", mst: "4601234567", ten: "Hợp tác xã Chè Quân Chu", tenHienThi: "Chè Quân Chu", daiDien: "Nguyễn Văn Hùng", sdt: "0987 123 456", diaChi: "Xã Quân Chu, Đại Từ, Thái Nguyên", modules: ["ERP", "TXNG", "VT"], status: "active", logoColor: "bg-emerald-100 text-emerald-700" },
-  { id: "2", mst: "4602345678", ten: "Công ty TNHH Trà Tân Cương Xanh", tenHienThi: "Tân Cương Xanh", daiDien: "Trần Thị Mai", sdt: "0912 345 678", diaChi: "Xã Tân Cương, Tp. Thái Nguyên", modules: ["ERP", "TXNG"], status: "active", logoColor: "bg-blue-100 text-blue-700" },
-  { id: "3", mst: "4603456789", ten: "HTX Chè Hữu Cơ La Bằng", tenHienThi: "La Bằng Organic", daiDien: "Lê Quốc Anh", sdt: "0903 567 890", diaChi: "Xã La Bằng, Đại Từ, Thái Nguyên", modules: ["TXNG", "VT"], status: "pending", logoColor: "bg-amber-100 text-amber-700" },
-  { id: "4", mst: "4604567890", ten: "Công ty CP Trà Phúc Vinh", tenHienThi: "Phúc Vinh Tea", daiDien: "Phạm Hồng Sơn", sdt: "0978 234 567", diaChi: "P. Phan Đình Phùng, Tp. Thái Nguyên", modules: ["ERP", "TXNG", "VT"], status: "active", logoColor: "bg-purple-100 text-purple-700" },
-  { id: "5", mst: "4605678901", ten: "HTX Trà Đại Từ", tenHienThi: "Trà Đại Từ", daiDien: "Hoàng Minh Tuấn", sdt: "0934 678 123", diaChi: "Thị trấn Hùng Sơn, Đại Từ, Thái Nguyên", modules: ["ERP"], status: "locked", logoColor: "bg-rose-100 text-rose-700" },
-  { id: "6", mst: "4606789012", ten: "Công ty TNHH Chè Sông Cầu", tenHienThi: "Sông Cầu Tea", daiDien: "Vũ Thị Lan", sdt: "0945 789 012", diaChi: "Xã Hòa Bình, Đồng Hỷ, Thái Nguyên", modules: ["ERP", "TXNG"], status: "active", logoColor: "bg-teal-100 text-teal-700" },
-];
-
-const STATUS_BADGE: Record<DN["status"], { text: string; cls: string }> = {
+const STATUS_BADGE: Record<Enterprise["status"], { text: string; cls: string }> = {
   active: { text: "Đang hoạt động", cls: "bg-emerald-50 text-emerald-700 ring-emerald-600/20" },
   pending: { text: "Chờ duyệt", cls: "bg-amber-50 text-amber-700 ring-amber-600/20" },
   locked: { text: "Tạm khóa", cls: "bg-slate-100 text-slate-600 ring-slate-500/20" },
@@ -41,10 +24,85 @@ const MODULE_INFO = {
   VT: { label: "Vùng trồng", color: "bg-amber-50 text-amber-700 ring-amber-600/20" },
 } as const;
 
+type FormState = {
+  mst: string;
+  ten: string;
+  tenHienThi: string;
+  daiDien: string;
+  sdt: string;
+  email: string;
+  diaChi: string;
+  tinh: string;
+  xa: string;
+  modules: ("ERP" | "TXNG" | "VT")[];
+};
+
+const EMPTY_FORM: FormState = {
+  mst: "", ten: "", tenHienThi: "", daiDien: "", sdt: "", email: "",
+  diaChi: "", tinh: "Thái Nguyên", xa: "",
+  modules: ["ERP", "TXNG"],
+};
+
+const LOGO_COLORS = [
+  "bg-emerald-100 text-emerald-700",
+  "bg-blue-100 text-blue-700",
+  "bg-amber-100 text-amber-700",
+  "bg-purple-100 text-purple-700",
+  "bg-rose-100 text-rose-700",
+  "bg-teal-100 text-teal-700",
+];
+
 export default function DoanhNghiepPage() {
   const [, setLocation] = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"general" | "location" | "modules">("general");
+  const [search, setSearch] = useState("");
+  const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [submitErr, setSubmitErr] = useState<string | null>(null);
+
+  const qc = useQueryClient();
+  const listQ = useQuery({ queryKey: ["enterprises"], queryFn: fetchEnterprises });
+  const statsQ = useQuery({ queryKey: ["enterprises-stats"], queryFn: fetchEnterpriseStats });
+
+  const createMu = useMutation({
+    mutationFn: (body: FormState) =>
+      createEnterprise({
+        ...body,
+        status: "active",
+        logoColor: LOGO_COLORS[Math.floor(Math.random() * LOGO_COLORS.length)],
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["enterprises"] });
+      qc.invalidateQueries({ queryKey: ["enterprises-stats"] });
+      setForm(EMPTY_FORM);
+      setActiveTab("general");
+      setDrawerOpen(false);
+      setSubmitErr(null);
+    },
+    onError: (e: Error) => setSubmitErr(e.message),
+  });
+
+  const items = listQ.data?.items ?? [];
+  const filtered = search.trim()
+    ? items.filter((d) =>
+        [d.mst, d.ten, d.tenHienThi, d.daiDien]
+          .some((s) => s.toLowerCase().includes(search.toLowerCase()))
+      )
+    : items;
+
+  function setF<K extends keyof FormState>(k: K, v: FormState[K]) {
+    setForm((p) => ({ ...p, [k]: v }));
+  }
+
+  function handleSubmit() {
+    setSubmitErr(null);
+    if (!form.mst.trim() || !form.ten.trim() || !form.tenHienThi.trim()) {
+      setActiveTab("general");
+      setSubmitErr("Vui lòng nhập đủ Mã số thuế, Tên doanh nghiệp và Tên hiển thị.");
+      return;
+    }
+    createMu.mutate(form);
+  }
 
   return (
     <AppLayout>
@@ -57,10 +115,10 @@ export default function DoanhNghiepPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Stat label="Tổng doanh nghiệp" value="48" delta="+4 trong tháng" tone="emerald" icon={Building2} />
-          <Stat label="Đang hoạt động" value="42" delta="87.5% tổng" tone="blue" icon={Users} />
-          <Stat label="Chờ duyệt" value="4" delta="Cần xử lý" tone="amber" icon={Bell} />
-          <Stat label="Tạm khóa" value="2" delta="-1 tuần này" tone="rose" icon={X} />
+          <Stat label="Tổng doanh nghiệp" value={String(statsQ.data?.total ?? "—")} delta="Dữ liệu thực tế" tone="emerald" icon={Building2} />
+          <Stat label="Đang hoạt động" value={String(statsQ.data?.active ?? "—")} delta={statsQ.data ? `${Math.round(((statsQ.data.active || 0) / Math.max(statsQ.data.total, 1)) * 100)}% tổng` : ""} tone="blue" icon={Users} />
+          <Stat label="Chờ duyệt" value={String(statsQ.data?.pending ?? "—")} delta="Cần xử lý" tone="amber" icon={Bell} />
+          <Stat label="Tạm khóa" value={String(statsQ.data?.locked ?? "—")} delta="" tone="rose" icon={X} />
         </div>
 
         {/* Toolbar */}
@@ -68,6 +126,8 @@ export default function DoanhNghiepPage() {
           <div className="relative flex-1 min-w-[220px]">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Tìm theo MST, tên doanh nghiệp, người đại diện…"
               className="w-full h-10 pl-9 pr-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
             />
@@ -106,7 +166,16 @@ export default function DoanhNghiepPage() {
                 </tr>
               </thead>
               <tbody>
-                {DATA.map((dn) => (
+                {listQ.isLoading && (
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải dữ liệu…</td></tr>
+                )}
+                {listQ.isError && (
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-rose-600">Lỗi tải dữ liệu: {(listQ.error as Error).message}</td></tr>
+                )}
+                {!listQ.isLoading && !listQ.isError && filtered.length === 0 && (
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">{search ? "Không tìm thấy doanh nghiệp phù hợp." : "Chưa có doanh nghiệp nào — bấm \"Thêm doanh nghiệp\" để bắt đầu."}</td></tr>
+                )}
+                {filtered.map((dn) => (
                   <tr key={dn.id} className="border-t border-border hover:bg-emerald-50/30">
                     <td className="px-4 py-3"><input type="checkbox" className="accent-primary" /></td>
                     <td className="px-3 py-3">
@@ -156,7 +225,7 @@ export default function DoanhNghiepPage() {
           </div>
 
           <div className="flex items-center justify-between px-4 py-3 border-t border-border text-[13px] text-muted-foreground">
-            <div>Hiển thị 1–6 trong tổng số 48 doanh nghiệp</div>
+            <div>Hiển thị {filtered.length} / {items.length} doanh nghiệp</div>
             <div className="flex items-center gap-1">
               <button className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted"><ArrowLeft className="w-4 h-4" /></button>
               {[1, 2, 3, "…", 8].map((p, i) => (
@@ -221,15 +290,15 @@ export default function DoanhNghiepPage() {
                   </div>
 
                   <div className="grid grid-cols-2 gap-4">
-                    <Field label="Mã số thuế" required placeholder="46xxxxxxxx" />
-                    <Field label="Tên đăng nhập" placeholder="vd: cong-ty-abc" />
+                    <Field label="Mã số thuế" required placeholder="46xxxxxxxx" value={form.mst} onChange={(v) => setF("mst", v)} />
+                    <Field label="SĐT doanh nghiệp" placeholder="09xx xxx xxx" value={form.sdt} onChange={(v) => setF("sdt", v)} />
                   </div>
-                  <Field label="Tên doanh nghiệp" required placeholder="Tên đầy đủ theo giấy phép kinh doanh" />
-                  <Field label="Tên hiển thị" required placeholder="Tên ngắn dùng trong giao diện" hint="Tên ngắn hiển thị trong giao diện và truy xuất nguồn gốc." />
+                  <Field label="Tên doanh nghiệp" required placeholder="Tên đầy đủ theo giấy phép kinh doanh" value={form.ten} onChange={(v) => setF("ten", v)} />
+                  <Field label="Tên hiển thị" required placeholder="Tên ngắn dùng trong giao diện" hint="Tên ngắn hiển thị trong giao diện và truy xuất nguồn gốc." value={form.tenHienThi} onChange={(v) => setF("tenHienThi", v)} />
 
                   <div className="grid grid-cols-2 gap-4">
-                    <Field label="Người đại diện" placeholder="Họ và tên" />
-                    <Field label="SĐT doanh nghiệp" placeholder="09xx xxx xxx" />
+                    <Field label="Người đại diện" placeholder="Họ và tên" value={form.daiDien} onChange={(v) => setF("daiDien", v)} />
+                    <Field label="Email" placeholder="lienhe@congty.vn" value={form.email} onChange={(v) => setF("email", v)} />
                   </div>
                 </div>
               )}
@@ -237,10 +306,10 @@ export default function DoanhNghiepPage() {
               {activeTab === "location" && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <Select label="Tỉnh / Thành phố" value="Thái Nguyên" />
-                    <Select label="Xã / Phường" value="-- Chọn --" />
+                    <Field label="Tỉnh / Thành phố" value={form.tinh} onChange={(v) => setF("tinh", v)} />
+                    <Field label="Xã / Phường" placeholder="Vd: Quân Chu" value={form.xa} onChange={(v) => setF("xa", v)} />
                   </div>
-                  <Field label="Địa chỉ chi tiết" placeholder="Số nhà, đường, xóm…" />
+                  <Field label="Địa chỉ chi tiết" placeholder="Số nhà, đường, xóm…" value={form.diaChi} onChange={(v) => setF("diaChi", v)} />
                   <div className="rounded-xl border border-border bg-muted/40 h-44 flex items-center justify-center text-muted-foreground text-sm">
                     <MapPin className="w-4 h-4 mr-2" /> Bản đồ vị trí (tùy chọn)
                   </div>
@@ -250,9 +319,15 @@ export default function DoanhNghiepPage() {
               {activeTab === "modules" && (
                 <div className="space-y-3">
                   <div className="text-[13px] text-muted-foreground mb-1">Chọn các phân hệ doanh nghiệp được phép truy cập.</div>
-                  <ModuleToggle name="ERP" desc="Quản trị nguồn lực doanh nghiệp: bán hàng, kho, kế toán, nhân sự…" defaultChecked icon={LayoutGrid} color="emerald" />
-                  <ModuleToggle name="TXNG" desc="Truy xuất nguồn gốc sản phẩm theo từng lô, mã QR." defaultChecked icon={Package} color="blue" />
-                  <ModuleToggle name="Vùng trồng" desc="Quản lý vùng nguyên liệu, hộ liên kết, bản đồ canh tác." icon={Sprout} color="amber" />
+                  <ModuleToggle name="ERP" desc="Quản trị nguồn lực doanh nghiệp: bán hàng, kho, kế toán, nhân sự…" icon={LayoutGrid} color="emerald" checked={form.modules.includes("ERP")} onChange={(v) => setF("modules", toggleModule(form.modules, "ERP", v))} />
+                  <ModuleToggle name="TXNG" desc="Truy xuất nguồn gốc sản phẩm theo từng lô, mã QR." icon={Package} color="blue" checked={form.modules.includes("TXNG")} onChange={(v) => setF("modules", toggleModule(form.modules, "TXNG", v))} />
+                  <ModuleToggle name="Vùng trồng" desc="Quản lý vùng nguyên liệu, hộ liên kết, bản đồ canh tác." icon={Sprout} color="amber" checked={form.modules.includes("VT")} onChange={(v) => setF("modules", toggleModule(form.modules, "VT", v))} />
+                </div>
+              )}
+
+              {submitErr && (
+                <div className="mt-4 px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">
+                  {submitErr}
                 </div>
               )}
             </div>
@@ -263,15 +338,16 @@ export default function DoanhNghiepPage() {
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={() => setDrawerOpen(false)} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
-                <button className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Lưu nháp</button>
                 <button
+                  disabled={createMu.isPending}
                   onClick={() => {
                     if (activeTab === "general") setActiveTab("location");
                     else if (activeTab === "location") setActiveTab("modules");
-                    else setDrawerOpen(false);
+                    else handleSubmit();
                   }}
-                  className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold shadow-sm hover:brightness-110"
+                  className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold shadow-sm hover:brightness-110 disabled:opacity-60 flex items-center gap-2"
                 >
+                  {createMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
                   {activeTab === "modules" ? "Tạo doanh nghiệp" : "Tiếp tục"}
                 </button>
               </div>
@@ -316,37 +392,29 @@ function Label({ children }: { children: React.ReactNode }) {
   return <div className="text-[13px] font-medium mb-1.5 text-foreground/80">{children}</div>;
 }
 
-function Field({ label, value, placeholder, required, hint }: { label: string; value?: string; placeholder?: string; required?: boolean; hint?: string }) {
+function Field({ label, value, placeholder, required, hint, onChange }: { label: string; value?: string; placeholder?: string; required?: boolean; hint?: string; onChange?: (v: string) => void }) {
   return (
     <div>
       <div className="flex items-center gap-1 mb-1.5">
         <span className="text-[13px] font-medium text-foreground/80">{label}</span>
         {required && <span className="text-rose-500">*</span>}
       </div>
-      <input defaultValue={value} placeholder={placeholder} className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" />
+      <input
+        value={value ?? ""}
+        onChange={(e) => onChange?.(e.target.value)}
+        placeholder={placeholder}
+        className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+      />
       {hint && <div className="text-[11.5px] text-muted-foreground mt-1">{hint}</div>}
     </div>
   );
 }
 
-function Select({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <Label>{label}</Label>
-      <button className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm flex items-center justify-between hover:bg-muted">
-        <span>{value}</span>
-        <ChevronDown className="w-4 h-4 text-muted-foreground" />
-      </button>
-    </div>
-  );
-}
-
-function ModuleToggle({ name, desc, defaultChecked, icon: Icon, color }: { name: string; desc: string; defaultChecked?: boolean; icon: React.ComponentType<{ className?: string }>; color: "emerald" | "blue" | "amber"; }) {
-  const [on, setOn] = useState(!!defaultChecked);
+function ModuleToggle({ name, desc, checked, onChange, icon: Icon, color }: { name: string; desc: string; checked: boolean; onChange: (v: boolean) => void; icon: React.ComponentType<{ className?: string }>; color: "emerald" | "blue" | "amber"; }) {
   const tones = {
-    emerald: { bg: "bg-emerald-50", text: "text-emerald-700", border: on ? "border-emerald-300 bg-emerald-50/40" : "border-border" },
-    blue: { bg: "bg-blue-50", text: "text-blue-700", border: on ? "border-blue-300 bg-blue-50/40" : "border-border" },
-    amber: { bg: "bg-amber-50", text: "text-amber-700", border: on ? "border-amber-300 bg-amber-50/40" : "border-border" },
+    emerald: { bg: "bg-emerald-50", text: "text-emerald-700", border: checked ? "border-emerald-300 bg-emerald-50/40" : "border-border" },
+    blue: { bg: "bg-blue-50", text: "text-blue-700", border: checked ? "border-blue-300 bg-blue-50/40" : "border-border" },
+    amber: { bg: "bg-amber-50", text: "text-amber-700", border: checked ? "border-amber-300 bg-amber-50/40" : "border-border" },
   }[color];
   return (
     <div className={`border rounded-xl p-4 flex items-center gap-4 transition ${tones.border}`}>
@@ -358,11 +426,15 @@ function ModuleToggle({ name, desc, defaultChecked, icon: Icon, color }: { name:
         <div className="text-[12.5px] text-muted-foreground leading-snug">{desc}</div>
       </div>
       <button
-        onClick={() => setOn(!on)}
-        className={`relative w-11 h-6 rounded-full transition ${on ? "bg-primary" : "bg-muted"}`}
+        onClick={() => onChange(!checked)}
+        className={`relative w-11 h-6 rounded-full transition ${checked ? "bg-primary" : "bg-muted"}`}
       >
-        <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition ${on ? "left-[22px]" : "left-0.5"}`} />
+        <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition ${checked ? "left-[22px]" : "left-0.5"}`} />
       </button>
     </div>
   );
+}
+
+function toggleModule(arr: ("ERP" | "TXNG" | "VT")[], m: "ERP" | "TXNG" | "VT", on: boolean): ("ERP" | "TXNG" | "VT")[] {
+  return on ? Array.from(new Set([...arr, m])) : arr.filter((x) => x !== m);
 }

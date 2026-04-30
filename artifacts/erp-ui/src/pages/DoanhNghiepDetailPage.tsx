@@ -1,28 +1,13 @@
 import { useState } from "react";
 import { useLocation, useParams } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   ArrowLeft, Pencil, MoreHorizontal, Search, MapPin, Phone, Mail,
   Building2, Users, Package, Sprout, FileText, Download,
-  CheckCircle2, AlertCircle, Clock, Globe, Hash, Calendar, LayoutGrid,
+  CheckCircle2, AlertCircle, Clock, Globe, Hash, Calendar, LayoutGrid, Loader2,
 } from "lucide-react";
-
-const MEMBERS = [
-  { name: "Nguyễn Văn Hùng",   role: "Admin",     phone: "0987 123 456", email: "hung.nv@chequanchu.vn",  initials: "NH", color: "bg-emerald-500", status: "active",  lastSeen: "Đang online" },
-  { name: "Hoàng Minh Tuấn",   role: "Quản lý",   phone: "0934 678 123", email: "tuan.hm@chequanchu.vn",  initials: "HT", color: "bg-teal-500",    status: "active",  lastSeen: "5 phút trước" },
-  { name: "Đặng Thanh Hà",     role: "Kế toán",   phone: "0966 222 333", email: "ha.dt@chequanchu.vn",    initials: "ĐH", color: "bg-violet-500",  status: "active",  lastSeen: "1 giờ trước" },
-  { name: "Lý Thị Hồng",       role: "Nhân viên", phone: "0977 444 555", email: "hong.lt@chequanchu.vn",  initials: "LH", color: "bg-rose-500",    status: "active",  lastSeen: "Hôm qua" },
-  { name: "Bùi Quốc Bảo",      role: "Nhân viên", phone: "0988 666 777", email: "bao.bq@chequanchu.vn",   initials: "BB", color: "bg-blue-500",    status: "invited", lastSeen: "Chưa đăng nhập" },
-  { name: "Trần Văn Khoa",     role: "Nhân viên", phone: "0901 888 999", email: "khoa.tv@chequanchu.vn",  initials: "TK", color: "bg-amber-500",   status: "active",  lastSeen: "Hôm nay" },
-];
-
-const ACTIVITY = [
-  { time: "Hôm nay · 14:32", user: "Nguyễn Văn Hùng", action: "Cập nhật thông tin", detail: "Thay đổi địa chỉ doanh nghiệp", icon: Pencil, tone: "blue" },
-  { time: "Hôm nay · 09:15", user: "Hoàng Minh Tuấn", action: "Thêm nhân viên mới", detail: "Trần Văn Khoa được thêm vào hệ thống", icon: Users, tone: "emerald" },
-  { time: "Hôm qua · 16:48", user: "Admin ESG",        action: "Kích hoạt phân hệ",   detail: "Bật phân hệ Vùng trồng cho doanh nghiệp", icon: CheckCircle2, tone: "emerald" },
-  { time: "28/04 · 10:22",   user: "Nguyễn Văn Hùng", action: "Tải lên hồ sơ",       detail: "Upload Giấy phép kinh doanh.pdf", icon: FileText, tone: "amber" },
-  { time: "26/04 · 08:05",   user: "Hệ thống",        action: "Tạo doanh nghiệp",    detail: "Doanh nghiệp được khởi tạo và phê duyệt", icon: Building2, tone: "blue" },
-];
+import { fetchEnterprise, type Employee } from "@/lib/api";
 
 const TONES: Record<string, string> = {
   emerald: "bg-emerald-50 text-emerald-700",
@@ -38,10 +23,65 @@ const ROLE_CLR: Record<string, string> = {
   "Kế toán": "bg-violet-50 text-violet-700 ring-violet-600/20",
 };
 
+const STATUS_LABEL: Record<string, { text: string; cls: string; dot: string }> = {
+  active: { text: "Đang hoạt động", cls: "bg-emerald-50 text-emerald-700 ring-emerald-600/20", dot: "bg-emerald-500" },
+  pending: { text: "Chờ duyệt", cls: "bg-amber-50 text-amber-700 ring-amber-600/20", dot: "bg-amber-500" },
+  locked: { text: "Tạm khóa", cls: "bg-slate-100 text-slate-600 ring-slate-500/20", dot: "bg-slate-400" },
+};
+
+function getInitials(name: string) {
+  return name.trim().split(/\s+/).slice(-2).map((s) => s[0]?.toUpperCase() ?? "").join("") || "??";
+}
+
+function formatDate(iso: string) {
+  try {
+    const d = new Date(iso);
+    return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
+  } catch {
+    return iso;
+  }
+}
+
 export default function DoanhNghiepDetailPage() {
-  useParams();
+  const params = useParams<{ id?: string }>();
+  const id = Number(params.id);
   const [, setLocation] = useLocation();
   const [tab, setTab] = useState<"overview" | "members" | "activity" | "documents">("overview");
+
+  const q = useQuery({
+    queryKey: ["enterprise", id],
+    queryFn: () => fetchEnterprise(id),
+    enabled: Number.isFinite(id),
+  });
+
+  if (q.isLoading) {
+    return (
+      <AppLayout>
+        <div className="bg-white border border-border rounded-xl p-12 text-center text-muted-foreground">
+          <Loader2 className="w-6 h-6 animate-spin inline mr-2" />Đang tải hồ sơ doanh nghiệp…
+        </div>
+      </AppLayout>
+    );
+  }
+
+  if (q.isError || !q.data) {
+    return (
+      <AppLayout>
+        <div className="bg-white border border-border rounded-xl p-12 text-center">
+          <div className="text-rose-600 font-medium mb-2">Không tìm thấy doanh nghiệp</div>
+          <div className="text-[13px] text-muted-foreground mb-4">{(q.error as Error)?.message ?? "Doanh nghiệp này có thể đã bị xóa."}</div>
+          <button onClick={() => setLocation("/quan-tri/doanh-nghiep")} className="h-10 px-4 rounded-lg border border-border hover:bg-muted text-[13.5px] font-medium">Quay lại danh sách</button>
+        </div>
+      </AppLayout>
+    );
+  }
+
+  const dn = q.data.item;
+  const members = q.data.members;
+  const status = STATUS_LABEL[dn.status] ?? STATUS_LABEL.active;
+  const lead = members.find((m) => m.role === "Admin") ?? members[0] ?? null;
+  const adminCount = members.filter((m) => m.status === "active").length;
+  const invitedCount = members.filter((m) => m.status === "invited").length;
 
   return (
     <AppLayout>
@@ -56,18 +96,20 @@ export default function DoanhNghiepDetailPage() {
           </button>
 
           <div className="flex items-start gap-5 flex-wrap">
-            <div className="w-20 h-20 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center text-2xl font-bold shadow-sm shrink-0">CQ</div>
+            <div className={`w-20 h-20 rounded-2xl flex items-center justify-center text-2xl font-bold shadow-sm shrink-0 ${dn.logoColor}`}>
+              {getInitials(dn.tenHienThi)}
+            </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl lg:text-[22px] font-bold leading-tight">Hợp tác xã Chè Quân Chu</h1>
-                <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5" /> Đang hoạt động
+                <h1 className="text-xl lg:text-[22px] font-bold leading-tight">{dn.ten}</h1>
+                <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ring-1 ring-inset ${status.cls}`}>
+                  <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${status.dot}`} /> {status.text}
                 </span>
               </div>
               <div className="text-[13.5px] text-muted-foreground mt-1 flex items-center gap-4 flex-wrap">
-                <span className="flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> MST: <b className="text-foreground font-mono">4601234567</b></span>
-                <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> Xã Quân Chu, Đại Từ, Thái Nguyên</span>
-                <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Tham gia 26/04/2026</span>
+                <span className="flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> MST: <b className="text-foreground font-mono">{dn.mst}</b></span>
+                {dn.diaChi && <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" /> {dn.diaChi}</span>}
+                <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Tham gia {formatDate(dn.createdAt)}</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
@@ -86,7 +128,7 @@ export default function DoanhNghiepDetailPage() {
           <div className="flex gap-1 mt-5 -mb-5 border-b border-border overflow-x-auto">
             {[
               { k: "overview",  label: "Tổng quan" },
-              { k: "members",   label: "Nhân viên (24)" },
+              { k: "members",   label: `Nhân viên (${members.length})` },
               { k: "activity",  label: "Lịch sử thay đổi" },
               { k: "documents", label: "Tài liệu" },
             ].map((t) => (
@@ -105,89 +147,85 @@ export default function DoanhNghiepDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
             <div className="lg:col-span-2 space-y-5">
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-                <MiniStat label="Nhân viên" value="24" tone="emerald" icon={Users} />
-                <MiniStat label="Lô sản phẩm" value="148" tone="blue" icon={Package} />
-                <MiniStat label="Vùng trồng" value="6" tone="amber" icon={Sprout} />
-                <MiniStat label="Đã quét QR" value="2.4K" tone="rose" icon={Globe} />
+                <MiniStat label="Nhân viên" value={String(members.length)} tone="emerald" icon={Users} />
+                <MiniStat label="Đã kích hoạt" value={String(adminCount)} tone="blue" icon={CheckCircle2} />
+                <MiniStat label="Đang chờ mời" value={String(invitedCount)} tone="amber" icon={Mail} />
+                <MiniStat label="Phân hệ" value={String(dn.modules.length)} tone="rose" icon={LayoutGrid} />
               </div>
 
               <Card title="Hồ sơ chung" actionLabel="Sửa">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
-                  <Info label="Tên doanh nghiệp" value="Hợp tác xã Chè Quân Chu" />
-                  <Info label="Tên hiển thị" value="Chè Quân Chu" />
-                  <Info label="Mã số thuế" value="4601234567" mono />
-                  <Info label="Tên đăng nhập" value="che-quan-chu" mono />
-                  <Info label="Người đại diện" value="Nguyễn Văn Hùng" />
-                  <Info label="SĐT doanh nghiệp" value="0987 123 456" icon={Phone} />
+                  <Info label="Tên doanh nghiệp" value={dn.ten} />
+                  <Info label="Tên hiển thị" value={dn.tenHienThi} />
+                  <Info label="Mã số thuế" value={dn.mst} mono />
+                  <Info label="Email" value={dn.email || "—"} icon={Mail} />
+                  <Info label="Người đại diện" value={dn.daiDien || "—"} />
+                  <Info label="SĐT doanh nghiệp" value={dn.sdt || "—"} icon={Phone} />
                 </div>
               </Card>
 
               <Card title="Vị trí địa lý" actionLabel="Sửa">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-4">
-                  <Info label="Tỉnh / Thành phố" value="Thái Nguyên" />
-                  <Info label="Xã / Phường" value="Xã Quân Chu" />
+                  <Info label="Tỉnh / Thành phố" value={dn.tinh || "—"} />
+                  <Info label="Xã / Phường" value={dn.xa || "—"} />
                   <div className="md:col-span-2">
-                    <Info label="Địa chỉ chi tiết" value="Xóm Cây Hồng, Xã Quân Chu, Huyện Đại Từ, Tỉnh Thái Nguyên" icon={MapPin} />
+                    <Info label="Địa chỉ chi tiết" value={dn.diaChi || "—"} icon={MapPin} />
                   </div>
                 </div>
                 <div className="rounded-xl border border-border h-44 flex items-center justify-center text-muted-foreground text-sm relative overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-50">
                   <div className="relative z-10 flex items-center gap-2 px-3 py-1.5 rounded-full bg-white shadow text-emerald-700 text-[12.5px] font-medium">
-                    <MapPin className="w-3.5 h-3.5" /> 21.5731° N, 105.7281° E
+                    <MapPin className="w-3.5 h-3.5" /> Bản đồ vị trí (chưa cấu hình)
                   </div>
                 </div>
               </Card>
 
               <Card title="Phân hệ đang sử dụng" actionLabel="Quản lý">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                  <ModuleCard name="ERP" desc="Quản trị nguồn lực" icon={LayoutGrid} color="emerald" usage="Đang dùng · 24 user" />
-                  <ModuleCard name="TXNG" desc="Truy xuất nguồn gốc" icon={Package} color="blue" usage="Đang dùng · 148 lô" />
-                  <ModuleCard name="Vùng trồng" desc="Quản lý vùng nguyên liệu" icon={Sprout} color="amber" usage="Đang dùng · 6 vùng" />
+                  {dn.modules.includes("ERP") && <ModuleCard name="ERP" desc="Quản trị nguồn lực" icon={LayoutGrid} color="emerald" usage={`Đang dùng · ${members.length} user`} />}
+                  {dn.modules.includes("TXNG") && <ModuleCard name="TXNG" desc="Truy xuất nguồn gốc" icon={Package} color="blue" usage="Đang dùng" />}
+                  {dn.modules.includes("VT") && <ModuleCard name="Vùng trồng" desc="Quản lý vùng nguyên liệu" icon={Sprout} color="amber" usage="Đang dùng" />}
+                  {dn.modules.length === 0 && <div className="text-[13px] text-muted-foreground col-span-3 py-4 text-center">Chưa kích hoạt phân hệ nào.</div>}
                 </div>
               </Card>
             </div>
 
             <div className="space-y-5">
               <Card title="Liên hệ chính">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-full bg-primary text-primary-foreground text-[14px] font-semibold flex items-center justify-center">NH</div>
-                  <div className="min-w-0">
-                    <div className="font-medium text-foreground">Nguyễn Văn Hùng</div>
-                    <div className="text-[12px] text-muted-foreground">Người đại diện · Admin</div>
-                  </div>
-                </div>
-                <div className="space-y-2 text-[13px]">
-                  <div className="flex items-center gap-2 text-foreground/80"><Phone className="w-3.5 h-3.5 text-muted-foreground" />0987 123 456</div>
-                  <div className="flex items-center gap-2 text-foreground/80"><Mail className="w-3.5 h-3.5 text-muted-foreground" />hung.nv@chequanchu.vn</div>
-                </div>
+                {lead ? (
+                  <>
+                    <div className="flex items-center gap-3 mb-4">
+                      <div className={`w-12 h-12 rounded-full text-white text-[14px] font-semibold flex items-center justify-center ${lead.avatarColor}`}>{getInitials(lead.name)}</div>
+                      <div className="min-w-0">
+                        <div className="font-medium text-foreground">{lead.name}</div>
+                        <div className="text-[12px] text-muted-foreground">{lead.role}</div>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-[13px]">
+                      <div className="flex items-center gap-2 text-foreground/80"><Phone className="w-3.5 h-3.5 text-muted-foreground" />{lead.phone || "—"}</div>
+                      <div className="flex items-center gap-2 text-foreground/80"><Mail className="w-3.5 h-3.5 text-muted-foreground" />{lead.email || "—"}</div>
+                    </div>
+                  </>
+                ) : (
+                  <div className="text-[13px] text-muted-foreground py-2">Chưa có nhân viên nào.</div>
+                )}
               </Card>
 
               <Card title="Tài liệu pháp lý" actionLabel="Tải lên">
-                <div className="space-y-2">
-                  {[
-                    { name: "Giấy phép kinh doanh.pdf", size: "2.4 MB", date: "28/04/2026" },
-                    { name: "Chứng nhận VietGAP.pdf",   size: "1.1 MB", date: "26/04/2026" },
-                    { name: "Hợp đồng nguyên liệu.pdf", size: "850 KB", date: "20/04/2026" },
-                  ].map((d) => (
-                    <div key={d.name} className="flex items-center gap-3 p-2.5 rounded-lg border border-border hover:bg-muted/40 transition">
-                      <div className="w-9 h-9 rounded-lg bg-rose-50 text-rose-600 flex items-center justify-center shrink-0">
-                        <FileText className="w-4 h-4" />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <div className="text-[13px] font-medium text-foreground truncate">{d.name}</div>
-                        <div className="text-[11.5px] text-muted-foreground">{d.size} · {d.date}</div>
-                      </div>
-                      <button className="p-1.5 text-muted-foreground hover:text-foreground"><Download className="w-4 h-4" /></button>
-                    </div>
-                  ))}
+                <div className="text-[13px] text-muted-foreground py-4 text-center">
+                  Chưa có tài liệu nào.
                 </div>
               </Card>
 
               <Card title="Trạng thái hệ thống">
                 <div className="space-y-3 text-[13px]">
-                  <Status icon={CheckCircle2} tone="emerald" label="Hồ sơ đã được phê duyệt" sub="26/04/2026" />
-                  <Status icon={CheckCircle2} tone="emerald" label="Đã xác minh MST" sub="Tự động qua API thuế" />
-                  <Status icon={Clock}        tone="amber"   label="Chứng nhận VietGAP" sub="Hết hạn sau 84 ngày" />
-                  <Status icon={AlertCircle}  tone="rose"    label="2 nhân viên chưa kích hoạt" sub="Cần nhắc lại email mời" />
+                  <Status icon={CheckCircle2} tone="emerald" label={`Hồ sơ ${status.text.toLowerCase()}`} sub={formatDate(dn.createdAt)} />
+                  <Status icon={CheckCircle2} tone="emerald" label="Đã có Mã số thuế" sub={dn.mst} />
+                  {invitedCount > 0 && (
+                    <Status icon={AlertCircle} tone="rose" label={`${invitedCount} nhân viên chưa kích hoạt`} sub="Cần nhắc lại email mời" />
+                  )}
+                  {dn.modules.length === 0 && (
+                    <Status icon={Clock} tone="amber" label="Chưa kích hoạt phân hệ" sub="Vào tab Phân hệ để bật" />
+                  )}
                 </div>
               </Card>
             </div>
@@ -201,8 +239,6 @@ export default function DoanhNghiepDetailPage() {
                 <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input placeholder="Tìm theo tên, email, SĐT…" className="w-full h-10 pl-9 pr-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary" />
               </div>
-              <button className="h-10 px-3 rounded-lg border border-border text-sm flex items-center gap-2 hover:bg-muted text-muted-foreground">Vai trò</button>
-              <button className="h-10 px-3 rounded-lg border border-border text-sm flex items-center gap-2 hover:bg-muted text-muted-foreground">Trạng thái</button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-sm min-w-[700px]">
@@ -217,11 +253,14 @@ export default function DoanhNghiepDetailPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {MEMBERS.map((m) => (
-                    <tr key={m.email} className="border-t border-border hover:bg-emerald-50/30">
+                  {members.length === 0 && (
+                    <tr><td colSpan={6} className="px-3 py-8 text-center text-muted-foreground">Chưa có nhân viên nào trong doanh nghiệp này.</td></tr>
+                  )}
+                  {members.map((m: Employee) => (
+                    <tr key={m.id} className="border-t border-border hover:bg-emerald-50/30">
                       <td className="px-3 py-3">
                         <div className="flex items-center gap-3">
-                          <div className={`w-9 h-9 rounded-full text-white text-[12.5px] font-semibold flex items-center justify-center ${m.color}`}>{m.initials}</div>
+                          <div className={`w-9 h-9 rounded-full text-white text-[12.5px] font-semibold flex items-center justify-center ${m.avatarColor}`}>{getInitials(m.name)}</div>
                           <div className="font-medium text-foreground">{m.name}</div>
                         </div>
                       </td>
@@ -229,14 +268,16 @@ export default function DoanhNghiepDetailPage() {
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ring-1 ring-inset ${ROLE_CLR[m.role]}`}>{m.role}</span>
                       </td>
                       <td className="px-3 py-3">
-                        <div className="text-[13px] text-foreground">{m.email}</div>
-                        <div className="text-[12px] text-muted-foreground">{m.phone}</div>
+                        <div className="text-[13px] text-foreground">{m.email || "—"}</div>
+                        <div className="text-[12px] text-muted-foreground">{m.phone || "—"}</div>
                       </td>
                       <td className="px-3 py-3">
                         {m.status === "active" ? (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ring-1 ring-inset bg-emerald-50 text-emerald-700 ring-emerald-600/20"><span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5" />Hoạt động</span>
-                        ) : (
+                        ) : m.status === "invited" ? (
                           <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ring-1 ring-inset bg-amber-50 text-amber-700 ring-amber-600/20"><span className="w-1.5 h-1.5 rounded-full bg-amber-500 mr-1.5" />Đã mời</span>
+                        ) : (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ring-1 ring-inset bg-slate-100 text-slate-600 ring-slate-500/20"><span className="w-1.5 h-1.5 rounded-full bg-slate-400 mr-1.5" />Tạm khóa</span>
                         )}
                       </td>
                       <td className="px-3 py-3 text-[12.5px] text-muted-foreground">{m.lastSeen}</td>
@@ -254,44 +295,29 @@ export default function DoanhNghiepDetailPage() {
         {tab === "activity" && (
           <Card title="Lịch sử thay đổi">
             <div className="space-y-0">
-              {ACTIVITY.map((a, i) => (
-                <div key={i} className="flex gap-3 py-3 border-b border-border last:border-b-0">
-                  <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${TONES[a.tone]}`}>
-                    <a.icon className="w-4 h-4" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-[13.5px]">
-                      <span className="font-medium text-foreground">{a.user}</span>
-                      <span className="text-muted-foreground"> · {a.action}</span>
-                    </div>
-                    <div className="text-[12.5px] text-muted-foreground mt-0.5">{a.detail}</div>
-                  </div>
-                  <div className="text-[11.5px] text-muted-foreground shrink-0">{a.time}</div>
+              <div className="flex gap-3 py-3 border-b border-border">
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${TONES.blue}`}>
+                  <Building2 className="w-4 h-4" />
                 </div>
-              ))}
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13.5px]">
+                    <span className="font-medium text-foreground">Hệ thống</span>
+                    <span className="text-muted-foreground"> · Tạo doanh nghiệp</span>
+                  </div>
+                  <div className="text-[12.5px] text-muted-foreground mt-0.5">Doanh nghiệp được khởi tạo trên hệ thống</div>
+                </div>
+                <div className="text-[11.5px] text-muted-foreground shrink-0">{formatDate(dn.createdAt)}</div>
+              </div>
+              <div className="px-2 py-6 text-center text-[12.5px] text-muted-foreground">Lịch sử thay đổi chi tiết sẽ được bổ sung sau.</div>
             </div>
           </Card>
         )}
 
         {tab === "documents" && (
           <Card title="Tài liệu" actionLabel="+ Tải lên">
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              {[
-                { name: "Giấy phép kinh doanh.pdf", size: "2.4 MB", date: "28/04/2026", color: "bg-rose-50 text-rose-700" },
-                { name: "Chứng nhận VietGAP.pdf",   size: "1.1 MB", date: "26/04/2026", color: "bg-emerald-50 text-emerald-700" },
-                { name: "Hợp đồng nguyên liệu.pdf", size: "850 KB", date: "20/04/2026", color: "bg-blue-50 text-blue-700" },
-                { name: "Báo cáo SX Q1-2026.xlsx",  size: "320 KB", date: "15/04/2026", color: "bg-emerald-50 text-emerald-700" },
-                { name: "Logo doanh nghiệp.png",     size: "180 KB", date: "10/04/2026", color: "bg-violet-50 text-violet-700" },
-                { name: "Hợp đồng nhân sự.pdf",      size: "640 KB", date: "05/04/2026", color: "bg-amber-50 text-amber-700" },
-              ].map((d) => (
-                <div key={d.name} className="border border-border rounded-xl p-4 hover:bg-muted/40 cursor-pointer transition">
-                  <div className={`w-10 h-10 rounded-lg flex items-center justify-center mb-3 ${d.color}`}>
-                    <FileText className="w-5 h-5" />
-                  </div>
-                  <div className="text-[13px] font-medium text-foreground truncate">{d.name}</div>
-                  <div className="text-[11.5px] text-muted-foreground mt-0.5">{d.size} · {d.date}</div>
-                </div>
-              ))}
+            <div className="text-[13px] text-muted-foreground py-8 text-center">
+              <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
+              Chưa có tài liệu nào được tải lên cho doanh nghiệp này.
             </div>
           </Card>
         )}

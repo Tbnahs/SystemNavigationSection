@@ -1,49 +1,96 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   Search, Plus, Filter, Download, MoreHorizontal, ChevronDown, X, Upload,
   Users, Package, Sprout, Bell, Pencil, Mail, Phone, ArrowLeft, ArrowRight,
-  Shield, Eye, LayoutGrid,
+  Shield, Eye, LayoutGrid, Loader2,
 } from "lucide-react";
+import {
+  fetchEmployees, fetchEmployeeStats, createEmployee, fetchEnterprises,
+  type Employee,
+} from "@/lib/api";
 
-type UserRow = {
-  id: string;
-  name: string;
-  email: string;
-  phone: string;
-  dn: string;
-  dnColor: string;
-  role: "Admin" | "Quản lý" | "Nhân viên" | "Kế toán";
-  status: "active" | "invited" | "locked";
-  initials: string;
-  avatarColor: string;
-  lastSeen: string;
-};
-
-const USERS: UserRow[] = [
-  { id: "1", name: "Nguyễn Văn Hùng", email: "hung.nv@chequanchu.vn", phone: "0987 123 456", dn: "Chè Quân Chu", dnColor: "bg-emerald-100 text-emerald-700", role: "Admin", status: "active", initials: "NH", avatarColor: "bg-emerald-500", lastSeen: "Đang online" },
-  { id: "2", name: "Trần Thị Mai", email: "mai.tt@tancuongxanh.vn", phone: "0912 345 678", dn: "Tân Cương Xanh", dnColor: "bg-blue-100 text-blue-700", role: "Quản lý", status: "active", initials: "TM", avatarColor: "bg-blue-500", lastSeen: "5 phút trước" },
-  { id: "3", name: "Lê Quốc Anh", email: "anh.lq@labangorganic.vn", phone: "0903 567 890", dn: "La Bằng Organic", dnColor: "bg-amber-100 text-amber-700", role: "Nhân viên", status: "invited", initials: "LA", avatarColor: "bg-amber-500", lastSeen: "Chưa đăng nhập" },
-  { id: "4", name: "Phạm Hồng Sơn", email: "son.ph@phucvinh.vn", phone: "0978 234 567", dn: "Phúc Vinh Tea", dnColor: "bg-purple-100 text-purple-700", role: "Kế toán", status: "active", initials: "PS", avatarColor: "bg-purple-500", lastSeen: "1 giờ trước" },
-  { id: "5", name: "Hoàng Minh Tuấn", email: "tuan.hm@chequanchu.vn", phone: "0934 678 123", dn: "Chè Quân Chu", dnColor: "bg-emerald-100 text-emerald-700", role: "Nhân viên", status: "active", initials: "HT", avatarColor: "bg-teal-500", lastSeen: "Hôm qua" },
-  { id: "6", name: "Vũ Thị Lan", email: "lan.vt@songcautea.vn", phone: "0945 789 012", dn: "Sông Cầu Tea", dnColor: "bg-teal-100 text-teal-700", role: "Quản lý", status: "locked", initials: "VL", avatarColor: "bg-rose-500", lastSeen: "12/04/2026" },
+const AVATAR_COLORS = [
+  "bg-emerald-500", "bg-blue-500", "bg-amber-500", "bg-violet-500",
+  "bg-rose-500", "bg-teal-500", "bg-indigo-500", "bg-orange-500",
 ];
 
-const STATUS: Record<UserRow["status"], { text: string; cls: string; dot: string }> = {
+const STATUS: Record<Employee["status"], { text: string; cls: string; dot: string }> = {
   active: { text: "Đang hoạt động", cls: "bg-emerald-50 text-emerald-700 ring-emerald-600/20", dot: "bg-emerald-500" },
   invited: { text: "Đã mời", cls: "bg-amber-50 text-amber-700 ring-amber-600/20", dot: "bg-amber-500" },
   locked: { text: "Tạm khóa", cls: "bg-slate-100 text-slate-600 ring-slate-500/20", dot: "bg-slate-400" },
 };
 
-const ROLE_CLR: Record<UserRow["role"], string> = {
+const ROLE_CLR: Record<Employee["role"], string> = {
   Admin: "bg-rose-50 text-rose-700 ring-rose-600/20",
   "Quản lý": "bg-blue-50 text-blue-700 ring-blue-600/20",
   "Nhân viên": "bg-slate-50 text-slate-700 ring-slate-500/20",
   "Kế toán": "bg-violet-50 text-violet-700 ring-violet-600/20",
 };
 
+type EForm = {
+  name: string;
+  email: string;
+  phone: string;
+  enterpriseId: number | null;
+  role: Employee["role"];
+};
+const EMPTY_E: EForm = { name: "", email: "", phone: "", enterpriseId: null, role: "Nhân viên" };
+
+function getInitials(name: string) {
+  return name.trim().split(/\s+/).slice(-2).map((s) => s[0]?.toUpperCase() ?? "").join("") || "??";
+}
+
+const DN_COLORS = [
+  "bg-emerald-100 text-emerald-700", "bg-blue-100 text-blue-700",
+  "bg-amber-100 text-amber-700", "bg-purple-100 text-purple-700",
+  "bg-rose-100 text-rose-700", "bg-teal-100 text-teal-700",
+];
+function colorFor(idx: number) { return DN_COLORS[idx % DN_COLORS.length]; }
+
 export default function NhanVienPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [form, setForm] = useState<EForm>(EMPTY_E);
+  const [submitErr, setSubmitErr] = useState<string | null>(null);
+
+  const qc = useQueryClient();
+  const listQ = useQuery({ queryKey: ["employees"], queryFn: fetchEmployees });
+  const statsQ = useQuery({ queryKey: ["employees-stats"], queryFn: fetchEmployeeStats });
+  const dnQ = useQuery({ queryKey: ["enterprises"], queryFn: fetchEnterprises });
+
+  const createMu = useMutation({
+    mutationFn: (body: EForm) =>
+      createEmployee({
+        ...body,
+        status: "invited",
+        avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
+        lastSeen: "Chưa đăng nhập",
+      }),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["employees"] });
+      qc.invalidateQueries({ queryKey: ["employees-stats"] });
+      setForm(EMPTY_E);
+      setDrawerOpen(false);
+      setSubmitErr(null);
+    },
+    onError: (e: Error) => setSubmitErr(e.message),
+  });
+
+  const items = listQ.data?.items ?? [];
+  const filtered = search.trim()
+    ? items.filter((u) =>
+        [u.name, u.email, u.phone].some((s) => s.toLowerCase().includes(search.toLowerCase()))
+      )
+    : items;
+
+  function setF<K extends keyof EForm>(k: K, v: EForm[K]) { setForm((p) => ({ ...p, [k]: v })); }
+  function handleSubmit() {
+    setSubmitErr(null);
+    if (!form.name.trim()) { setSubmitErr("Vui lòng nhập họ và tên."); return; }
+    createMu.mutate(form);
+  }
 
   return (
     <AppLayout>
@@ -54,16 +101,18 @@ export default function NhanVienPage() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Stat label="Tổng nhân viên" value="124" delta="+8 trong tuần" tone="emerald" icon={Users} />
-          <Stat label="Đang hoạt động" value="118" delta="95% tổng" tone="blue" icon={Shield} />
-          <Stat label="Đã mời, chờ kích hoạt" value="4" delta="Cần nhắc lại" tone="amber" icon={Mail} />
-          <Stat label="Tạm khóa" value="2" delta="-1 tuần này" tone="rose" icon={X} />
+          <Stat label="Tổng nhân viên" value={String(statsQ.data?.total ?? "—")} delta="Dữ liệu thực tế" tone="emerald" icon={Users} />
+          <Stat label="Đang hoạt động" value={String(statsQ.data?.active ?? "—")} delta={statsQ.data ? `${Math.round(((statsQ.data.active || 0) / Math.max(statsQ.data.total, 1)) * 100)}% tổng` : ""} tone="blue" icon={Shield} />
+          <Stat label="Đã mời, chờ kích hoạt" value={String(statsQ.data?.invited ?? "—")} delta="Cần nhắc lại" tone="amber" icon={Mail} />
+          <Stat label="Tạm khóa" value={String(statsQ.data?.locked ?? "—")} delta="" tone="rose" icon={X} />
         </div>
 
         <div className="bg-white border border-border rounded-xl p-3 lg:p-4 flex items-center gap-2 flex-wrap">
           <div className="relative flex-1 min-w-[220px]">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
               placeholder="Tìm theo tên, email, SĐT…"
               className="w-full h-10 pl-9 pr-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
             />
@@ -102,24 +151,33 @@ export default function NhanVienPage() {
                 </tr>
               </thead>
               <tbody>
-                {USERS.map((u) => (
+                {listQ.isLoading && (
+                  <tr><td colSpan={8} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>
+                )}
+                {listQ.isError && (
+                  <tr><td colSpan={8} className="px-4 py-10 text-center text-rose-600">Lỗi: {(listQ.error as Error).message}</td></tr>
+                )}
+                {!listQ.isLoading && !listQ.isError && filtered.length === 0 && (
+                  <tr><td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">{search ? "Không tìm thấy nhân viên phù hợp." : "Chưa có nhân viên nào."}</td></tr>
+                )}
+                {filtered.map((u, i) => (
                   <tr key={u.id} className="border-t border-border hover:bg-emerald-50/30">
                     <td className="px-4 py-3"><input type="checkbox" className="accent-primary" /></td>
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-full text-white text-[12.5px] font-semibold flex items-center justify-center ${u.avatarColor}`}>{u.initials}</div>
+                        <div className={`w-9 h-9 rounded-full text-white text-[12.5px] font-semibold flex items-center justify-center ${u.avatarColor}`}>{getInitials(u.name)}</div>
                         <div>
                           <div className="font-medium text-foreground">{u.name}</div>
-                          <div className="text-[11.5px] text-muted-foreground">ID: USR-{1000 + Number(u.id)}</div>
+                          <div className="text-[11.5px] text-muted-foreground">ID: USR-{1000 + u.id}</div>
                         </div>
                       </div>
                     </td>
                     <td className="px-3 py-3">
-                      <div className="flex items-center gap-1.5 text-[13px] text-foreground"><Mail className="w-3.5 h-3.5 text-muted-foreground" />{u.email}</div>
-                      <div className="flex items-center gap-1.5 text-[12.5px] text-muted-foreground mt-0.5"><Phone className="w-3 h-3" />{u.phone}</div>
+                      <div className="flex items-center gap-1.5 text-[13px] text-foreground"><Mail className="w-3.5 h-3.5 text-muted-foreground" />{u.email || "—"}</div>
+                      <div className="flex items-center gap-1.5 text-[12.5px] text-muted-foreground mt-0.5"><Phone className="w-3 h-3" />{u.phone || "—"}</div>
                     </td>
                     <td className="px-3 py-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ${u.dnColor}`}>{u.dn}</span>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ${colorFor(i)}`}>{u.enterpriseName ?? "—"}</span>
                     </td>
                     <td className="px-3 py-3">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ring-1 ring-inset ${ROLE_CLR[u.role]}`}>{u.role}</span>
@@ -145,7 +203,7 @@ export default function NhanVienPage() {
           </div>
 
           <div className="flex items-center justify-between px-4 py-3 border-t border-border text-[13px] text-muted-foreground">
-            <div>Hiển thị 1–6 trong tổng số 124 nhân viên</div>
+            <div>Hiển thị {filtered.length} / {items.length} nhân viên</div>
             <div className="flex items-center gap-1">
               <button className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted"><ArrowLeft className="w-4 h-4" /></button>
               {[1, 2, 3, "…", 21].map((p, i) => (
@@ -175,38 +233,45 @@ export default function NhanVienPage() {
               <div>
                 <Label>Ảnh đại diện</Label>
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground text-[18px] font-semibold flex items-center justify-center">NV</div>
+                  <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground text-[18px] font-semibold flex items-center justify-center">{form.name ? getInitials(form.name) : "NV"}</div>
                   <button className="h-9 px-3 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted">
                     <Upload className="w-4 h-4" /> Tải ảnh lên
                   </button>
                 </div>
               </div>
 
-              <Field label="Họ và tên" required placeholder="Nguyễn Văn A" />
+              <Field label="Họ và tên" required placeholder="Nguyễn Văn A" value={form.name} onChange={(v) => setF("name", v)} />
 
               <div className="grid grid-cols-2 gap-4">
-                <Field label="Số điện thoại" required placeholder="09xx xxx xxx" />
-                <Field label="Email" placeholder="ten@congty.vn" />
-              </div>
-
-              <Select label="Doanh nghiệp" value="-- Chọn doanh nghiệp --" />
-
-              <div className="grid grid-cols-2 gap-4">
-                <Select label="Vai trò" value="Nhân viên" />
-                <Select label="Phòng ban" value="-- Chọn --" />
+                <Field label="Số điện thoại" placeholder="09xx xxx xxx" value={form.phone} onChange={(v) => setF("phone", v)} />
+                <Field label="Email" placeholder="ten@congty.vn" value={form.email} onChange={(v) => setF("email", v)} />
               </div>
 
               <div>
-                <Label>Quyền truy cập phân hệ</Label>
-                <div className="grid grid-cols-3 gap-2">
-                  {[
-                    { name: "ERP", icon: LayoutGrid, color: "emerald" as const, on: true },
-                    { name: "TXNG", icon: Package, color: "blue" as const, on: true },
-                    { name: "Vùng trồng", icon: Sprout, color: "amber" as const, on: false },
-                  ].map((m) => (
-                    <ModuleChip key={m.name} {...m} />
+                <Label>Doanh nghiệp</Label>
+                <select
+                  value={form.enterpriseId ?? ""}
+                  onChange={(e) => setF("enterpriseId", e.target.value ? Number(e.target.value) : null)}
+                  className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
+                >
+                  <option value="">-- Không gắn doanh nghiệp --</option>
+                  {(dnQ.data?.items ?? []).map((d) => (
+                    <option key={d.id} value={d.id}>{d.tenHienThi}</option>
                   ))}
-                </div>
+                </select>
+              </div>
+
+              <div>
+                <Label>Vai trò</Label>
+                <select
+                  value={form.role}
+                  onChange={(e) => setF("role", e.target.value as Employee["role"])}
+                  className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
+                >
+                  {(["Admin", "Quản lý", "Nhân viên", "Kế toán"] as const).map((r) => (
+                    <option key={r} value={r}>{r}</option>
+                  ))}
+                </select>
               </div>
 
               <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-3 flex items-start gap-3">
@@ -216,11 +281,22 @@ export default function NhanVienPage() {
                   <div className="text-[12px] text-muted-foreground mt-0.5">Nhân viên sẽ nhận được email kèm liên kết đặt mật khẩu lần đầu.</div>
                 </div>
               </div>
+
+              {submitErr && (
+                <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">
+                  {submitErr}
+                </div>
+              )}
             </div>
 
             <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-2 bg-muted/40">
               <button onClick={() => setDrawerOpen(false)} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
-              <button className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold shadow-sm hover:brightness-110">
+              <button
+                disabled={createMu.isPending}
+                onClick={handleSubmit}
+                className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold shadow-sm hover:brightness-110 disabled:opacity-60 flex items-center gap-2"
+              >
+                {createMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
                 Tạo tài khoản
               </button>
             </div>
@@ -264,40 +340,15 @@ function Label({ children }: { children: React.ReactNode }) {
   return <div className="text-[13px] font-medium mb-1.5 text-foreground/80">{children}</div>;
 }
 
-function Field({ label, value, placeholder, required }: { label: string; value?: string; placeholder?: string; required?: boolean }) {
+function Field({ label, value, placeholder, required, onChange }: { label: string; value?: string; placeholder?: string; required?: boolean; onChange?: (v: string) => void }) {
   return (
     <div>
       <div className="flex items-center gap-1 mb-1.5">
         <span className="text-[13px] font-medium text-foreground/80">{label}</span>
         {required && <span className="text-rose-500">*</span>}
       </div>
-      <input defaultValue={value} placeholder={placeholder} className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" />
+      <input value={value ?? ""} onChange={(e) => onChange?.(e.target.value)} placeholder={placeholder} className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" />
     </div>
   );
 }
 
-function Select({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <Label>{label}</Label>
-      <button className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm flex items-center justify-between hover:bg-muted">
-        <span>{value}</span>
-        <ChevronDown className="w-4 h-4 text-muted-foreground" />
-      </button>
-    </div>
-  );
-}
-
-function ModuleChip({ name, icon: Icon, color, on }: { name: string; icon: React.ComponentType<{ className?: string }>; color: "emerald" | "blue" | "amber"; on: boolean }) {
-  const tones = {
-    emerald: on ? "bg-emerald-50 text-emerald-700 border-emerald-300" : "bg-white text-muted-foreground border-border border-dashed",
-    blue: on ? "bg-blue-50 text-blue-700 border-blue-300" : "bg-white text-muted-foreground border-border border-dashed",
-    amber: on ? "bg-amber-50 text-amber-700 border-amber-300" : "bg-white text-muted-foreground border-border border-dashed",
-  }[color];
-  return (
-    <button className={`h-16 rounded-lg border-2 transition flex flex-col items-center justify-center gap-1 ${tones}`}>
-      <Icon className="w-4 h-4" />
-      <span className="text-[12px] font-medium">{name}</span>
-    </button>
-  );
-}

@@ -21,7 +21,9 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 ```text
 artifacts-monorepo/
 ├── artifacts/              # Deployable applications
-│   └── api-server/         # Express API server
+│   ├── api-server/         # Express API server (REST endpoints)
+│   ├── erp-ui/             # ERP web app (React + Vite + Tailwind)
+│   └── mockup-sandbox/     # Component preview server (canvas)
 ├── lib/                    # Shared libraries
 │   ├── api-spec/           # OpenAPI spec + Orval codegen config
 │   ├── api-client-react/   # Generated React Query hooks
@@ -57,6 +59,7 @@ Express 5 API server. Routes live in `src/routes/` and use `@workspace/api-zod` 
 - Entry: `src/index.ts` — reads `PORT`, starts Express
 - App setup: `src/app.ts` — mounts CORS, JSON/urlencoded parsing, routes at `/api`
 - Routes: `src/routes/index.ts` mounts sub-routers; `src/routes/health.ts` exposes `GET /health` (full path: `/api/health`)
+- ERP routes: `src/routes/enterprises.ts` (`/api/enterprises`, GET/POST/PATCH/DELETE + `/:id` with members + `/enterprises-stats`) and `src/routes/employees.ts` (`/api/employees` CRUD + `/employees-stats`)
 - Depends on: `@workspace/db`, `@workspace/api-zod`
 - `pnpm --filter @workspace/api-server run dev` — run the dev server
 - `pnpm --filter @workspace/api-server run build` — production esbuild bundle (`dist/index.cjs`)
@@ -90,6 +93,18 @@ Generated Zod schemas from the OpenAPI spec (e.g. `HealthCheckResponse`). Used b
 ### `lib/api-client-react` (`@workspace/api-client-react`)
 
 Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHealthCheck`, `healthCheck`).
+
+### `artifacts/erp-ui` (`@workspace/erp-ui`)
+
+ERP web app for "Chè Quân Chu" tea origin tracing (Vietnamese UI). Vite + React + Tailwind + shadcn-style components.
+
+- Routing via `wouter` in `src/App.tsx`. All app routes wrapped in `AppLayout` (sidebar + header).
+- Auth: `src/contexts/AuthContext.tsx` — accepts any non-empty email/password (mock for now).
+- API access: `src/lib/api.ts` — small typed `fetch` wrapper hitting `/api/*` directly (proxied to api-server). Uses TanStack Query (`useQuery`/`useMutation`).
+- Admin screens (live data, backed by Postgres):
+  - `/quan-tri/doanh-nghiep` — list/create enterprises
+  - `/quan-tri/doanh-nghiep/:id` — enterprise detail with members tab
+  - `/quan-tri/nguoi-dung` — list/create employees
 
 ### `scripts` (`@workspace/scripts`)
 
