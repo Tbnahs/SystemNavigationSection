@@ -22,6 +22,9 @@ import HRPage from "@/pages/HRPage";
 import CRMPage from "@/pages/CRMPage";
 import ReportsPage from "@/pages/ReportsPage";
 import SettingsPage from "@/pages/SettingsPage";
+import DoanhNghiepPage from "@/pages/DoanhNghiepPage";
+import DoanhNghiepDetailPage from "@/pages/DoanhNghiepDetailPage";
+import NhanVienPage from "@/pages/NhanVienPage";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -86,6 +89,15 @@ function Router() {
       </Route>
       <Route path="/module/erp/settings">
         {() => <ProtectedRoute component={SettingsPage} />}
+      </Route>
+      <Route path="/quan-tri/doanh-nghiep">
+        {() => <ProtectedRoute component={DoanhNghiepPage} />}
+      </Route>
+      <Route path="/quan-tri/doanh-nghiep/:id">
+        {() => <ProtectedRoute component={DoanhNghiepDetailPage} />}
+      </Route>
+      <Route path="/quan-tri/nguoi-dung">
+        {() => <ProtectedRoute component={NhanVienPage} />}
       </Route>
       <Route path="/module/:moduleId/:subId">
         {() => <ProtectedRoute component={SubModulePage} />}

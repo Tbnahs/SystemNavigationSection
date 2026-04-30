@@ -6,6 +6,7 @@ import {
   UserCircle, FileBarChart, CheckSquare, BookOpen, ChevronDown,
   QrCode, Link2, Award, Layers, GitBranch, Search,
   MapPin, Sprout, FlaskConical, Scissors, CloudSun, ClipboardCheck,
+  Building2, ShieldCheck,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import logoImg from "@assets/Logo ESG.png";
@@ -49,17 +50,23 @@ const FARMING_SUB_ITEMS = [
   { id: "inspection", icon: ClipboardCheck, label: "Kiểm định" },
 ];
 
+const ADMIN_SUB_ITEMS = [
+  { id: "doanh-nghiep", icon: Building2, label: "Doanh nghiệp" },
+  { id: "nguoi-dung",   icon: Users,     label: "Người dùng" },
+];
+
 /* Shared component: expandable nav item with split click */
 function ExpandableNavItem({
   href, icon: Icon, label, expanded, onToggle, onNavigate,
-  isActive, subItems, location,
+  isActive, subItems, location, subBase: subBaseProp,
 }: {
   href: string; icon: React.ElementType; label: string;
   expanded: boolean; onToggle: () => void; onNavigate: () => void;
   isActive: boolean; subItems: { id: string; icon: React.ElementType; label: string }[];
   location: string;
+  subBase?: string;
 }) {
-  const subBase = href;
+  const subBase = subBaseProp ?? href;
   return (
     <div>
       <div className={`flex items-center rounded-xl text-sm font-medium transition-all ${isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
@@ -115,14 +122,17 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   const isOnErp     = location === "/module/erp"     || location.startsWith("/module/erp/");
   const isOnTxng    = location === "/module/txng"    || location.startsWith("/module/txng/");
   const isOnFarming = location === "/module/farming" || location.startsWith("/module/farming/");
+  const isOnAdmin   = location.startsWith("/quan-tri/");
 
   const [erpExpanded,     setErpExpanded]     = useState(isOnErp);
   const [txngExpanded,    setTxngExpanded]    = useState(isOnTxng);
   const [farmingExpanded, setFarmingExpanded] = useState(isOnFarming);
+  const [adminExpanded,   setAdminExpanded]   = useState(isOnAdmin);
 
   useEffect(() => { if (isOnErp)     setErpExpanded(true);     }, [isOnErp]);
   useEffect(() => { if (isOnTxng)    setTxngExpanded(true);    }, [isOnTxng]);
   useEffect(() => { if (isOnFarming) setFarmingExpanded(true); }, [isOnFarming]);
+  useEffect(() => { if (isOnAdmin)   setAdminExpanded(true);   }, [isOnAdmin]);
 
   const plainItems = [
     { href: "/reports",  icon: TrendingUp, label: t("nav.reports")  },
@@ -200,6 +210,20 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             onNavigate={onClose}
             isActive={isOnFarming}
             subItems={FARMING_SUB_ITEMS}
+            location={location}
+          />
+
+          {/* Quản trị hệ thống */}
+          <ExpandableNavItem
+            href="/quan-tri/doanh-nghiep"
+            subBase="/quan-tri"
+            icon={ShieldCheck}
+            label="Quản trị hệ thống"
+            expanded={adminExpanded}
+            onToggle={() => setAdminExpanded(v => !v)}
+            onNavigate={onClose}
+            isActive={isOnAdmin}
+            subItems={ADMIN_SUB_ITEMS}
             location={location}
           />
 
