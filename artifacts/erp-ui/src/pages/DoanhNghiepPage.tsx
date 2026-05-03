@@ -252,7 +252,7 @@ export default function DoanhNghiepPage() {
                         </div>
                       </div>
                     </td>
-                    <td className="px-3 py-3 font-mono text-[13px] text-foreground">{dn.mst}</td>
+                    <td className="px-3 py-3 text-[13px] text-foreground">{dn.email || <span className="text-muted-foreground italic">Chưa có</span>}</td>
                     <td className="px-3 py-3">
                       <div className="text-foreground">{dn.daiDien}</div>
                       <div className="text-[12px] text-muted-foreground">{dn.sdt}</div>
