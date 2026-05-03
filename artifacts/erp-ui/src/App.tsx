@@ -103,10 +103,10 @@ function Router() {
       <Route path="/quan-tri/nguoi-dung">
         {() => <ProtectedRoute component={NhanVienPage} />}
       </Route>
-      <Route path="/module/erp/don-vi-tinh">
+      <Route path="/quan-tri/don-vi-tinh">
         {() => <ProtectedRoute component={DonViTinhPage} />}
       </Route>
-      <Route path="/module/erp/co-so">
+      <Route path="/quan-tri/co-so">
         {() => <ProtectedRoute component={CoSoPage} />}
       </Route>
       <Route path="/module/erp/thuong-pham">

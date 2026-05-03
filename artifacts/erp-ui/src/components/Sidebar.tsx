@@ -22,19 +22,17 @@ type NavItem =
 
 const ERP_SUB_ITEMS: NavItem[] = [
   { type: "divider", label: "Thu mua" },
-  { id: "co-so",    icon: Users,          label: "Hộ liên kết" },
   { id: "thu-mua",  icon: ShoppingBasket, label: "Đơn thu mua" },
 
   { type: "divider", label: "Sản xuất" },
-  { id: "production", icon: Factory,       label: "Lệnh sản xuất" },
+  { id: "production", icon: Factory,      label: "Lệnh sản xuất" },
 
   { type: "divider", label: "Đóng gói" },
-  { id: "packaging",  icon: Package,       label: "Lô đóng gói" },
+  { id: "packaging",  icon: Package,      label: "Lô đóng gói" },
 
-  { type: "divider", label: "Cấu hình" },
-  { id: "thuong-pham",  icon: Package,   label: "Thương phẩm" },
-  { id: "don-vi-tinh",  icon: Scale,     label: "Đơn vị tính" },
-  { id: "quy-cach",     icon: BookOpen,  label: "Quy cách & Tiêu chuẩn" },
+  { type: "divider", label: "Danh mục" },
+  { id: "thuong-pham", icon: Package,     label: "Thương phẩm" },
+  { id: "quy-cach",    icon: BookOpen,    label: "Quy cách & Tiêu chuẩn" },
 ];
 
 const TXNG_SUB_ITEMS: NavItem[] = [
@@ -56,8 +54,12 @@ const FARMING_SUB_ITEMS: NavItem[] = [
 ];
 
 const ADMIN_SUB_ITEMS: NavItem[] = [
+  { type: "divider", label: "Tài khoản" },
   { id: "doanh-nghiep", icon: Building2, label: "Doanh nghiệp" },
   { id: "nguoi-dung",   icon: Users,     label: "Người dùng" },
+  { type: "divider", label: "Danh mục" },
+  { id: "don-vi-tinh",  icon: Scale,     label: "Đơn vị tính" },
+  { id: "co-so",        icon: Factory,   label: "Cơ sở" },
 ];
 
 function ExpandableNavItem({
