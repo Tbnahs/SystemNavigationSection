@@ -36,11 +36,8 @@ const DEFAULT_ROLES = ["Admin", "Quản lý", "Nhân viên", "Kế toán"];
 
 /* ─── Permissions ───────────────────────────────────────────────── */
 const ALL_PERMS: { id: string; label: string; group: string }[] = [
-  { id: "erp.dn.xem",  label: "Xem nội dung doanh nghiệp",      group: "ERP" },
+  { id: "erp.dn.xem",  label: "Xem nội dung doanh nghiệp",       group: "ERP" },
   { id: "erp.dn.sua",  label: "Chỉnh sửa nội dung doanh nghiệp", group: "ERP" },
-  { id: "erp.nv.xem",  label: "Xem nhân viên",                    group: "ERP" },
-  { id: "erp.nv.sua",  label: "Thêm / Sửa nhân viên",             group: "ERP" },
-  { id: "erp.nv.xoa",  label: "Xóa nhân viên",                    group: "ERP" },
   { id: "erp.bc.xem",  label: "Xem báo cáo ERP",                  group: "ERP" },
   { id: "erp.bc.xuat", label: "Kết xuất dữ liệu",                 group: "ERP" },
   { id: "txng.xem",    label: "Xem truy xuất nguồn gốc",          group: "TXNG" },
@@ -54,21 +51,10 @@ const ALL_PERMS: { id: string; label: string; group: string }[] = [
 ];
 const ALL_IDS = ALL_PERMS.map(p => p.id);
 const ROLE_PRESET: Record<string, string[]> = {
-  "Admin": ALL_IDS,
-  "Quản lý": [
-    "erp.dn.xem","erp.dn.sua","erp.nv.xem","erp.nv.sua",
-    "erp.bc.xem","erp.bc.xuat",
-    "txng.xem","txng.tao","txng.duyet",
-    "vt.xem","vt.sua","vt.muavu",
-  ],
-  "Kế toán": [
-    "erp.dn.xem","erp.nv.xem","erp.bc.xem","erp.bc.xuat",
-    "txng.xem","vt.xem",
-  ],
-  "Nhân viên": [
-    "txng.xem","txng.tao",
-    "vt.xem","vt.muavu",
-  ],
+  "Admin":    ALL_IDS,
+  "Quản lý": ["erp.dn.xem","erp.dn.sua","erp.bc.xem","erp.bc.xuat","txng.xem","txng.tao","txng.duyet","vt.xem","vt.sua","vt.muavu"],
+  "Kế toán": ["erp.dn.xem","erp.bc.xem","erp.bc.xuat","txng.xem","vt.xem"],
+  "Nhân viên":["txng.xem","txng.tao","vt.xem","vt.muavu"],
 };
 function presetFor(role: string) { return ROLE_PRESET[role] ?? []; }
 
