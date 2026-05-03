@@ -4,8 +4,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   Search, Plus, Filter, Download, MoreHorizontal, ChevronDown, X, Upload,
-  Building2, Users, Package, Sprout, Leaf, Bell,
-  Pencil, Eye, MapPin, ArrowLeft, ArrowRight, LayoutGrid, Loader2,
+  Building2, Users, Package, Sprout, Leaf, Bell, KeyRound, Copy, CheckCheck,
+  Pencil, Eye, EyeOff, MapPin, ArrowLeft, ArrowRight, LayoutGrid, Loader2,
 } from "lucide-react";
 import {
   fetchEnterprises, fetchEnterpriseStats, createEnterprise,
@@ -37,6 +37,7 @@ type FormState = {
   xa: string;
   modules: ("ERP" | "TXNG" | "VT")[];
   logoUrl: string | null;
+  matKhau: string;
 };
 
 const EMPTY_FORM: FormState = {
@@ -44,6 +45,7 @@ const EMPTY_FORM: FormState = {
   diaChi: "", tinh: "Thái Nguyên", xa: "",
   modules: ["ERP", "TXNG"],
   logoUrl: null,
+  matKhau: "",
 };
 
 const LOGO_COLORS = [
@@ -64,6 +66,8 @@ export default function DoanhNghiepPage() {
   const [search, setSearch] = useState("");
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [submitErr, setSubmitErr] = useState<string | null>(null);
+  const [showPwdInDrawer, setShowPwdInDrawer] = useState(false);
+  const [createdCreds, setCreatedCreds] = useState<{ email: string; password: string; name: string } | null>(null);
 
   const qc = useQueryClient();
   const listQ = useQuery({ queryKey: ["enterprises"], queryFn: fetchEnterprises });
@@ -81,8 +85,17 @@ export default function DoanhNghiepPage() {
         status: "active",
         logoColor: LOGO_COLORS[Math.floor(Math.random() * LOGO_COLORS.length)],
         logoUrl: body.logoUrl ?? null,
+        matKhau: body.matKhau || undefined,
       }),
-    onSuccess: () => { invalidate(); closeDrawer(); },
+    onSuccess: (data, vars) => {
+      invalidate();
+      closeDrawer();
+      setCreatedCreds({
+        email: data.item.email,
+        password: vars.matKhau || "esgvalley@2025",
+        name: data.adminUser?.name || data.item.daiDien || data.item.tenHienThi,
+      });
+    },
     onError: (e: Error) => setSubmitErr(e.message),
   });
 
@@ -298,6 +311,34 @@ export default function DoanhNghiepPage() {
         </div>
       </div>
 
+      {/* Credentials success modal */}
+      {createdCreds && (
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+              <KeyRound className="w-6 h-6" />
+            </div>
+            <h3 className="text-[17px] font-semibold text-center mb-1">Doanh nghiệp đã được tạo!</h3>
+            <p className="text-[13px] text-muted-foreground text-center mb-5">
+              Tài khoản Admin cho <span className="font-semibold text-foreground">{createdCreds.name}</span> đã sẵn sàng đăng nhập.
+            </p>
+            <div className="space-y-3 bg-muted/50 rounded-xl p-4 mb-5">
+              <CredRow label="Email đăng nhập" value={createdCreds.email} />
+              <CredRow label="Mật khẩu" value={createdCreds.password} secret />
+            </div>
+            <p className="text-[11.5px] text-amber-600 bg-amber-50 rounded-lg px-3 py-2 mb-4 text-center">
+              Lưu thông tin này — mật khẩu sẽ không hiển thị lại sau khi đóng.
+            </p>
+            <button
+              onClick={() => setCreatedCreds(null)}
+              className="w-full h-11 rounded-xl bg-primary text-primary-foreground font-semibold text-[14px] hover:brightness-110"
+            >
+              Đã lưu, đóng lại
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Delete confirmation */}
       {deleteTarget && (
         <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
@@ -421,6 +462,28 @@ export default function DoanhNghiepPage() {
                     <Field label="Người đại diện" placeholder="Họ và tên" value={form.daiDien} onChange={(v) => setF("daiDien", v)} />
                     <Field label="Email" placeholder="lienhe@congty.vn" value={form.email} onChange={(v) => setF("email", v)} />
                   </div>
+
+                  {!editItem && (
+                    <div>
+                      <div className="flex items-center gap-1 mb-1.5">
+                        <KeyRound className="w-3.5 h-3.5 text-muted-foreground" />
+                        <span className="text-[13px] font-medium text-foreground/80">Mật khẩu đăng nhập</span>
+                      </div>
+                      <div className="relative">
+                        <input
+                          type={showPwdInDrawer ? "text" : "password"}
+                          value={form.matKhau}
+                          onChange={(e) => setF("matKhau", e.target.value)}
+                          placeholder="Để trống → dùng mặc định: esgvalley@2025"
+                          className="w-full h-10 pl-3 pr-10 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                        />
+                        <button type="button" onClick={() => setShowPwdInDrawer(p => !p)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                          {showPwdInDrawer ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                      <div className="text-[11.5px] text-muted-foreground mt-1">Mật khẩu sẽ dùng để đăng nhập bằng email doanh nghiệp.</div>
+                    </div>
+                  )}
                 </div>
               )}
 
@@ -613,6 +676,35 @@ const PROVINCES_VN_2025 = [
   "Trà Vinh",
   "Cà Mau",
 ];
+
+function CredRow({ label, value, secret }: { label: string; value: string; secret?: boolean }) {
+  const [show, setShow] = useState(!secret);
+  const [copied, setCopied] = useState(false);
+  function copy() {
+    navigator.clipboard.writeText(value).then(() => {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    });
+  }
+  return (
+    <div className="flex items-center justify-between gap-3">
+      <div className="text-[12.5px] text-muted-foreground w-32 flex-shrink-0">{label}</div>
+      <div className="flex-1 font-mono text-[13px] text-foreground bg-white rounded-lg px-3 py-1.5 border border-border flex items-center justify-between gap-2 min-w-0">
+        <span className="truncate">{show ? value : "••••••••••••"}</span>
+        <div className="flex items-center gap-1 flex-shrink-0">
+          {secret && (
+            <button type="button" onClick={() => setShow(p => !p)} className="text-muted-foreground hover:text-foreground">
+              {show ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+            </button>
+          )}
+          <button type="button" onClick={copy} className="text-muted-foreground hover:text-primary">
+            {copied ? <CheckCheck className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function ProvinceSelect({ value, onChange }: { value?: string; onChange?: (v: string) => void }) {
   return (

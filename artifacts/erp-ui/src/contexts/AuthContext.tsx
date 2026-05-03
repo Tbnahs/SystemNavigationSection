@@ -1,14 +1,8 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-
-interface User {
-  name: string;
-  email: string;
-  role: string;
-  avatar: string;
-}
+import { loginUser, type AuthUser } from "@/lib/api";
 
 interface AuthContextType {
-  user: User | null;
+  user: AuthUser | null;
   isAuthenticated: boolean;
   login: (email: string, password: string) => Promise<boolean>;
   logout: () => void;
@@ -16,23 +10,17 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const mockUser: User = {
-  name: "Nguyễn Văn An",
-  email: "an.nguyen@agrierp.vn",
-  role: "Admin",
-  avatar: "NA",
-};
-
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
 
   const login = async (email: string, password: string): Promise<boolean> => {
-    await new Promise((r) => setTimeout(r, 800));
-    if (email && password) {
-      setUser(mockUser);
+    try {
+      const { user: u } = await loginUser(email, password);
+      setUser(u);
       return true;
+    } catch {
+      return false;
     }
-    return false;
   };
 
   const logout = () => {

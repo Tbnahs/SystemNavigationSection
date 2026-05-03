@@ -1,4 +1,5 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
+import bcrypt from "bcryptjs";
 import { db, enterprisesTable, insertEnterpriseSchema, employeesTable } from "@workspace/db";
 import { eq, desc, count } from "drizzle-orm";
 
@@ -53,15 +54,19 @@ router.post("/enterprises", async (req: Request, res: Response, next: NextFuncti
     const [created] = await db.insert(enterprisesTable).values(parsed.data).returning();
 
     /* Auto-create Admin account for the enterprise representative */
+    const rawPassword: string = (req.body.matKhau as string | undefined) || "esgvalley@2025";
+    const passwordHash = await bcrypt.hash(rawPassword, 10);
+
     const [adminUser] = await db.insert(employeesTable).values({
       enterpriseId: created.id,
       name: created.daiDien || created.tenHienThi,
-      email: created.email || "",
+      email: (created.email || "").trim().toLowerCase(),
       phone: created.sdt || "",
       role: "Admin",
       status: "active",
       avatarColor: randomColor(),
       lastSeen: "Chưa đăng nhập",
+      passwordHash,
     }).returning();
 
     res.status(201).json({ item: created, adminUser });

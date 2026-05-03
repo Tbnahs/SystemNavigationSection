@@ -59,13 +59,30 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
 export const fetchEnterprises = () => request<{ items: Enterprise[] }>("/enterprises");
 export const fetchEnterprise = (id: number | string) =>
   request<{ item: Enterprise; members: Employee[] }>(`/enterprises/${id}`);
-export const createEnterprise = (body: Partial<Enterprise>) =>
-  request<{ item: Enterprise }>("/enterprises", { method: "POST", body: JSON.stringify(body) });
+export const createEnterprise = (body: Partial<Enterprise> & { matKhau?: string }) =>
+  request<{ item: Enterprise; adminUser: Employee }>("/enterprises", { method: "POST", body: JSON.stringify(body) });
 export const updateEnterprise = (id: number, body: Partial<Enterprise>) =>
   request<{ item: Enterprise }>(`/enterprises/${id}`, { method: "PATCH", body: JSON.stringify(body) });
 export const deleteEnterprise = (id: number) =>
   request<{ ok: true }>(`/enterprises/${id}`, { method: "DELETE" });
 export const fetchEnterpriseStats = () => request<EnterpriseStats>("/enterprises-stats");
+
+/* Auth */
+export type AuthUser = {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  enterpriseId: number | null;
+  enterpriseName: string | null;
+  avatarUrl: string | null;
+  avatarColor: string;
+};
+export const loginUser = (email: string, password: string) =>
+  request<{ user: AuthUser }>("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  });
 
 /* Employees */
 export const fetchEmployees = () => request<{ items: Employee[] }>("/employees");
