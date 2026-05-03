@@ -21,6 +21,7 @@ router.get("/purchase-orders", async (_req, res, next) => {
         status: purchaseOrdersTable.status,
         notes: purchaseOrdersTable.notes,
         total: purchaseOrdersTable.total,
+        lamTron: purchaseOrdersTable.lamTron,
         createdAt: purchaseOrdersTable.createdAt,
         updatedAt: purchaseOrdersTable.updatedAt,
         enterpriseName: enterprisesTable.tenHienThi,

@@ -116,6 +116,7 @@ export type PurchaseOrder = {
   status: "draft" | "confirmed" | "cancelled";
   notes: string;
   total: string;
+  lamTron: string;
   createdAt: string;
   updatedAt: string;
   enterpriseName?: string | null;
@@ -133,6 +134,7 @@ export type PurchaseOrderItem = {
   khoiLuong: string;
   donGia: string;
   thanhTien: string;
+  moTa: string;
 };
 
 const BASE = (import.meta.env.BASE_URL || "/").replace(/\/$/, "");

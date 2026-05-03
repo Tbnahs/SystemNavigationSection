@@ -35,7 +35,7 @@ function emptyLine(): LineItem {
     _key: String(Date.now() + Math.random()),
     productId: null, gradeId: null,
     productName: "", gradeName: "", qualityPercent: "", xepLoai: "",
-    khoiLuong: "", donGia: "", thanhTien: "",
+    khoiLuong: "", donGia: "", thanhTien: "", moTa: "",
   };
 }
 
@@ -47,6 +47,7 @@ type OForm = {
   status: PurchaseOrder["status"];
   notes: string;
   maPhieu: string;
+  lamTron: string;
 };
 
 function EMPTY_FORM(): OForm {
@@ -54,17 +55,17 @@ function EMPTY_FORM(): OForm {
     maPhieu: genMaPhieu(),
     enterpriseId: null, facilityId: null, facilityName: "",
     ngayThu: new Date().toISOString().slice(0, 10),
-    status: "draft", notes: "",
+    status: "draft", notes: "", lamTron: "0",
   };
 }
 
-function calcTotal(lines: LineItem[]) {
-  let sum = 0;
-  for (const l of lines) {
-    const n = parseFloat(l.thanhTien.replace(/[^0-9.]/g, ""));
-    if (!isNaN(n)) sum += n;
-  }
-  return sum > 0 ? sum.toLocaleString("vi-VN") + " đ" : "0 đ";
+function parseNum(s: string) { return parseFloat(s.replace(/[^0-9.\-]/g, "")) || 0; }
+
+function calcTotal(lines: LineItem[], lamTron = "0") {
+  const sum = lines.reduce((acc, l) => acc + parseNum(l.thanhTien), 0);
+  const round = parseNum(lamTron);
+  const total = sum + round;
+  return total !== 0 ? total.toLocaleString("vi-VN") + " đ" : "0 đ";
 }
 
 export default function DonThuMuaPage() {
@@ -90,7 +91,7 @@ export default function DonThuMuaPage() {
   const createMu = useMutation({
     mutationFn: (payload: OForm & { lineItems: Omit<LineItem, "_key">[] }) => {
       const { lineItems, ...orderData } = payload;
-      return createPurchaseOrder({ ...orderData, total: calcTotal(lines), lineItems });
+      return createPurchaseOrder({ ...orderData, total: calcTotal(lines, form.lamTron), lineItems });
     },
     onSuccess: () => { inv(); close_(); },
     onError: (e: Error) => setErr(e.message),
@@ -98,7 +99,7 @@ export default function DonThuMuaPage() {
   const updateMu = useMutation({
     mutationFn: ({ id, payload }: { id: number; payload: OForm & { lineItems: Omit<LineItem, "_key">[] } }) => {
       const { lineItems, ...orderData } = payload;
-      return updatePurchaseOrder(id, { ...orderData, total: calcTotal(lines), lineItems });
+      return updatePurchaseOrder(id, { ...orderData, total: calcTotal(lines, form.lamTron), lineItems });
     },
     onSuccess: () => { inv(); close_(); },
     onError: (e: Error) => setErr(e.message),
@@ -111,7 +112,7 @@ export default function DonThuMuaPage() {
   function close_() { setDrawerOpen(false); setEditItem(null); setForm(EMPTY_FORM()); setLines([emptyLine()]); setErr(null); }
   function openEdit(o: PurchaseOrder) {
     setEditItem(o);
-    setForm({ maPhieu: o.maPhieu, enterpriseId: o.enterpriseId, facilityId: o.facilityId, facilityName: o.facilityName, ngayThu: o.ngayThu, status: o.status, notes: o.notes });
+    setForm({ maPhieu: o.maPhieu, enterpriseId: o.enterpriseId, facilityId: o.facilityId, facilityName: o.facilityName, ngayThu: o.ngayThu, status: o.status, notes: o.notes, lamTron: o.lamTron ?? "0" });
     setErr(null); setDrawerOpen(true);
   }
   function setF<K extends keyof OForm>(k: K, v: OForm[K]) { setForm(p => ({ ...p, [k]: v })); }
@@ -120,24 +121,58 @@ export default function DonThuMuaPage() {
     setLines(prev => prev.map(l => {
       if (l._key !== key) return l;
       const updated = { ...l, [field]: value };
+
       if (field === "productId" && value) {
         const p = productsQ.data?.items.find(p => p.id === Number(value));
         if (p) updated.productName = p.name;
       }
-      if (field === "gradeId" && value) {
-        const g = gradesQ.data?.items.find(g => g.id === Number(value));
-        if (g) {
-          updated.gradeName = g.name;
-          updated.donGia = g.price;
+
+      if (field === "gradeId") {
+        if (value) {
+          const g = gradesQ.data?.items.find(g => g.id === Number(value));
+          if (g) {
+            updated.gradeName = g.name;
+            // Chỉ áp giá quy cách nếu chưa có % chất lượng
+            if (!updated.qualityPercent) updated.donGia = g.price;
+          }
+        } else {
+          updated.gradeName = "";
         }
       }
-      if ((field === "khoiLuong" || field === "donGia")) {
-        const kg = parseFloat((field === "khoiLuong" ? String(value) : updated.khoiLuong).replace(/[^0-9.]/g, ""));
-        const dg = parseFloat((field === "donGia" ? String(value) : updated.donGia).replace(/[^0-9.]/g, ""));
-        if (!isNaN(kg) && !isNaN(dg)) {
+
+      if (field === "qualityPercent") {
+        const ql = qlQ.data?.items.find(q => q.danhGia === String(value));
+        if (ql) {
+          updated.xepLoai = ql.xepLoai;
+          // Ưu tiên giá theo % chất lượng
+          updated.donGia = ql.donGia;
+        } else if (!value) {
+          // Quay về giá quy cách nếu bỏ chọn % CL
+          if (updated.gradeId) {
+            const g = gradesQ.data?.items.find(g => g.id === Number(updated.gradeId));
+            if (g) updated.donGia = g.price;
+          }
+          updated.xepLoai = "";
+        }
+      }
+
+      if (field === "khoiLuong" || field === "donGia") {
+        const kg = parseNum(field === "khoiLuong" ? String(value) : updated.khoiLuong);
+        const dg = parseNum(field === "donGia" ? String(value) : updated.donGia);
+        if (kg > 0 && dg > 0) {
           updated.thanhTien = (kg * dg).toLocaleString("vi-VN") + " đ";
         }
       }
+
+      // Recalc thanhTien if donGia changed by grade/quality selection
+      if (field === "gradeId" || field === "qualityPercent") {
+        const kg = parseNum(updated.khoiLuong);
+        const dg = parseNum(updated.donGia);
+        if (kg > 0 && dg > 0) {
+          updated.thanhTien = (kg * dg).toLocaleString("vi-VN") + " đ";
+        }
+      }
+
       return updated;
     }));
   }
@@ -367,6 +402,7 @@ export default function DonThuMuaPage() {
                         <th className="px-3 py-2.5 text-left">KL (kg)</th>
                         <th className="px-3 py-2.5 text-left">Đơn giá</th>
                         <th className="px-3 py-2.5 text-left">Thành tiền</th>
+                        <th className="px-3 py-2.5 text-left">Mô tả / Chất lượng</th>
                         <th className="px-3 py-2.5 w-8"></th>
                       </tr>
                     </thead>
@@ -396,14 +432,7 @@ export default function DonThuMuaPage() {
                           <td className="px-2 py-1.5">
                             <select
                               value={line.qualityPercent}
-                              onChange={e => {
-                                const ql = qualityLevels.find(q => q.danhGia === e.target.value);
-                                updateLine(line._key, "qualityPercent", e.target.value);
-                                if (ql) {
-                                  updateLine(line._key, "xepLoai", ql.xepLoai);
-                                  updateLine(line._key, "donGia", ql.donGia);
-                                }
-                              }}
+                              onChange={e => updateLine(line._key, "qualityPercent", e.target.value)}
                               className="w-full h-8 px-2 rounded border border-border text-[12px] outline-none bg-white"
                             >
                               <option value="">% CL</option>
@@ -419,14 +448,27 @@ export default function DonThuMuaPage() {
                             />
                           </td>
                           <td className="px-2 py-1.5">
+                            <div className="flex flex-col gap-0.5">
+                              <input
+                                value={line.donGia}
+                                onChange={e => updateLine(line._key, "donGia", e.target.value)}
+                                placeholder="0"
+                                className="w-24 h-8 px-2 rounded border border-border text-[12px] outline-none focus:border-primary"
+                              />
+                              {line.qualityPercent && (
+                                <span className="text-[10px] text-blue-600 font-medium px-1">% CL</span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="px-2 py-1.5 font-medium text-emerald-700 whitespace-nowrap">{line.thanhTien || "—"}</td>
+                          <td className="px-2 py-1.5">
                             <input
-                              value={line.donGia}
-                              onChange={e => updateLine(line._key, "donGia", e.target.value)}
-                              placeholder="0"
-                              className="w-24 h-8 px-2 rounded border border-border text-[12px] outline-none focus:border-primary"
+                              value={line.moTa}
+                              onChange={e => updateLine(line._key, "moTa", e.target.value)}
+                              placeholder="Mô tả, chất lượng…"
+                              className="w-32 h-8 px-2 rounded border border-border text-[12px] outline-none focus:border-primary"
                             />
                           </td>
-                          <td className="px-2 py-1.5 font-medium text-emerald-700">{line.thanhTien || "—"}</td>
                           <td className="px-2 py-1.5">
                             {lines.length > 1 && (
                               <button onClick={() => setLines(p => p.filter(l => l._key !== line._key))} className="p-1 rounded hover:bg-rose-50">
@@ -438,9 +480,26 @@ export default function DonThuMuaPage() {
                       ))}
                     </tbody>
                     <tfoot>
-                      <tr className="border-t-2 border-border bg-muted/20">
-                        <td colSpan={5} className="px-3 py-2.5 text-right text-[13px] font-semibold">Tổng cộng:</td>
-                        <td colSpan={2} className="px-3 py-2.5 text-[14px] font-bold text-emerald-700">{calcTotal(lines)}</td>
+                      <tr className="border-t border-border/60 bg-muted/10">
+                        <td colSpan={5} className="px-3 py-2 text-right text-[12px] text-muted-foreground">Tổng dòng:</td>
+                        <td colSpan={3} className="px-3 py-2 text-[13px] font-semibold text-emerald-700">
+                          {lines.reduce((acc, l) => acc + parseNum(l.thanhTien), 0).toLocaleString("vi-VN")} đ
+                        </td>
+                      </tr>
+                      <tr className="border-t border-border/60 bg-muted/10">
+                        <td colSpan={5} className="px-3 py-2 text-right text-[12px] text-muted-foreground">Làm tròn (±):</td>
+                        <td colSpan={3} className="px-3 py-2">
+                          <input
+                            value={form.lamTron}
+                            onChange={e => setF("lamTron", e.target.value)}
+                            placeholder="0"
+                            className="w-28 h-7 px-2 rounded border border-border text-[12px] outline-none focus:border-primary text-right"
+                          />
+                        </td>
+                      </tr>
+                      <tr className="border-t-2 border-border bg-emerald-50/60">
+                        <td colSpan={5} className="px-3 py-2.5 text-right text-[13px] font-bold">Tổng cộng:</td>
+                        <td colSpan={3} className="px-3 py-2.5 text-[14px] font-bold text-emerald-700">{calcTotal(lines, form.lamTron)}</td>
                       </tr>
                     </tfoot>
                   </table>
