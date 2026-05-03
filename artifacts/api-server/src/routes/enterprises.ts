@@ -2,6 +2,9 @@ import { Router, type Request, type Response, type NextFunction } from "express"
 import { db, enterprisesTable, insertEnterpriseSchema, employeesTable } from "@workspace/db";
 import { eq, desc, count } from "drizzle-orm";
 
+const AVATAR_COLORS = ["bg-emerald-500","bg-blue-500","bg-amber-500","bg-violet-500","bg-rose-500","bg-teal-500"];
+function randomColor() { return AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)]; }
+
 const router: Router = Router();
 
 router.get("/enterprises", async (_req: Request, res: Response, next: NextFunction) => {
@@ -46,8 +49,22 @@ router.post("/enterprises", async (req: Request, res: Response, next: NextFuncti
     if (!parsed.success) {
       return res.status(400).json({ error: "Validation failed", issues: parsed.error.issues });
     }
+
     const [created] = await db.insert(enterprisesTable).values(parsed.data).returning();
-    res.status(201).json({ item: created });
+
+    /* Auto-create Admin account for the enterprise representative */
+    const [adminUser] = await db.insert(employeesTable).values({
+      enterpriseId: created.id,
+      name: created.daiDien || created.tenHienThi,
+      email: created.email || "",
+      phone: created.sdt || "",
+      role: "Admin",
+      status: "active",
+      avatarColor: randomColor(),
+      lastSeen: "Chưa đăng nhập",
+    }).returning();
+
+    res.status(201).json({ item: created, adminUser });
   } catch (e) {
     next(e);
   }
