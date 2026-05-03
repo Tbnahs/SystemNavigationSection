@@ -17,20 +17,21 @@ interface SidebarProps {
 }
 
 const ERP_SUB_ITEMS = [
-  { id: "sales",      icon: ShoppingCart, label: "Bán hàng" },
-  { id: "purchase",   icon: Truck,        label: "Mua hàng" },
-  { id: "inventory",  icon: Package,      label: "Kho hàng" },
-  { id: "accounting", icon: DollarSign,   label: "Kế toán" },
-  { id: "production", icon: Factory,      label: "Sản xuất" },
-  { id: "quality",    icon: CheckSquare,  label: "QC - Chất lượng" },
-  { id: "packaging",  icon: Package,      label: "Đóng gói" },
-  { id: "farmers",    icon: Users,        label: "Hộ dân liên kết" },
-  { id: "crm",        icon: UserCircle,   label: "Khách hàng" },
-  { id: "thuong-pham", icon: Package,       label: "Thương phẩm" },
   { id: "thu-mua",     icon: ShoppingBasket, label: "Thu mua chè" },
-  { id: "quy-cach",   icon: BookOpen,     label: "Quy cách & Tiêu chuẩn" },
-  { id: "reports",    icon: FileBarChart, label: "Báo cáo" },
-  { id: "settings",   icon: Settings,     label: "Cài đặt" },
+  { id: "thuong-pham", icon: Package,        label: "Thương phẩm" },
+  { id: "don-vi-tinh", icon: Scale,          label: "Đơn vị tính" },
+  { id: "co-so",       icon: Factory,        label: "Cơ sở" },
+  { id: "quy-cach",    icon: BookOpen,       label: "Quy cách & Tiêu chuẩn" },
+  { id: "production",  icon: Factory,        label: "Sản xuất" },
+  { id: "quality",     icon: CheckSquare,    label: "QC - Chất lượng" },
+  { id: "packaging",   icon: Package,        label: "Đóng gói" },
+  { id: "inventory",   icon: Package,        label: "Kho hàng" },
+  { id: "sales",       icon: ShoppingCart,   label: "Bán hàng" },
+  { id: "accounting",  icon: DollarSign,     label: "Kế toán" },
+  { id: "farmers",     icon: Users,          label: "Hộ dân liên kết" },
+  { id: "crm",         icon: UserCircle,     label: "Khách hàng" },
+  { id: "reports",     icon: FileBarChart,   label: "Báo cáo" },
+  { id: "settings",    icon: Settings,       label: "Cài đặt" },
 ];
 
 const TXNG_SUB_ITEMS = [
@@ -54,8 +55,6 @@ const FARMING_SUB_ITEMS = [
 const ADMIN_SUB_ITEMS = [
   { id: "doanh-nghiep", icon: Building2, label: "Doanh nghiệp" },
   { id: "nguoi-dung",   icon: Users,     label: "Người dùng" },
-  { id: "don-vi-tinh",  icon: Scale,     label: "Đơn vị tính" },
-  { id: "co-so",        icon: Factory,   label: "Cơ sở" },
 ];
 
 /* Shared component: expandable nav item with split click */
