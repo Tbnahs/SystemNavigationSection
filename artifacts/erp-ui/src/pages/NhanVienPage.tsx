@@ -7,7 +7,8 @@ import {
   Shield, Eye, LayoutGrid, Loader2,
 } from "lucide-react";
 import {
-  fetchEmployees, fetchEmployeeStats, createEmployee, fetchEnterprises,
+  fetchEmployees, fetchEmployeeStats, createEmployee,
+  updateEmployee, deleteEmployee, fetchEnterprises,
   type Employee,
 } from "@/lib/api";
 
@@ -51,6 +52,8 @@ function colorFor(idx: number) { return DN_COLORS[idx % DN_COLORS.length]; }
 
 export default function NhanVienPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [editItem, setEditItem] = useState<Employee | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null);
   const [search, setSearch] = useState("");
   const [form, setForm] = useState<EForm>(EMPTY_E);
   const [submitErr, setSubmitErr] = useState<string | null>(null);
@@ -60,6 +63,11 @@ export default function NhanVienPage() {
   const statsQ = useQuery({ queryKey: ["employees-stats"], queryFn: fetchEmployeeStats });
   const dnQ = useQuery({ queryKey: ["enterprises"], queryFn: fetchEnterprises });
 
+  function invalidate() {
+    qc.invalidateQueries({ queryKey: ["employees"] });
+    qc.invalidateQueries({ queryKey: ["employees-stats"] });
+  }
+
   const createMu = useMutation({
     mutationFn: (body: EForm) =>
       createEmployee({
@@ -68,15 +76,41 @@ export default function NhanVienPage() {
         avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
         lastSeen: "Chưa đăng nhập",
       }),
-    onSuccess: () => {
-      qc.invalidateQueries({ queryKey: ["employees"] });
-      qc.invalidateQueries({ queryKey: ["employees-stats"] });
-      setForm(EMPTY_E);
-      setDrawerOpen(false);
-      setSubmitErr(null);
-    },
+    onSuccess: () => { invalidate(); closeDrawer(); },
     onError: (e: Error) => setSubmitErr(e.message),
   });
+
+  const updateMu = useMutation({
+    mutationFn: ({ id, body }: { id: number; body: EForm }) => updateEmployee(id, body),
+    onSuccess: () => { invalidate(); closeDrawer(); },
+    onError: (e: Error) => setSubmitErr(e.message),
+  });
+
+  const deleteMu = useMutation({
+    mutationFn: (id: number) => deleteEmployee(id),
+    onSuccess: () => { invalidate(); setDeleteTarget(null); },
+    onError: (e: Error) => alert("Lỗi xóa: " + e.message),
+  });
+
+  function closeDrawer() {
+    setDrawerOpen(false);
+    setEditItem(null);
+    setForm(EMPTY_E);
+    setSubmitErr(null);
+  }
+
+  function openEdit(u: Employee) {
+    setEditItem(u);
+    setForm({
+      name: u.name, email: u.email, phone: u.phone,
+      enterpriseId: u.enterpriseId,
+      role: u.role,
+    });
+    setSubmitErr(null);
+    setDrawerOpen(true);
+  }
+
+  const isPending = createMu.isPending || updateMu.isPending;
 
   const items = listQ.data?.items ?? [];
   const filtered = search.trim()
@@ -89,7 +123,11 @@ export default function NhanVienPage() {
   function handleSubmit() {
     setSubmitErr(null);
     if (!form.name.trim()) { setSubmitErr("Vui lòng nhập họ và tên."); return; }
-    createMu.mutate(form);
+    if (editItem) {
+      updateMu.mutate({ id: editItem.id, body: form });
+    } else {
+      createMu.mutate(form);
+    }
   }
 
   return (
@@ -191,9 +229,8 @@ export default function NhanVienPage() {
                     <td className="px-3 py-3 text-[12.5px] text-muted-foreground">{u.lastSeen}</td>
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-1 text-muted-foreground">
-                        <button className="p-1.5 rounded hover:bg-muted"><Eye className="w-4 h-4" /></button>
-                        <button className="p-1.5 rounded hover:bg-muted"><Pencil className="w-4 h-4" /></button>
-                        <button className="p-1.5 rounded hover:bg-muted"><MoreHorizontal className="w-4 h-4" /></button>
+                        <button onClick={() => openEdit(u)} className="p-1.5 rounded hover:bg-muted text-muted-foreground" title="Sửa"><Pencil className="w-4 h-4" /></button>
+                        <button onClick={() => setDeleteTarget(u)} className="p-1.5 rounded hover:bg-rose-50 text-muted-foreground hover:text-rose-600" title="Xóa"><X className="w-4 h-4" /></button>
                       </div>
                     </td>
                   </tr>
@@ -215,16 +252,49 @@ export default function NhanVienPage() {
         </div>
       </div>
 
+      {/* Delete confirmation */}
+      {deleteTarget && (
+        <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4">
+              <X className="w-6 h-6" />
+            </div>
+            <h3 className="text-[17px] font-semibold text-center mb-1">Xóa tài khoản?</h3>
+            <p className="text-[13.5px] text-muted-foreground text-center mb-6">
+              Bạn sắp xóa nhân viên <span className="font-semibold text-foreground">{deleteTarget.name}</span> khỏi hệ thống.
+              Thao tác này không thể hoàn tác.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 h-11 rounded-xl border border-border font-medium text-[14px] hover:bg-muted"
+              >
+                Hủy
+              </button>
+              <button
+                disabled={deleteMu.isPending}
+                onClick={() => deleteMu.mutate(deleteTarget.id)}
+                className="flex-1 h-11 rounded-xl bg-rose-600 text-white font-semibold text-[14px] hover:bg-rose-700 disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {deleteMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                Xóa tài khoản
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add/Edit Employee Drawer */}
       {drawerOpen && (
         <>
-          <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={() => setDrawerOpen(false)} />
+          <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={closeDrawer} />
           <aside className="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-white shadow-2xl z-50 flex flex-col">
             <div className="px-6 py-5 border-b border-border flex items-center justify-between">
               <div>
-                <div className="text-[18px] font-semibold">Thêm nhân viên mới</div>
-                <div className="text-[12.5px] text-muted-foreground">Tạo tài khoản và gửi lời mời qua email.</div>
+                <div className="text-[18px] font-semibold">{editItem ? "Sửa thông tin nhân viên" : "Thêm nhân viên mới"}</div>
+                <div className="text-[12.5px] text-muted-foreground">{editItem ? "Cập nhật thông tin nhân viên." : "Tạo tài khoản và gửi lời mời qua email."}</div>
               </div>
-              <button onClick={() => setDrawerOpen(false)} className="p-1.5 rounded hover:bg-muted">
+              <button onClick={closeDrawer} className="p-1.5 rounded hover:bg-muted">
                 <X className="w-5 h-5 text-muted-foreground" />
               </button>
             </div>
@@ -290,14 +360,14 @@ export default function NhanVienPage() {
             </div>
 
             <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-2 bg-muted/40">
-              <button onClick={() => setDrawerOpen(false)} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
+              <button onClick={closeDrawer} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
               <button
-                disabled={createMu.isPending}
+                disabled={isPending}
                 onClick={handleSubmit}
                 className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold shadow-sm hover:brightness-110 disabled:opacity-60 flex items-center gap-2"
               >
-                {createMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                Tạo tài khoản
+                {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                {editItem ? "Lưu thay đổi" : "Tạo tài khoản"}
               </button>
             </div>
           </aside>
