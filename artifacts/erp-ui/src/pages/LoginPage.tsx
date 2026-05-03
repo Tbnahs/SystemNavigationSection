@@ -174,12 +174,6 @@ export default function LoginPage() {
               </button>
             </form>
 
-            <p className="text-center text-sm text-muted-foreground mt-6">
-              {t("login.noAccount")}{" "}
-              <button className="text-primary font-medium hover:underline">
-                {t("login.signUp")}
-              </button>
-            </p>
           </div>
         </div>
       </div>
