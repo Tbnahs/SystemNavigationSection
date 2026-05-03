@@ -1,490 +1,300 @@
 import { useState } from "react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import AppLayout from "@/components/AppLayout";
-import { ArrowLeft, Leaf, Plus, Pencil, Trash2, X, FileSpreadsheet, FileText } from "lucide-react";
-import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
-
-interface QuyCachRow {
-  id: number;
-  quyCach: string;
-  donGia: string;
-  loaiChe: string;
-  ghiChu: string;
-  color: string;
-  badge: string;
-}
-
-interface QualityRow {
-  id: number;
-  danhGia: string;
-  donGia: string;
-  xepLoai: string;
-}
-
-interface TieuChuan {
-  id: number;
-  title: string;
-  desc: string;
-  color: string;
-}
+import { ArrowLeft, Leaf, Plus, Pencil, Trash2, X, Loader2 } from "lucide-react";
+import {
+  fetchGrades, createGrade, updateGrade, deleteGrade,
+  fetchQualityLevels, createQualityLevel, updateQualityLevel, deleteQualityLevel,
+  fetchStandards, createStandard, updateStandard, deleteStandard,
+  type Grade, type QualityLevel, type Standard,
+} from "@/lib/api";
 
 const COLOR_OPTIONS = [
-  { label: "Chè xanh",   color: "bg-emerald-50 text-emerald-800 border-emerald-200", badge: "bg-emerald-100 text-emerald-800 border-emerald-300" },
-  { label: "Hồng trà",   color: "bg-rose-50 text-rose-800 border-rose-200",           badge: "bg-rose-100 text-rose-800 border-rose-300" },
-  { label: "Bạch trà",   color: "bg-sky-50 text-sky-800 border-sky-200",              badge: "bg-sky-100 text-sky-800 border-sky-300" },
-  { label: "Chè thường", color: "bg-amber-50 text-amber-800 border-amber-200",        badge: "bg-amber-100 text-amber-800 border-amber-300" },
-  { label: "Đặc sản",    color: "bg-violet-50 text-violet-800 border-violet-200",     badge: "bg-violet-100 text-violet-800 border-violet-300" },
+  { key: "emerald", label: "Chè xanh",   row: "bg-emerald-50 text-emerald-800 border-emerald-200", badge: "bg-emerald-100 text-emerald-800 border-emerald-300" },
+  { key: "rose",    label: "Hồng trà",   row: "bg-rose-50 text-rose-800 border-rose-200",          badge: "bg-rose-100 text-rose-800 border-rose-300" },
+  { key: "sky",     label: "Bạch trà",   row: "bg-sky-50 text-sky-800 border-sky-200",             badge: "bg-sky-100 text-sky-800 border-sky-300" },
+  { key: "amber",   label: "Chè thường", row: "bg-amber-50 text-amber-800 border-amber-200",       badge: "bg-amber-100 text-amber-800 border-amber-300" },
+  { key: "violet",  label: "Đặc sản",    row: "bg-violet-50 text-violet-800 border-violet-200",    badge: "bg-violet-100 text-violet-800 border-violet-300" },
 ];
-
-const INIT_QUY_CACH: QuyCachRow[] = [
-  { id: 1, quyCach: "1 tôm",       donGia: "27,000 – 30,000 đ/kg", loaiChe: "Chè xanh",   ghiChu: "Tính theo % chất lượng", color: "bg-emerald-50 text-emerald-800 border-emerald-200", badge: "bg-emerald-100 text-emerald-800 border-emerald-300" },
-  { id: 2, quyCach: "1 tôm 1 lá",  donGia: "50,000 đ/kg",          loaiChe: "Hồng trà",   ghiChu: "Giá cố định",            color: "bg-rose-50 text-rose-800 border-rose-200",           badge: "bg-rose-100 text-rose-800 border-rose-300" },
-  { id: 3, quyCach: "1 tôm 2 lá",  donGia: "27,000 – 30,000 đ/kg", loaiChe: "Bạch trà",   ghiChu: "Tính theo % chất lượng", color: "bg-sky-50 text-sky-800 border-sky-200",              badge: "bg-sky-100 text-sky-800 border-sky-300" },
-  { id: 4, quyCach: "2 lá",        donGia: "27,000 đ/kg",           loaiChe: "Chè thường", ghiChu: "Giá cố định",            color: "bg-amber-50 text-amber-800 border-amber-200",        badge: "bg-amber-100 text-amber-800 border-amber-300" },
-  { id: 5, quyCach: "Cây di sản",  donGia: "40,000 – 60,000 đ/kg", loaiChe: "Đặc sản",    ghiChu: "Giá cố định",            color: "bg-violet-50 text-violet-800 border-violet-200",     badge: "bg-violet-100 text-violet-800 border-violet-300" },
-];
-
-const INIT_QUALITY: QualityRow[] = [
-  { id: 1, danhGia: "70 – 79%",    donGia: "27,000 đ/kg",           xepLoai: "Đạt cơ bản" },
-  { id: 2, danhGia: "80 – 89%",    donGia: "28,000 đ/kg",           xepLoai: "Khá" },
-  { id: 3, danhGia: "90 – 99%",    donGia: "29,000 đ/kg",           xepLoai: "Tốt" },
-  { id: 4, danhGia: "100%",        donGia: "30,000 đ/kg",           xepLoai: "Xuất sắc" },
-  { id: 5, danhGia: "Cây di sản",  donGia: "40,000 – 60,000 đ/kg", xepLoai: "Di sản / Đặc sản" },
-];
-
-const INIT_TIEU_CHUAN: TieuChuan[] = [
-  { id: 1, title: "Độ non, già của búp chè",       desc: "Búp phải non, đúng quy cách được chỉ định. Không hái già, không lẫn búp đen. Búp 1 tôm: chỉ lấy đỉnh búp cuộn. 1 tôm 2 lá: 2 lá non đầu tiên.", color: "bg-emerald-500" },
-  { id: 2, title: "Độ đồng đều khi thu hái",        desc: "Búp chè đồng đều về kích cỡ và độ trưởng thành. Không lẫn quy cách khác. Tỷ lệ lẫn không được vượt quá 3% theo khối lượng.",               color: "bg-blue-500" },
-  { id: 3, title: "Độ chuẩn chỉ khi thu hái",       desc: "Thu hái đúng kỹ thuật: ngắt sát cuống, không dập nát, không để bị oxy hoá trước khi giao. Vận chuyển trong giỏ thoáng, không nén chặt.",      color: "bg-amber-500" },
-];
-
-let _idQC = 100;
-let _idQL = 200;
-let _idTC = 300;
-const nextId = (counter: { v: number }) => ++counter.v;
-const cQC = { v: _idQC };
-const cQL = { v: _idQL };
-const cTC = { v: _idTC };
-
-type ModalMode = "add" | "edit";
-
-function emptyQC(): Omit<QuyCachRow, "id"> {
-  return { quyCach: "", donGia: "", loaiChe: "Chè xanh", ghiChu: "", color: COLOR_OPTIONS[0].color, badge: COLOR_OPTIONS[0].badge };
+function colorRow(key: string)   { return COLOR_OPTIONS.find(c => c.key === key)?.row   ?? COLOR_OPTIONS[0].row; }
+function colorBadge(key: string) { return COLOR_OPTIONS.find(c => c.key === key)?.badge ?? COLOR_OPTIONS[0].badge; }
+function dotColor(key: string) {
+  const m: Record<string, string> = { emerald: "bg-emerald-500", rose: "bg-rose-500", sky: "bg-sky-500", amber: "bg-amber-500", violet: "bg-violet-500" };
+  return m[key] ?? "bg-emerald-500";
 }
-function emptyQL(): Omit<QualityRow, "id"> {
-  return { danhGia: "", donGia: "", xepLoai: "" };
-}
-function emptyTC(): Omit<TieuChuan, "id"> {
-  return { title: "", desc: "", color: "bg-emerald-500" };
-}
+
+const XEP_LOAI_OPTIONS = ["Đạt cơ bản", "Khá", "Tốt", "Xuất sắc", "Di sản / Đặc sản"];
+
+type GForm  = { name: string; price: string; loaiChe: string; ghiChu: string; colorKey: string };
+type QLForm = { gradeId: number | null; danhGia: string; donGia: string; xepLoai: string };
+type SForm  = { title: string; description: string; colorKey: string };
+const EMPTY_G:  GForm  = { name: "", price: "", loaiChe: "Chè xanh", ghiChu: "", colorKey: "emerald" };
+const EMPTY_QL: QLForm = { gradeId: null, danhGia: "", donGia: "", xepLoai: "Đạt cơ bản" };
+const EMPTY_S:  SForm  = { title: "", description: "", colorKey: "emerald" };
+type Tab = "grade" | "quality" | "standard";
 
 export default function QuyCachPage() {
-  const [, setLocation] = useLocation();
+  const [, navigate] = useLocation();
+  const [tab, setTab] = useState<Tab>("grade");
 
-  const [quyCache, setQuyCach] = useState<QuyCachRow[]>(INIT_QUY_CACH);
-  const [quality, setQuality] = useState<QualityRow[]>(INIT_QUALITY);
-  const [tieuChuan, setTieuChuan] = useState<TieuChuan[]>(INIT_TIEU_CHUAN);
+  const [gD, setGD] = useState(false); const [gE, setGE] = useState<Grade | null>(null); const [gF, setGF] = useState<GForm>(EMPTY_G); const [gErr, setGErr] = useState<string | null>(null); const [gDel, setGDel] = useState<Grade | null>(null);
+  const [qlD, setQlD] = useState(false); const [qlE, setQlE] = useState<QualityLevel | null>(null); const [qlF, setQlF] = useState<QLForm>(EMPTY_QL); const [qlErr, setQlErr] = useState<string | null>(null); const [qlDel, setQlDel] = useState<QualityLevel | null>(null);
+  const [sD, setSD] = useState(false); const [sE, setSE] = useState<Standard | null>(null); const [sF, setSF] = useState<SForm>(EMPTY_S); const [sErr, setSErr] = useState<string | null>(null); const [sDel, setSDel] = useState<Standard | null>(null);
 
-  const [qcModal, setQcModal] = useState<{ mode: ModalMode; row: Omit<QuyCachRow, "id"> & { id?: number } } | null>(null);
-  const [qlModal, setQlModal] = useState<{ mode: ModalMode; row: Omit<QualityRow, "id"> & { id?: number } } | null>(null);
-  const [tcModal, setTcModal] = useState<{ mode: ModalMode; row: Omit<TieuChuan, "id"> & { id?: number } } | null>(null);
+  const qc = useQueryClient();
+  const gQ  = useQuery({ queryKey: ["grades"],         queryFn: fetchGrades });
+  const qlQ = useQuery({ queryKey: ["quality-levels"], queryFn: fetchQualityLevels });
+  const sQ  = useQuery({ queryKey: ["standards"],      queryFn: fetchStandards });
 
-  const saveQC = () => {
-    if (!qcModal) return;
-    const { mode, row } = qcModal;
-    const colorOpt = COLOR_OPTIONS.find((o) => o.label === row.loaiChe) ?? COLOR_OPTIONS[0];
-    const full = { ...row, color: colorOpt.color, badge: colorOpt.badge };
-    if (mode === "add") {
-      setQuyCach((prev) => [...prev, { ...full, id: nextId(cQC) }]);
-    } else {
-      setQuyCach((prev) => prev.map((r) => (r.id === row.id ? { ...full, id: r.id } : r)));
-    }
-    setQcModal(null);
+  const gC  = useMutation({ mutationFn: (b: GForm)  => createGrade(b),      onSuccess: () => { qc.invalidateQueries({ queryKey: ["grades"] });         closeG();  }, onError: (e: Error) => setGErr(e.message)  });
+  const gU  = useMutation({ mutationFn: ({ id, b }: { id: number; b: GForm  }) => updateGrade(id, b),        onSuccess: () => { qc.invalidateQueries({ queryKey: ["grades"] });         closeG();  }, onError: (e: Error) => setGErr(e.message)  });
+  const gX  = useMutation({ mutationFn: (id: number) => deleteGrade(id),    onSuccess: () => { qc.invalidateQueries({ queryKey: ["grades"] });         setGDel(null); } });
+  const qlC = useMutation({ mutationFn: (b: QLForm) => createQualityLevel(b), onSuccess: () => { qc.invalidateQueries({ queryKey: ["quality-levels"] }); closeQL(); }, onError: (e: Error) => setQlErr(e.message) });
+  const qlU = useMutation({ mutationFn: ({ id, b }: { id: number; b: QLForm }) => updateQualityLevel(id, b), onSuccess: () => { qc.invalidateQueries({ queryKey: ["quality-levels"] }); closeQL(); }, onError: (e: Error) => setQlErr(e.message) });
+  const qlX = useMutation({ mutationFn: (id: number) => deleteQualityLevel(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ["quality-levels"] }); setQlDel(null); } });
+  const sC  = useMutation({ mutationFn: (b: SForm)  => createStandard(b),   onSuccess: () => { qc.invalidateQueries({ queryKey: ["standards"] });      closeS();  }, onError: (e: Error) => setSErr(e.message)  });
+  const sU  = useMutation({ mutationFn: ({ id, b }: { id: number; b: SForm  }) => updateStandard(id, b),     onSuccess: () => { qc.invalidateQueries({ queryKey: ["standards"] });      closeS();  }, onError: (e: Error) => setSErr(e.message)  });
+  const sX  = useMutation({ mutationFn: (id: number) => deleteStandard(id), onSuccess: () => { qc.invalidateQueries({ queryKey: ["standards"] });      setSDel(null); } });
+
+  function closeG()  { setGD(false);  setGE(null);  setGF(EMPTY_G);  setGErr(null);  }
+  function closeQL() { setQlD(false); setQlE(null); setQlF(EMPTY_QL); setQlErr(null); }
+  function closeS()  { setSD(false);  setSE(null);  setSF(EMPTY_S);  setSErr(null);  }
+
+  const grades = gQ.data?.items ?? [];
+  const qualityLevels = qlQ.data?.items ?? [];
+  const standards = sQ.data?.items ?? [];
+
+  const TABS: { key: Tab; label: string; count: number }[] = [
+    { key: "grade",    label: "Quy cách",     count: grades.length },
+    { key: "quality",  label: "% Chất lượng", count: qualityLevels.length },
+    { key: "standard", label: "Tiêu chuẩn",   count: standards.length },
+  ];
+
+  const xClrMap: Record<string, string> = {
+    "Đạt cơ bản": "bg-slate-50 text-slate-700 ring-slate-300",
+    "Khá": "bg-blue-50 text-blue-700 ring-blue-200",
+    "Tốt": "bg-emerald-50 text-emerald-700 ring-emerald-200",
+    "Xuất sắc": "bg-violet-50 text-violet-700 ring-violet-200",
+    "Di sản / Đặc sản": "bg-amber-50 text-amber-700 ring-amber-200",
   };
-
-  const deleteQC = (id: number) => {
-    if (!window.confirm("Xóa dòng này?")) return;
-    setQuyCach((prev) => prev.filter((r) => r.id !== id));
-  };
-
-  const saveQL = () => {
-    if (!qlModal) return;
-    const { mode, row } = qlModal;
-    if (mode === "add") {
-      setQuality((prev) => [...prev, { ...row, id: nextId(cQL) }]);
-    } else {
-      setQuality((prev) => prev.map((r) => (r.id === row.id ? { ...row, id: r.id } : r)));
-    }
-    setQlModal(null);
-  };
-
-  const deleteQL = (id: number) => {
-    if (!window.confirm("Xóa dòng này?")) return;
-    setQuality((prev) => prev.filter((r) => r.id !== id));
-  };
-
-  const saveTC = () => {
-    if (!tcModal) return;
-    const { mode, row } = tcModal;
-    if (mode === "add") {
-      setTieuChuan((prev) => [...prev, { ...row, id: nextId(cTC) }]);
-    } else {
-      setTieuChuan((prev) => prev.map((r) => (r.id === row.id ? { ...row, id: r.id } : r)));
-    }
-    setTcModal(null);
-  };
-
-  const deleteTC = (id: number) => {
-    if (!window.confirm("Xóa tiêu chuẩn này?")) return;
-    setTieuChuan((prev) => prev.filter((r) => r.id !== id));
-  };
-
-  const exportQCExcel = () => {
-    exportToExcel(
-      [
-        { header: "STT", key: "stt", width: 6 },
-        { header: "Quy cách", key: "quyCach", width: 18 },
-        { header: "Đơn giá", key: "donGia", width: 22 },
-        { header: "Loại chè", key: "loaiChe", width: 16 },
-        { header: "Ghi chú", key: "ghiChu", width: 24 },
-      ],
-      quyCache.map((r, i) => ({ stt: i + 1, quyCach: r.quyCach, donGia: r.donGia, loaiChe: r.loaiChe, ghiChu: r.ghiChu })),
-      "BangQuyCach_DonGia"
-    );
-  };
-
-  const exportQCPDF = () => {
-    exportToPDF(
-      "Bảng Quy Cách Thu Hái & Đơn Giá",
-      "HTX Hồng Hà · Chè Shan Tuyết Bằng Phúc · Vụ thu hái 2026",
-      [
-        { header: "STT", key: "stt", width: 8 },
-        { header: "Quy cách", key: "quyCach", width: 30 },
-        { header: "Đơn giá", key: "donGia", width: 40 },
-        { header: "Loại chè", key: "loaiChe", width: 25 },
-        { header: "Ghi chú", key: "ghiChu", width: 40 },
-      ],
-      quyCache.map((r, i) => ({ stt: i + 1, quyCach: r.quyCach, donGia: r.donGia, loaiChe: r.loaiChe, ghiChu: r.ghiChu })),
-      "BangQuyCach_DonGia"
-    );
-  };
-
-  const exportQLExcel = () => {
-    exportToExcel(
-      [
-        { header: "STT", key: "stt", width: 6 },
-        { header: "Đánh giá %", key: "danhGia", width: 16 },
-        { header: "Đơn giá", key: "donGia", width: 24 },
-        { header: "Xếp loại", key: "xepLoai", width: 22 },
-      ],
-      quality.map((r, i) => ({ stt: i + 1, danhGia: r.danhGia, donGia: r.donGia, xepLoai: r.xepLoai })),
-      "BangDonGia_PhanTram"
-    );
-  };
-
-  const exportQLPDF = () => {
-    exportToPDF(
-      "Bảng Đơn Giá Theo % Chất Lượng",
-      "HTX Hồng Hà · Áp dụng cho: 1 tôm (Chè xanh) và 1 tôm 2 lá (Bạch trà)",
-      [
-        { header: "STT", key: "stt", width: 8 },
-        { header: "Đánh giá %", key: "danhGia", width: 25 },
-        { header: "Đơn giá", key: "donGia", width: 40 },
-        { header: "Xếp loại", key: "xepLoai", width: 35 },
-      ],
-      quality.map((r, i) => ({ stt: i + 1, danhGia: r.danhGia, donGia: r.donGia, xepLoai: r.xepLoai })),
-      "BangDonGia_PhanTram"
-    );
-  };
-
-  const TC_COLORS = ["bg-emerald-500", "bg-blue-500", "bg-amber-500", "bg-violet-500", "bg-rose-500"];
 
   return (
     <AppLayout>
-      <div className="max-w-3xl mx-auto space-y-6">
+      <div className="space-y-5">
         <div className="flex items-center gap-3">
-          <button onClick={() => setLocation("/module/erp")} className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4" /> Quay lại
+          <button onClick={() => navigate("/module/erp")} className="p-2 rounded-lg hover:bg-muted">
+            <ArrowLeft className="w-5 h-5 text-muted-foreground" />
           </button>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-            <Leaf className="w-5 h-5 text-primary" strokeWidth={1.5} />
-          </div>
           <div>
-            <h1 className="text-xl font-bold">Quy cách & Tiêu chuẩn</h1>
-            <p className="text-sm text-muted-foreground">Bảng quy cách thu hái và đơn giá thu mua chè Shan Tuyết Bằng Phúc — HTX Hồng Hà</p>
+            <div className="text-[12px] text-muted-foreground">ERP / Quy cách & Tiêu chuẩn</div>
+            <h1 className="text-xl font-bold mt-0.5 flex items-center gap-2"><Leaf className="w-5 h-5 text-emerald-600" />Quy cách & Tiêu chuẩn</h1>
           </div>
         </div>
 
-        {/* ── Bảng 1: Quy cách & đơn giá ── */}
-        <div className="bg-white border border-border rounded-xl overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-border bg-muted/20 flex items-center justify-between">
-            <div>
-              <h2 className="font-semibold text-sm">Bảng quy cách thu hái & đơn giá</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">Ban hành theo quy định thu mua — áp dụng cho vụ thu hái 2026</p>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <button onClick={exportQCExcel} className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100">
-                <FileSpreadsheet className="w-3.5 h-3.5" /> Excel
-              </button>
-              <button onClick={exportQCPDF} className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100">
-                <FileText className="w-3.5 h-3.5" /> PDF
-              </button>
-              <button onClick={() => setQcModal({ mode: "add", row: emptyQC() })} className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
-                <Plus className="w-3.5 h-3.5" /> Thêm
-              </button>
-            </div>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-muted/10">
-                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground w-10">STT</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Quy cách</th>
-                  <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Đơn giá</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Loại chè</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Ghi chú</th>
-                  <th className="w-20 px-4 py-2.5" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/60">
-                {quyCache.map((row, i) => (
-                  <tr key={row.id} className={`hover:bg-muted/10 transition-colors border-l-2 ${row.color}`}>
-                    <td className="px-4 py-3 text-muted-foreground text-xs">{i + 1}</td>
-                    <td className="px-4 py-3 font-bold text-base">{row.quyCach}</td>
-                    <td className="px-4 py-3 text-right font-semibold text-primary">{row.donGia}</td>
-                    <td className="px-4 py-3">
-                      <span className={`inline-flex text-xs px-2.5 py-1 rounded-lg font-semibold border ${row.badge}`}>{row.loaiChe}</span>
-                    </td>
-                    <td className="px-4 py-3 text-xs text-muted-foreground">{row.ghiChu}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1 justify-end">
-                        <button onClick={() => setQcModal({ mode: "edit", row: { ...row } })} className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10">
-                          <Pencil className="w-3.5 h-3.5" />
-                        </button>
-                        <button onClick={() => deleteQC(row.id)} className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-red-600 hover:bg-red-50">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-                <tr className="bg-muted/20 border-t-2 border-border">
-                  <td colSpan={2} className="px-4 py-2.5 text-xs font-bold text-muted-foreground">Tổng cộng</td>
-                  <td colSpan={4} className="px-4 py-2.5 text-xs text-muted-foreground">{quyCache.length} quy cách</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* ── Bảng 2: Đơn giá theo % ── */}
-        <div className="bg-white border border-border rounded-xl overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-border bg-muted/20 flex items-center justify-between">
-            <div>
-              <h2 className="font-semibold text-sm">Bảng đơn giá theo % chất lượng</h2>
-              <p className="text-xs text-muted-foreground mt-0.5">Áp dụng cho: <strong>1 tôm</strong> (Chè xanh) và <strong>1 tôm 2 lá</strong> (Bạch trà)</p>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <button onClick={exportQLExcel} className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100">
-                <FileSpreadsheet className="w-3.5 h-3.5" /> Excel
-              </button>
-              <button onClick={exportQLPDF} className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100">
-                <FileText className="w-3.5 h-3.5" /> PDF
-              </button>
-              <button onClick={() => setQlModal({ mode: "add", row: emptyQL() })} className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
-                <Plus className="w-3.5 h-3.5" /> Thêm
-              </button>
-            </div>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-muted/10">
-                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground w-10">STT</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Đánh giá %</th>
-                  <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Đơn giá</th>
-                  <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Xếp loại</th>
-                  <th className="w-20 px-4 py-2.5" />
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/60">
-                {quality.map((row, i) => (
-                  <tr key={row.id} className={`hover:bg-muted/10 transition-colors ${i === quality.length - 1 ? "bg-violet-50/50" : ""}`}>
-                    <td className="px-4 py-3 text-muted-foreground text-xs">{i + 1}</td>
-                    <td className={`px-4 py-3 font-semibold ${i === quality.length - 1 ? "text-violet-800" : ""}`}>{row.danhGia}</td>
-                    <td className={`px-4 py-3 text-right font-bold ${i === quality.length - 1 ? "text-violet-700" : "text-emerald-700"}`}>{row.donGia}</td>
-                    <td className={`px-4 py-3 text-xs ${i === quality.length - 1 ? "text-violet-600 font-medium" : "text-muted-foreground"}`}>{row.xepLoai}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-1 justify-end">
-                        <button onClick={() => setQlModal({ mode: "edit", row: { ...row } })} className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10">
-                          <Pencil className="w-3.5 h-3.5" />
-                        </button>
-                        <button onClick={() => deleteQL(row.id)} className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-red-600 hover:bg-red-50">
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        {/* ── Tiêu chuẩn ── */}
-        <div className="bg-white border border-border rounded-xl overflow-hidden">
-          <div className="px-5 py-3.5 border-b border-border bg-muted/20 flex items-center justify-between">
-            <h2 className="font-semibold text-sm">Tiêu chuẩn đánh giá tỉ lệ đạt chất lượng khi thu hái</h2>
-            <button onClick={() => setTcModal({ mode: "add", row: emptyTC() })} className="flex items-center gap-1 px-2.5 py-1.5 text-xs font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90">
-              <Plus className="w-3.5 h-3.5" /> Thêm
+        {/* Tabs */}
+        <div className="border-b border-border flex gap-1">
+          {TABS.map(t => (
+            <button key={t.key} onClick={() => setTab(t.key)} className={`px-4 py-2.5 text-[13.5px] font-medium border-b-2 transition-colors flex items-center gap-2 ${tab === t.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+              {t.label}
+              <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-semibold ${tab === t.key ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{t.count}</span>
             </button>
-          </div>
-          <div className="divide-y divide-border/60">
-            {tieuChuan.map((item, i) => (
-              <div key={item.id} className="flex items-start gap-4 px-5 py-4 hover:bg-muted/10 transition-colors group">
-                <div className={`w-8 h-8 rounded-lg ${item.color} flex items-center justify-center shrink-0 mt-0.5`}>
-                  <span className="text-white text-xs font-bold">{String(i + 1).padStart(2, "0")}</span>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-semibold">* {item.title}</p>
-                  <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{item.desc}</p>
-                </div>
-                <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
-                  <button onClick={() => setTcModal({ mode: "edit", row: { ...item } })} className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/10">
-                    <Pencil className="w-3.5 h-3.5" />
-                  </button>
-                  <button onClick={() => deleteTC(item.id)} className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:text-red-600 hover:bg-red-50">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-            ))}
-          </div>
+          ))}
         </div>
+
+        {/* Grade tab */}
+        {tab === "grade" && (
+          <div className="space-y-3">
+            <div className="flex justify-end">
+              <button onClick={() => setGD(true)} className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 hover:brightness-110"><Plus className="w-4 h-4" />Thêm quy cách</button>
+            </div>
+            {gQ.isLoading && <div className="py-10 text-center"><Loader2 className="w-5 h-5 animate-spin inline text-muted-foreground" /></div>}
+            {grades.length === 0 && !gQ.isLoading && <div className="py-10 text-center text-muted-foreground text-[13px]">Chưa có quy cách nào.</div>}
+            <div className="grid gap-3">
+              {grades.map(g => (
+                <div key={g.id} className={`rounded-xl border p-4 flex items-center justify-between ${colorRow(g.colorKey)}`}>
+                  <div className="flex items-center gap-3">
+                    <div className={`w-2 h-10 rounded-full ${dotColor(g.colorKey)}`} />
+                    <div>
+                      <div className="font-semibold text-[14px]">{g.name}</div>
+                      <div className="text-[12px] flex items-center gap-3 mt-0.5">
+                        <span className={`px-2 py-0.5 rounded-full border text-[11px] font-medium ${colorBadge(g.colorKey)}`}>{g.loaiChe}</span>
+                        <span className="font-medium">{g.price || "—"}</span>
+                        {g.ghiChu && <span className="opacity-70">{g.ghiChu}</span>}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <button onClick={() => { setGE(g); setGF({ name: g.name, price: g.price, loaiChe: g.loaiChe, ghiChu: g.ghiChu, colorKey: g.colorKey }); setGD(true); }} className="p-1.5 rounded hover:bg-black/5"><Pencil className="w-4 h-4" /></button>
+                    <button onClick={() => setGDel(g)} className="p-1.5 rounded hover:bg-rose-100/60"><Trash2 className="w-4 h-4 text-rose-600" /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Quality tab */}
+        {tab === "quality" && (
+          <div className="space-y-3">
+            <div className="flex justify-end">
+              <button onClick={() => setQlD(true)} className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 hover:brightness-110"><Plus className="w-4 h-4" />Thêm % chất lượng</button>
+            </div>
+            {qlQ.isLoading && <div className="py-10 text-center"><Loader2 className="w-5 h-5 animate-spin inline text-muted-foreground" /></div>}
+            {qualityLevels.length === 0 && !qlQ.isLoading && <div className="py-10 text-center text-muted-foreground text-[13px]">Chưa có mức chất lượng nào.</div>}
+            <div className="bg-white border border-border rounded-xl overflow-hidden">
+              <table className="w-full text-sm">
+                <thead><tr className="text-left text-[12px] uppercase text-muted-foreground bg-muted/40"><th className="px-4 py-3">% Đánh giá</th><th className="px-4 py-3">Đơn giá</th><th className="px-4 py-3">Xếp loại</th><th className="px-4 py-3">Quy cách</th><th className="px-4 py-3 w-20"></th></tr></thead>
+                <tbody>
+                  {qualityLevels.map(q => (
+                    <tr key={q.id} className="border-t border-border hover:bg-emerald-50/20">
+                      <td className="px-4 py-3 font-semibold">{q.danhGia}</td>
+                      <td className="px-4 py-3 font-medium text-emerald-700">{q.donGia}</td>
+                      <td className="px-4 py-3"><span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ring-1 ring-inset ${xClrMap[q.xepLoai] ?? xClrMap["Đạt cơ bản"]}`}>{q.xepLoai}</span></td>
+                      <td className="px-4 py-3 text-[13px] text-muted-foreground">{grades.find(g => g.id === q.gradeId)?.name ?? "—"}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => { setQlE(q); setQlF({ gradeId: q.gradeId, danhGia: q.danhGia, donGia: q.donGia, xepLoai: q.xepLoai }); setQlD(true); }} className="p-1.5 rounded hover:bg-muted"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
+                          <button onClick={() => setQlDel(q)} className="p-1.5 rounded hover:bg-rose-50"><Trash2 className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
+
+        {/* Standard tab */}
+        {tab === "standard" && (
+          <div className="space-y-3">
+            <div className="flex justify-end">
+              <button onClick={() => setSD(true)} className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 hover:brightness-110"><Plus className="w-4 h-4" />Thêm tiêu chuẩn</button>
+            </div>
+            {sQ.isLoading && <div className="py-10 text-center"><Loader2 className="w-5 h-5 animate-spin inline text-muted-foreground" /></div>}
+            {standards.length === 0 && !sQ.isLoading && <div className="py-10 text-center text-muted-foreground text-[13px]">Chưa có tiêu chuẩn nào.</div>}
+            <div className="grid gap-3">
+              {standards.map(s => (
+                <div key={s.id} className="bg-white border border-border rounded-xl p-4 flex items-start gap-4">
+                  <div className={`w-1.5 rounded-full self-stretch ${dotColor(s.colorKey)}`} />
+                  <div className="flex-1 min-w-0"><div className="font-semibold text-[14px]">{s.title}</div><div className="text-[13px] text-muted-foreground mt-1">{s.description}</div></div>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button onClick={() => { setSE(s); setSF({ title: s.title, description: s.description, colorKey: s.colorKey }); setSD(true); }} className="p-1.5 rounded hover:bg-muted"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
+                    <button onClick={() => setSDel(s)} className="p-1.5 rounded hover:bg-rose-50"><Trash2 className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* ── Modal: Quy cách ── */}
-      {qcModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setQcModal(null)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <span className="font-semibold text-sm">{qcModal.mode === "add" ? "Thêm quy cách" : "Sửa quy cách"}</span>
-              <button onClick={() => setQcModal(null)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4" /></button>
+      {/* Delete confirms */}
+      {gDel && (
+        <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <h3 className="text-[16px] font-semibold text-center mb-2">Xóa quy cách?</h3>
+            <p className="text-[13px] text-muted-foreground text-center mb-5">Xóa <span className="font-semibold text-foreground">{gDel.name}</span>.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setGDel(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">Hủy</button>
+              <button disabled={gX.isPending} onClick={() => gX.mutate(gDel.id)} className="flex-1 h-10 rounded-xl bg-rose-600 text-white font-semibold text-sm disabled:opacity-60 flex items-center justify-center gap-2">{gX.isPending && <Loader2 className="w-4 h-4 animate-spin" />}Xóa</button>
             </div>
-            <div className="px-5 py-4 space-y-3">
-              <div>
-                <label className="block text-xs font-semibold mb-1.5">Quy cách <span className="text-red-500">*</span></label>
-                <input value={qcModal.row.quyCach} onChange={e => setQcModal(m => m && ({ ...m, row: { ...m.row, quyCach: e.target.value } }))}
-                  className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" placeholder="VD: 1 tôm 1 lá" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold mb-1.5">Đơn giá <span className="text-red-500">*</span></label>
-                <input value={qcModal.row.donGia} onChange={e => setQcModal(m => m && ({ ...m, row: { ...m.row, donGia: e.target.value } }))}
-                  className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" placeholder="VD: 27,000 – 30,000 đ/kg" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold mb-1.5">Loại chè</label>
-                <select value={qcModal.row.loaiChe} onChange={e => setQcModal(m => m && ({ ...m, row: { ...m.row, loaiChe: e.target.value } }))}
-                  className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
-                  {COLOR_OPTIONS.map(o => <option key={o.label} value={o.label}>{o.label}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold mb-1.5">Ghi chú</label>
-                <input value={qcModal.row.ghiChu} onChange={e => setQcModal(m => m && ({ ...m, row: { ...m.row, ghiChu: e.target.value } }))}
-                  className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" placeholder="VD: Giá cố định" />
-              </div>
+          </div>
+        </div>
+      )}
+      {qlDel && (
+        <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <h3 className="text-[16px] font-semibold text-center mb-2">Xóa mức chất lượng?</h3>
+            <p className="text-[13px] text-muted-foreground text-center mb-5">Xóa <span className="font-semibold text-foreground">{qlDel.danhGia}</span>.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setQlDel(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">Hủy</button>
+              <button disabled={qlX.isPending} onClick={() => qlX.mutate(qlDel.id)} className="flex-1 h-10 rounded-xl bg-rose-600 text-white font-semibold text-sm disabled:opacity-60 flex items-center justify-center gap-2">{qlX.isPending && <Loader2 className="w-4 h-4 animate-spin" />}Xóa</button>
             </div>
-            <div className="px-5 pb-5 flex gap-2">
-              <button onClick={() => setQcModal(null)} className="flex-1 px-4 py-2.5 text-sm border border-border rounded-lg hover:bg-muted/50">Hủy</button>
-              <button onClick={saveQC} disabled={!qcModal.row.quyCach || !qcModal.row.donGia}
-                className="flex-1 px-4 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-40">
-                {qcModal.mode === "add" ? "Thêm" : "Lưu"}
-              </button>
+          </div>
+        </div>
+      )}
+      {sDel && (
+        <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <h3 className="text-[16px] font-semibold text-center mb-2">Xóa tiêu chuẩn?</h3>
+            <p className="text-[13px] text-muted-foreground text-center mb-5">Xóa <span className="font-semibold text-foreground">{sDel.title}</span>.</p>
+            <div className="flex gap-3">
+              <button onClick={() => setSDel(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">Hủy</button>
+              <button disabled={sX.isPending} onClick={() => sX.mutate(sDel.id)} className="flex-1 h-10 rounded-xl bg-rose-600 text-white font-semibold text-sm disabled:opacity-60 flex items-center justify-center gap-2">{sX.isPending && <Loader2 className="w-4 h-4 animate-spin" />}Xóa</button>
             </div>
           </div>
         </div>
       )}
 
-      {/* ── Modal: Chất lượng ── */}
-      {qlModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setQlModal(null)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <span className="font-semibold text-sm">{qlModal.mode === "add" ? "Thêm đơn giá %" : "Sửa đơn giá %"}</span>
-              <button onClick={() => setQlModal(null)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4" /></button>
-            </div>
-            <div className="px-5 py-4 space-y-3">
+      {/* Grade Drawer */}
+      {gD && (
+        <>
+          <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={closeG} />
+          <aside className="fixed top-0 right-0 h-full w-full sm:w-[440px] bg-white shadow-2xl z-50 flex flex-col">
+            <div className="px-6 py-5 border-b border-border flex items-center justify-between"><div className="text-[17px] font-semibold">{gE ? "Sửa quy cách" : "Thêm quy cách"}</div><button onClick={closeG} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button></div>
+            <div className="flex-1 overflow-auto px-6 py-5 space-y-4">
+              <div><label className="block text-[13px] font-medium mb-1.5">Tên quy cách <span className="text-rose-500">*</span></label><input value={gF.name} onChange={e => setGF(p => ({ ...p, name: e.target.value }))} placeholder="1 tôm, 1 tôm 1 lá…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" /></div>
+              <div><label className="block text-[13px] font-medium mb-1.5">Loại chè</label><input value={gF.loaiChe} onChange={e => setGF(p => ({ ...p, loaiChe: e.target.value }))} placeholder="Chè xanh, Hồng trà…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" /></div>
+              <div><label className="block text-[13px] font-medium mb-1.5">Đơn giá tham khảo</label><input value={gF.price} onChange={e => setGF(p => ({ ...p, price: e.target.value }))} placeholder="27,000 – 30,000 đ/kg" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" /></div>
+              <div><label className="block text-[13px] font-medium mb-1.5">Ghi chú</label><input value={gF.ghiChu} onChange={e => setGF(p => ({ ...p, ghiChu: e.target.value }))} placeholder="Tính theo % chất lượng…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" /></div>
               <div>
-                <label className="block text-xs font-semibold mb-1.5">Đánh giá % <span className="text-red-500">*</span></label>
-                <input value={qlModal.row.danhGia} onChange={e => setQlModal(m => m && ({ ...m, row: { ...m.row, danhGia: e.target.value } }))}
-                  className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" placeholder="VD: 80 – 89%" />
+                <label className="block text-[13px] font-medium mb-2">Màu hiển thị</label>
+                <div className="flex flex-wrap gap-2">{COLOR_OPTIONS.map(c => <button key={c.key} onClick={() => setGF(p => ({ ...p, colorKey: c.key }))} className={`px-3 py-1.5 rounded-lg border text-[12px] font-medium ${colorRow(c.key)} ${gF.colorKey === c.key ? "ring-2 ring-offset-1 ring-primary" : ""}`}>{c.label}</button>)}</div>
               </div>
-              <div>
-                <label className="block text-xs font-semibold mb-1.5">Đơn giá <span className="text-red-500">*</span></label>
-                <input value={qlModal.row.donGia} onChange={e => setQlModal(m => m && ({ ...m, row: { ...m.row, donGia: e.target.value } }))}
-                  className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" placeholder="VD: 28,000 đ/kg" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold mb-1.5">Xếp loại</label>
-                <input value={qlModal.row.xepLoai} onChange={e => setQlModal(m => m && ({ ...m, row: { ...m.row, xepLoai: e.target.value } }))}
-                  className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" placeholder="VD: Khá" />
-              </div>
+              {gErr && <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{gErr}</div>}
             </div>
-            <div className="px-5 pb-5 flex gap-2">
-              <button onClick={() => setQlModal(null)} className="flex-1 px-4 py-2.5 text-sm border border-border rounded-lg hover:bg-muted/50">Hủy</button>
-              <button onClick={saveQL} disabled={!qlModal.row.danhGia || !qlModal.row.donGia}
-                className="flex-1 px-4 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-40">
-                {qlModal.mode === "add" ? "Thêm" : "Lưu"}
-              </button>
+            <div className="px-6 py-4 border-t border-border flex justify-end gap-2 bg-muted/40">
+              <button onClick={closeG} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
+              <button disabled={gC.isPending || gU.isPending} onClick={() => { setGErr(null); if (!gF.name.trim()) { setGErr("Tên bắt buộc."); return; } gE ? gU.mutate({ id: gE.id, b: gF }) : gC.mutate(gF); }} className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold hover:brightness-110 disabled:opacity-60 flex items-center gap-2">{(gC.isPending || gU.isPending) && <Loader2 className="w-4 h-4 animate-spin" />}{gE ? "Lưu" : "Thêm"}</button>
             </div>
-          </div>
-        </div>
+          </aside>
+        </>
       )}
 
-      {/* ── Modal: Tiêu chuẩn ── */}
-      {tcModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setTcModal(null)} />
-          <div className="relative bg-white rounded-2xl shadow-2xl w-full max-w-md">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-border">
-              <span className="font-semibold text-sm">{tcModal.mode === "add" ? "Thêm tiêu chuẩn" : "Sửa tiêu chuẩn"}</span>
-              <button onClick={() => setTcModal(null)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4" /></button>
+      {/* Quality Drawer */}
+      {qlD && (
+        <>
+          <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={closeQL} />
+          <aside className="fixed top-0 right-0 h-full w-full sm:w-[440px] bg-white shadow-2xl z-50 flex flex-col">
+            <div className="px-6 py-5 border-b border-border flex items-center justify-between"><div className="text-[17px] font-semibold">{qlE ? "Sửa % chất lượng" : "Thêm % chất lượng"}</div><button onClick={closeQL} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button></div>
+            <div className="flex-1 overflow-auto px-6 py-5 space-y-4">
+              <div><label className="block text-[13px] font-medium mb-1.5">% Đánh giá <span className="text-rose-500">*</span></label><input value={qlF.danhGia} onChange={e => setQlF(p => ({ ...p, danhGia: e.target.value }))} placeholder="70 – 79%, 100%…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" /></div>
+              <div><label className="block text-[13px] font-medium mb-1.5">Đơn giá <span className="text-rose-500">*</span></label><input value={qlF.donGia} onChange={e => setQlF(p => ({ ...p, donGia: e.target.value }))} placeholder="27,000 đ/kg" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" /></div>
+              <div><label className="block text-[13px] font-medium mb-1.5">Xếp loại</label><select value={qlF.xepLoai} onChange={e => setQlF(p => ({ ...p, xepLoai: e.target.value }))} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">{XEP_LOAI_OPTIONS.map(x => <option key={x} value={x}>{x}</option>)}</select></div>
+              <div><label className="block text-[13px] font-medium mb-1.5">Quy cách áp dụng</label><select value={qlF.gradeId ?? ""} onChange={e => setQlF(p => ({ ...p, gradeId: e.target.value ? Number(e.target.value) : null }))} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white"><option value="">-- Áp dụng chung --</option>{grades.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}</select></div>
+              {qlErr && <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{qlErr}</div>}
             </div>
-            <div className="px-5 py-4 space-y-3">
-              <div>
-                <label className="block text-xs font-semibold mb-1.5">Tiêu đề <span className="text-red-500">*</span></label>
-                <input value={tcModal.row.title} onChange={e => setTcModal(m => m && ({ ...m, row: { ...m.row, title: e.target.value } }))}
-                  className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold mb-1.5">Mô tả</label>
-                <textarea value={tcModal.row.desc} onChange={e => setTcModal(m => m && ({ ...m, row: { ...m.row, desc: e.target.value } }))}
-                  rows={3} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary resize-none" />
-              </div>
-              <div>
-                <label className="block text-xs font-semibold mb-1.5">Màu</label>
-                <div className="flex items-center gap-2">
-                  {TC_COLORS.map(c => (
-                    <button key={c} onClick={() => setTcModal(m => m && ({ ...m, row: { ...m.row, color: c } }))}
-                      className={`w-7 h-7 rounded-lg ${c} ${tcModal.row.color === c ? "ring-2 ring-offset-1 ring-primary" : ""}`} />
-                  ))}
-                </div>
-              </div>
+            <div className="px-6 py-4 border-t border-border flex justify-end gap-2 bg-muted/40">
+              <button onClick={closeQL} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
+              <button disabled={qlC.isPending || qlU.isPending} onClick={() => { setQlErr(null); if (!qlF.danhGia.trim() || !qlF.donGia.trim()) { setQlErr("Vui lòng điền đủ thông tin."); return; } qlE ? qlU.mutate({ id: qlE.id, b: qlF }) : qlC.mutate(qlF); }} className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold hover:brightness-110 disabled:opacity-60 flex items-center gap-2">{(qlC.isPending || qlU.isPending) && <Loader2 className="w-4 h-4 animate-spin" />}{qlE ? "Lưu" : "Thêm"}</button>
             </div>
-            <div className="px-5 pb-5 flex gap-2">
-              <button onClick={() => setTcModal(null)} className="flex-1 px-4 py-2.5 text-sm border border-border rounded-lg hover:bg-muted/50">Hủy</button>
-              <button onClick={saveTC} disabled={!tcModal.row.title}
-                className="flex-1 px-4 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-40">
-                {tcModal.mode === "add" ? "Thêm" : "Lưu"}
-              </button>
+          </aside>
+        </>
+      )}
+
+      {/* Standard Drawer */}
+      {sD && (
+        <>
+          <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={closeS} />
+          <aside className="fixed top-0 right-0 h-full w-full sm:w-[440px] bg-white shadow-2xl z-50 flex flex-col">
+            <div className="px-6 py-5 border-b border-border flex items-center justify-between"><div className="text-[17px] font-semibold">{sE ? "Sửa tiêu chuẩn" : "Thêm tiêu chuẩn"}</div><button onClick={closeS} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button></div>
+            <div className="flex-1 overflow-auto px-6 py-5 space-y-4">
+              <div><label className="block text-[13px] font-medium mb-1.5">Tiêu đề <span className="text-rose-500">*</span></label><input value={sF.title} onChange={e => setSF(p => ({ ...p, title: e.target.value }))} placeholder="Độ non, già của búp chè…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" /></div>
+              <div><label className="block text-[13px] font-medium mb-1.5">Mô tả chi tiết</label><textarea value={sF.description} onChange={e => setSF(p => ({ ...p, description: e.target.value }))} rows={4} placeholder="Búp phải non, đúng quy cách…" className="w-full px-3 py-2.5 rounded-lg border border-border text-sm outline-none focus:border-primary resize-none" /></div>
+              <div>
+                <label className="block text-[13px] font-medium mb-2">Màu</label>
+                <div className="flex gap-2">{["emerald","sky","amber","rose","violet"].map(c => <button key={c} onClick={() => setSF(p => ({ ...p, colorKey: c }))} className={`w-8 h-8 rounded-full ${dotColor(c)} transition-all ${sF.colorKey === c ? "ring-2 ring-offset-2 ring-primary scale-110" : ""}`} />)}</div>
+              </div>
+              {sErr && <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{sErr}</div>}
             </div>
-          </div>
-        </div>
+            <div className="px-6 py-4 border-t border-border flex justify-end gap-2 bg-muted/40">
+              <button onClick={closeS} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
+              <button disabled={sC.isPending || sU.isPending} onClick={() => { setSErr(null); if (!sF.title.trim()) { setSErr("Tiêu đề bắt buộc."); return; } sE ? sU.mutate({ id: sE.id, b: sF }) : sC.mutate(sF); }} className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold hover:brightness-110 disabled:opacity-60 flex items-center gap-2">{(sC.isPending || sU.isPending) && <Loader2 className="w-4 h-4 animate-spin" />}{sE ? "Lưu" : "Thêm"}</button>
+            </div>
+          </aside>
+        </>
       )}
     </AppLayout>
   );

@@ -1,4 +1,5 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
+import bcrypt from "bcryptjs";
 import { db, employeesTable, enterprisesTable, insertEmployeeSchema } from "@workspace/db";
 import { eq, desc, count } from "drizzle-orm";
 
@@ -16,6 +17,7 @@ router.get("/employees", async (_req: Request, res: Response, next: NextFunction
         role: employeesTable.role,
         status: employeesTable.status,
         avatarColor: employeesTable.avatarColor,
+        avatarUrl: employeesTable.avatarUrl,
         lastSeen: employeesTable.lastSeen,
         createdAt: employeesTable.createdAt,
         updatedAt: employeesTable.updatedAt,
@@ -95,6 +97,28 @@ router.get("/employees-stats", async (_req: Request, res: Response, next: NextFu
       invited: invited?.n ?? 0,
       locked: locked?.n ?? 0,
     });
+  } catch (e) {
+    next(e);
+  }
+});
+
+/* Reset mật khẩu mặc định */
+router.post("/employees/:id/reset-password", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return res.status(400).json({ error: "Invalid id" });
+
+    const DEFAULT_PASSWORD = "esgvalley@2025";
+    const passwordHash = await bcrypt.hash(DEFAULT_PASSWORD, 10);
+
+    const [updated] = await db
+      .update(employeesTable)
+      .set({ passwordHash, updatedAt: new Date() })
+      .where(eq(employeesTable.id, id))
+      .returning({ id: employeesTable.id, name: employeesTable.name });
+
+    if (!updated) return res.status(404).json({ error: "Not found" });
+    res.json({ ok: true, defaultPassword: DEFAULT_PASSWORD });
   } catch (e) {
     next(e);
   }

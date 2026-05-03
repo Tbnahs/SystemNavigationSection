@@ -9,7 +9,7 @@ import {
 import {
   fetchEmployees, fetchEmployeeStats, createEmployee,
   updateEmployee, deleteEmployee, fetchEnterprises,
-  type Employee,
+  resetEmployeePassword, type Employee,
 } from "@/lib/api";
 
 /* ─── Constants ────────────────────────────────────────────────── */
@@ -344,6 +344,8 @@ export default function NhanVienPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<Employee | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null);
+  const [resetTarget, setResetTarget] = useState<Employee | null>(null);
+  const [resetDonePassword, setResetDonePassword] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [form, setForm] = useState<EForm>(EMPTY_E);
   const [submitErr, setSubmitErr] = useState<string | null>(null);
@@ -381,6 +383,12 @@ export default function NhanVienPage() {
     mutationFn: (id: number) => deleteEmployee(id),
     onSuccess: () => { invalidate(); setDeleteTarget(null); },
     onError: (e: Error) => alert("Lỗi xóa: " + e.message),
+  });
+
+  const resetMu = useMutation({
+    mutationFn: (id: number) => resetEmployeePassword(id),
+    onSuccess: (data) => { setResetTarget(null); setResetDonePassword(data.defaultPassword); },
+    onError: (e: Error) => alert("Lỗi đặt lại mật khẩu: " + e.message),
   });
 
   function closeDrawer() {
@@ -579,6 +587,7 @@ export default function NhanVienPage() {
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-1 text-muted-foreground">
                         <button onClick={() => openEdit(u)} className="p-1.5 rounded hover:bg-muted text-muted-foreground" title="Sửa"><Pencil className="w-4 h-4" /></button>
+                        <button onClick={() => setResetTarget(u)} className="p-1.5 rounded hover:bg-amber-50 text-muted-foreground hover:text-amber-600" title="Đặt lại mật khẩu"><RotateCcw className="w-4 h-4" /></button>
                         <button onClick={() => setDeleteTarget(u)} className="p-1.5 rounded hover:bg-rose-50 text-muted-foreground hover:text-rose-600" title="Xóa"><X className="w-4 h-4" /></button>
                       </div>
                     </td>
@@ -624,6 +633,50 @@ export default function NhanVienPage() {
                 Xóa tài khoản
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset password confirm */}
+      {resetTarget && (
+        <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4">
+              <RotateCcw className="w-6 h-6" />
+            </div>
+            <h3 className="text-[17px] font-semibold text-center mb-1">Đặt lại mật khẩu?</h3>
+            <p className="text-[13px] text-muted-foreground text-center mb-5">
+              Đặt lại mật khẩu của <span className="font-semibold text-foreground">{resetTarget.name}</span> về mật khẩu mặc định.
+            </p>
+            <div className="flex gap-3">
+              <button onClick={() => setResetTarget(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">Hủy</button>
+              <button
+                disabled={resetMu.isPending}
+                onClick={() => resetMu.mutate(resetTarget.id)}
+                className="flex-1 h-10 rounded-xl bg-amber-500 text-white font-semibold text-sm hover:bg-amber-600 disabled:opacity-60 flex items-center justify-center gap-2"
+              >
+                {resetMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                Xác nhận
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Reset password success */}
+      {resetDonePassword && (
+        <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
+              <Check className="w-6 h-6" />
+            </div>
+            <h3 className="text-[17px] font-semibold text-center mb-2">Đặt lại thành công!</h3>
+            <p className="text-[13px] text-muted-foreground text-center mb-3">Mật khẩu mặc định mới:</p>
+            <div className="bg-muted rounded-lg px-4 py-3 text-center font-mono font-semibold text-[16px] tracking-wider mb-5 select-all">
+              {resetDonePassword}
+            </div>
+            <p className="text-[12px] text-muted-foreground text-center mb-5">Vui lòng thông báo cho nhân viên và yêu cầu đổi mật khẩu sau khi đăng nhập.</p>
+            <button onClick={() => setResetDonePassword(null)} className="w-full h-10 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110">Đóng</button>
           </div>
         </div>
       )}

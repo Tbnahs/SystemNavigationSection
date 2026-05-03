@@ -25,6 +25,10 @@ import SettingsPage from "@/pages/SettingsPage";
 import DoanhNghiepPage from "@/pages/DoanhNghiepPage";
 import DoanhNghiepDetailPage from "@/pages/DoanhNghiepDetailPage";
 import NhanVienPage from "@/pages/NhanVienPage";
+import DonViTinhPage from "@/pages/DonViTinhPage";
+import CoSoPage from "@/pages/CoSoPage";
+import ThuongPhamPage from "@/pages/ThuongPhamPage";
+import DonThuMuaPage from "@/pages/DonThuMuaPage";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -98,6 +102,18 @@ function Router() {
       </Route>
       <Route path="/quan-tri/nguoi-dung">
         {() => <ProtectedRoute component={NhanVienPage} />}
+      </Route>
+      <Route path="/quan-tri/don-vi-tinh">
+        {() => <ProtectedRoute component={DonViTinhPage} />}
+      </Route>
+      <Route path="/quan-tri/co-so">
+        {() => <ProtectedRoute component={CoSoPage} />}
+      </Route>
+      <Route path="/module/erp/thuong-pham">
+        {() => <ProtectedRoute component={ThuongPhamPage} />}
+      </Route>
+      <Route path="/module/erp/thu-mua">
+        {() => <ProtectedRoute component={DonThuMuaPage} />}
       </Route>
       <Route path="/module/:moduleId/:subId">
         {() => <ProtectedRoute component={SubModulePage} />}

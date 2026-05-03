@@ -6,7 +6,7 @@ import {
   UserCircle, FileBarChart, CheckSquare, BookOpen, ChevronDown,
   QrCode, Link2, Award, Layers, GitBranch, Search,
   MapPin, Sprout, FlaskConical, Scissors, CloudSun, ClipboardCheck,
-  Building2, ShieldCheck,
+  Building2, ShieldCheck, Scale, ShoppingBasket,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import logoImg from "@assets/Logo ESG.png";
@@ -26,6 +26,8 @@ const ERP_SUB_ITEMS = [
   { id: "packaging",  icon: Package,      label: "Đóng gói" },
   { id: "farmers",    icon: Users,        label: "Hộ dân liên kết" },
   { id: "crm",        icon: UserCircle,   label: "Khách hàng" },
+  { id: "thuong-pham", icon: Package,       label: "Thương phẩm" },
+  { id: "thu-mua",     icon: ShoppingBasket, label: "Thu mua chè" },
   { id: "quy-cach",   icon: BookOpen,     label: "Quy cách & Tiêu chuẩn" },
   { id: "reports",    icon: FileBarChart, label: "Báo cáo" },
   { id: "settings",   icon: Settings,     label: "Cài đặt" },
@@ -52,6 +54,8 @@ const FARMING_SUB_ITEMS = [
 const ADMIN_SUB_ITEMS = [
   { id: "doanh-nghiep", icon: Building2, label: "Doanh nghiệp" },
   { id: "nguoi-dung",   icon: Users,     label: "Người dùng" },
+  { id: "don-vi-tinh",  icon: Scale,     label: "Đơn vị tính" },
+  { id: "co-so",        icon: Factory,   label: "Cơ sở" },
 ];
 
 /* Shared component: expandable nav item with split click */
