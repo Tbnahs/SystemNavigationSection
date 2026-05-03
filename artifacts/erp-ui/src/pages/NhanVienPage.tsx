@@ -74,6 +74,12 @@ function presetFor(role: string) { return ROLE_PRESET[role] ?? []; }
 
 const PERM_GROUPS = [...new Set(ALL_PERMS.map(p => p.group))];
 
+const MODULE_TO_GROUP: Record<string, string> = {
+  "ERP": "ERP",
+  "TXNG": "TXNG",
+  "VT": "Vùng Trồng",
+};
+
 /* ─── Form type ─────────────────────────────────────────────────── */
 type EForm = {
   name: string;
@@ -231,25 +237,49 @@ function RoleCombobox({ value, onChange, roles, onAddRole }: {
 }
 
 /* ─── PermissionMatrix ──────────────────────────────────────────── */
-function PermissionMatrix({ permissions, onChange, role }: {
+const GROUP_ICON: Record<string, string> = {
+  "ERP": "🏢",
+  "TXNG": "🔍",
+  "Vùng Trồng": "🌱",
+};
+
+function PermissionMatrix({ permissions, onChange, role, activeGroups }: {
   permissions: string[];
   onChange: (p: string[]) => void;
   role: string;
+  activeGroups: string[] | null;
 }) {
-  const preset = presetFor(role);
-  const isDefault = JSON.stringify([...permissions].sort()) === JSON.stringify([...preset].sort());
+  const visibleGroups = activeGroups ? PERM_GROUPS.filter(g => activeGroups.includes(g)) : PERM_GROUPS;
+
+  const visiblePreset = presetFor(role).filter(id => {
+    const perm = ALL_PERMS.find(p => p.id === id);
+    return perm && (!activeGroups || activeGroups.includes(perm.group));
+  });
+  const isDefault = JSON.stringify([...permissions].sort()) === JSON.stringify([...visiblePreset].sort());
 
   function toggle(id: string) {
     onChange(permissions.includes(id) ? permissions.filter(p => p !== id) : [...permissions, id]);
   }
-  function reset() { onChange(preset); }
+  function reset() { onChange(visiblePreset); }
+
+  if (activeGroups !== null && visibleGroups.length === 0) {
+    return (
+      <div className="rounded-xl border border-border bg-slate-50/60 p-4 text-center text-[13px] text-muted-foreground">
+        Doanh nghiệp này chưa đăng ký phân hệ nào.
+      </div>
+    );
+  }
 
   return (
     <div className="rounded-xl border border-border bg-slate-50/60 overflow-hidden">
       <div className="px-4 py-3 border-b border-border flex items-center justify-between bg-white">
         <div>
           <div className="text-[13px] font-semibold">Phạm vi tài khoản</div>
-          <div className="text-[11.5px] text-muted-foreground mt-0.5">Chọn chức năng nhân viên được phép truy cập</div>
+          <div className="text-[11.5px] text-muted-foreground mt-0.5">
+            {activeGroups
+              ? <>Theo phân hệ DN đã đăng ký: <span className="font-medium text-foreground">{visibleGroups.join(", ")}</span></>
+              : "Chọn chức năng nhân viên được phép truy cập"}
+          </div>
         </div>
         <div className="flex items-center gap-2">
           {isDefault ? (
@@ -264,7 +294,6 @@ function PermissionMatrix({ permissions, onChange, role }: {
               <button
                 onClick={reset}
                 className="h-7 px-2.5 rounded-lg border border-border text-[11.5px] flex items-center gap-1 hover:bg-muted text-muted-foreground"
-                title="Đặt lại theo vai trò"
               >
                 <RotateCcw className="w-3 h-3" /> Đặt lại
               </button>
@@ -274,7 +303,7 @@ function PermissionMatrix({ permissions, onChange, role }: {
       </div>
 
       <div className="p-4 space-y-4">
-        {PERM_GROUPS.map(group => {
+        {visibleGroups.map(group => {
           const perms = ALL_PERMS.filter(p => p.group === group);
           const checkedCount = perms.filter(p => permissions.includes(p.id)).length;
           const allChecked = checkedCount === perms.length;
@@ -282,26 +311,22 @@ function PermissionMatrix({ permissions, onChange, role }: {
 
           function toggleGroup() {
             const ids = perms.map(p => p.id);
-            if (allChecked) {
-              onChange(permissions.filter(id => !ids.includes(id)));
-            } else {
-              onChange([...new Set([...permissions, ...ids])]);
-            }
+            if (allChecked) onChange(permissions.filter(id => !ids.includes(id)));
+            else onChange([...new Set([...permissions, ...ids])]);
           }
 
           return (
             <div key={group}>
-              <button
-                onClick={toggleGroup}
-                className="flex items-center gap-2 mb-2 w-full text-left group"
-              >
+              <button onClick={toggleGroup} className="flex items-center gap-2 mb-2 w-full text-left group">
                 <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
                   allChecked ? "bg-primary border-primary" : someChecked ? "bg-primary/30 border-primary/50" : "border-border"
                 }`}>
                   {allChecked && <Check className="w-2.5 h-2.5 text-white" />}
                   {someChecked && <div className="w-2 h-0.5 bg-primary rounded" />}
                 </div>
-                <span className="text-[12.5px] font-semibold text-foreground">{group}</span>
+                <span className="text-[12.5px] font-semibold text-foreground">
+                  {GROUP_ICON[group] ?? "•"} {group}
+                </span>
                 <span className="text-[11.5px] text-muted-foreground">({checkedCount}/{perms.length})</span>
               </button>
               <div className="ml-6 space-y-1.5">
@@ -393,9 +418,44 @@ export default function NhanVienPage() {
 
   function setF<K extends keyof EForm>(k: K, v: EForm[K]) { setForm((p) => ({ ...p, [k]: v })); }
 
-  function setRole(r: string) {
-    setForm(p => ({ ...p, role: r, permissions: presetFor(r) }));
+  function getGroupsForDN(eid: number | null): string[] | null {
+    if (!eid) return null;
+    const dn = (dnQ.data?.items ?? []).find(d => d.id === eid);
+    if (!dn) return null;
+    return dn.modules.map(m => MODULE_TO_GROUP[m]).filter(Boolean);
   }
+
+  function filterPermsToGroups(perms: string[], groups: string[] | null): string[] {
+    if (!groups) return perms;
+    return perms.filter(id => {
+      const p = ALL_PERMS.find(pp => pp.id === id);
+      return p && groups.includes(p.group);
+    });
+  }
+
+  function setEnterprise(eid: number | null) {
+    const groups = getGroupsForDN(eid);
+    setForm(p => ({
+      ...p,
+      enterpriseId: eid,
+      permissions: filterPermsToGroups(p.permissions, groups),
+    }));
+  }
+
+  function setRole(r: string) {
+    setForm(p => {
+      const groups = getGroupsForDN(p.enterpriseId);
+      const preset = filterPermsToGroups(presetFor(r), groups);
+      return { ...p, role: r, permissions: preset };
+    });
+  }
+
+  const selectedDN = form.enterpriseId
+    ? (dnQ.data?.items ?? []).find(d => d.id === form.enterpriseId) ?? null
+    : null;
+  const activeGroups: string[] | null = selectedDN
+    ? selectedDN.modules.map(m => MODULE_TO_GROUP[m]).filter(Boolean)
+    : null;
 
   const isPending = createMu.isPending || updateMu.isPending;
 
@@ -604,12 +664,15 @@ export default function NhanVienPage() {
                 <Label>Doanh nghiệp</Label>
                 <select
                   value={form.enterpriseId ?? ""}
-                  onChange={(e) => setF("enterpriseId", e.target.value ? Number(e.target.value) : null)}
+                  onChange={(e) => setEnterprise(e.target.value ? Number(e.target.value) : null)}
                   className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
                 >
                   <option value="">-- Không gắn doanh nghiệp --</option>
                   {(dnQ.data?.items ?? []).map((d) => (
-                    <option key={d.id} value={d.id}>{d.tenHienThi}</option>
+                    <option key={d.id} value={d.id}>
+                      {d.tenHienThi}
+                      {d.modules.length > 0 ? ` (${d.modules.join(", ")})` : ""}
+                    </option>
                   ))}
                 </select>
               </div>
@@ -630,6 +693,7 @@ export default function NhanVienPage() {
                 permissions={form.permissions}
                 onChange={(p) => setF("permissions", p)}
                 role={form.role}
+                activeGroups={activeGroups}
               />
 
               {/* Email invite */}
