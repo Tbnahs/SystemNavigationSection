@@ -215,7 +215,7 @@ export default function DoanhNghiepPage() {
                 <tr className="text-left text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/40">
                   <th className="px-4 py-3 w-10"><input type="checkbox" className="accent-primary" /></th>
                   <th className="px-3 py-3">Doanh nghiệp</th>
-                  <th className="px-3 py-3">Mã số thuế</th>
+                  <th className="px-3 py-3">Tên tài khoản</th>
                   <th className="px-3 py-3">Người đại diện</th>
                   <th className="px-3 py-3">Phân hệ</th>
                   <th className="px-3 py-3">Trạng thái</th>
