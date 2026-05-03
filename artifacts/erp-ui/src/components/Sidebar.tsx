@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import {
-  Home, BarChart3, Leaf, ScanLine, Settings, TrendingUp,
+  Home, BarChart3, Leaf, ScanLine, Settings,
   ShoppingCart, Truck, Package, DollarSign, Users, Factory,
   UserCircle, FileBarChart, CheckSquare, BookOpen, ChevronDown,
   QrCode, Link2, Award, Layers, GitBranch, Search,
   MapPin, Sprout, FlaskConical, Scissors, CloudSun, ClipboardCheck,
-  Building2, ShieldCheck, Scale, ShoppingBasket,
+  Building2, ShieldCheck, Scale, ShoppingBasket, ClipboardList,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import logoImg from "@assets/Logo ESG.png";
@@ -16,34 +16,37 @@ interface SidebarProps {
   onClose: () => void;
 }
 
-const ERP_SUB_ITEMS = [
-  { id: "thu-mua",     icon: ShoppingBasket, label: "Thu mua chè" },
-  { id: "thuong-pham", icon: Package,        label: "Thương phẩm" },
-  { id: "don-vi-tinh", icon: Scale,          label: "Đơn vị tính" },
-  { id: "co-so",       icon: Factory,        label: "Cơ sở" },
-  { id: "quy-cach",    icon: BookOpen,       label: "Quy cách & Tiêu chuẩn" },
-  { id: "production",  icon: Factory,        label: "Sản xuất" },
-  { id: "quality",     icon: CheckSquare,    label: "QC - Chất lượng" },
-  { id: "packaging",   icon: Package,        label: "Đóng gói" },
-  { id: "inventory",   icon: Package,        label: "Kho hàng" },
-  { id: "sales",       icon: ShoppingCart,   label: "Bán hàng" },
-  { id: "accounting",  icon: DollarSign,     label: "Kế toán" },
-  { id: "farmers",     icon: Users,          label: "Hộ dân liên kết" },
-  { id: "crm",         icon: UserCircle,     label: "Khách hàng" },
-  { id: "reports",     icon: FileBarChart,   label: "Báo cáo" },
-  { id: "settings",    icon: Settings,       label: "Cài đặt" },
+type NavItem =
+  | { type?: "item"; id: string; icon: React.ElementType; label: string }
+  | { type: "divider"; label: string };
+
+const ERP_SUB_ITEMS: NavItem[] = [
+  { type: "divider", label: "Thu mua" },
+  { id: "co-so",    icon: Users,          label: "Hộ liên kết" },
+  { id: "thu-mua",  icon: ShoppingBasket, label: "Đơn thu mua" },
+
+  { type: "divider", label: "Sản xuất" },
+  { id: "production", icon: Factory,       label: "Lệnh sản xuất" },
+
+  { type: "divider", label: "Đóng gói" },
+  { id: "packaging",  icon: Package,       label: "Lô đóng gói" },
+
+  { type: "divider", label: "Cấu hình" },
+  { id: "thuong-pham",  icon: Package,   label: "Thương phẩm" },
+  { id: "don-vi-tinh",  icon: Scale,     label: "Đơn vị tính" },
+  { id: "quy-cach",     icon: BookOpen,  label: "Quy cách & Tiêu chuẩn" },
 ];
 
-const TXNG_SUB_ITEMS = [
-  { id: "qrcode",       icon: QrCode,        label: "Mã QR" },
-  { id: "supplychain",  icon: Link2,         label: "Chuỗi cung ứng" },
-  { id: "certification",icon: Award,         label: "Chứng nhận" },
-  { id: "batch",        icon: Layers,        label: "Lô hàng" },
-  { id: "timeline",     icon: GitBranch,     label: "Lịch sử" },
-  { id: "audit",        icon: Search,        label: "Kiểm toán" },
+const TXNG_SUB_ITEMS: NavItem[] = [
+  { id: "qrcode",        icon: QrCode,        label: "Mã QR" },
+  { id: "supplychain",   icon: Link2,         label: "Chuỗi cung ứng" },
+  { id: "certification", icon: Award,         label: "Chứng nhận" },
+  { id: "batch",         icon: Layers,        label: "Lô hàng" },
+  { id: "timeline",      icon: GitBranch,     label: "Lịch sử" },
+  { id: "audit",         icon: Search,        label: "Kiểm toán" },
 ];
 
-const FARMING_SUB_ITEMS = [
+const FARMING_SUB_ITEMS: NavItem[] = [
   { id: "zones",      icon: MapPin,         label: "Vùng trồng" },
   { id: "crops",      icon: Sprout,         label: "Cây trồng" },
   { id: "pesticides", icon: FlaskConical,   label: "Thuốc BVTV" },
@@ -52,19 +55,18 @@ const FARMING_SUB_ITEMS = [
   { id: "inspection", icon: ClipboardCheck, label: "Kiểm định" },
 ];
 
-const ADMIN_SUB_ITEMS = [
+const ADMIN_SUB_ITEMS: NavItem[] = [
   { id: "doanh-nghiep", icon: Building2, label: "Doanh nghiệp" },
   { id: "nguoi-dung",   icon: Users,     label: "Người dùng" },
 ];
 
-/* Shared component: expandable nav item with split click */
 function ExpandableNavItem({
   href, icon: Icon, label, expanded, onToggle, onNavigate,
   isActive, subItems, location, subBase: subBaseProp,
 }: {
   href: string; icon: React.ElementType; label: string;
   expanded: boolean; onToggle: () => void; onNavigate: () => void;
-  isActive: boolean; subItems: { id: string; icon: React.ElementType; label: string }[];
+  isActive: boolean; subItems: NavItem[];
   location: string;
   subBase?: string;
 }) {
@@ -94,12 +96,20 @@ function ExpandableNavItem({
 
       {expanded && (
         <div className="mt-0.5 ml-3 pl-3 border-l border-border space-y-0.5">
-          {subItems.map(({ id, icon: SubIcon, label: subLabel }) => {
-            const subHref = `${subBase}/${id}`;
+          {subItems.map((item, idx) => {
+            if (item.type === "divider") {
+              return (
+                <p key={`div-${idx}`} className="px-2 pt-3 pb-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 select-none">
+                  {item.label}
+                </p>
+              );
+            }
+            const subHref = `${subBase}/${item.id}`;
             const active = location === subHref;
+            const SubIcon = item.icon;
             return (
               <Link
-                key={id}
+                key={item.id}
                 href={subHref}
                 onClick={onNavigate}
                 className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all ${
@@ -107,7 +117,7 @@ function ExpandableNavItem({
                 }`}
               >
                 <SubIcon className={`w-3.5 h-3.5 shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
-                {subLabel}
+                {item.label}
               </Link>
             );
           })}
@@ -136,11 +146,6 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   useEffect(() => { if (isOnFarming) setFarmingExpanded(true); }, [isOnFarming]);
   useEffect(() => { if (isOnAdmin)   setAdminExpanded(true);   }, [isOnAdmin]);
 
-  const plainItems = [
-    { href: "/reports",  icon: TrendingUp, label: t("nav.reports")  },
-    { href: "/settings", icon: Settings,   label: t("nav.settings") },
-  ];
-
   const isActive = (href: string) =>
     location === href || location.startsWith(href + "/");
 
@@ -151,7 +156,6 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
       )}
 
       <aside className={`fixed left-0 top-16 bottom-0 w-60 bg-white border-r border-border z-20 flex flex-col transition-transform duration-200 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
-        {/* Logo */}
         <div className="px-4 py-5 border-b border-border">
           <div className="flex items-center gap-3">
             <img src={logoImg} alt="ESG VALLEY logo" className="w-9 h-9 object-contain" />
@@ -162,9 +166,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           </div>
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 px-3 py-4 space-y-0.5 overflow-y-auto">
-          {/* Home */}
           <Link
             href="/home"
             onClick={onClose}
@@ -176,7 +178,6 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             {t("nav.home")}
           </Link>
 
-          {/* ERP */}
           <ExpandableNavItem
             href="/module/erp"
             icon={BarChart3}
@@ -189,7 +190,6 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             location={location}
           />
 
-          {/* Truy xuất nguồn gốc */}
           <ExpandableNavItem
             href="/module/txng"
             icon={ScanLine}
@@ -202,7 +202,6 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             location={location}
           />
 
-          {/* Vùng trồng */}
           <ExpandableNavItem
             href="/module/farming"
             icon={Leaf}
@@ -215,7 +214,6 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             location={location}
           />
 
-          {/* Quản trị hệ thống */}
           <ExpandableNavItem
             href="/quan-tri/doanh-nghiep"
             subBase="/quan-tri"
@@ -228,24 +226,8 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             subItems={ADMIN_SUB_ITEMS}
             location={location}
           />
-
-          {/* Plain items */}
-          {plainItems.map(({ href, icon: Icon, label }) => (
-            <Link
-              key={href}
-              href={href}
-              onClick={onClose}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                isActive(href) ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"
-              }`}
-            >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive(href) ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
-              {label}
-            </Link>
-          ))}
         </nav>
 
-        {/* Footer */}
         <div className="px-4 py-4 border-t border-border">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
