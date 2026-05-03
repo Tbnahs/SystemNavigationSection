@@ -427,7 +427,7 @@ export default function DoanhNghiepPage() {
               {activeTab === "location" && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <Field label="Tỉnh / Thành phố" value={form.tinh} onChange={(v) => setF("tinh", v)} />
+                    <ProvinceSelect value={form.tinh} onChange={(v) => setF("tinh", v)} />
                     <Field label="Xã / Phường" placeholder="Vd: Quân Chu" value={form.xa} onChange={(v) => setF("xa", v)} />
                   </div>
                   <Field label="Địa chỉ chi tiết" placeholder="Số nhà, đường, xóm…" value={form.diaChi} onChange={(v) => setF("diaChi", v)} />
@@ -575,4 +575,64 @@ function ModuleToggle({ name, desc, checked, onChange, icon: Icon, color }: { na
 
 function toggleModule(arr: ("ERP" | "TXNG" | "VT")[], m: "ERP" | "TXNG" | "VT", on: boolean): ("ERP" | "TXNG" | "VT")[] {
   return on ? Array.from(new Set([...arr, m])) : arr.filter((x) => x !== m);
+}
+
+const PROVINCES_VN_2025 = [
+  "Hà Nội",
+  "Hải Phòng",
+  "Hồ Chí Minh",
+  "Đà Nẵng",
+  "Cần Thơ",
+  "Cao Bằng",
+  "Thái Nguyên",
+  "Lào Cai",
+  "Điện Biên",
+  "Hà Giang",
+  "Lạng Sơn",
+  "Bắc Ninh",
+  "Hưng Yên",
+  "Thanh Hóa",
+  "Nghệ An",
+  "Huế",
+  "Quảng Ngãi",
+  "Bình Định",
+  "Khánh Hòa",
+  "Gia Lai",
+  "Đắk Lắk",
+  "Lâm Đồng",
+  "Bình Thuận",
+  "Đồng Nai",
+  "Tây Ninh",
+  "Long An",
+  "Tiền Giang",
+  "Vĩnh Long",
+  "Đồng Tháp",
+  "An Giang",
+  "Kiên Giang",
+  "Bến Tre",
+  "Trà Vinh",
+  "Cà Mau",
+];
+
+function ProvinceSelect({ value, onChange }: { value?: string; onChange?: (v: string) => void }) {
+  return (
+    <div>
+      <div className="flex items-center gap-1 mb-1.5">
+        <span className="text-[13px] font-medium text-foreground/80">Tỉnh / Thành phố</span>
+      </div>
+      <div className="relative">
+        <select
+          value={value ?? ""}
+          onChange={(e) => onChange?.(e.target.value)}
+          className="w-full h-10 pl-3 pr-8 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 appearance-none cursor-pointer"
+        >
+          <option value="">-- Chọn tỉnh / thành phố --</option>
+          {PROVINCES_VN_2025.map((p) => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
+        <ChevronDown className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+      </div>
+    </div>
+  );
 }
