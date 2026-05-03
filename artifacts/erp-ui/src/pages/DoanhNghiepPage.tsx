@@ -431,9 +431,26 @@ export default function DoanhNghiepPage() {
                     <Field label="Xã / Phường" placeholder="Vd: Quân Chu" value={form.xa} onChange={(v) => setF("xa", v)} />
                   </div>
                   <Field label="Địa chỉ chi tiết" placeholder="Số nhà, đường, xóm…" value={form.diaChi} onChange={(v) => setF("diaChi", v)} />
-                  <div className="rounded-xl border border-border bg-muted/40 h-44 flex items-center justify-center text-muted-foreground text-sm">
-                    <MapPin className="w-4 h-4 mr-2" /> Bản đồ vị trí (tùy chọn)
-                  </div>
+                  {(() => {
+                    const q = [form.diaChi, form.xa, form.tinh].filter(Boolean).join(", ");
+                    return q ? (
+                      <div className="rounded-xl border border-border overflow-hidden h-44">
+                        <iframe
+                          key={q}
+                          title="Bản đồ vị trí"
+                          width="100%"
+                          height="100%"
+                          style={{ border: 0 }}
+                          loading="lazy"
+                          src={`https://maps.google.com/maps?q=${encodeURIComponent(q)}&output=embed&z=14`}
+                        />
+                      </div>
+                    ) : (
+                      <div className="rounded-xl border border-border bg-muted/40 h-44 flex items-center justify-center text-muted-foreground text-sm">
+                        <MapPin className="w-4 h-4 mr-2" /> Nhập địa chỉ bên trên để xem bản đồ
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
