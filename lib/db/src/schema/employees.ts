@@ -17,6 +17,7 @@ export const employeesTable = pgTable("employees", {
     .default("invited")
     .notNull(),
   avatarColor: text("avatar_color").default("bg-emerald-500").notNull(),
+  avatarUrl: text("avatar_url"),
   lastSeen: text("last_seen").default("Chưa đăng nhập").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

@@ -74,10 +74,11 @@ type EForm = {
   enterpriseId: number | null;
   role: string;
   permissions: string[];
+  avatarUrl: string | null;
 };
 const EMPTY_E: EForm = {
   name: "", email: "", phone: "", enterpriseId: null,
-  role: "Nhân viên", permissions: presetFor("Nhân viên"),
+  role: "Nhân viên", permissions: presetFor("Nhân viên"), avatarUrl: null,
 };
 
 /* ─── Helpers ───────────────────────────────────────────────────── */
@@ -397,9 +398,21 @@ export default function NhanVienPage() {
       enterpriseId: u.enterpriseId,
       role: u.role,
       permissions: presetFor(u.role),
+      avatarUrl: u.avatarUrl ?? null,
     });
     setSubmitErr(null);
     setDrawerOpen(true);
+  }
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      setF("avatarUrl", ev.target?.result as string ?? null);
+    };
+    reader.readAsDataURL(file);
   }
 
   function setF<K extends keyof EForm>(k: K, v: EForm[K]) { setForm((p) => ({ ...p, [k]: v })); }
@@ -535,7 +548,11 @@ export default function NhanVienPage() {
                     <td className="px-4 py-3"><input type="checkbox" className="accent-primary" /></td>
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-full text-white text-[12.5px] font-semibold flex items-center justify-center ${u.avatarColor}`}>{getInitials(u.name)}</div>
+                        {u.avatarUrl ? (
+                          <img src={u.avatarUrl} alt={u.name} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                        ) : (
+                          <div className={`w-9 h-9 rounded-full text-white text-[12.5px] font-semibold flex items-center justify-center flex-shrink-0 ${u.avatarColor}`}>{getInitials(u.name)}</div>
+                        )}
                         <div>
                           <div className="font-medium text-foreground">{u.name}</div>
                           <div className="text-[11.5px] text-muted-foreground">ID: USR-{1000 + u.id}</div>
@@ -631,10 +648,42 @@ export default function NhanVienPage() {
               <div>
                 <Label>Ảnh đại diện</Label>
                 <div className="flex items-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground text-[18px] font-semibold flex items-center justify-center">{form.name ? getInitials(form.name) : "NV"}</div>
-                  <button className="h-9 px-3 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted">
-                    <Upload className="w-4 h-4" /> Tải ảnh lên
-                  </button>
+                  {form.avatarUrl ? (
+                    <img
+                      src={form.avatarUrl}
+                      alt="avatar"
+                      className="w-16 h-16 rounded-full object-cover ring-2 ring-primary/20"
+                    />
+                  ) : (
+                    <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground text-[18px] font-semibold flex items-center justify-center">
+                      {form.name ? getInitials(form.name) : "NV"}
+                    </div>
+                  )}
+                  <div className="flex flex-col gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="h-9 px-3 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted"
+                    >
+                      <Upload className="w-4 h-4" /> Tải ảnh lên
+                    </button>
+                    {form.avatarUrl && (
+                      <button
+                        type="button"
+                        onClick={() => setF("avatarUrl", null)}
+                        className="h-7 px-2.5 rounded-lg text-[12px] text-muted-foreground hover:text-rose-600 hover:bg-rose-50 flex items-center gap-1"
+                      >
+                        <X className="w-3 h-3" /> Xóa ảnh
+                      </button>
+                    )}
+                  </div>
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={handleFileChange}
+                  />
                 </div>
               </div>
 

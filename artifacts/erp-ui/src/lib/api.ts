@@ -25,6 +25,7 @@ export type Employee = {
   role: string;
   status: "active" | "invited" | "locked";
   avatarColor: string;
+  avatarUrl: string | null;
   lastSeen: string;
   createdAt: string;
   updatedAt: string;
