@@ -36,25 +36,39 @@ const DEFAULT_ROLES = ["Admin", "Quản lý", "Nhân viên", "Kế toán"];
 
 /* ─── Permissions ───────────────────────────────────────────────── */
 const ALL_PERMS: { id: string; label: string; group: string }[] = [
-  { id: "dn.xem", label: "Xem danh sách", group: "Doanh nghiệp" },
-  { id: "dn.sua", label: "Thêm / Sửa", group: "Doanh nghiệp" },
-  { id: "dn.xoa", label: "Xóa", group: "Doanh nghiệp" },
-  { id: "nv.xem", label: "Xem danh sách", group: "Nhân viên" },
-  { id: "nv.sua", label: "Thêm / Sửa", group: "Nhân viên" },
-  { id: "nv.xoa", label: "Xóa", group: "Nhân viên" },
-  { id: "txng.xem", label: "Xem truy xuất nguồn gốc", group: "TXNG" },
-  { id: "txng.tao", label: "Tạo / Cập nhật lô hàng", group: "TXNG" },
-  { id: "vt.xem", label: "Xem vùng trồng", group: "Vùng trồng" },
-  { id: "vt.sua", label: "Quản lý vùng trồng", group: "Vùng trồng" },
-  { id: "bc.xem", label: "Xem báo cáo", group: "Báo cáo" },
-  { id: "bc.xuat", label: "Kết xuất dữ liệu", group: "Báo cáo" },
+  { id: "erp.dn.xem",  label: "Xem nội dung doanh nghiệp",      group: "ERP" },
+  { id: "erp.dn.sua",  label: "Chỉnh sửa nội dung doanh nghiệp", group: "ERP" },
+  { id: "erp.nv.xem",  label: "Xem nhân viên",                    group: "ERP" },
+  { id: "erp.nv.sua",  label: "Thêm / Sửa nhân viên",             group: "ERP" },
+  { id: "erp.nv.xoa",  label: "Xóa nhân viên",                    group: "ERP" },
+  { id: "erp.bc.xem",  label: "Xem báo cáo ERP",                  group: "ERP" },
+  { id: "erp.bc.xuat", label: "Kết xuất dữ liệu",                 group: "ERP" },
+  { id: "txng.xem",    label: "Xem truy xuất nguồn gốc",          group: "TXNG" },
+  { id: "txng.tao",    label: "Tạo / Cập nhật lô hàng",           group: "TXNG" },
+  { id: "txng.xoa",    label: "Xóa lô hàng",                      group: "TXNG" },
+  { id: "txng.duyet",  label: "Phê duyệt lô hàng",                group: "TXNG" },
+  { id: "vt.xem",      label: "Xem vùng trồng",                   group: "Vùng Trồng" },
+  { id: "vt.sua",      label: "Thêm / Sửa vùng trồng",            group: "Vùng Trồng" },
+  { id: "vt.xoa",      label: "Xóa vùng trồng",                   group: "Vùng Trồng" },
+  { id: "vt.muavu",    label: "Quản lý mùa vụ",                   group: "Vùng Trồng" },
 ];
 const ALL_IDS = ALL_PERMS.map(p => p.id);
 const ROLE_PRESET: Record<string, string[]> = {
   "Admin": ALL_IDS,
-  "Quản lý": ["dn.xem","dn.sua","nv.xem","nv.sua","txng.xem","txng.tao","vt.xem","vt.sua","bc.xem","bc.xuat"],
-  "Kế toán": ["dn.xem","nv.xem","txng.xem","vt.xem","bc.xem","bc.xuat"],
-  "Nhân viên": ["txng.xem","txng.tao","vt.xem"],
+  "Quản lý": [
+    "erp.dn.xem","erp.dn.sua","erp.nv.xem","erp.nv.sua",
+    "erp.bc.xem","erp.bc.xuat",
+    "txng.xem","txng.tao","txng.duyet",
+    "vt.xem","vt.sua","vt.muavu",
+  ],
+  "Kế toán": [
+    "erp.dn.xem","erp.nv.xem","erp.bc.xem","erp.bc.xuat",
+    "txng.xem","vt.xem",
+  ],
+  "Nhân viên": [
+    "txng.xem","txng.tao",
+    "vt.xem","vt.muavu",
+  ],
 };
 function presetFor(role: string) { return ROLE_PRESET[role] ?? []; }
 
