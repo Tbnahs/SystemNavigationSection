@@ -16,6 +16,7 @@ export const enterprisesTable = pgTable("enterprises", {
   modules: jsonb("modules").$type<("ERP" | "TXNG" | "VT")[]>().default([]).notNull(),
   status: text("status", { enum: ["active", "pending", "locked"] }).default("active").notNull(),
   logoColor: text("logo_color").default("bg-emerald-100 text-emerald-700").notNull(),
+  logoUrl: text("logo_url"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

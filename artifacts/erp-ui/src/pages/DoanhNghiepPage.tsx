@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
@@ -36,12 +36,14 @@ type FormState = {
   tinh: string;
   xa: string;
   modules: ("ERP" | "TXNG" | "VT")[];
+  logoUrl: string | null;
 };
 
 const EMPTY_FORM: FormState = {
   mst: "", ten: "", tenHienThi: "", daiDien: "", sdt: "", email: "",
   diaChi: "", tinh: "Thái Nguyên", xa: "",
   modules: ["ERP", "TXNG"],
+  logoUrl: null,
 };
 
 const LOGO_COLORS = [
@@ -78,6 +80,7 @@ export default function DoanhNghiepPage() {
         ...body,
         status: "active",
         logoColor: LOGO_COLORS[Math.floor(Math.random() * LOGO_COLORS.length)],
+        logoUrl: body.logoUrl ?? null,
       }),
     onSuccess: () => { invalidate(); closeDrawer(); },
     onError: (e: Error) => setSubmitErr(e.message),
@@ -114,10 +117,20 @@ export default function DoanhNghiepPage() {
       daiDien: dn.daiDien, sdt: dn.sdt, email: dn.email,
       diaChi: dn.diaChi, tinh: dn.tinh, xa: dn.xa,
       modules: dn.modules,
+      logoUrl: dn.logoUrl ?? null,
     });
     setActiveTab("general");
     setSubmitErr(null);
     setDrawerOpen(true);
+  }
+
+  const fileLogoRef = useRef<HTMLInputElement>(null);
+  function handleLogoChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setF("logoUrl", (ev.target?.result as string) ?? null);
+    reader.readAsDataURL(file);
   }
 
   const isPending = createMu.isPending || updateMu.isPending;
@@ -224,9 +237,13 @@ export default function DoanhNghiepPage() {
                     <td className="px-4 py-3"><input type="checkbox" className="accent-primary" /></td>
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-3">
-                        <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-semibold text-[13px] ${dn.logoColor}`}>
-                          {dn.tenHienThi.split(" ").slice(0, 2).map((s) => s[0]).join("")}
-                        </div>
+                        {dn.logoUrl ? (
+                          <img src={dn.logoUrl} alt={dn.tenHienThi} className="w-9 h-9 rounded-lg object-cover flex-shrink-0" />
+                        ) : (
+                          <div className={`w-9 h-9 rounded-lg flex items-center justify-center font-semibold text-[13px] flex-shrink-0 ${dn.logoColor}`}>
+                            {dn.tenHienThi.split(" ").slice(0, 2).map((s) => s[0]).join("")}
+                          </div>
+                        )}
                         <div>
                           <div className="font-medium text-foreground">{dn.ten}</div>
                           <div className="text-[12px] text-muted-foreground flex items-center gap-1">
@@ -353,15 +370,43 @@ export default function DoanhNghiepPage() {
                   <div>
                     <Label>Ảnh logo</Label>
                     <div className="flex items-center gap-4">
-                      <div className="w-20 h-20 rounded-xl bg-emerald-50 border-2 border-dashed border-emerald-300 flex items-center justify-center text-emerald-600">
-                        <Leaf className="w-8 h-8" />
-                      </div>
-                      <div>
-                        <button className="h-9 px-3 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted">
+                      {form.logoUrl ? (
+                        <img
+                          src={form.logoUrl}
+                          alt="logo"
+                          className="w-20 h-20 rounded-xl object-cover ring-2 ring-primary/20"
+                        />
+                      ) : (
+                        <div className="w-20 h-20 rounded-xl bg-emerald-50 border-2 border-dashed border-emerald-300 flex items-center justify-center text-emerald-600">
+                          <Leaf className="w-8 h-8" />
+                        </div>
+                      )}
+                      <div className="flex flex-col gap-1.5">
+                        <button
+                          type="button"
+                          onClick={() => fileLogoRef.current?.click()}
+                          className="h-9 px-3 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted"
+                        >
                           <Upload className="w-4 h-4" /> Tải ảnh lên
                         </button>
-                        <div className="text-[11.5px] text-muted-foreground mt-1.5">PNG / JPG, tối đa 2MB. Khuyến nghị 512×512.</div>
+                        {form.logoUrl && (
+                          <button
+                            type="button"
+                            onClick={() => setF("logoUrl", null)}
+                            className="h-7 px-2.5 rounded-lg text-[12px] text-muted-foreground hover:text-rose-600 hover:bg-rose-50 flex items-center gap-1"
+                          >
+                            <X className="w-3 h-3" /> Xóa logo
+                          </button>
+                        )}
+                        <div className="text-[11.5px] text-muted-foreground">PNG / JPG, tối đa 2MB. Khuyến nghị 512×512.</div>
                       </div>
+                      <input
+                        ref={fileLogoRef}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={handleLogoChange}
+                      />
                     </div>
                   </div>
 

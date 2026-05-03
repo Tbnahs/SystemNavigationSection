@@ -12,6 +12,7 @@ export type Enterprise = {
   modules: ("ERP" | "TXNG" | "VT")[];
   status: "active" | "pending" | "locked";
   logoColor: string;
+  logoUrl: string | null;
   createdAt: string;
   updatedAt: string;
 };
