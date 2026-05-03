@@ -21,7 +21,6 @@ const ERP_SUB_ITEMS = [
   { id: "purchase",   icon: Truck,        label: "Mua hàng" },
   { id: "inventory",  icon: Package,      label: "Kho hàng" },
   { id: "accounting", icon: DollarSign,   label: "Kế toán" },
-  { id: "hr",         icon: Users,        label: "Nhân sự" },
   { id: "production", icon: Factory,      label: "Sản xuất" },
   { id: "quality",    icon: CheckSquare,  label: "QC - Chất lượng" },
   { id: "packaging",  icon: Package,      label: "Đóng gói" },
