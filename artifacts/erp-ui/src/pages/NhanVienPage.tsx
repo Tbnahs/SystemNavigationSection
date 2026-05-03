@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
-  Search, Plus, Filter, Download, MoreHorizontal, ChevronDown, X, Upload,
-  Users, Package, Sprout, Bell, Pencil, Mail, Phone, ArrowLeft, ArrowRight,
-  Shield, Eye, LayoutGrid, Loader2,
+  Search, Plus, Filter, Download, X, Upload,
+  Users, Mail, Phone, ArrowLeft, ArrowRight,
+  Shield, Pencil, Loader2, ChevronDown, Check, RotateCcw,
 } from "lucide-react";
 import {
   fetchEmployees, fetchEmployeeStats, createEmployee,
@@ -12,6 +12,7 @@ import {
   type Employee,
 } from "@/lib/api";
 
+/* ─── Constants ────────────────────────────────────────────────── */
 const AVATAR_COLORS = [
   "bg-emerald-500", "bg-blue-500", "bg-amber-500", "bg-violet-500",
   "bg-rose-500", "bg-teal-500", "bg-indigo-500", "bg-orange-500",
@@ -23,26 +24,60 @@ const STATUS: Record<Employee["status"], { text: string; cls: string; dot: strin
   locked: { text: "Tạm khóa", cls: "bg-slate-100 text-slate-600 ring-slate-500/20", dot: "bg-slate-400" },
 };
 
-const ROLE_CLR: Record<Employee["role"], string> = {
-  Admin: "bg-rose-50 text-rose-700 ring-rose-600/20",
+const ROLE_CLR: Record<string, string> = {
+  "Admin": "bg-rose-50 text-rose-700 ring-rose-600/20",
   "Quản lý": "bg-blue-50 text-blue-700 ring-blue-600/20",
   "Nhân viên": "bg-slate-50 text-slate-700 ring-slate-500/20",
   "Kế toán": "bg-violet-50 text-violet-700 ring-violet-600/20",
 };
+function roleClr(role: string) { return ROLE_CLR[role] ?? "bg-emerald-50 text-emerald-700 ring-emerald-600/20"; }
 
+const DEFAULT_ROLES = ["Admin", "Quản lý", "Nhân viên", "Kế toán"];
+
+/* ─── Permissions ───────────────────────────────────────────────── */
+const ALL_PERMS: { id: string; label: string; group: string }[] = [
+  { id: "dn.xem", label: "Xem danh sách", group: "Doanh nghiệp" },
+  { id: "dn.sua", label: "Thêm / Sửa", group: "Doanh nghiệp" },
+  { id: "dn.xoa", label: "Xóa", group: "Doanh nghiệp" },
+  { id: "nv.xem", label: "Xem danh sách", group: "Nhân viên" },
+  { id: "nv.sua", label: "Thêm / Sửa", group: "Nhân viên" },
+  { id: "nv.xoa", label: "Xóa", group: "Nhân viên" },
+  { id: "txng.xem", label: "Xem truy xuất nguồn gốc", group: "TXNG" },
+  { id: "txng.tao", label: "Tạo / Cập nhật lô hàng", group: "TXNG" },
+  { id: "vt.xem", label: "Xem vùng trồng", group: "Vùng trồng" },
+  { id: "vt.sua", label: "Quản lý vùng trồng", group: "Vùng trồng" },
+  { id: "bc.xem", label: "Xem báo cáo", group: "Báo cáo" },
+  { id: "bc.xuat", label: "Kết xuất dữ liệu", group: "Báo cáo" },
+];
+const ALL_IDS = ALL_PERMS.map(p => p.id);
+const ROLE_PRESET: Record<string, string[]> = {
+  "Admin": ALL_IDS,
+  "Quản lý": ["dn.xem","dn.sua","nv.xem","nv.sua","txng.xem","txng.tao","vt.xem","vt.sua","bc.xem","bc.xuat"],
+  "Kế toán": ["dn.xem","nv.xem","txng.xem","vt.xem","bc.xem","bc.xuat"],
+  "Nhân viên": ["txng.xem","txng.tao","vt.xem"],
+};
+function presetFor(role: string) { return ROLE_PRESET[role] ?? []; }
+
+const PERM_GROUPS = [...new Set(ALL_PERMS.map(p => p.group))];
+
+/* ─── Form type ─────────────────────────────────────────────────── */
 type EForm = {
   name: string;
   email: string;
   phone: string;
   enterpriseId: number | null;
-  role: Employee["role"];
+  role: string;
+  permissions: string[];
 };
-const EMPTY_E: EForm = { name: "", email: "", phone: "", enterpriseId: null, role: "Nhân viên" };
+const EMPTY_E: EForm = {
+  name: "", email: "", phone: "", enterpriseId: null,
+  role: "Nhân viên", permissions: presetFor("Nhân viên"),
+};
 
+/* ─── Helpers ───────────────────────────────────────────────────── */
 function getInitials(name: string) {
   return name.trim().split(/\s+/).slice(-2).map((s) => s[0]?.toUpperCase() ?? "").join("") || "??";
 }
-
 const DN_COLORS = [
   "bg-emerald-100 text-emerald-700", "bg-blue-100 text-blue-700",
   "bg-amber-100 text-amber-700", "bg-purple-100 text-purple-700",
@@ -50,6 +85,235 @@ const DN_COLORS = [
 ];
 function colorFor(idx: number) { return DN_COLORS[idx % DN_COLORS.length]; }
 
+/* ─── Sub-components ────────────────────────────────────────────── */
+function Label({ children }: { children: React.ReactNode }) {
+  return <label className="block text-[13px] font-medium text-foreground mb-1.5">{children}</label>;
+}
+function Field({ label, required, placeholder, value, onChange }: {
+  label: string; required?: boolean; placeholder?: string; value: string; onChange: (v: string) => void;
+}) {
+  return (
+    <div>
+      <Label>{label}{required && <span className="text-rose-500 ml-0.5">*</span>}</Label>
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
+      />
+    </div>
+  );
+}
+
+function SelectChip({ label }: { label: string }) {
+  return (
+    <button className="h-10 px-3 rounded-lg border border-border text-sm flex items-center gap-1.5 hover:bg-muted text-foreground whitespace-nowrap">
+      {label} <ChevronDown className="w-3.5 h-3.5 text-muted-foreground" />
+    </button>
+  );
+}
+
+function Stat({ label, value, delta, tone, icon: Icon }: {
+  label: string; value: string; delta: string; tone: "emerald" | "blue" | "amber" | "rose"; icon: React.ElementType;
+}) {
+  const c = { emerald: "bg-emerald-50 text-emerald-600", blue: "bg-blue-50 text-blue-600", amber: "bg-amber-50 text-amber-600", rose: "bg-rose-50 text-rose-600" };
+  return (
+    <div className="bg-white border border-border rounded-xl p-4">
+      <div className="flex items-center justify-between mb-2">
+        <span className="text-[12.5px] text-muted-foreground">{label}</span>
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${c[tone]}`}><Icon className="w-4 h-4" /></div>
+      </div>
+      <div className="text-2xl font-bold">{value}</div>
+      {delta && <div className="text-[11.5px] text-muted-foreground mt-1">{delta}</div>}
+    </div>
+  );
+}
+
+/* ─── RoleCombobox ──────────────────────────────────────────────── */
+function RoleCombobox({ value, onChange, roles, onAddRole }: {
+  value: string;
+  onChange: (v: string) => void;
+  roles: string[];
+  onAddRole: (r: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handler(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
+
+  const filtered = roles.filter(r => r.toLowerCase().includes(search.toLowerCase()));
+  const exactMatch = roles.some(r => r.toLowerCase() === search.toLowerCase());
+  const canCreate = search.trim() && !exactMatch;
+
+  function select(r: string) {
+    onChange(r);
+    setSearch("");
+    setOpen(false);
+  }
+  function create() {
+    const r = search.trim();
+    onAddRole(r);
+    onChange(r);
+    setSearch("");
+    setOpen(false);
+  }
+
+  return (
+    <div ref={ref} className="relative">
+      <div
+        onClick={() => { setOpen(o => !o); }}
+        className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm flex items-center justify-between cursor-pointer hover:border-primary/60 transition-colors"
+      >
+        {open ? (
+          <input
+            autoFocus
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Tìm vai trò…"
+            className="flex-1 outline-none bg-transparent text-sm"
+            onClick={e => e.stopPropagation()}
+          />
+        ) : (
+          <span>{value || "Chọn vai trò"}</span>
+        )}
+        <ChevronDown className={`w-4 h-4 text-muted-foreground ml-2 flex-shrink-0 transition-transform ${open ? "rotate-180" : ""}`} />
+      </div>
+
+      {open && (
+        <div className="absolute z-50 mt-1 w-full bg-white border border-border rounded-xl shadow-lg py-1 max-h-52 overflow-auto">
+          {filtered.length === 0 && !canCreate && (
+            <div className="px-3 py-2.5 text-[13px] text-muted-foreground text-center">Không tìm thấy</div>
+          )}
+          {filtered.map(r => (
+            <button
+              key={r}
+              onClick={() => select(r)}
+              className="w-full px-3 py-2 text-left text-[13.5px] flex items-center justify-between hover:bg-muted/60"
+            >
+              <span>{r}</span>
+              {r === value && <Check className="w-3.5 h-3.5 text-primary" />}
+            </button>
+          ))}
+          {canCreate && (
+            <button
+              onClick={create}
+              className="w-full px-3 py-2 text-left text-[13.5px] flex items-center gap-2 hover:bg-emerald-50 text-emerald-700 border-t border-border mt-1 pt-2"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              Tạo vai trò "<span className="font-semibold">{search.trim()}</span>"
+            </button>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── PermissionMatrix ──────────────────────────────────────────── */
+function PermissionMatrix({ permissions, onChange, role }: {
+  permissions: string[];
+  onChange: (p: string[]) => void;
+  role: string;
+}) {
+  const preset = presetFor(role);
+  const isDefault = JSON.stringify([...permissions].sort()) === JSON.stringify([...preset].sort());
+
+  function toggle(id: string) {
+    onChange(permissions.includes(id) ? permissions.filter(p => p !== id) : [...permissions, id]);
+  }
+  function reset() { onChange(preset); }
+
+  return (
+    <div className="rounded-xl border border-border bg-slate-50/60 overflow-hidden">
+      <div className="px-4 py-3 border-b border-border flex items-center justify-between bg-white">
+        <div>
+          <div className="text-[13px] font-semibold">Phạm vi tài khoản</div>
+          <div className="text-[11.5px] text-muted-foreground mt-0.5">Chọn chức năng nhân viên được phép truy cập</div>
+        </div>
+        <div className="flex items-center gap-2">
+          {isDefault ? (
+            <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 font-medium">
+              Mặc định theo vai trò
+            </span>
+          ) : (
+            <>
+              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 ring-1 ring-amber-600/20 font-medium">
+                Đã tùy chỉnh
+              </span>
+              <button
+                onClick={reset}
+                className="h-7 px-2.5 rounded-lg border border-border text-[11.5px] flex items-center gap-1 hover:bg-muted text-muted-foreground"
+                title="Đặt lại theo vai trò"
+              >
+                <RotateCcw className="w-3 h-3" /> Đặt lại
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+
+      <div className="p-4 space-y-4">
+        {PERM_GROUPS.map(group => {
+          const perms = ALL_PERMS.filter(p => p.group === group);
+          const checkedCount = perms.filter(p => permissions.includes(p.id)).length;
+          const allChecked = checkedCount === perms.length;
+          const someChecked = checkedCount > 0 && !allChecked;
+
+          function toggleGroup() {
+            const ids = perms.map(p => p.id);
+            if (allChecked) {
+              onChange(permissions.filter(id => !ids.includes(id)));
+            } else {
+              onChange([...new Set([...permissions, ...ids])]);
+            }
+          }
+
+          return (
+            <div key={group}>
+              <button
+                onClick={toggleGroup}
+                className="flex items-center gap-2 mb-2 w-full text-left group"
+              >
+                <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
+                  allChecked ? "bg-primary border-primary" : someChecked ? "bg-primary/30 border-primary/50" : "border-border"
+                }`}>
+                  {allChecked && <Check className="w-2.5 h-2.5 text-white" />}
+                  {someChecked && <div className="w-2 h-0.5 bg-primary rounded" />}
+                </div>
+                <span className="text-[12.5px] font-semibold text-foreground">{group}</span>
+                <span className="text-[11.5px] text-muted-foreground">({checkedCount}/{perms.length})</span>
+              </button>
+              <div className="ml-6 space-y-1.5">
+                {perms.map(p => (
+                  <label key={p.id} className="flex items-center gap-2.5 cursor-pointer group">
+                    <div
+                      onClick={() => toggle(p.id)}
+                      className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer ${
+                        permissions.includes(p.id) ? "bg-primary border-primary" : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      {permissions.includes(p.id) && <Check className="w-2.5 h-2.5 text-white" />}
+                    </div>
+                    <span className="text-[13px] text-foreground/90 group-hover:text-foreground">{p.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Main Page ─────────────────────────────────────────────────── */
 export default function NhanVienPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<Employee | null>(null);
@@ -57,6 +321,7 @@ export default function NhanVienPage() {
   const [search, setSearch] = useState("");
   const [form, setForm] = useState<EForm>(EMPTY_E);
   const [submitErr, setSubmitErr] = useState<string | null>(null);
+  const [roles, setRoles] = useState<string[]>(DEFAULT_ROLES);
 
   const qc = useQueryClient();
   const listQ = useQuery({ queryKey: ["employees"], queryFn: fetchEmployees });
@@ -100,14 +365,22 @@ export default function NhanVienPage() {
   }
 
   function openEdit(u: Employee) {
+    if (!roles.includes(u.role)) setRoles(r => [...r, u.role]);
     setEditItem(u);
     setForm({
       name: u.name, email: u.email, phone: u.phone,
       enterpriseId: u.enterpriseId,
       role: u.role,
+      permissions: presetFor(u.role),
     });
     setSubmitErr(null);
     setDrawerOpen(true);
+  }
+
+  function setF<K extends keyof EForm>(k: K, v: EForm[K]) { setForm((p) => ({ ...p, [k]: v })); }
+
+  function setRole(r: string) {
+    setForm(p => ({ ...p, role: r, permissions: presetFor(r) }));
   }
 
   const isPending = createMu.isPending || updateMu.isPending;
@@ -119,7 +392,6 @@ export default function NhanVienPage() {
       )
     : items;
 
-  function setF<K extends keyof EForm>(k: K, v: EForm[K]) { setForm((p) => ({ ...p, [k]: v })); }
   function handleSubmit() {
     setSubmitErr(null);
     if (!form.name.trim()) { setSubmitErr("Vui lòng nhập họ và tên."); return; }
@@ -218,7 +490,7 @@ export default function NhanVienPage() {
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ${colorFor(i)}`}>{u.enterpriseName ?? "—"}</span>
                     </td>
                     <td className="px-3 py-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ring-1 ring-inset ${ROLE_CLR[u.role]}`}>{u.role}</span>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ring-1 ring-inset ${roleClr(u.role)}`}>{u.role}</span>
                     </td>
                     <td className="px-3 py-3">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ring-1 ring-inset ${STATUS[u.status].cls}`}>
@@ -265,12 +537,7 @@ export default function NhanVienPage() {
               Thao tác này không thể hoàn tác.
             </p>
             <div className="flex gap-3">
-              <button
-                onClick={() => setDeleteTarget(null)}
-                className="flex-1 h-11 rounded-xl border border-border font-medium text-[14px] hover:bg-muted"
-              >
-                Hủy
-              </button>
+              <button onClick={() => setDeleteTarget(null)} className="flex-1 h-11 rounded-xl border border-border font-medium text-[14px] hover:bg-muted">Hủy</button>
               <button
                 disabled={deleteMu.isPending}
                 onClick={() => deleteMu.mutate(deleteTarget.id)}
@@ -284,11 +551,11 @@ export default function NhanVienPage() {
         </div>
       )}
 
-      {/* Add/Edit Employee Drawer */}
+      {/* Add/Edit Drawer */}
       {drawerOpen && (
         <>
           <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={closeDrawer} />
-          <aside className="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-white shadow-2xl z-50 flex flex-col">
+          <aside className="fixed top-0 right-0 h-full w-full sm:w-[520px] bg-white shadow-2xl z-50 flex flex-col">
             <div className="px-6 py-5 border-b border-border flex items-center justify-between">
               <div>
                 <div className="text-[18px] font-semibold">{editItem ? "Sửa thông tin nhân viên" : "Thêm nhân viên mới"}</div>
@@ -300,6 +567,7 @@ export default function NhanVienPage() {
             </div>
 
             <div className="flex-1 overflow-auto px-6 py-5 space-y-4">
+              {/* Avatar */}
               <div>
                 <Label>Ảnh đại diện</Label>
                 <div className="flex items-center gap-4">
@@ -317,6 +585,7 @@ export default function NhanVienPage() {
                 <Field label="Email" placeholder="ten@congty.vn" value={form.email} onChange={(v) => setF("email", v)} />
               </div>
 
+              {/* Doanh nghiệp */}
               <div>
                 <Label>Doanh nghiệp</Label>
                 <select
@@ -331,19 +600,25 @@ export default function NhanVienPage() {
                 </select>
               </div>
 
+              {/* Vai trò – searchable combobox */}
               <div>
                 <Label>Vai trò</Label>
-                <select
+                <RoleCombobox
                   value={form.role}
-                  onChange={(e) => setF("role", e.target.value as Employee["role"])}
-                  className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
-                >
-                  {(["Admin", "Quản lý", "Nhân viên", "Kế toán"] as const).map((r) => (
-                    <option key={r} value={r}>{r}</option>
-                  ))}
-                </select>
+                  onChange={setRole}
+                  roles={roles}
+                  onAddRole={(r) => setRoles(prev => [...prev, r])}
+                />
               </div>
 
+              {/* Permission matrix */}
+              <PermissionMatrix
+                permissions={form.permissions}
+                onChange={(p) => setF("permissions", p)}
+                role={form.role}
+              />
+
+              {/* Email invite */}
               <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-3 flex items-start gap-3">
                 <input type="checkbox" defaultChecked className="mt-1 accent-primary" />
                 <div className="text-[13px] text-foreground">
@@ -353,9 +628,7 @@ export default function NhanVienPage() {
               </div>
 
               {submitErr && (
-                <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">
-                  {submitErr}
-                </div>
+                <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{submitErr}</div>
               )}
             </div>
 
@@ -376,49 +649,3 @@ export default function NhanVienPage() {
     </AppLayout>
   );
 }
-
-function Stat({ label, value, delta, tone, icon: Icon }: { label: string; value: string; delta: string; tone: "emerald" | "blue" | "amber" | "rose"; icon: React.ComponentType<{ className?: string }>; }) {
-  const tones = {
-    emerald: "bg-emerald-50 text-emerald-700",
-    blue: "bg-blue-50 text-blue-700",
-    amber: "bg-amber-50 text-amber-700",
-    rose: "bg-rose-50 text-rose-700",
-  };
-  return (
-    <div className="bg-white border border-border rounded-xl p-4 flex items-start justify-between">
-      <div>
-        <div className="text-[12.5px] text-muted-foreground">{label}</div>
-        <div className="text-[24px] font-bold text-foreground leading-tight mt-0.5">{value}</div>
-        <div className="text-[11.5px] text-muted-foreground mt-0.5">{delta}</div>
-      </div>
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${tones[tone]}`}>
-        <Icon className="w-5 h-5" />
-      </div>
-    </div>
-  );
-}
-
-function SelectChip({ label }: { label: string }) {
-  return (
-    <button className="h-10 px-3 rounded-lg border border-border text-sm flex items-center gap-2 hover:bg-muted text-muted-foreground">
-      {label}<ChevronDown className="w-3.5 h-3.5" />
-    </button>
-  );
-}
-
-function Label({ children }: { children: React.ReactNode }) {
-  return <div className="text-[13px] font-medium mb-1.5 text-foreground/80">{children}</div>;
-}
-
-function Field({ label, value, placeholder, required, onChange }: { label: string; value?: string; placeholder?: string; required?: boolean; onChange?: (v: string) => void }) {
-  return (
-    <div>
-      <div className="flex items-center gap-1 mb-1.5">
-        <span className="text-[13px] font-medium text-foreground/80">{label}</span>
-        {required && <span className="text-rose-500">*</span>}
-      </div>
-      <input value={value ?? ""} onChange={(e) => onChange?.(e.target.value)} placeholder={placeholder} className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10" />
-    </div>
-  );
-}
-

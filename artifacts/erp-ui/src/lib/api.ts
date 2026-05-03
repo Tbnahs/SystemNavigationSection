@@ -22,7 +22,7 @@ export type Employee = {
   name: string;
   email: string;
   phone: string;
-  role: "Admin" | "Quản lý" | "Nhân viên" | "Kế toán";
+  role: string;
   status: "active" | "invited" | "locked";
   avatarColor: string;
   lastSeen: string;

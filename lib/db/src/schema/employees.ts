@@ -10,7 +10,7 @@ export const employeesTable = pgTable("employees", {
   name: text("name").notNull(),
   email: text("email").default("").notNull(),
   phone: text("phone").default("").notNull(),
-  role: text("role", { enum: ["Admin", "Quản lý", "Nhân viên", "Kế toán"] })
+  role: text("role")
     .default("Nhân viên")
     .notNull(),
   status: text("status", { enum: ["active", "invited", "locked"] })
