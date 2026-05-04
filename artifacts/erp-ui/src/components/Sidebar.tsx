@@ -30,6 +30,13 @@ const ERP_SUB_ITEMS: NavItem[] = [
   { type: "divider", label: "Đóng gói" },
   { id: "packaging",  icon: Package,      label: "Lô đóng gói" },
 
+  { type: "divider", label: "Bán hàng" },
+  { id: "sales",    icon: ShoppingCart,   label: "Đơn hàng" },
+  { id: "crm",      icon: UserCircle,     label: "Khách hàng" },
+
+  { type: "divider", label: "Báo cáo" },
+  { id: "reports",  icon: FileBarChart,   label: "Báo cáo" },
+
   { type: "divider", label: "Danh mục" },
   { id: "thuong-pham", icon: Package,     label: "Thương phẩm" },
   { id: "quy-cach",    icon: BookOpen,    label: "Quy cách & Tiêu chuẩn" },
