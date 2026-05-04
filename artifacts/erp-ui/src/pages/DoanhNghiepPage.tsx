@@ -131,6 +131,7 @@ export default function DoanhNghiepPage() {
       diaChi: dn.diaChi, tinh: dn.tinh, xa: dn.xa,
       modules: dn.modules,
       logoUrl: dn.logoUrl ?? null,
+      matKhau: "",
     });
     setActiveTab("general");
     setSubmitErr(null);

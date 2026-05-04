@@ -6,7 +6,7 @@ import {
   CheckCircle, FileText, XCircle,
 } from "lucide-react";
 import {
-  fetchPurchaseOrders, createPurchaseOrder, updatePurchaseOrder, deletePurchaseOrder,
+  fetchPurchaseOrders, fetchPurchaseOrder, createPurchaseOrder, updatePurchaseOrder, deletePurchaseOrder,
   fetchProducts, fetchGrades, fetchQualityLevels, fetchFacilities, fetchEnterprises,
   type PurchaseOrder, type PurchaseOrderItem,
 } from "@/lib/api";
@@ -113,7 +113,16 @@ export default function DonThuMuaPage() {
   function openEdit(o: PurchaseOrder) {
     setEditItem(o);
     setForm({ maPhieu: o.maPhieu, enterpriseId: o.enterpriseId, facilityId: o.facilityId, facilityName: o.facilityName, ngayThu: o.ngayThu, status: o.status, notes: o.notes, lamTron: o.lamTron ?? "0" });
-    setErr(null); setDrawerOpen(true);
+    setLines([emptyLine()]);
+    setErr(null);
+    setDrawerOpen(true);
+    fetchPurchaseOrder(o.id)
+      .then(({ lineItems }) => {
+        if (lineItems && lineItems.length > 0) {
+          setLines(lineItems.map(li => ({ ...li, _key: String(Date.now() + Math.random()) })));
+        }
+      })
+      .catch(() => {});
   }
   function setF<K extends keyof OForm>(k: K, v: OForm[K]) { setForm(p => ({ ...p, [k]: v })); }
 
@@ -192,7 +201,10 @@ export default function DonThuMuaPage() {
   const products = productsQ.data?.items ?? [];
   const grades = gradesQ.data?.items ?? [];
   const qualityLevels = qlQ.data?.items ?? [];
-  const facilities = facilitiesQ.data?.items ?? [];
+  const allFacilities = facilitiesQ.data?.items ?? [];
+  const facilities = form.enterpriseId
+    ? allFacilities.filter(f => f.enterpriseId === form.enterpriseId)
+    : allFacilities;
   const enterprises = dnQ.data?.items ?? [];
 
   return (
@@ -349,7 +361,13 @@ export default function DonThuMuaPage() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[13px] font-medium mb-1.5">Doanh nghiệp</label>
-                  <select value={form.enterpriseId ?? ""} onChange={e => setF("enterpriseId", e.target.value ? Number(e.target.value) : null)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
+                  <select
+                    value={form.enterpriseId ?? ""}
+                    onChange={e => {
+                      setForm(p => ({ ...p, enterpriseId: e.target.value ? Number(e.target.value) : null, facilityId: null, facilityName: "" }));
+                    }}
+                    className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white"
+                  >
                     <option value="">-- Chọn DN --</option>
                     {enterprises.map(d => <option key={d.id} value={d.id}>{d.tenHienThi}</option>)}
                   </select>
