@@ -29,6 +29,7 @@ import DonViTinhPage from "@/pages/DonViTinhPage";
 import CoSoPage from "@/pages/CoSoPage";
 import ThuongPhamPage from "@/pages/ThuongPhamPage";
 import DonThuMuaPage from "@/pages/DonThuMuaPage";
+import QuanTriPage from "@/pages/QuanTriPage";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -93,6 +94,9 @@ function Router() {
       </Route>
       <Route path="/module/erp/settings">
         {() => <ProtectedRoute component={SettingsPage} />}
+      </Route>
+      <Route path="/quan-tri">
+        {() => <ProtectedRoute component={QuanTriPage} />}
       </Route>
       <Route path="/quan-tri/doanh-nghiep">
         {() => <ProtectedRoute component={DoanhNghiepPage} />}

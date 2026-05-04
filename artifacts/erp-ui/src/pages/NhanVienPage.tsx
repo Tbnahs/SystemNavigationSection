@@ -1,15 +1,16 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   Search, Plus, Filter, Download, X, Upload,
   Users, Mail, Phone, ArrowLeft, ArrowRight,
-  Shield, Pencil, Loader2, ChevronDown, Check, RotateCcw,
+  Shield, Pencil, Loader2, ChevronDown, Check, RotateCcw, Factory,
 } from "lucide-react";
 import {
   fetchEmployees, fetchEmployeeStats, createEmployee,
   updateEmployee, deleteEmployee, fetchEnterprises,
-  resetEmployeePassword, type Employee,
+  resetEmployeePassword, setEmployeeFacilities,
+  fetchFacilities, fetchAdminTree, type Employee, type Facility,
 } from "@/lib/api";
 
 /* ─── Constants ────────────────────────────────────────────────── */
@@ -75,10 +76,12 @@ type EForm = {
   role: string;
   permissions: string[];
   avatarUrl: string | null;
+  facilityIds: number[];
 };
 const EMPTY_E: EForm = {
   name: "", email: "", phone: "", enterpriseId: null,
   role: "Nhân viên", permissions: presetFor("Nhân viên"), avatarUrl: null,
+  facilityIds: [],
 };
 
 /* ─── Helpers ───────────────────────────────────────────────────── */
@@ -355,6 +358,30 @@ export default function NhanVienPage() {
   const listQ = useQuery({ queryKey: ["employees"], queryFn: fetchEmployees });
   const statsQ = useQuery({ queryKey: ["employees-stats"], queryFn: fetchEmployeeStats });
   const dnQ = useQuery({ queryKey: ["enterprises"], queryFn: fetchEnterprises });
+  const facQ = useQuery({ queryKey: ["facilities"], queryFn: fetchFacilities });
+  const treeQ = useQuery({ queryKey: ["admin-tree"], queryFn: fetchAdminTree });
+
+  const empFacilityMap = useMemo<Record<number, Facility[]>>(() => {
+    if (!treeQ.data || !facQ.data) return {};
+    const facilityById: Record<number, Facility> = {};
+    for (const f of facQ.data.items) facilityById[f.id] = f;
+    const map: Record<number, Facility[]> = {};
+    for (const dn of treeQ.data.tree) {
+      for (const f of dn.facilities) {
+        for (const u of f.users) {
+          if (!map[u.id]) map[u.id] = [];
+          const fac = facilityById[f.id];
+          if (fac) map[u.id].push(fac);
+        }
+      }
+    }
+    return map;
+  }, [treeQ.data, facQ.data]);
+
+  const facilities = facQ.data?.items ?? [];
+  const facilitiesForEnt = form.enterpriseId
+    ? facilities.filter(f => f.enterpriseId === form.enterpriseId)
+    : facilities;
 
   function invalidate() {
     qc.invalidateQueries({ queryKey: ["employees"] });
@@ -362,20 +389,29 @@ export default function NhanVienPage() {
   }
 
   const createMu = useMutation({
-    mutationFn: (body: EForm) =>
-      createEmployee({
+    mutationFn: async (body: EForm) => {
+      const result = await createEmployee({
         ...body,
         status: "invited",
         avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
         lastSeen: "Chưa đăng nhập",
-      }),
-    onSuccess: () => { invalidate(); closeDrawer(); },
+      });
+      if (body.facilityIds.length > 0) {
+        await setEmployeeFacilities(result.item.id, body.facilityIds);
+      }
+      return result;
+    },
+    onSuccess: () => { invalidate(); qc.invalidateQueries({ queryKey: ["admin-tree"] }); closeDrawer(); },
     onError: (e: Error) => setSubmitErr(e.message),
   });
 
   const updateMu = useMutation({
-    mutationFn: ({ id, body }: { id: number; body: EForm }) => updateEmployee(id, body),
-    onSuccess: () => { invalidate(); closeDrawer(); },
+    mutationFn: async ({ id, body }: { id: number; body: EForm }) => {
+      const result = await updateEmployee(id, body);
+      await setEmployeeFacilities(id, body.facilityIds);
+      return result;
+    },
+    onSuccess: () => { invalidate(); qc.invalidateQueries({ queryKey: ["admin-tree"] }); closeDrawer(); },
     onError: (e: Error) => setSubmitErr(e.message),
   });
 
@@ -407,9 +443,14 @@ export default function NhanVienPage() {
       role: u.role,
       permissions: presetFor(u.role),
       avatarUrl: u.avatarUrl ?? null,
+      facilityIds: [],
     });
     setSubmitErr(null);
     setDrawerOpen(true);
+    fetch(`${(import.meta.env.BASE_URL || "/").replace(/\/$/, "")}/api/employees/${u.id}/facilities`)
+      .then(r => r.json())
+      .then((d: { facilityIds: number[] }) => setForm(p => ({ ...p, facilityIds: d.facilityIds ?? [] })))
+      .catch(() => {});
   }
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -535,6 +576,7 @@ export default function NhanVienPage() {
                   <th className="px-3 py-3">Nhân viên</th>
                   <th className="px-3 py-3">Liên hệ</th>
                   <th className="px-3 py-3">Doanh nghiệp</th>
+                  <th className="px-3 py-3">Cơ sở phụ trách</th>
                   <th className="px-3 py-3">Vai trò</th>
                   <th className="px-3 py-3">Trạng thái</th>
                   <th className="px-3 py-3">Hoạt động cuối</th>
@@ -543,15 +585,16 @@ export default function NhanVienPage() {
               </thead>
               <tbody>
                 {listQ.isLoading && (
-                  <tr><td colSpan={8} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>
+                  <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>
                 )}
                 {listQ.isError && (
-                  <tr><td colSpan={8} className="px-4 py-10 text-center text-rose-600">Lỗi: {(listQ.error as Error).message}</td></tr>
+                  <tr><td colSpan={9} className="px-4 py-10 text-center text-rose-600">Lỗi: {(listQ.error as Error).message}</td></tr>
                 )}
                 {!listQ.isLoading && !listQ.isError && filtered.length === 0 && (
-                  <tr><td colSpan={8} className="px-4 py-10 text-center text-muted-foreground">{search ? "Không tìm thấy nhân viên phù hợp." : "Chưa có nhân viên nào."}</td></tr>
+                  <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">{search ? "Không tìm thấy nhân viên phù hợp." : "Chưa có nhân viên nào."}</td></tr>
                 )}
-                {filtered.map((u, i) => (
+                {filtered.map((u, i) => {
+                  return (
                   <tr key={u.id} className="border-t border-border hover:bg-emerald-50/30">
                     <td className="px-4 py-3"><input type="checkbox" className="accent-primary" /></td>
                     <td className="px-3 py-3">
@@ -575,6 +618,19 @@ export default function NhanVienPage() {
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ${colorFor(i)}`}>{u.enterpriseName ?? "—"}</span>
                     </td>
                     <td className="px-3 py-3">
+                      {empFacilityMap[u.id]?.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {empFacilityMap[u.id].map(f => (
+                            <span key={f.id} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[11px] font-medium">
+                              <Factory className="w-2.5 h-2.5" />{f.name}
+                            </span>
+                          ))}
+                        </div>
+                      ) : (
+                        <span className="text-[12px] text-muted-foreground italic">Chưa gán</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-3">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ring-1 ring-inset ${roleClr(u.role)}`}>{u.role}</span>
                     </td>
                     <td className="px-3 py-3">
@@ -592,7 +648,8 @@ export default function NhanVienPage() {
                       </div>
                     </td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -764,6 +821,50 @@ export default function NhanVienPage() {
                   ))}
                 </select>
               </div>
+
+              {/* Cơ sở phụ trách */}
+              {facilitiesForEnt.length > 0 && (
+                <div>
+                  <Label>Cơ sở phụ trách (Operator)</Label>
+                  <div className="rounded-xl border border-border overflow-hidden">
+                    <div className="px-3 py-2 bg-muted/40 border-b border-border text-[11.5px] text-muted-foreground">
+                      {form.facilityIds.length === 0
+                        ? "Chưa gán cơ sở (tài khoản cấp doanh nghiệp)"
+                        : `Đã chọn ${form.facilityIds.length} cơ sở`}
+                    </div>
+                    <div className="max-h-40 overflow-y-auto divide-y divide-border">
+                      {facilitiesForEnt.map(f => {
+                        const checked = form.facilityIds.includes(f.id);
+                        return (
+                          <label key={f.id} className="flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-muted/40">
+                            <div
+                              onClick={() => setF("facilityIds", checked
+                                ? form.facilityIds.filter(id => id !== f.id)
+                                : [...form.facilityIds, f.id]
+                              )}
+                              className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer ${
+                                checked ? "bg-primary border-primary" : "border-border hover:border-primary/50"
+                              }`}
+                            >
+                              {checked && <Check className="w-2.5 h-2.5 text-white" />}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="text-[13px] font-medium text-foreground flex items-center gap-1.5">
+                                <Factory className="w-3.5 h-3.5 text-muted-foreground" />{f.name}
+                              </div>
+                              {f.address && <div className="text-[11px] text-muted-foreground truncate">{f.address}</div>}
+                            </div>
+                            {f.code && <span className="ml-auto text-[11px] text-muted-foreground shrink-0">{f.code}</span>}
+                          </label>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <p className="text-[11.5px] text-muted-foreground mt-1">
+                    Không chọn cơ sở = tài khoản quản lý cấp doanh nghiệp (Admin/Manager).
+                  </p>
+                </div>
+              )}
 
               {/* Vai trò – searchable combobox */}
               <div>

@@ -1,7 +1,7 @@
 import { Router, type Request, type Response, type NextFunction } from "express";
 import bcrypt from "bcryptjs";
-import { db, employeesTable, enterprisesTable, insertEmployeeSchema } from "@workspace/db";
-import { eq, desc, count } from "drizzle-orm";
+import { db, employeesTable, enterprisesTable, facilityEmployeesTable, facilitiesTable, insertEmployeeSchema } from "@workspace/db";
+import { eq, desc, count, inArray } from "drizzle-orm";
 
 const router: Router = Router();
 
@@ -100,6 +100,36 @@ router.get("/employees-stats", async (_req: Request, res: Response, next: NextFu
   } catch (e) {
     next(e);
   }
+});
+
+/* Lấy danh sách cơ sở của nhân viên */
+router.get("/employees/:id/facilities", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const id = Number(req.params.id);
+    if (!Number.isFinite(id)) return res.status(400).json({ error: "Invalid id" });
+    const rows = await db
+      .select({ facilityId: facilityEmployeesTable.facilityId })
+      .from(facilityEmployeesTable)
+      .where(eq(facilityEmployeesTable.employeeId, id));
+    res.json({ facilityIds: rows.map(r => r.facilityId) });
+  } catch (e) { next(e); }
+});
+
+/* Gán nhân viên vào cơ sở (user-centric) */
+router.post("/employees/:id/set-facilities", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const employeeId = Number(req.params.id);
+    if (!Number.isFinite(employeeId)) return res.status(400).json({ error: "Invalid id" });
+    const { facilityIds } = req.body as { facilityIds: number[] };
+
+    await db.delete(facilityEmployeesTable).where(eq(facilityEmployeesTable.employeeId, employeeId));
+    if (Array.isArray(facilityIds) && facilityIds.length > 0) {
+      await db.insert(facilityEmployeesTable).values(
+        facilityIds.map(fid => ({ facilityId: fid, employeeId }))
+      );
+    }
+    res.json({ ok: true });
+  } catch (e) { next(e); }
 });
 
 /* Reset mật khẩu mặc định */

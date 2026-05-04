@@ -196,6 +196,10 @@ export const deleteEmployee = (id: number) =>
 export const fetchEmployeeStats = () => request<EmployeeStats>("/employees-stats");
 export const resetEmployeePassword = (id: number) =>
   request<{ ok: true; defaultPassword: string }>(`/employees/${id}/reset-password`, { method: "POST" });
+export const setEmployeeFacilities = (id: number, facilityIds: number[]) =>
+  request<{ ok: true }>(`/employees/${id}/set-facilities`, { method: "POST", body: JSON.stringify({ facilityIds }) });
+export const fetchEmployeeFacilities = (id: number) =>
+  request<{ facilityIds: number[] }>(`/employees/${id}/facilities`);
 
 /* ── Units (Đơn vị tính) ─────────────────────────────────── */
 export const fetchUnits = () => request<{ items: Unit[] }>("/units");
@@ -252,6 +256,32 @@ export const updateStandard = (id: number, body: Partial<Standard>) =>
   request<{ item: Standard }>(`/standards/${id}`, { method: "PATCH", body: JSON.stringify(body) });
 export const deleteStandard = (id: number) =>
   request<{ ok: true }>(`/standards/${id}`, { method: "DELETE" });
+
+/* ── Admin Tree ──────────────────────────────────────────── */
+export type AdminFacilityUser = {
+  id: number; name: string; role: string;
+  status: "active" | "invited" | "locked";
+  avatarColor: string; email: string;
+};
+export type AdminFacility = {
+  id: number; enterpriseId: number | null; name: string; code: string;
+  type: "ho_lien_ket" | "co_so_thue_ngoai" | "co_so_noi_bo";
+  status: "active" | "inactive"; address: string; phone: string;
+  users: AdminFacilityUser[];
+};
+export type AdminEnterprise = {
+  id: number; tenHienThi: string; ten: string; email: string;
+  logoColor: string; logoUrl: string | null;
+  status: "active" | "pending" | "locked";
+  modules: ("ERP" | "TXNG" | "VT")[];
+  facilities: AdminFacility[];
+  adminUsers: AdminFacilityUser[];
+};
+export type AdminTree = {
+  tree: AdminEnterprise[];
+  superAdmins: AdminFacilityUser[];
+};
+export const fetchAdminTree = () => request<AdminTree>("/admin-tree");
 
 /* ── Purchase Orders (Đơn thu mua) ──────────────────────── */
 export const fetchPurchaseOrders = () => request<{ items: PurchaseOrder[] }>("/purchase-orders");

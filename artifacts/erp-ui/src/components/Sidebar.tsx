@@ -6,7 +6,7 @@ import {
   UserCircle, FileBarChart, CheckSquare, BookOpen, ChevronDown,
   QrCode, Link2, Award, Layers, GitBranch, Search,
   MapPin, Sprout, FlaskConical, Scissors, CloudSun, ClipboardCheck,
-  Building2, ShieldCheck, Scale, ShoppingBasket, ClipboardList,
+  Building2, ShieldCheck, Scale, ShoppingBasket, ClipboardList, LayoutGrid,
 } from "lucide-react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import logoImg from "@assets/Logo ESG.png";
@@ -54,12 +54,13 @@ const FARMING_SUB_ITEMS: NavItem[] = [
 ];
 
 const ADMIN_SUB_ITEMS: NavItem[] = [
+  { id: "",             icon: LayoutGrid, label: "Tổng quan tổ chức" },
   { type: "divider", label: "Tài khoản" },
-  { id: "doanh-nghiep", icon: Building2, label: "Doanh nghiệp" },
-  { id: "nguoi-dung",   icon: Users,     label: "Người dùng" },
+  { id: "doanh-nghiep", icon: Building2,  label: "Doanh nghiệp" },
+  { id: "nguoi-dung",   icon: Users,      label: "Người dùng" },
   { type: "divider", label: "Danh mục" },
-  { id: "don-vi-tinh",  icon: Scale,     label: "Đơn vị tính" },
-  { id: "co-so",        icon: Factory,   label: "Cơ sở" },
+  { id: "don-vi-tinh",  icon: Scale,      label: "Đơn vị tính" },
+  { id: "co-so",        icon: Factory,    label: "Cơ sở" },
 ];
 
 function ExpandableNavItem({
@@ -106,8 +107,8 @@ function ExpandableNavItem({
                 </p>
               );
             }
-            const subHref = `${subBase}/${item.id}`;
-            const active = location === subHref;
+            const subHref = item.id ? `${subBase}/${item.id}` : subBase;
+            const active = item.id ? location === subHref : (location === subBase);
             const SubIcon = item.icon;
             return (
               <Link
@@ -136,7 +137,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   const isOnErp     = location === "/module/erp"     || location.startsWith("/module/erp/");
   const isOnTxng    = location === "/module/txng"    || location.startsWith("/module/txng/");
   const isOnFarming = location === "/module/farming" || location.startsWith("/module/farming/");
-  const isOnAdmin   = location.startsWith("/quan-tri/");
+  const isOnAdmin   = location === "/quan-tri" || location.startsWith("/quan-tri/");
 
   const [erpExpanded,     setErpExpanded]     = useState(isOnErp);
   const [txngExpanded,    setTxngExpanded]    = useState(isOnTxng);
@@ -217,7 +218,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           />
 
           <ExpandableNavItem
-            href="/quan-tri/doanh-nghiep"
+            href="/quan-tri"
             subBase="/quan-tri"
             icon={ShieldCheck}
             label="Quản trị hệ thống"
