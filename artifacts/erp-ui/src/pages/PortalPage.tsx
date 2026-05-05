@@ -26,10 +26,15 @@ const TYPE_LABEL: Record<string, { label: string; color: string; icon: React.Ele
   co_so_noi_bo:     { label: "Cơ sở SX (nội bộ)",       color: "bg-violet-50 text-violet-700 ring-violet-200",   icon: Factory },
 };
 
-const MODULE_META: Record<string, { label: string; color: string; bg: string; icon: React.ElementType }> = {
-  ERP:  { label: "ERP",                  color: "text-emerald-700", bg: "bg-emerald-100", icon: BarChart3 },
-  TXNG: { label: "Truy xuất nguồn gốc",  color: "text-blue-700",    bg: "bg-blue-100",    icon: ScanLine  },
-  VT:   { label: "Vùng trồng + IoT",     color: "text-amber-700",   bg: "bg-amber-100",   icon: Leaf      },
+type ModuleMetaItem = { label: string; color: string; bg: string; icon: React.ElementType };
+
+const MODULE_META: Record<string, ModuleMetaItem[]> = {
+  ERP:  [{ label: "ERP",                 color: "text-emerald-700", bg: "bg-emerald-100", icon: BarChart3 }],
+  TXNG: [{ label: "Truy xuất nguồn gốc", color: "text-blue-700",    bg: "bg-blue-100",    icon: ScanLine  }],
+  VT:   [
+    { label: "Vùng trồng",               color: "text-amber-700",   bg: "bg-amber-100",   icon: Leaf      },
+    { label: "Thiết bị IoT",             color: "text-rose-700",    bg: "bg-rose-100",    icon: Cpu       },
+  ],
 };
 
 function Avatar({ name, color, size = "sm" }: { name: string; color: string; size?: "sm" | "md" }) {
@@ -129,12 +134,10 @@ function EnterpriseCard({ dn }: { dn: AdminEnterprise }) {
             )}
             {dn.modules && dn.modules.length > 0 && (
               <div className="flex items-center gap-1.5 flex-wrap">
-                {dn.modules.map(m => {
-                  const meta = MODULE_META[m];
-                  if (!meta) return null;
+                {dn.modules.flatMap(m => MODULE_META[m] ?? []).map((meta, i) => {
                   const ModIcon = meta.icon;
                   return (
-                    <span key={m} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-medium ${meta.bg} ${meta.color}`}>
+                    <span key={i} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-medium ${meta.bg} ${meta.color}`}>
                       <ModIcon className="w-2.5 h-2.5" />{meta.label}
                     </span>
                   );
