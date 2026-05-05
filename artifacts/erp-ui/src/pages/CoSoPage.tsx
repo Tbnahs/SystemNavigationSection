@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   Plus, Pencil, X, Loader2, Search, Factory, QrCode, Printer,
-  Building2, Home, MapPin, Phone, Users, Upload, Download, CheckCircle,
+  Building2, Home, MapPin, Phone, Users, Upload, Download, CheckCircle, Lock,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
@@ -11,6 +11,7 @@ import {
   fetchEnterprises, fetchEmployees, assignFacilityEmployees,
   type Facility,
 } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 const TYPE_OPTIONS: { value: Facility["type"]; label: string; color: string }[] = [
   { value: "ho_lien_ket", label: "Hộ liên kết", color: "bg-emerald-50 text-emerald-700 ring-emerald-200" },
@@ -66,6 +67,9 @@ const EMPTY_F: FForm = {
 };
 
 export default function CoSoPage() {
+  const { user } = useAuth();
+  const isSuperAdmin = !user?.enterpriseId;
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<Facility | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Facility | null>(null);
@@ -162,7 +166,7 @@ export default function CoSoPage() {
         const type: Facility["type"] = typeMap[typeRaw] ?? "ho_lien_ket";
         try {
           await createFacility({
-            enterpriseId: null, name,
+            enterpriseId: isSuperAdmin ? null : (user?.enterpriseId ?? null), name,
             code: (row["Mã"] || row["ma"] || "").trim(),
             type,
             phone: (row["Số điện thoại"] || row["sdt"] || "").trim(),
@@ -286,7 +290,10 @@ export default function CoSoPage() {
           </button>
           <input ref={importRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImportFile} />
           <button
-            onClick={() => setDrawerOpen(true)}
+            onClick={() => {
+              setForm({ ...EMPTY_F, enterpriseId: isSuperAdmin ? null : (user?.enterpriseId ?? null) });
+              setDrawerOpen(true);
+            }}
             className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 shadow-sm hover:brightness-110"
           >
             <Plus className="w-4 h-4" /> Thêm cơ sở
@@ -461,10 +468,17 @@ export default function CoSoPage() {
                   </div>
                   <div>
                     <label className="block text-[13px] font-medium mb-1.5">Doanh nghiệp</label>
-                    <select value={form.enterpriseId ?? ""} onChange={e => setF("enterpriseId", e.target.value ? Number(e.target.value) : null)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
-                      <option value="">-- Chưa gắn doanh nghiệp --</option>
-                      {enterprises.map(d => <option key={d.id} value={d.id}>{d.tenHienThi}</option>)}
-                    </select>
+                    {isSuperAdmin ? (
+                      <select value={form.enterpriseId ?? ""} onChange={e => setF("enterpriseId", e.target.value ? Number(e.target.value) : null)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
+                        <option value="">-- Chưa gắn doanh nghiệp --</option>
+                        {enterprises.map(d => <option key={d.id} value={d.id}>{d.tenHienThi}</option>)}
+                      </select>
+                    ) : (
+                      <div className="w-full h-10 px-3 rounded-lg border border-border bg-muted/50 text-sm flex items-center justify-between text-foreground">
+                        <span>{user?.enterpriseName ?? "—"}</span>
+                        <Lock className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                      </div>
+                    )}
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
