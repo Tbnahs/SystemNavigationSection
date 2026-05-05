@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 import AppLayout from "@/components/AppLayout";
 import {
   Building2, Factory, Users, Home, ChevronDown, ChevronRight,
@@ -178,9 +179,14 @@ function EnterpriseCard({ dn }: { dn: AdminEnterprise }) {
 }
 
 export default function PortalPage() {
+  const { user: currentUser } = useAuth();
+  const isSuperAdmin = !currentUser?.enterpriseId;
   const [, navigate] = useLocation();
   const { data, isLoading } = useQuery({ queryKey: ["admin-tree"], queryFn: fetchAdminTree });
-  const enterprises = data?.enterprises ?? [];
+  const allEnterprises = data?.enterprises ?? [];
+  const enterprises = isSuperAdmin
+    ? allEnterprises
+    : allEnterprises.filter(dn => dn.id === currentUser?.enterpriseId);
 
   const shortcuts = [
     { icon: Building2, label: "Doanh nghiệp", desc: "Tạo & quản lý DN", href: "/portal/doanh-nghiep", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
@@ -256,12 +262,14 @@ export default function PortalPage() {
         <div>
           <div className="flex items-center justify-between mb-3">
             <h2 className="text-[13.5px] font-semibold text-foreground">Danh sách Doanh nghiệp</h2>
+            {isSuperAdmin && (
             <button
               onClick={() => navigate("/portal/doanh-nghiep")}
               className="h-8 px-3 rounded-lg border border-border text-[12.5px] font-medium hover:bg-muted flex items-center gap-1.5"
             >
               <Plus className="w-3.5 h-3.5" /> Thêm mới
             </button>
+          )}
           </div>
           {isLoading && (
             <div className="py-10 text-center text-muted-foreground">

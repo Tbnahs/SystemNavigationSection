@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 import AppLayout from "@/components/AppLayout";
 import {
   Search, Plus, Filter, Download, MoreHorizontal, ChevronDown, X, Upload,
@@ -58,6 +59,8 @@ const LOGO_COLORS = [
 ];
 
 export default function DoanhNghiepPage() {
+  const { user: currentUser } = useAuth();
+  const isSuperAdmin = !currentUser?.enterpriseId;
   const [, setLocation] = useLocation();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<Enterprise | null>(null);
@@ -149,7 +152,9 @@ export default function DoanhNghiepPage() {
 
   const isPending = createMu.isPending || updateMu.isPending;
 
-  const items = listQ.data?.items ?? [];
+  const items = (listQ.data?.items ?? []).filter(d =>
+    isSuperAdmin ? true : d.id === currentUser?.enterpriseId
+  );
   const filtered = search.trim()
     ? items.filter((d) =>
         [d.mst, d.ten, d.tenHienThi, d.daiDien]
@@ -213,12 +218,14 @@ export default function DoanhNghiepPage() {
           <button className="h-10 px-3 rounded-lg border border-border text-sm flex items-center gap-2 hover:bg-muted text-muted-foreground">
             <Download className="w-4 h-4" /> Xuất Excel
           </button>
-          <button
-            onClick={() => setDrawerOpen(true)}
-            className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 shadow-sm hover:brightness-110"
-          >
-            <Plus className="w-4 h-4" /> Thêm doanh nghiệp
-          </button>
+          {isSuperAdmin && (
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 shadow-sm hover:brightness-110"
+            >
+              <Plus className="w-4 h-4" /> Thêm doanh nghiệp
+            </button>
+          )}
         </div>
 
         {/* Table */}
