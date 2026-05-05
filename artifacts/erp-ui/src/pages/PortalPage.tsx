@@ -230,34 +230,6 @@ export default function PortalPage() {
           })}
         </div>
 
-        {/* Luồng hệ thống */}
-        <div className="bg-white border border-border rounded-2xl p-5">
-          <h2 className="text-[13.5px] font-semibold mb-4 flex items-center gap-2">
-            <Globe className="w-4 h-4 text-primary" /> Luồng truy cập hệ thống
-          </h2>
-          <div className="flex items-center gap-2 flex-wrap text-[12.5px]">
-            {[
-              { icon: Users,     label: "Tạo tài khoản",         bg: "bg-slate-100" },
-              { icon: ShieldCheck, label: "Gán quyền hệ thống",  bg: "bg-violet-50" },
-              { icon: BarChart3, label: "ERP",                    bg: "bg-emerald-50" },
-              { icon: ScanLine,  label: "Truy xuất nguồn gốc",   bg: "bg-blue-50" },
-              { icon: Leaf,      label: "Vùng trồng",             bg: "bg-amber-50" },
-              { icon: Cpu,       label: "Thiết bị IoT",           bg: "bg-rose-50" },
-            ].map((step, i, arr) => {
-              const Icon = step.icon;
-              return (
-                <div key={step.label} className="flex items-center gap-2">
-                  <div className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg ${step.bg} font-medium text-foreground`}>
-                    <Icon className="w-3.5 h-3.5 text-muted-foreground" />
-                    {step.label}
-                  </div>
-                  {i < arr.length - 1 && <ArrowRight className="w-3.5 h-3.5 text-muted-foreground shrink-0" />}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
         {/* Enterprise tree */}
         <div>
           <div className="flex items-center justify-between mb-3">
