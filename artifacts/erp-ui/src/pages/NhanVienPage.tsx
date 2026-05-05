@@ -344,13 +344,19 @@ function PermissionMatrix({ permissions, onChange, role, activeGroups }: {
 
 /* ─── Main Page ─────────────────────────────────────────────────── */
 export default function NhanVienPage() {
+  const { user: currentUser } = useAuth();
+  const isSuperAdmin = !currentUser?.enterpriseId;
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<Employee | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null);
   const [resetTarget, setResetTarget] = useState<Employee | null>(null);
   const [resetDonePassword, setResetDonePassword] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [form, setForm] = useState<EForm>(EMPTY_E);
+  const [form, setForm] = useState<EForm>(() => ({
+    ...EMPTY_E,
+    enterpriseId: currentUser?.enterpriseId ?? null,
+  }));
   const [submitErr, setSubmitErr] = useState<string | null>(null);
   const [roles, setRoles] = useState<string[]>(DEFAULT_ROLES);
 
@@ -430,7 +436,7 @@ export default function NhanVienPage() {
   function closeDrawer() {
     setDrawerOpen(false);
     setEditItem(null);
-    setForm(EMPTY_E);
+    setForm({ ...EMPTY_E, enterpriseId: currentUser?.enterpriseId ?? null });
     setSubmitErr(null);
   }
 
@@ -507,7 +513,9 @@ export default function NhanVienPage() {
 
   const isPending = createMu.isPending || updateMu.isPending;
 
-  const items = listQ.data?.items ?? [];
+  const items = (listQ.data?.items ?? []).filter(u =>
+    isSuperAdmin ? true : u.enterpriseId === currentUser?.enterpriseId
+  );
   const filtered = search.trim()
     ? items.filter((u) =>
         [u.name, u.email, u.phone].some((s) => s.toLowerCase().includes(search.toLowerCase()))
@@ -807,19 +815,26 @@ export default function NhanVienPage() {
               {/* Doanh nghiệp */}
               <div>
                 <Label>Doanh nghiệp</Label>
-                <select
-                  value={form.enterpriseId ?? ""}
-                  onChange={(e) => setEnterprise(e.target.value ? Number(e.target.value) : null)}
-                  className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
-                >
-                  <option value="">-- Không gắn doanh nghiệp --</option>
-                  {(dnQ.data?.items ?? []).map((d) => (
-                    <option key={d.id} value={d.id}>
-                      {d.tenHienThi}
-                      {d.modules.length > 0 ? ` (${d.modules.join(", ")})` : ""}
-                    </option>
-                  ))}
-                </select>
+                {isSuperAdmin ? (
+                  <select
+                    value={form.enterpriseId ?? ""}
+                    onChange={(e) => setEnterprise(e.target.value ? Number(e.target.value) : null)}
+                    className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
+                  >
+                    <option value="">-- Không gắn doanh nghiệp --</option>
+                    {(dnQ.data?.items ?? []).map((d) => (
+                      <option key={d.id} value={d.id}>
+                        {d.tenHienThi}
+                        {d.modules.length > 0 ? ` (${d.modules.join(", ")})` : ""}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <div className="w-full h-10 px-3 rounded-lg border border-border bg-muted/40 text-sm flex items-center text-foreground">
+                    {(dnQ.data?.items ?? []).find(d => d.id === form.enterpriseId)?.tenHienThi ?? "—"}
+                    <span className="ml-auto text-[11.5px] text-muted-foreground">Cố định theo tài khoản</span>
+                  </div>
+                )}
               </div>
 
               {/* Cơ sở phụ trách */}

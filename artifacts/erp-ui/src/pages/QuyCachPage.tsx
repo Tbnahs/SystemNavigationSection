@@ -33,11 +33,8 @@ type SForm  = { title: string; description: string; colorKey: string };
 const EMPTY_G:  GForm  = { name: "", price: "", loaiChe: "Chè xanh", ghiChu: "", colorKey: "emerald" };
 const EMPTY_QL: QLForm = { gradeId: null, danhGia: "", donGia: "", xepLoai: "Đạt cơ bản" };
 const EMPTY_S:  SForm  = { title: "", description: "", colorKey: "emerald" };
-type Tab = "grade" | "quality" | "standard";
-
 export default function QuyCachPage() {
   const [, navigate] = useLocation();
-  const [tab, setTab] = useState<Tab>("grade");
 
   const [gD, setGD] = useState(false); const [gE, setGE] = useState<Grade | null>(null); const [gF, setGF] = useState<GForm>(EMPTY_G); const [gErr, setGErr] = useState<string | null>(null); const [gDel, setGDel] = useState<Grade | null>(null);
   const [qlD, setQlD] = useState(false); const [qlE, setQlE] = useState<QualityLevel | null>(null); const [qlF, setQlF] = useState<QLForm>(EMPTY_QL); const [qlErr, setQlErr] = useState<string | null>(null); const [qlDel, setQlDel] = useState<QualityLevel | null>(null);
@@ -100,12 +97,6 @@ export default function QuyCachPage() {
     XLSX.writeFile(wb, `quy-cach-tieu-chuan-${new Date().toISOString().slice(0, 10)}.xlsx`);
   }
 
-  const TABS: { key: Tab; label: string; count: number }[] = [
-    { key: "grade",    label: "Quy cách",     count: grades.length },
-    { key: "quality",  label: "% Chất lượng", count: qualityLevels.length },
-    { key: "standard", label: "Tiêu chuẩn",   count: standards.length },
-  ];
-
   const xClrMap: Record<string, string> = {
     "Đạt cơ bản": "bg-slate-50 text-slate-700 ring-slate-300",
     "Khá": "bg-blue-50 text-blue-700 ring-blue-200",
@@ -116,75 +107,68 @@ export default function QuyCachPage() {
 
   return (
     <AppLayout>
-      <div className="space-y-5">
-        <div className="flex items-center gap-3">
-          <button onClick={() => navigate("/module/erp")} className="p-2 rounded-lg hover:bg-muted">
-            <ArrowLeft className="w-5 h-5 text-muted-foreground" />
-          </button>
-          <div>
-            <div className="text-[12px] text-muted-foreground">ERP / Quy cách & Tiêu chuẩn</div>
-            <h1 className="text-xl font-bold mt-0.5 flex items-center gap-2"><Leaf className="w-5 h-5 text-emerald-600" />Quy cách & Tiêu chuẩn</h1>
-          </div>
-        </div>
-
-        {/* Tabs + Export */}
-        <div className="border-b border-border flex items-center gap-1">
-          {TABS.map(t => (
-            <button key={t.key} onClick={() => setTab(t.key)} className={`px-4 py-2.5 text-[13.5px] font-medium border-b-2 transition-colors flex items-center gap-2 ${tab === t.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
-              {t.label}
-              <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-semibold ${tab === t.key ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{t.count}</span>
+      <div className="space-y-7">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <button onClick={() => navigate("/module/erp")} className="p-2 rounded-lg hover:bg-muted">
+              <ArrowLeft className="w-5 h-5 text-muted-foreground" />
             </button>
-          ))}
-          <div className="ml-auto pb-1">
-            <button
-              onClick={exportExcel}
-              className="h-9 px-3 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted"
-            >
-              <Download className="w-4 h-4 text-muted-foreground" /> Xuất Excel
-            </button>
-          </div>
-        </div>
-
-        {/* Grade tab */}
-        {tab === "grade" && (
-          <div className="space-y-3">
-            <div className="flex justify-end">
-              <button onClick={() => setGD(true)} className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 hover:brightness-110"><Plus className="w-4 h-4" />Thêm quy cách</button>
+            <div>
+              <div className="text-[12px] text-muted-foreground">ERP / Quy cách & Tiêu chuẩn</div>
+              <h1 className="text-xl font-bold mt-0.5 flex items-center gap-2"><Leaf className="w-5 h-5 text-emerald-600" />Quy cách & Tiêu chuẩn</h1>
             </div>
-            {gQ.isLoading && <div className="py-10 text-center"><Loader2 className="w-5 h-5 animate-spin inline text-muted-foreground" /></div>}
-            {grades.length === 0 && !gQ.isLoading && <div className="py-10 text-center text-muted-foreground text-[13px]">Chưa có quy cách nào.</div>}
-            <div className="grid gap-3">
-              {grades.map(g => (
-                <div key={g.id} className={`rounded-xl border p-4 flex items-center justify-between ${colorRow(g.colorKey)}`}>
-                  <div className="flex items-center gap-3">
-                    <div className={`w-2 h-10 rounded-full ${dotColor(g.colorKey)}`} />
-                    <div>
-                      <div className="font-semibold text-[14px]">{g.name}</div>
-                      <div className="text-[12px] flex items-center gap-3 mt-0.5">
-                        <span className={`px-2 py-0.5 rounded-full border text-[11px] font-medium ${colorBadge(g.colorKey)}`}>{g.loaiChe}</span>
-                        <span className="font-medium">{g.price || "—"}</span>
-                        {g.ghiChu && <span className="opacity-70">{g.ghiChu}</span>}
-                      </div>
+          </div>
+          <button onClick={exportExcel} className="h-9 px-3 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted">
+            <Download className="w-4 h-4 text-muted-foreground" /> Xuất Excel
+          </button>
+        </div>
+
+        {/* ── Section 1: Quy cách ─────────────────────────────── */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-[15px] font-bold">Quy cách</h2>
+              <p className="text-[12px] text-muted-foreground mt-0.5">{grades.length} quy cách</p>
+            </div>
+            <button onClick={() => setGD(true)} className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 hover:brightness-110"><Plus className="w-4 h-4" />Thêm quy cách</button>
+          </div>
+          {gQ.isLoading && <div className="py-8 text-center"><Loader2 className="w-5 h-5 animate-spin inline text-muted-foreground" /></div>}
+          {grades.length === 0 && !gQ.isLoading && <div className="py-8 text-center text-muted-foreground text-[13px] bg-white border border-border rounded-xl">Chưa có quy cách nào.</div>}
+          <div className="grid gap-3">
+            {grades.map(g => (
+              <div key={g.id} className={`rounded-xl border p-4 flex items-center justify-between ${colorRow(g.colorKey)}`}>
+                <div className="flex items-center gap-3">
+                  <div className={`w-2 h-10 rounded-full ${dotColor(g.colorKey)}`} />
+                  <div>
+                    <div className="font-semibold text-[14px]">{g.name}</div>
+                    <div className="text-[12px] flex items-center gap-3 mt-0.5">
+                      <span className={`px-2 py-0.5 rounded-full border text-[11px] font-medium ${colorBadge(g.colorKey)}`}>{g.loaiChe}</span>
+                      <span className="font-medium">{g.price || "—"}</span>
+                      {g.ghiChu && <span className="opacity-70">{g.ghiChu}</span>}
                     </div>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <button onClick={() => { setGE(g); setGF({ name: g.name, price: g.price, loaiChe: g.loaiChe, ghiChu: g.ghiChu, colorKey: g.colorKey }); setGD(true); }} className="p-1.5 rounded hover:bg-black/5"><Pencil className="w-4 h-4" /></button>
-                    <button onClick={() => setGDel(g)} className="p-1.5 rounded hover:bg-rose-100/60"><Trash2 className="w-4 h-4 text-rose-600" /></button>
-                  </div>
                 </div>
-              ))}
-            </div>
+                <div className="flex items-center gap-1">
+                  <button onClick={() => { setGE(g); setGF({ name: g.name, price: g.price, loaiChe: g.loaiChe, ghiChu: g.ghiChu, colorKey: g.colorKey }); setGD(true); }} className="p-1.5 rounded hover:bg-black/5"><Pencil className="w-4 h-4" /></button>
+                  <button onClick={() => setGDel(g)} className="p-1.5 rounded hover:bg-rose-100/60"><Trash2 className="w-4 h-4 text-rose-600" /></button>
+                </div>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
 
-        {/* Quality tab */}
-        {tab === "quality" && (
-          <div className="space-y-3">
-            <div className="flex justify-end">
-              <button onClick={() => setQlD(true)} className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 hover:brightness-110"><Plus className="w-4 h-4" />Thêm % chất lượng</button>
+        {/* ── Section 2: % Chất lượng ─────────────────────────── */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-[15px] font-bold">% Chất lượng</h2>
+              <p className="text-[12px] text-muted-foreground mt-0.5">{qualityLevels.length} mức</p>
             </div>
-            {qlQ.isLoading && <div className="py-10 text-center"><Loader2 className="w-5 h-5 animate-spin inline text-muted-foreground" /></div>}
-            {qualityLevels.length === 0 && !qlQ.isLoading && <div className="py-10 text-center text-muted-foreground text-[13px]">Chưa có mức chất lượng nào.</div>}
+            <button onClick={() => setQlD(true)} className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 hover:brightness-110"><Plus className="w-4 h-4" />Thêm % chất lượng</button>
+          </div>
+          {qlQ.isLoading && <div className="py-8 text-center"><Loader2 className="w-5 h-5 animate-spin inline text-muted-foreground" /></div>}
+          {qualityLevels.length === 0 && !qlQ.isLoading && <div className="py-8 text-center text-muted-foreground text-[13px] bg-white border border-border rounded-xl">Chưa có mức chất lượng nào.</div>}
+          {qualityLevels.length > 0 && (
             <div className="bg-white border border-border rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead><tr className="text-left text-[12px] uppercase text-muted-foreground bg-muted/40"><th className="px-4 py-3">% Đánh giá</th><th className="px-4 py-3">Đơn giá</th><th className="px-4 py-3">Xếp loại</th><th className="px-4 py-3">Quy cách</th><th className="px-4 py-3 w-20"></th></tr></thead>
@@ -206,31 +190,33 @@ export default function QuyCachPage() {
                 </tbody>
               </table>
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Standard tab */}
-        {tab === "standard" && (
-          <div className="space-y-3">
-            <div className="flex justify-end">
-              <button onClick={() => setSD(true)} className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 hover:brightness-110"><Plus className="w-4 h-4" />Thêm tiêu chuẩn</button>
+        {/* ── Section 3: Tiêu chuẩn ───────────────────────────── */}
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="text-[15px] font-bold">Tiêu chuẩn</h2>
+              <p className="text-[12px] text-muted-foreground mt-0.5">{standards.length} tiêu chuẩn</p>
             </div>
-            {sQ.isLoading && <div className="py-10 text-center"><Loader2 className="w-5 h-5 animate-spin inline text-muted-foreground" /></div>}
-            {standards.length === 0 && !sQ.isLoading && <div className="py-10 text-center text-muted-foreground text-[13px]">Chưa có tiêu chuẩn nào.</div>}
-            <div className="grid gap-3">
-              {standards.map(s => (
-                <div key={s.id} className="bg-white border border-border rounded-xl p-4 flex items-start gap-4">
-                  <div className={`w-1.5 rounded-full self-stretch ${dotColor(s.colorKey)}`} />
-                  <div className="flex-1 min-w-0"><div className="font-semibold text-[14px]">{s.title}</div><div className="text-[13px] text-muted-foreground mt-1">{s.description}</div></div>
-                  <div className="flex items-center gap-1 shrink-0">
-                    <button onClick={() => { setSE(s); setSF({ title: s.title, description: s.description, colorKey: s.colorKey }); setSD(true); }} className="p-1.5 rounded hover:bg-muted"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
-                    <button onClick={() => setSDel(s)} className="p-1.5 rounded hover:bg-rose-50"><Trash2 className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
-                  </div>
-                </div>
-              ))}
-            </div>
+            <button onClick={() => setSD(true)} className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 hover:brightness-110"><Plus className="w-4 h-4" />Thêm tiêu chuẩn</button>
           </div>
-        )}
+          {sQ.isLoading && <div className="py-8 text-center"><Loader2 className="w-5 h-5 animate-spin inline text-muted-foreground" /></div>}
+          {standards.length === 0 && !sQ.isLoading && <div className="py-8 text-center text-muted-foreground text-[13px] bg-white border border-border rounded-xl">Chưa có tiêu chuẩn nào.</div>}
+          <div className="grid gap-3">
+            {standards.map(s => (
+              <div key={s.id} className="bg-white border border-border rounded-xl p-4 flex items-start gap-4">
+                <div className={`w-1.5 rounded-full self-stretch ${dotColor(s.colorKey)}`} />
+                <div className="flex-1 min-w-0"><div className="font-semibold text-[14px]">{s.title}</div><div className="text-[13px] text-muted-foreground mt-1">{s.description}</div></div>
+                <div className="flex items-center gap-1 shrink-0">
+                  <button onClick={() => { setSE(s); setSF({ title: s.title, description: s.description, colorKey: s.colorKey }); setSD(true); }} className="p-1.5 rounded hover:bg-muted"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
+                  <button onClick={() => setSDel(s)} className="p-1.5 rounded hover:bg-rose-50"><Trash2 className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Delete confirms */}

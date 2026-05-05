@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
-import { Plus, Pencil, X, Loader2, Search, Package } from "lucide-react";
+import { Plus, Pencil, X, Loader2, Search, Package, Eye, Building2, Tag, Scale, DollarSign, Info, Calendar } from "lucide-react";
 import {
   fetchProducts, createProduct, updateProduct, deleteProduct,
   fetchUnits, fetchEnterprises,
@@ -36,6 +36,7 @@ export default function ThuongPhamPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<Product | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
+  const [viewItem, setViewItem] = useState<Product | null>(null);
   const [form, setForm] = useState<PForm>(EMPTY_P);
   const [err, setErr] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -171,6 +172,7 @@ export default function ThuongPhamPage() {
                       </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-1">
+                          <button onClick={() => setViewItem(p)} className="p-1.5 rounded hover:bg-blue-50" title="Xem chi tiết"><Eye className="w-4 h-4 text-muted-foreground hover:text-blue-600" /></button>
                           <button onClick={() => openEdit(p)} className="p-1.5 rounded hover:bg-muted" title="Sửa"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
                           <button onClick={() => setDeleteTarget(p)} className="p-1.5 rounded hover:bg-rose-50" title="Xóa"><X className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
                         </div>
@@ -184,6 +186,96 @@ export default function ThuongPhamPage() {
           <div className="px-4 py-3 border-t border-border text-[13px] text-muted-foreground">{filtered.length} / {items.length} thương phẩm</div>
         </div>
       </div>
+
+      {/* Detail Panel */}
+      {viewItem && (
+        <>
+          <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={() => setViewItem(null)} />
+          <aside className="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-white shadow-2xl z-50 flex flex-col">
+            <div className="px-6 py-5 border-b border-border flex items-center justify-between">
+              <div>
+                <div className="text-[18px] font-semibold">Chi tiết thương phẩm</div>
+                <div className="text-[12.5px] text-muted-foreground">Thông tin đầy đủ về sản phẩm</div>
+              </div>
+              <button onClick={() => setViewItem(null)} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
+            </div>
+            <div className="flex-1 overflow-auto px-6 py-5 space-y-5">
+              {/* Header */}
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Package className="w-7 h-7 text-primary" />
+                </div>
+                <div>
+                  <div className="text-[17px] font-bold">{viewItem.name}</div>
+                  {viewItem.code && <div className="text-[13px] text-muted-foreground mt-0.5">Mã: <span className="font-mono font-semibold">{viewItem.code}</span></div>}
+                </div>
+              </div>
+
+              {/* Status + Type badges */}
+              <div className="flex gap-2 flex-wrap">
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-[12px] font-semibold ring-1 ring-inset ${typeColor(viewItem.type)}`}>{typeLabel(viewItem.type)}</span>
+                {(() => { const s = STATUS_OPT.find(o => o.value === viewItem.status); return s ? (
+                  <span className={`inline-flex items-center px-3 py-1 rounded-full text-[12px] font-semibold ring-1 ring-inset ${s.cls}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${viewItem.status === "active" ? "bg-emerald-500" : "bg-slate-400"}`} />
+                    {s.label}
+                  </span>
+                ) : null; })()}
+              </div>
+
+              {/* Info grid */}
+              <div className="rounded-xl border border-border overflow-hidden">
+                <div className="divide-y divide-border">
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <Tag className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-[13px] text-muted-foreground w-32">Loại sản phẩm</span>
+                    <span className="text-[13px] font-medium">{typeLabel(viewItem.type)}</span>
+                  </div>
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <Scale className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-[13px] text-muted-foreground w-32">Đơn vị tính</span>
+                    <span className="text-[13px] font-medium">{viewItem.unitName ?? "—"}</span>
+                  </div>
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <DollarSign className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-[13px] text-muted-foreground w-32">Đơn giá tham khảo</span>
+                    <span className="text-[13px] font-semibold text-emerald-700">{viewItem.price || "—"}</span>
+                  </div>
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <Building2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-[13px] text-muted-foreground w-32">Doanh nghiệp</span>
+                    <span className="text-[13px] font-medium">{viewItem.enterpriseName ?? "Dùng chung"}</span>
+                  </div>
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-[13px] text-muted-foreground w-32">Ngày tạo</span>
+                    <span className="text-[13px] font-medium">{viewItem.createdAt ? new Date(viewItem.createdAt).toLocaleDateString("vi-VN") : "—"}</span>
+                  </div>
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                    <span className="text-[13px] text-muted-foreground w-32">Cập nhật lần cuối</span>
+                    <span className="text-[13px] font-medium">{viewItem.updatedAt ? new Date(viewItem.updatedAt).toLocaleDateString("vi-VN") : "—"}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Description */}
+              {viewItem.description && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Info className="w-4 h-4 text-muted-foreground" />
+                    <span className="text-[13px] font-semibold">Mô tả</span>
+                  </div>
+                  <div className="rounded-xl border border-border bg-muted/30 px-4 py-3 text-[13px] text-foreground/80 leading-relaxed">{viewItem.description}</div>
+                </div>
+              )}
+            </div>
+            <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-2 bg-muted/40">
+              <button onClick={() => { setViewItem(null); openEdit(viewItem); }} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted flex items-center gap-2"><Pencil className="w-4 h-4" />Sửa</button>
+              <button onClick={() => setViewItem(null)} className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold hover:brightness-110">Đóng</button>
+            </div>
+          </aside>
+        </>
+      )}
 
       {/* Delete */}
       {deleteTarget && (

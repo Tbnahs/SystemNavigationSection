@@ -17,7 +17,6 @@ import {
   AlertCircle,
   MapPin,
   Globe,
-  Cpu,
   ShieldCheck,
 } from "lucide-react";
 import {
@@ -68,22 +67,12 @@ const ALL_SYSTEMS = [
   {
     id: "vung_trong",
     icon: Leaf,
-    label: "Vùng trồng",
-    desc: "Quản lý vùng nguyên liệu, cây trồng",
+    label: "Vùng trồng & IoT",
+    desc: "Quản lý vùng nguyên liệu, cây trồng và thiết bị IoT",
     href: "/module/vung-trong",
-    count: "6",
+    count: "10",
     gradient: "from-amber-500 to-orange-500",
     badge: "bg-amber-100 text-amber-700",
-  },
-  {
-    id: "iot",
-    icon: Cpu,
-    label: "Thiết bị IoT",
-    desc: "Giám sát cảm biến và kết nối thiết bị",
-    href: "/module/iot",
-    count: "4",
-    gradient: "from-rose-500 to-pink-600",
-    badge: "bg-rose-100 text-rose-700",
   },
 ];
 

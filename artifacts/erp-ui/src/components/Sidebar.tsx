@@ -59,13 +59,11 @@ const VUNG_TRONG_SUB_ITEMS: NavItem[] = [
   { id: "harvest",    icon: Scissors,       label: "Thu hoạch" },
   { id: "weather",    icon: CloudSun,       label: "Thời tiết" },
   { id: "inspection", icon: ClipboardCheck, label: "Kiểm định" },
-];
-
-const IOT_SUB_ITEMS: NavItem[] = [
-  { id: "devices",    icon: Server,    label: "Thiết bị" },
-  { id: "sensors",    icon: Activity,  label: "Cảm biến" },
-  { id: "connect",    icon: Wifi,      label: "Kết nối" },
-  { id: "monitor",    icon: Cpu,       label: "Giám sát" },
+  { type: "divider",  label: "Thiết bị IoT" },
+  { id: "iot/devices",  icon: Server,   label: "Thiết bị" },
+  { id: "iot/sensors",  icon: Activity, label: "Cảm biến" },
+  { id: "iot/connect",  icon: Wifi,     label: "Kết nối" },
+  { id: "iot/monitor",  icon: Cpu,      label: "Giám sát" },
 ];
 
 const PORTAL_SUB_ITEMS: NavItem[] = [
@@ -193,17 +191,6 @@ const MODULE_CONFIG = [
     iconColor: "text-amber-700",
     pathPrefix: "/module/vung-trong",
   },
-  {
-    key: "iot",
-    href: "/module/iot",
-    subBase: "/module/iot",
-    icon: Cpu,
-    label: "Thiết bị IoT",
-    subItems: IOT_SUB_ITEMS,
-    color: "text-rose-700 bg-rose-50",
-    iconColor: "text-rose-700",
-    pathPrefix: "/module/iot",
-  },
 ];
 
 export default function Sidebar({ open, onClose }: SidebarProps) {
@@ -213,7 +200,10 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
 
   const userModules: string[] = user?.modules ?? ["portal", "erp", "txng", "vung_trong", "iot"];
 
-  const visibleModules = MODULE_CONFIG.filter(m => userModules.includes(m.key));
+  const visibleModules = MODULE_CONFIG.filter(m => {
+    if (m.key === "vung_trong") return userModules.includes("vung_trong") || userModules.includes("iot");
+    return userModules.includes(m.key);
+  });
 
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
