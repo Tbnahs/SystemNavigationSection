@@ -70,7 +70,7 @@ export default function DoanhNghiepDetailPage() {
         <div className="bg-white border border-border rounded-xl p-12 text-center">
           <div className="text-rose-600 font-medium mb-2">Không tìm thấy doanh nghiệp</div>
           <div className="text-[13px] text-muted-foreground mb-4">{(q.error as Error)?.message ?? "Doanh nghiệp này có thể đã bị xóa."}</div>
-          <button onClick={() => setLocation("/quan-tri/doanh-nghiep")} className="h-10 px-4 rounded-lg border border-border hover:bg-muted text-[13.5px] font-medium">Quay lại danh sách</button>
+          <button onClick={() => setLocation("/portal/doanh-nghiep")} className="h-10 px-4 rounded-lg border border-border hover:bg-muted text-[13.5px] font-medium">Quay lại danh sách</button>
         </div>
       </AppLayout>
     );
@@ -89,7 +89,7 @@ export default function DoanhNghiepDetailPage() {
         {/* Header */}
         <div className="bg-white border border-border rounded-xl p-5">
           <button
-            onClick={() => setLocation("/quan-tri/doanh-nghiep")}
+            onClick={() => setLocation("/portal/doanh-nghiep")}
             className="text-[12.5px] text-muted-foreground hover:text-foreground flex items-center gap-1.5 mb-4"
           >
             <ArrowLeft className="w-3.5 h-3.5" /> Quay lại danh sách doanh nghiệp

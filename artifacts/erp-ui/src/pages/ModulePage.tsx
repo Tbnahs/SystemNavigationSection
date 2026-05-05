@@ -1,4 +1,5 @@
 import { useParams, useLocation } from "wouter";
+import { useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { TranslationKey } from "@/i18n/translations";
 import AppLayout from "@/components/AppLayout";
@@ -98,10 +99,30 @@ const moduleConfig: Record<
       { id: "harvest", icon: Scissors, nameKey: "submodule.farming.harvest", descKey: "submodule.farming.harvest.desc" },
       { id: "weather", icon: CloudSun, nameKey: "submodule.farming.weather", descKey: "submodule.farming.weather.desc" },
       { id: "inspection", icon: ClipboardCheck, nameKey: "submodule.farming.inspection", descKey: "submodule.farming.inspection.desc" },
-      { id: "iot-sensors", icon: Cpu, nameKey: "submodule.iot.sensors", descKey: "submodule.iot.sensors.desc" },
-      { id: "iot-alerts", icon: Bell, nameKey: "submodule.iot.alerts", descKey: "submodule.iot.alerts.desc" },
-      { id: "iot-monitoring", icon: Activity, nameKey: "submodule.iot.monitoring", descKey: "submodule.iot.monitoring.desc" },
-      { id: "iot-reports", icon: BarChart2, nameKey: "submodule.iot.reports", descKey: "submodule.iot.reports.desc" },
+    ],
+  },
+  "vung-trong": {
+    nameKey: "module.farming",
+    descKey: "module.farming.desc",
+    icon: Leaf,
+    subModules: [
+      { id: "zones", icon: MapPin, nameKey: "submodule.farming.zones", descKey: "submodule.farming.zones.desc" },
+      { id: "crops", icon: Sprout, nameKey: "submodule.farming.crops", descKey: "submodule.farming.crops.desc" },
+      { id: "pesticides", icon: FlaskConical, nameKey: "submodule.farming.pesticides", descKey: "submodule.farming.pesticides.desc" },
+      { id: "harvest", icon: Scissors, nameKey: "submodule.farming.harvest", descKey: "submodule.farming.harvest.desc" },
+      { id: "weather", icon: CloudSun, nameKey: "submodule.farming.weather", descKey: "submodule.farming.weather.desc" },
+      { id: "inspection", icon: ClipboardCheck, nameKey: "submodule.farming.inspection", descKey: "submodule.farming.inspection.desc" },
+    ],
+  },
+  iot: {
+    nameKey: "module.iot" as TranslationKey,
+    descKey: "module.iot.desc" as TranslationKey,
+    icon: Cpu,
+    subModules: [
+      { id: "devices", icon: Zap, nameKey: "submodule.iot.sensors" as TranslationKey, descKey: "submodule.iot.sensors.desc" as TranslationKey },
+      { id: "sensors", icon: Activity, nameKey: "submodule.iot.monitoring" as TranslationKey, descKey: "submodule.iot.monitoring.desc" as TranslationKey },
+      { id: "connect", icon: Bell, nameKey: "submodule.iot.alerts" as TranslationKey, descKey: "submodule.iot.alerts.desc" as TranslationKey },
+      { id: "monitor", icon: BarChart2, nameKey: "submodule.iot.reports" as TranslationKey, descKey: "submodule.iot.reports.desc" as TranslationKey },
     ],
   },
 };
@@ -113,10 +134,13 @@ export default function ModulePage() {
   const moduleId = params.id || "erp";
   const config = moduleConfig[moduleId];
 
-  if (!config) {
-    setLocation("/home");
-    return null;
-  }
+  useEffect(() => {
+    if (!config) {
+      setLocation("/home");
+    }
+  }, [config, setLocation]);
+
+  if (!config) return null;
 
   const ModuleIcon = config.icon;
 

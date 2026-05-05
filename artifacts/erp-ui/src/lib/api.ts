@@ -178,6 +178,7 @@ export type AuthUser = {
   enterpriseName: string | null;
   avatarUrl: string | null;
   avatarColor: string;
+  modules: string[];
 };
 export const loginUser = (email: string, password: string) =>
   request<{ user: AuthUser }>("/auth/login", {

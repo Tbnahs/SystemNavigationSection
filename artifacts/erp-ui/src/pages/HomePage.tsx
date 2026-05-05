@@ -16,6 +16,9 @@ import {
   CheckCircle2,
   AlertCircle,
   MapPin,
+  Globe,
+  Cpu,
+  ShieldCheck,
 } from "lucide-react";
 import {
   BarChart,
@@ -31,30 +34,56 @@ import {
   Legend,
 } from "recharts";
 
-const modules = [
+const ALL_SYSTEMS = [
+  {
+    id: "portal",
+    icon: Globe,
+    label: "Portal",
+    desc: "Quản lý tài khoản và phân quyền truy cập",
+    href: "/portal",
+    count: "4",
+    gradient: "from-violet-500 to-purple-600",
+    badge: "bg-violet-100 text-violet-700",
+  },
   {
     id: "erp",
     icon: BarChart3,
-    nameKey: "module.erp" as const,
-    descKey: "module.erp.desc" as const,
+    label: "ERP",
+    desc: "Thu mua, sản xuất, đóng gói, bán hàng",
     href: "/module/erp",
     count: "13",
+    gradient: "from-emerald-500 to-green-600",
+    badge: "bg-emerald-100 text-emerald-700",
   },
   {
     id: "txng",
     icon: ScanLine,
-    nameKey: "module.txng" as const,
-    descKey: "module.txng.desc" as const,
+    label: "Truy xuất nguồn gốc",
+    desc: "QR code, chuỗi cung ứng, chứng nhận",
     href: "/module/txng",
     count: "6",
+    gradient: "from-blue-500 to-cyan-600",
+    badge: "bg-blue-100 text-blue-700",
   },
   {
-    id: "farming",
+    id: "vung_trong",
     icon: Leaf,
-    nameKey: "module.farming" as const,
-    descKey: "module.farming.desc" as const,
-    href: "/module/farming",
-    count: "10",
+    label: "Vùng trồng",
+    desc: "Quản lý vùng nguyên liệu, cây trồng",
+    href: "/module/vung-trong",
+    count: "6",
+    gradient: "from-amber-500 to-orange-500",
+    badge: "bg-amber-100 text-amber-700",
+  },
+  {
+    id: "iot",
+    icon: Cpu,
+    label: "Thiết bị IoT",
+    desc: "Giám sát cảm biến và kết nối thiết bị",
+    href: "/module/iot",
+    count: "4",
+    gradient: "from-rose-500 to-pink-600",
+    badge: "bg-rose-100 text-rose-700",
   },
 ];
 
@@ -278,33 +307,34 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Main Modules */}
+      {/* Systems */}
       <section className="mb-8">
         <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
           {t("home.modules")}
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {modules.map((mod) => {
-            const Icon = mod.icon;
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {ALL_SYSTEMS.filter(sys => (user?.modules ?? ALL_SYSTEMS.map(s => s.id)).includes(sys.id)).map((sys) => {
+            const Icon = sys.icon;
             return (
               <button
-                key={mod.id}
-                data-testid={`card-module-${mod.id}`}
-                onClick={() => setLocation(mod.href)}
-                className="group bg-white border border-border rounded-xl p-5 text-left hover:border-primary/40 hover:shadow-sm active:scale-[0.99] transition-all duration-150 cursor-pointer"
+                key={sys.id}
+                data-testid={`card-module-${sys.id}`}
+                onClick={() => setLocation(sys.href)}
+                className="group bg-white border border-border rounded-xl p-5 text-left hover:shadow-md hover:border-transparent active:scale-[0.99] transition-all duration-150 cursor-pointer relative overflow-hidden"
               >
-                <div className="flex items-start justify-between mb-4">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-5 h-5 text-primary" strokeWidth={1.5} />
+                <div className={`absolute inset-x-0 top-0 h-1 bg-gradient-to-r ${sys.gradient}`} />
+                <div className="flex items-start justify-between mb-4 pt-1">
+                  <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${sys.gradient} flex items-center justify-center shadow-sm`}>
+                    <Icon className="w-5 h-5 text-white" strokeWidth={1.5} />
                   </div>
-                  <span className="text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                    {mod.count} chức năng
+                  <span className={`text-[10.5px] font-medium px-2 py-0.5 rounded-full ${sys.badge}`}>
+                    {sys.count} chức năng
                   </span>
                 </div>
-                <h3 className="font-semibold text-foreground text-sm mb-1">{t(mod.nameKey)}</h3>
-                <p className="text-xs text-muted-foreground mb-4">{t(mod.descKey)}</p>
+                <h3 className="font-semibold text-foreground text-sm mb-1">{sys.label}</h3>
+                <p className="text-xs text-muted-foreground mb-4">{sys.desc}</p>
                 <div className="flex items-center gap-1 text-primary text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  Xem chi tiết <ArrowRight className="w-3 h-3" />
+                  Vào hệ thống <ArrowRight className="w-3 h-3" />
                 </div>
               </button>
             );

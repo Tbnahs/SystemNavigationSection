@@ -288,7 +288,7 @@ export default function DoanhNghiepPage() {
                     </td>
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-1 text-muted-foreground">
-                        <button onClick={() => setLocation(`/quan-tri/doanh-nghiep/${dn.id}`)} className="p-1.5 rounded hover:bg-muted text-muted-foreground" title="Xem chi tiết"><Eye className="w-4 h-4" /></button>
+                        <button onClick={() => setLocation(`/portal/doanh-nghiep/${dn.id}`)} className="p-1.5 rounded hover:bg-muted text-muted-foreground" title="Xem chi tiết"><Eye className="w-4 h-4" /></button>
                         <button onClick={() => openEdit(dn)} className="p-1.5 rounded hover:bg-muted text-muted-foreground" title="Sửa"><Pencil className="w-4 h-4" /></button>
                         <button onClick={() => setDeleteTarget(dn)} className="p-1.5 rounded hover:bg-rose-50 text-muted-foreground hover:text-rose-600" title="Xóa"><X className="w-4 h-4" /></button>
                       </div>

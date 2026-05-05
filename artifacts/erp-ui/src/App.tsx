@@ -29,7 +29,7 @@ import DonViTinhPage from "@/pages/DonViTinhPage";
 import CoSoPage from "@/pages/CoSoPage";
 import ThuongPhamPage from "@/pages/ThuongPhamPage";
 import DonThuMuaPage from "@/pages/DonThuMuaPage";
-import QuanTriPage from "@/pages/QuanTriPage";
+import PortalPage from "@/pages/PortalPage";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -56,6 +56,48 @@ function Router() {
       <Route path="/home">
         {() => <ProtectedRoute component={HomePage} />}
       </Route>
+
+      {/* Portal routes (canonical) */}
+      <Route path="/portal">
+        {() => <ProtectedRoute component={PortalPage} />}
+      </Route>
+      <Route path="/portal/doanh-nghiep">
+        {() => <ProtectedRoute component={DoanhNghiepPage} />}
+      </Route>
+      <Route path="/portal/doanh-nghiep/:id">
+        {() => <ProtectedRoute component={DoanhNghiepDetailPage} />}
+      </Route>
+      <Route path="/portal/nguoi-dung">
+        {() => <ProtectedRoute component={NhanVienPage} />}
+      </Route>
+      <Route path="/portal/don-vi-tinh">
+        {() => <ProtectedRoute component={DonViTinhPage} />}
+      </Route>
+      <Route path="/portal/co-so">
+        {() => <ProtectedRoute component={CoSoPage} />}
+      </Route>
+
+      {/* Legacy /quan-tri routes — redirect to /portal */}
+      <Route path="/quan-tri">
+        {() => <ProtectedRoute component={PortalPage} />}
+      </Route>
+      <Route path="/quan-tri/doanh-nghiep">
+        {() => <ProtectedRoute component={DoanhNghiepPage} />}
+      </Route>
+      <Route path="/quan-tri/doanh-nghiep/:id">
+        {() => <ProtectedRoute component={DoanhNghiepDetailPage} />}
+      </Route>
+      <Route path="/quan-tri/nguoi-dung">
+        {() => <ProtectedRoute component={NhanVienPage} />}
+      </Route>
+      <Route path="/quan-tri/don-vi-tinh">
+        {() => <ProtectedRoute component={DonViTinhPage} />}
+      </Route>
+      <Route path="/quan-tri/co-so">
+        {() => <ProtectedRoute component={CoSoPage} />}
+      </Route>
+
+      {/* ERP module */}
       <Route path="/module/erp/purchase">
         {() => <ProtectedRoute component={PurchasePage} />}
       </Route>
@@ -95,36 +137,21 @@ function Router() {
       <Route path="/module/erp/settings">
         {() => <ProtectedRoute component={SettingsPage} />}
       </Route>
-      <Route path="/quan-tri">
-        {() => <ProtectedRoute component={QuanTriPage} />}
-      </Route>
-      <Route path="/quan-tri/doanh-nghiep">
-        {() => <ProtectedRoute component={DoanhNghiepPage} />}
-      </Route>
-      <Route path="/quan-tri/doanh-nghiep/:id">
-        {() => <ProtectedRoute component={DoanhNghiepDetailPage} />}
-      </Route>
-      <Route path="/quan-tri/nguoi-dung">
-        {() => <ProtectedRoute component={NhanVienPage} />}
-      </Route>
-      <Route path="/quan-tri/don-vi-tinh">
-        {() => <ProtectedRoute component={DonViTinhPage} />}
-      </Route>
-      <Route path="/quan-tri/co-so">
-        {() => <ProtectedRoute component={CoSoPage} />}
-      </Route>
       <Route path="/module/erp/thuong-pham">
         {() => <ProtectedRoute component={ThuongPhamPage} />}
       </Route>
       <Route path="/module/erp/thu-mua">
         {() => <ProtectedRoute component={DonThuMuaPage} />}
       </Route>
+
+      {/* Generic sub-module and module fallbacks */}
       <Route path="/module/:moduleId/:subId">
         {() => <ProtectedRoute component={SubModulePage} />}
       </Route>
       <Route path="/module/:id">
         {() => <ProtectedRoute component={ModulePage} />}
       </Route>
+
       <Route component={NotFound} />
     </Switch>
   );

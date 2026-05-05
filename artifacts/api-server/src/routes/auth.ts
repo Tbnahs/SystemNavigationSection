@@ -5,6 +5,19 @@ import { eq } from "drizzle-orm";
 
 const router: Router = Router();
 
+const ALL_MODULES = ["portal", "erp", "txng", "vung_trong", "iot"];
+
+function deriveModules(enterpriseModules: string[] | null | undefined): string[] {
+  if (!enterpriseModules || enterpriseModules.length === 0) {
+    return ALL_MODULES;
+  }
+  const result: string[] = ["portal"];
+  if (enterpriseModules.includes("ERP"))  result.push("erp");
+  if (enterpriseModules.includes("TXNG")) result.push("txng");
+  if (enterpriseModules.includes("VT"))   { result.push("vung_trong"); result.push("iot"); }
+  return result;
+}
+
 router.post("/auth/login", async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { email, password } = req.body as { email?: string; password?: string };
@@ -35,18 +48,23 @@ router.post("/auth/login", async (req: Request, res: Response, next: NextFunctio
     }
 
     let enterpriseName: string | null = null;
+    let enterpriseModules: string[] = [];
+
     if (employee.enterpriseId) {
       const [ent] = await db
-        .select({ tenHienThi: enterprisesTable.tenHienThi })
+        .select({ tenHienThi: enterprisesTable.tenHienThi, modules: enterprisesTable.modules })
         .from(enterprisesTable)
         .where(eq(enterprisesTable.id, employee.enterpriseId));
       enterpriseName = ent?.tenHienThi ?? null;
+      enterpriseModules = ent?.modules ?? [];
     }
 
     await db
       .update(employeesTable)
       .set({ lastSeen: new Date().toISOString() })
       .where(eq(employeesTable.id, employee.id));
+
+    const modules = deriveModules(employee.enterpriseId ? enterpriseModules : null);
 
     res.json({
       user: {
@@ -58,6 +76,7 @@ router.post("/auth/login", async (req: Request, res: Response, next: NextFunctio
         enterpriseName,
         avatarUrl: employee.avatarUrl,
         avatarColor: employee.avatarColor,
+        modules,
       },
     });
   } catch (e) {

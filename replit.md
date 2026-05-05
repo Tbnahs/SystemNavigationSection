@@ -98,18 +98,37 @@ Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHea
 
 ERP web app for "Chè Quân Chu" tea origin tracing (Vietnamese UI). Vite + React + Tailwind + shadcn-style components.
 
-- Routing via `wouter` in `src/App.tsx`. All app routes wrapped in `AppLayout` (sidebar + header).
-- Auth: `src/contexts/AuthContext.tsx` — accepts any non-empty email/password (mock for now).
-- API access: `src/lib/api.ts` — small typed `fetch` wrapper hitting `/api/*` directly (proxied to api-server). Uses TanStack Query (`useQuery`/`useMutation`).
-- Admin screens (live data, backed by Postgres):
-  - `/quan-tri/doanh-nghiep` — list/create/edit/delete enterprises + Phân quyền modules (ERP/TXNG/VT)
-  - `/quan-tri/doanh-nghiep/:id` — enterprise detail with members tab
-  - `/quan-tri/nguoi-dung` — list/create employees + full permission matrix + reset password
-  - `/co-so` — facilities (hộ liên kết, cơ sở SX) + QR + Print + Gán nhân viên + **Import Excel** + **Xuất Excel** + file mẫu download
-  - `/don-vi-tinh` — units of measure CRUD
-  - `/thuong-pham` — products (bán thành phẩm, thành phẩm cuối) CRUD
-  - `/quy-cach` — grades + % quality levels + standards + **Xuất Excel** (3 sheets)
-  - `/don-thu-mua` — purchase orders with auto-price calculation from grade/quality
+#### SSO Architecture (implemented)
+Five distinct systems. After login, user sees only the systems they have permission for (stored in `AuthUser.modules[]`):
+
+| System | Route | Module key | Description |
+|---|---|---|---|
+| Portal | `/portal` | `portal` | Account & access management (always shown) |
+| ERP | `/module/erp` | `erp` | Thu mua, sản xuất, đóng gói, bán hàng |
+| Truy xuất nguồn gốc | `/module/txng` | `txng` | QR code, chuỗi cung ứng, chứng nhận |
+| Vùng trồng | `/module/vung-trong` | `vung_trong` | Vùng nguyên liệu, cây trồng, thu hoạch |
+| Thiết bị IoT | `/module/iot` | `iot` | Cảm biến, giám sát, thiết bị |
+
+- Login response now returns `user.modules[]` derived from enterprise's licensed modules (ERP→`erp`, TXNG→`txng`, VT→`vung_trong`+`iot`). Super admin (no enterprise) gets all modules.
+- Legacy `/quan-tri/*` routes still work (mapped to Portal) for backward compatibility.
+- `QuanTriPage.tsx` is an orphan (superseded by `PortalPage.tsx`).
+
+#### Key files
+- Routing: `src/App.tsx` — all routes protected
+- Auth: `src/contexts/AuthContext.tsx` | `src/lib/api.ts` — `AuthUser` includes `modules: string[]`
+- Navigation: `src/components/Sidebar.tsx` — dynamic module visibility based on `user.modules`
+- Home: `src/pages/HomePage.tsx` — 5 system cards with gradient colors, permission-filtered
+- Portal: `src/pages/PortalPage.tsx` — enterprise tree + access shortcuts
+
+#### Pages (live data, backed by Postgres)
+- `/portal/doanh-nghiep` — enterprises CRUD + module licensing (ERP/TXNG/VT)
+- `/portal/doanh-nghiep/:id` — enterprise detail + members
+- `/portal/nguoi-dung` — employees CRUD + permission matrix + reset password
+- `/portal/co-so` — facilities + QR + Print + Gán nhân viên + Import/Xuất Excel
+- `/portal/don-vi-tinh` — units CRUD
+- `/module/erp/thuong-pham` — products CRUD
+- `/module/erp/quy-cach` — grades + % quality + standards + Xuất Excel
+- `/module/erp/thu-mua` — purchase orders with auto-price calculation
 
 ## Sprint Status (ESG Valley)
 
@@ -122,6 +141,13 @@ ERP web app for "Chè Quân Chu" tea origin tracing (Vietnamese UI). Vite + Reac
 - Thương phẩm CRUD (bán thành phẩm + thành phẩm cuối) ✅
 - Quy cách + % Chất lượng + Tiêu chuẩn CRUD ✅ | Xuất Excel Quy cách ✅
 - Đơn thu mua: tạo/xem/sửa/xóa + auto-tính giá theo quy cách + % chất lượng ✅
+
+### SSO Architecture Restructure (COMPLETE)
+- Portal = tài khoản & phân quyền (route `/portal`, replaces `/quan-tri`) ✅
+- 5 system cards on Home page with gradient UI, permission-filtered ✅
+- Sidebar: Portal + ERP + TXNG + Vùng trồng + IoT, dynamic per user.modules ✅
+- Login response returns modules[] derived from enterprise licensing ✅
+- PortalPage.tsx: enterprise tree overview + flow diagram + shortcuts ✅
 
 ### `scripts` (`@workspace/scripts`)
 

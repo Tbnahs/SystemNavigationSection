@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { useLocation, Link } from "wouter";
 import {
   Home, BarChart3, Leaf, ScanLine, Settings,
-  ShoppingCart, Truck, Package, DollarSign, Users, Factory,
-  UserCircle, FileBarChart, CheckSquare, BookOpen, ChevronDown,
+  ShoppingCart, Package, Users, Factory,
+  FileBarChart, BookOpen, ChevronDown,
   QrCode, Link2, Award, Layers, GitBranch, Search,
   MapPin, Sprout, FlaskConical, Scissors, CloudSun, ClipboardCheck,
-  Building2, ShieldCheck, Scale, ShoppingBasket, ClipboardList, LayoutGrid,
+  Building2, ShieldCheck, Scale, ShoppingBasket, LayoutGrid,
+  Cpu, Wifi, Activity, Server, Globe,
 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import logoImg from "@assets/Logo ESG.png";
 
@@ -32,7 +34,6 @@ const ERP_SUB_ITEMS: NavItem[] = [
 
   { type: "divider", label: "Bán hàng" },
   { id: "sales",    icon: ShoppingCart,   label: "Đơn hàng" },
-  { id: "crm",      icon: UserCircle,     label: "Khách hàng" },
 
   { type: "divider", label: "Báo cáo" },
   { id: "reports",  icon: FileBarChart,   label: "Báo cáo" },
@@ -44,14 +45,14 @@ const ERP_SUB_ITEMS: NavItem[] = [
 
 const TXNG_SUB_ITEMS: NavItem[] = [
   { id: "qrcode",        icon: QrCode,        label: "Mã QR" },
+  { id: "batch",         icon: Layers,        label: "Lô hàng" },
   { id: "supplychain",   icon: Link2,         label: "Chuỗi cung ứng" },
   { id: "certification", icon: Award,         label: "Chứng nhận" },
-  { id: "batch",         icon: Layers,        label: "Lô hàng" },
-  { id: "timeline",      icon: GitBranch,     label: "Lịch sử" },
-  { id: "audit",         icon: Search,        label: "Kiểm toán" },
+  { id: "timeline",      icon: GitBranch,     label: "Lịch sử lô" },
+  { id: "audit",         icon: Search,        label: "Tra cứu / Kiểm toán" },
 ];
 
-const FARMING_SUB_ITEMS: NavItem[] = [
+const VUNG_TRONG_SUB_ITEMS: NavItem[] = [
   { id: "zones",      icon: MapPin,         label: "Vùng trồng" },
   { id: "crops",      icon: Sprout,         label: "Cây trồng" },
   { id: "pesticides", icon: FlaskConical,   label: "Thuốc BVTV" },
@@ -60,8 +61,15 @@ const FARMING_SUB_ITEMS: NavItem[] = [
   { id: "inspection", icon: ClipboardCheck, label: "Kiểm định" },
 ];
 
-const ADMIN_SUB_ITEMS: NavItem[] = [
-  { id: "",             icon: LayoutGrid, label: "Tổng quan tổ chức" },
+const IOT_SUB_ITEMS: NavItem[] = [
+  { id: "devices",    icon: Server,    label: "Thiết bị" },
+  { id: "sensors",    icon: Activity,  label: "Cảm biến" },
+  { id: "connect",    icon: Wifi,      label: "Kết nối" },
+  { id: "monitor",    icon: Cpu,       label: "Giám sát" },
+];
+
+const PORTAL_SUB_ITEMS: NavItem[] = [
+  { id: "",             icon: LayoutGrid, label: "Tổng quan" },
   { type: "divider", label: "Tài khoản" },
   { id: "doanh-nghiep", icon: Building2,  label: "Doanh nghiệp" },
   { id: "nguoi-dung",   icon: Users,      label: "Người dùng" },
@@ -72,24 +80,27 @@ const ADMIN_SUB_ITEMS: NavItem[] = [
 
 function ExpandableNavItem({
   href, icon: Icon, label, expanded, onToggle, onNavigate,
-  isActive, subItems, location, subBase: subBaseProp,
+  isActive, subItems, location, subBase: subBaseProp, color,
 }: {
   href: string; icon: React.ElementType; label: string;
   expanded: boolean; onToggle: () => void; onNavigate: () => void;
   isActive: boolean; subItems: NavItem[];
   location: string;
   subBase?: string;
+  color?: string;
 }) {
   const subBase = subBaseProp ?? href;
+  const activeColor = color ?? "text-primary bg-primary/10";
+  const iconActive = color ? color.split(" ")[0] : "text-primary";
   return (
     <div>
-      <div className={`flex items-center rounded-xl text-sm font-medium transition-all ${isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
+      <div className={`flex items-center rounded-xl text-sm font-medium transition-all ${isActive ? activeColor : "text-muted-foreground hover:bg-muted hover:text-foreground"}`}>
         <Link
           href={href}
           onClick={onNavigate}
           className="flex items-center gap-3 flex-1 px-3 py-2.5 min-w-0"
         >
-          <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
+          <Icon className={`w-4 h-4 shrink-0 ${isActive ? iconActive : "text-muted-foreground"}`} strokeWidth={1.5} />
           <span className="truncate">{label}</span>
         </Link>
         <button
@@ -98,7 +109,7 @@ function ExpandableNavItem({
           title={expanded ? "Thu gọn" : "Mở rộng"}
         >
           <ChevronDown
-            className={`w-3.5 h-3.5 transition-transform duration-200 ${expanded ? "rotate-180" : ""} ${isActive ? "text-primary" : "text-muted-foreground"}`}
+            className={`w-3.5 h-3.5 transition-transform duration-200 ${expanded ? "rotate-180" : ""} ${isActive ? iconActive : "text-muted-foreground"}`}
             strokeWidth={2}
           />
         </button>
@@ -119,7 +130,7 @@ function ExpandableNavItem({
             const SubIcon = item.icon;
             return (
               <Link
-                key={item.id}
+                key={item.id ?? idx}
                 href={subHref}
                 onClick={onNavigate}
                 className={`flex items-center gap-2.5 px-2.5 py-2 rounded-lg text-xs font-medium transition-all ${
@@ -137,24 +148,82 @@ function ExpandableNavItem({
   );
 }
 
+const MODULE_CONFIG = [
+  {
+    key: "portal",
+    href: "/portal",
+    subBase: "/portal",
+    icon: Globe,
+    label: "Portal",
+    subItems: PORTAL_SUB_ITEMS,
+    color: "text-violet-700 bg-violet-50",
+    iconColor: "text-violet-700",
+    pathPrefix: "/portal",
+  },
+  {
+    key: "erp",
+    href: "/module/erp",
+    subBase: "/module/erp",
+    icon: BarChart3,
+    label: "ERP",
+    subItems: ERP_SUB_ITEMS,
+    color: "text-primary bg-primary/10",
+    iconColor: "text-primary",
+    pathPrefix: "/module/erp",
+  },
+  {
+    key: "txng",
+    href: "/module/txng",
+    subBase: "/module/txng",
+    icon: ScanLine,
+    label: "Truy xuất nguồn gốc",
+    subItems: TXNG_SUB_ITEMS,
+    color: "text-blue-700 bg-blue-50",
+    iconColor: "text-blue-700",
+    pathPrefix: "/module/txng",
+  },
+  {
+    key: "vung_trong",
+    href: "/module/vung-trong",
+    subBase: "/module/vung-trong",
+    icon: Leaf,
+    label: "Vùng trồng",
+    subItems: VUNG_TRONG_SUB_ITEMS,
+    color: "text-amber-700 bg-amber-50",
+    iconColor: "text-amber-700",
+    pathPrefix: "/module/vung-trong",
+  },
+  {
+    key: "iot",
+    href: "/module/iot",
+    subBase: "/module/iot",
+    icon: Cpu,
+    label: "Thiết bị IoT",
+    subItems: IOT_SUB_ITEMS,
+    color: "text-rose-700 bg-rose-50",
+    iconColor: "text-rose-700",
+    pathPrefix: "/module/iot",
+  },
+];
+
 export default function Sidebar({ open, onClose }: SidebarProps) {
   const { t } = useLanguage();
+  const { user } = useAuth();
   const [location] = useLocation();
 
-  const isOnErp     = location === "/module/erp"     || location.startsWith("/module/erp/");
-  const isOnTxng    = location === "/module/txng"    || location.startsWith("/module/txng/");
-  const isOnFarming = location === "/module/farming" || location.startsWith("/module/farming/");
-  const isOnAdmin   = location === "/quan-tri" || location.startsWith("/quan-tri/");
+  const userModules: string[] = user?.modules ?? ["portal", "erp", "txng", "vung_trong", "iot"];
 
-  const [erpExpanded,     setErpExpanded]     = useState(isOnErp);
-  const [txngExpanded,    setTxngExpanded]    = useState(isOnTxng);
-  const [farmingExpanded, setFarmingExpanded] = useState(isOnFarming);
-  const [adminExpanded,   setAdminExpanded]   = useState(isOnAdmin);
+  const visibleModules = MODULE_CONFIG.filter(m => userModules.includes(m.key));
 
-  useEffect(() => { if (isOnErp)     setErpExpanded(true);     }, [isOnErp]);
-  useEffect(() => { if (isOnTxng)    setTxngExpanded(true);    }, [isOnTxng]);
-  useEffect(() => { if (isOnFarming) setFarmingExpanded(true); }, [isOnFarming]);
-  useEffect(() => { if (isOnAdmin)   setAdminExpanded(true);   }, [isOnAdmin]);
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    for (const m of MODULE_CONFIG) {
+      if (location === m.pathPrefix || location.startsWith(m.pathPrefix + "/")) {
+        setExpanded(prev => ({ ...prev, [m.key]: true }));
+      }
+    }
+  }, [location]);
 
   const isActive = (href: string) =>
     location === href || location.startsWith(href + "/");
@@ -188,54 +257,22 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
             {t("nav.home")}
           </Link>
 
-          <ExpandableNavItem
-            href="/module/erp"
-            icon={BarChart3}
-            label={t("nav.erp")}
-            expanded={erpExpanded}
-            onToggle={() => setErpExpanded(v => !v)}
-            onNavigate={onClose}
-            isActive={isOnErp}
-            subItems={ERP_SUB_ITEMS}
-            location={location}
-          />
-
-          <ExpandableNavItem
-            href="/module/txng"
-            icon={ScanLine}
-            label={t("nav.txng")}
-            expanded={txngExpanded}
-            onToggle={() => setTxngExpanded(v => !v)}
-            onNavigate={onClose}
-            isActive={isOnTxng}
-            subItems={TXNG_SUB_ITEMS}
-            location={location}
-          />
-
-          <ExpandableNavItem
-            href="/module/farming"
-            icon={Leaf}
-            label={t("nav.farming")}
-            expanded={farmingExpanded}
-            onToggle={() => setFarmingExpanded(v => !v)}
-            onNavigate={onClose}
-            isActive={isOnFarming}
-            subItems={FARMING_SUB_ITEMS}
-            location={location}
-          />
-
-          <ExpandableNavItem
-            href="/quan-tri"
-            subBase="/quan-tri"
-            icon={ShieldCheck}
-            label="Quản trị hệ thống"
-            expanded={adminExpanded}
-            onToggle={() => setAdminExpanded(v => !v)}
-            onNavigate={onClose}
-            isActive={isOnAdmin}
-            subItems={ADMIN_SUB_ITEMS}
-            location={location}
-          />
+          {visibleModules.map(m => (
+            <ExpandableNavItem
+              key={m.key}
+              href={m.href}
+              subBase={m.subBase}
+              icon={m.icon}
+              label={m.label}
+              expanded={!!expanded[m.key]}
+              onToggle={() => setExpanded(prev => ({ ...prev, [m.key]: !prev[m.key] }))}
+              onNavigate={onClose}
+              isActive={isActive(m.pathPrefix)}
+              subItems={m.subItems}
+              location={location}
+              color={m.color}
+            />
+          ))}
         </nav>
 
         <div className="px-4 py-4 border-t border-border">
