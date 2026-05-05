@@ -38,6 +38,7 @@ export type EmployeeStats = { total: number; active: number; invited: number; lo
 
 export type Unit = {
   id: number;
+  enterpriseId: number | null;
   name: string;
   abbreviation: string;
   description: string;

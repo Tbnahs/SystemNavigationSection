@@ -1,9 +1,10 @@
-import { pgTable, serial, text, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, serial, text, timestamp, integer } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const unitsTable = pgTable("units_of_measure", {
   id: serial("id").primaryKey(),
+  enterpriseId: integer("enterprise_id"),
   name: text("name").notNull(),
   abbreviation: text("abbreviation").notNull(),
   description: text("description").default("").notNull(),

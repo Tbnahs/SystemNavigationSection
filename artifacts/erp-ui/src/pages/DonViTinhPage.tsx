@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 import AppLayout from "@/components/AppLayout";
-import { Plus, Pencil, X, Loader2, Scale, Search } from "lucide-react";
+import { Plus, Pencil, X, Loader2, Scale, Search, Globe, Building2 } from "lucide-react";
 import { fetchUnits, createUnit, updateUnit, deleteUnit, type Unit } from "@/lib/api";
 
 type UForm = { name: string; abbreviation: string; description: string };
@@ -12,6 +13,9 @@ function toForm(u: Unit): UForm {
 }
 
 export default function DonViTinhPage() {
+  const { user: currentUser } = useAuth();
+  const isSuperAdmin = !currentUser?.enterpriseId;
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<Unit | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Unit | null>(null);
@@ -25,7 +29,10 @@ export default function DonViTinhPage() {
   function inv() { qc.invalidateQueries({ queryKey: ["units"] }); }
 
   const createMu = useMutation({
-    mutationFn: (b: UForm) => createUnit(b),
+    mutationFn: (b: UForm) => createUnit({
+      ...b,
+      enterpriseId: isSuperAdmin ? null : (currentUser?.enterpriseId ?? null),
+    }),
     onSuccess: () => { inv(); close_(); },
     onError: (e: Error) => setErr(e.message),
   });
@@ -57,6 +64,11 @@ export default function DonViTinhPage() {
     : items;
   const isPending = createMu.isPending || updateMu.isPending;
 
+  function canEdit(u: Unit) {
+    if (isSuperAdmin) return true;
+    return u.enterpriseId === currentUser?.enterpriseId;
+  }
+
   return (
     <AppLayout>
       <div className="space-y-5">
@@ -64,6 +76,13 @@ export default function DonViTinhPage() {
           <div className="text-[12px] text-muted-foreground">Quản trị hệ thống / Đơn vị tính</div>
           <h1 className="text-xl lg:text-2xl font-bold mt-0.5">Đơn vị tính</h1>
         </div>
+
+        {!isSuperAdmin && (
+          <div className="flex items-start gap-2 px-4 py-3 rounded-xl bg-blue-50 border border-blue-200 text-[12.5px] text-blue-700">
+            <Globe className="w-4 h-4 mt-0.5 shrink-0" />
+            <span>Đơn vị dùng chung có thể sử dụng nhưng không chỉnh sửa. Bạn có thể tạo đơn vị riêng cho doanh nghiệp.</span>
+          </div>
+        )}
 
         <div className="bg-white border border-border rounded-xl p-3 lg:p-4 flex items-center gap-2 flex-wrap">
           <div className="relative flex-1 min-w-[220px]">
@@ -92,15 +111,16 @@ export default function DonViTinhPage() {
                   <th className="px-4 py-3">Tên đơn vị</th>
                   <th className="px-4 py-3">Ký hiệu</th>
                   <th className="px-4 py-3">Mô tả</th>
+                  <th className="px-4 py-3">Phạm vi</th>
                   <th className="px-4 py-3 w-20"></th>
                 </tr>
               </thead>
               <tbody>
                 {listQ.isLoading && (
-                  <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>
+                  <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>
                 )}
                 {!listQ.isLoading && filtered.length === 0 && (
-                  <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">
+                  <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
                     <Scale className="w-8 h-8 mx-auto mb-2 opacity-30" />
                     {search ? "Không tìm thấy đơn vị phù hợp." : "Chưa có đơn vị tính nào. Thêm đơn vị đầu tiên!"}
                   </td></tr>
@@ -116,10 +136,25 @@ export default function DonViTinhPage() {
                     </td>
                     <td className="px-4 py-3 text-muted-foreground text-[13px]">{u.description || "—"}</td>
                     <td className="px-4 py-3">
-                      <div className="flex items-center gap-1">
-                        <button onClick={() => openEdit(u)} className="p-1.5 rounded hover:bg-muted" title="Sửa"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
-                        <button onClick={() => setDeleteTarget(u)} className="p-1.5 rounded hover:bg-rose-50" title="Xóa"><X className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
-                      </div>
+                      {u.enterpriseId == null ? (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-sky-50 text-sky-700 ring-1 ring-sky-200">
+                          <Globe className="w-3 h-3" /> Dùng chung
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium bg-violet-50 text-violet-700 ring-1 ring-violet-200">
+                          <Building2 className="w-3 h-3" /> Doanh nghiệp
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-4 py-3">
+                      {canEdit(u) ? (
+                        <div className="flex items-center gap-1">
+                          <button onClick={() => openEdit(u)} className="p-1.5 rounded hover:bg-muted" title="Sửa"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
+                          <button onClick={() => setDeleteTarget(u)} className="p-1.5 rounded hover:bg-rose-50" title="Xóa"><X className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
+                        </div>
+                      ) : (
+                        <span className="text-[11px] text-muted-foreground/60 italic px-1.5">Chỉ xem</span>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -128,6 +163,11 @@ export default function DonViTinhPage() {
           </div>
           <div className="px-4 py-3 border-t border-border text-[13px] text-muted-foreground">
             {filtered.length} / {items.length} đơn vị tính
+            {!isSuperAdmin && (
+              <span className="ml-3 text-[11.5px]">
+                ({items.filter(u => u.enterpriseId == null).length} dùng chung · {items.filter(u => u.enterpriseId === currentUser?.enterpriseId).length} của DN)
+              </span>
+            )}
           </div>
         </div>
       </div>
@@ -165,11 +205,23 @@ export default function DonViTinhPage() {
             <div className="px-6 py-5 border-b border-border flex items-center justify-between">
               <div>
                 <div className="text-[17px] font-semibold">{editItem ? "Sửa đơn vị tính" : "Thêm đơn vị tính"}</div>
-                <div className="text-[12px] text-muted-foreground">Ví dụ: Kilogram (kg), Tấn (t), Bao (bao)…</div>
+                <div className="text-[12px] text-muted-foreground">
+                  {editItem
+                    ? "Cập nhật thông tin đơn vị"
+                    : isSuperAdmin
+                      ? "Tạo đơn vị dùng chung toàn hệ thống"
+                      : "Tạo đơn vị riêng cho doanh nghiệp bạn"}
+                </div>
               </div>
               <button onClick={close_} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
             <div className="flex-1 overflow-auto px-6 py-5 space-y-4">
+              {!isSuperAdmin && !editItem && (
+                <div className="flex items-center gap-2 px-3 py-2.5 rounded-lg bg-violet-50 border border-violet-200 text-[12px] text-violet-700">
+                  <Building2 className="w-3.5 h-3.5 shrink-0" />
+                  Đơn vị này sẽ thuộc về doanh nghiệp của bạn
+                </div>
+              )}
               <div>
                 <label className="block text-[13px] font-medium mb-1.5">Tên đơn vị <span className="text-rose-500">*</span></label>
                 <input value={form.name} onChange={e => setF("name", e.target.value)} placeholder="Kilogram" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
