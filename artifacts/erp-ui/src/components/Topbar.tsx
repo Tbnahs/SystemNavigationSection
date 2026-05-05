@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Bell, Search, ChevronDown, Globe, User, Settings, LogOut, Menu, X } from "lucide-react";
+import { Bell, Search, ChevronDown, Globe, User, Settings, LogOut, Menu, X, Building2 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language, languageLabels } from "@/i18n/translations";
@@ -149,10 +149,16 @@ export default function Topbar({ onMenuToggle, menuOpen }: TopbarProps) {
             <ChevronDown className="w-3.5 h-3.5 text-muted-foreground hidden md:block" />
           </button>
           {showProfile && (
-            <div className="absolute right-0 mt-2 w-52 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
+            <div className="absolute right-0 mt-2 w-60 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
               <div className="px-4 py-3 border-b border-border">
                 <p className="text-sm font-semibold text-foreground">{user?.name}</p>
                 <p className="text-xs text-muted-foreground">{user?.email}</p>
+                {user?.enterpriseName && (
+                  <div className="flex items-center gap-1.5 mt-2 px-2 py-1.5 rounded-lg bg-emerald-50 border border-emerald-100">
+                    <Building2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span className="text-[11.5px] font-medium text-emerald-700 truncate">{user.enterpriseName}</span>
+                  </div>
+                )}
               </div>
               <div className="py-1">
                 {[

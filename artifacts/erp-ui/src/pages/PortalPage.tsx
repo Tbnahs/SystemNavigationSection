@@ -189,7 +189,7 @@ export default function PortalPage() {
     : allEnterprises.filter(dn => dn.id === currentUser?.enterpriseId);
 
   const shortcuts = [
-    { icon: Building2, label: "Doanh nghiệp", desc: "Tạo & quản lý DN", href: "/portal/doanh-nghiep", color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+    ...( isSuperAdmin ? [{ icon: Building2, label: "Doanh nghiệp", desc: "Tạo & quản lý DN", href: "/portal/doanh-nghiep", color: "bg-emerald-50 text-emerald-700 border-emerald-200" }] : []),
     { icon: Users,     label: "Người dùng",   desc: "Tạo & phân quyền",  href: "/portal/nguoi-dung",   color: "bg-blue-50 text-blue-700 border-blue-200"     },
     { icon: ShieldCheck, label: "Phân quyền", desc: "Gán quyền hệ thống", href: "/portal/nguoi-dung",  color: "bg-violet-50 text-violet-700 border-violet-200" },
     { icon: Factory,   label: "Cơ sở",        desc: "Hộ liên kết & CS SX", href: "/portal/co-so",      color: "bg-amber-50 text-amber-700 border-amber-200"   },
