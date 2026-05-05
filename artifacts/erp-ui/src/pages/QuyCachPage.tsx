@@ -2,7 +2,8 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import AppLayout from "@/components/AppLayout";
-import { ArrowLeft, Leaf, Plus, Pencil, Trash2, X, Loader2 } from "lucide-react";
+import { ArrowLeft, Leaf, Plus, Pencil, Trash2, X, Loader2, Download } from "lucide-react";
+import * as XLSX from "xlsx";
 import {
   fetchGrades, createGrade, updateGrade, deleteGrade,
   fetchQualityLevels, createQualityLevel, updateQualityLevel, deleteQualityLevel,
@@ -65,6 +66,40 @@ export default function QuyCachPage() {
   const qualityLevels = qlQ.data?.items ?? [];
   const standards = sQ.data?.items ?? [];
 
+  function exportExcel() {
+    const wb = XLSX.utils.book_new();
+
+    const gradeRows = grades.map(g => ({
+      "Tên quy cách": g.name,
+      "Loại chè": g.loaiChe,
+      "Đơn giá tham khảo": g.price,
+      "Ghi chú": g.ghiChu,
+    }));
+    const wsG = XLSX.utils.json_to_sheet(gradeRows);
+    wsG["!cols"] = [{ wch: 25 }, { wch: 18 }, { wch: 22 }, { wch: 30 }];
+    XLSX.utils.book_append_sheet(wb, wsG, "Quy Cách");
+
+    const qlRows = qualityLevels.map(q => ({
+      "% Đánh giá": q.danhGia,
+      "Đơn giá": q.donGia,
+      "Xếp loại": q.xepLoai,
+      "Quy cách áp dụng": grades.find(g => g.id === q.gradeId)?.name ?? "Chung",
+    }));
+    const wsQ = XLSX.utils.json_to_sheet(qlRows);
+    wsQ["!cols"] = [{ wch: 18 }, { wch: 18 }, { wch: 15 }, { wch: 25 }];
+    XLSX.utils.book_append_sheet(wb, wsQ, "% Chất Lượng");
+
+    const sRows = standards.map(s => ({
+      "Tiêu đề": s.title,
+      "Mô tả": s.description,
+    }));
+    const wsS = XLSX.utils.json_to_sheet(sRows);
+    wsS["!cols"] = [{ wch: 30 }, { wch: 50 }];
+    XLSX.utils.book_append_sheet(wb, wsS, "Tiêu Chuẩn");
+
+    XLSX.writeFile(wb, `quy-cach-tieu-chuan-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  }
+
   const TABS: { key: Tab; label: string; count: number }[] = [
     { key: "grade",    label: "Quy cách",     count: grades.length },
     { key: "quality",  label: "% Chất lượng", count: qualityLevels.length },
@@ -92,14 +127,22 @@ export default function QuyCachPage() {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="border-b border-border flex gap-1">
+        {/* Tabs + Export */}
+        <div className="border-b border-border flex items-center gap-1">
           {TABS.map(t => (
             <button key={t.key} onClick={() => setTab(t.key)} className={`px-4 py-2.5 text-[13.5px] font-medium border-b-2 transition-colors flex items-center gap-2 ${tab === t.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
               {t.label}
               <span className={`text-[11px] px-1.5 py-0.5 rounded-full font-semibold ${tab === t.key ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{t.count}</span>
             </button>
           ))}
+          <div className="ml-auto pb-1">
+            <button
+              onClick={exportExcel}
+              className="h-9 px-3 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted"
+            >
+              <Download className="w-4 h-4 text-muted-foreground" /> Xuất Excel
+            </button>
+          </div>
         </div>
 
         {/* Grade tab */}

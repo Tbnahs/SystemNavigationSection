@@ -102,9 +102,26 @@ ERP web app for "Chè Quân Chu" tea origin tracing (Vietnamese UI). Vite + Reac
 - Auth: `src/contexts/AuthContext.tsx` — accepts any non-empty email/password (mock for now).
 - API access: `src/lib/api.ts` — small typed `fetch` wrapper hitting `/api/*` directly (proxied to api-server). Uses TanStack Query (`useQuery`/`useMutation`).
 - Admin screens (live data, backed by Postgres):
-  - `/quan-tri/doanh-nghiep` — list/create enterprises
+  - `/quan-tri/doanh-nghiep` — list/create/edit/delete enterprises + Phân quyền modules (ERP/TXNG/VT)
   - `/quan-tri/doanh-nghiep/:id` — enterprise detail with members tab
-  - `/quan-tri/nguoi-dung` — list/create employees
+  - `/quan-tri/nguoi-dung` — list/create employees + full permission matrix + reset password
+  - `/co-so` — facilities (hộ liên kết, cơ sở SX) + QR + Print + Gán nhân viên + **Import Excel** + **Xuất Excel** + file mẫu download
+  - `/don-vi-tinh` — units of measure CRUD
+  - `/thuong-pham` — products (bán thành phẩm, thành phẩm cuối) CRUD
+  - `/quy-cach` — grades + % quality levels + standards + **Xuất Excel** (3 sheets)
+  - `/don-thu-mua` — purchase orders with auto-price calculation from grade/quality
+
+## Sprint Status (ESG Valley)
+
+### Sprint 1 — Portal SSO + Cơ sở (COMPLETE)
+- Login ✅ | Doanh nghiệp CRUD + Phân quyền modules ✅ | User CRUD + Phân quyền + Reset mật khẩu ✅
+- Đơn vị tính CRUD ✅ | Cơ sở CRUD + QR + Print + Gán nhân viên ✅
+- Import Excel cơ sở ✅ | Xuất Excel cơ sở ✅ | Download file mẫu ✅
+
+### Sprint 2 — Thương phẩm + Quy cách + Đơn thu mua (COMPLETE)
+- Thương phẩm CRUD (bán thành phẩm + thành phẩm cuối) ✅
+- Quy cách + % Chất lượng + Tiêu chuẩn CRUD ✅ | Xuất Excel Quy cách ✅
+- Đơn thu mua: tạo/xem/sửa/xóa + auto-tính giá theo quy cách + % chất lượng ✅
 
 ### `scripts` (`@workspace/scripts`)
 

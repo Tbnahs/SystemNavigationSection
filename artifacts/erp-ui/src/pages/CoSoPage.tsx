@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   Plus, Pencil, X, Loader2, Search, Factory, QrCode, Printer,
-  Building2, Home, MapPin, Phone, Users,
+  Building2, Home, MapPin, Phone, Users, Upload, Download, CheckCircle,
 } from "lucide-react";
+import * as XLSX from "xlsx";
 import {
   fetchFacilities, createFacility, updateFacility, deleteFacility,
   fetchEnterprises, fetchEmployees, assignFacilityEmployees,
@@ -75,6 +76,9 @@ export default function CoSoPage() {
   const [typeFilter, setTypeFilter] = useState<string>("all");
   const [activeTab, setActiveTab] = useState<"info" | "employees">("info");
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<number[]>([]);
+  const [importLoading, setImportLoading] = useState(false);
+  const [importResult, setImportResult] = useState<{ ok: number; fail: number } | null>(null);
+  const importRef = useRef<HTMLInputElement>(null);
 
   const qc = useQueryClient();
   const listQ = useQuery({ queryKey: ["facilities"], queryFn: fetchFacilities });
@@ -103,6 +107,80 @@ export default function CoSoPage() {
   });
 
   function close_() { setDrawerOpen(false); setEditItem(null); setForm(EMPTY_F); setErr(null); setActiveTab("info"); setSelectedEmployeeIds([]); }
+
+  function exportExcel() {
+    const rows = filtered.map(f => ({
+      "Tên cơ sở": f.name,
+      "Mã": f.code || `CS-${f.id}`,
+      "Loại": typeLabel(f.type),
+      "Doanh nghiệp": f.enterpriseName ?? "",
+      "Số điện thoại": f.phone,
+      "Địa chỉ": f.address,
+      "Trạng thái": statusLabel(f.status),
+      "Ghi chú": f.notes,
+    }));
+    const ws = XLSX.utils.json_to_sheet(rows);
+    ws["!cols"] = [{ wch: 30 }, { wch: 12 }, { wch: 28 }, { wch: 25 }, { wch: 15 }, { wch: 35 }, { wch: 18 }, { wch: 25 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Co So");
+    XLSX.writeFile(wb, `danh-sach-co-so-${new Date().toISOString().slice(0, 10)}.xlsx`);
+  }
+
+  function downloadTemplate() {
+    const sample = [
+      { "Tên cơ sở": "Hộ Nguyễn Văn A", "Mã": "CS-001", "Loại": "ho_lien_ket", "Số điện thoại": "0912345678", "Địa chỉ": "Thôn Nà Hồng, Quân Chu", "Ghi chú": "" },
+      { "Tên cơ sở": "Xưởng chế biến B", "Mã": "CS-002", "Loại": "co_so_thue_ngoai", "Số điện thoại": "0987654321", "Địa chỉ": "Xã Quân Chu, Đại Từ", "Ghi chú": "Thuê ngoài" },
+    ];
+    const ws = XLSX.utils.json_to_sheet(sample);
+    ws["!cols"] = [{ wch: 30 }, { wch: 12 }, { wch: 20 }, { wch: 15 }, { wch: 35 }, { wch: 25 }];
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "Template");
+    XLSX.writeFile(wb, "template-import-co-so.xlsx");
+  }
+
+  async function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+    setImportLoading(true);
+    setImportResult(null);
+    try {
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, { type: "array" });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json<Record<string, string>>(ws);
+      let ok = 0; let fail = 0;
+      for (const row of rows) {
+        const name = (row["Tên cơ sở"] || row["ten_co_so"] || "").trim();
+        if (!name) { fail++; continue; }
+        const typeRaw = (row["Loại"] || row["loai"] || "ho_lien_ket").trim();
+        const typeMap: Record<string, Facility["type"]> = {
+          ho_lien_ket: "ho_lien_ket", "Hộ liên kết": "ho_lien_ket",
+          co_so_thue_ngoai: "co_so_thue_ngoai", "Cơ sở sản xuất (thuê ngoài)": "co_so_thue_ngoai",
+          co_so_noi_bo: "co_so_noi_bo", "Cơ sở sản xuất (nội bộ)": "co_so_noi_bo",
+        };
+        const type: Facility["type"] = typeMap[typeRaw] ?? "ho_lien_ket";
+        try {
+          await createFacility({
+            enterpriseId: null, name,
+            code: (row["Mã"] || row["ma"] || "").trim(),
+            type,
+            phone: (row["Số điện thoại"] || row["sdt"] || "").trim(),
+            address: (row["Địa chỉ"] || row["dia_chi"] || "").trim(),
+            status: "active",
+            notes: (row["Ghi chú"] || row["ghi_chu"] || "").trim(),
+          });
+          ok++;
+        } catch { fail++; }
+      }
+      inv();
+      setImportResult({ ok, fail });
+    } catch {
+      setImportResult({ ok: 0, fail: -1 });
+    } finally {
+      setImportLoading(false);
+    }
+  }
 
   function openEdit(f: Facility) {
     setEditItem(f);
@@ -153,6 +231,17 @@ export default function CoSoPage() {
           })}
         </div>
 
+        {/* Import result toast */}
+        {importResult && (
+          <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-[13px] ${importResult.fail === -1 ? "bg-rose-50 border-rose-200 text-rose-700" : "bg-emerald-50 border-emerald-200 text-emerald-800"}`}>
+            <CheckCircle className="w-4 h-4 shrink-0" />
+            {importResult.fail === -1
+              ? "Lỗi đọc file. Vui lòng kiểm tra định dạng Excel."
+              : `Import xong: ${importResult.ok} thành công${importResult.fail > 0 ? `, ${importResult.fail} lỗi` : ""}.`}
+            <button onClick={() => setImportResult(null)} className="ml-auto p-0.5 hover:opacity-70"><X className="w-3.5 h-3.5" /></button>
+          </div>
+        )}
+
         {/* Toolbar */}
         <div className="bg-white border border-border rounded-xl p-3 lg:p-4 flex items-center gap-2 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
@@ -172,6 +261,30 @@ export default function CoSoPage() {
             <option value="all">Tất cả loại</option>
             {TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
+          <button
+            onClick={exportExcel}
+            title="Xuất Excel"
+            className="h-10 px-3 rounded-lg border border-border text-sm font-medium flex items-center gap-2 hover:bg-muted"
+          >
+            <Download className="w-4 h-4 text-muted-foreground" /> Xuất Excel
+          </button>
+          <button
+            onClick={downloadTemplate}
+            title="Tải file mẫu import"
+            className="h-10 px-3 rounded-lg border border-border text-sm font-medium flex items-center gap-2 hover:bg-muted"
+          >
+            <Download className="w-4 h-4 text-muted-foreground" /> File mẫu
+          </button>
+          <button
+            onClick={() => importRef.current?.click()}
+            disabled={importLoading}
+            title="Import từ Excel"
+            className="h-10 px-3 rounded-lg border border-border text-sm font-medium flex items-center gap-2 hover:bg-muted disabled:opacity-60"
+          >
+            {importLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4 text-muted-foreground" />}
+            Import Excel
+          </button>
+          <input ref={importRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImportFile} />
           <button
             onClick={() => setDrawerOpen(true)}
             className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 shadow-sm hover:brightness-110"
