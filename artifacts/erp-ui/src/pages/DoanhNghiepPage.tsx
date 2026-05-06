@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import AppLayout from "@/components/AppLayout";
 import {
-  Search, Plus, Filter, Download, MoreHorizontal, ChevronDown, X, Upload,
+  Search, Plus, Filter, Download, ChevronDown, X, Upload,
   Building2, Users, Package, Sprout, Leaf, Bell, KeyRound, Copy, CheckCheck,
   Pencil, Eye, EyeOff, MapPin, ArrowLeft, ArrowRight, LayoutGrid, Loader2,
 } from "lucide-react";
@@ -13,6 +13,7 @@ import {
   updateEnterprise, deleteEnterprise,
   type Enterprise,
 } from "@/lib/api";
+import { PROVINCES_VN, COMMUNE_MAP } from "@/lib/vietnam-data";
 
 const STATUS_BADGE: Record<Enterprise["status"], { text: string; cls: string }> = {
   active: { text: "Đang hoạt động", cls: "bg-emerald-50 text-emerald-700 ring-emerald-600/20" },
@@ -171,6 +172,11 @@ export default function DoanhNghiepPage() {
     if (!form.mst.trim() || !form.ten.trim() || !form.tenHienThi.trim()) {
       setActiveTab("general");
       setSubmitErr("Vui lòng nhập đủ Mã số thuế, Tên doanh nghiệp và Tên hiển thị.");
+      return;
+    }
+    if (!form.email.trim()) {
+      setActiveTab("general");
+      setSubmitErr("Email doanh nghiệp là bắt buộc để tạo tài khoản đăng nhập.");
       return;
     }
     if (editItem) {
@@ -468,7 +474,7 @@ export default function DoanhNghiepPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <Field label="Người đại diện" placeholder="Họ và tên" value={form.daiDien} onChange={(v) => setF("daiDien", v)} />
-                    <Field label="Email" placeholder="lienhe@congty.vn" value={form.email} onChange={(v) => setF("email", v)} />
+                    <Field label="Email" required placeholder="lienhe@congty.vn" value={form.email} onChange={(v) => setF("email", v)} />
                   </div>
 
                   {!editItem && (
@@ -498,8 +504,8 @@ export default function DoanhNghiepPage() {
               {activeTab === "location" && (
                 <div className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <ProvinceSelect value={form.tinh} onChange={(v) => setF("tinh", v)} />
-                    <Field label="Xã / Phường" placeholder="Vd: Quân Chu" value={form.xa} onChange={(v) => setF("xa", v)} />
+                    <ProvinceSelect value={form.tinh} onChange={(v) => { setF("tinh", v); setF("xa", ""); }} />
+                    <CommuneSelect province={form.tinh} value={form.xa} onChange={(v) => setF("xa", v)} />
                   </div>
                   <Field label="Địa chỉ chi tiết" placeholder="Số nhà, đường, xóm…" value={form.diaChi} onChange={(v) => setF("diaChi", v)} />
                   {(() => {
@@ -648,42 +654,6 @@ function toggleModule(arr: ("ERP" | "TXNG" | "VT")[], m: "ERP" | "TXNG" | "VT", 
   return on ? Array.from(new Set([...arr, m])) : arr.filter((x) => x !== m);
 }
 
-const PROVINCES_VN_2025 = [
-  "Hà Nội",
-  "Hải Phòng",
-  "Hồ Chí Minh",
-  "Đà Nẵng",
-  "Cần Thơ",
-  "Cao Bằng",
-  "Thái Nguyên",
-  "Lào Cai",
-  "Điện Biên",
-  "Hà Giang",
-  "Lạng Sơn",
-  "Bắc Ninh",
-  "Hưng Yên",
-  "Thanh Hóa",
-  "Nghệ An",
-  "Huế",
-  "Quảng Ngãi",
-  "Bình Định",
-  "Khánh Hòa",
-  "Gia Lai",
-  "Đắk Lắk",
-  "Lâm Đồng",
-  "Bình Thuận",
-  "Đồng Nai",
-  "Tây Ninh",
-  "Long An",
-  "Tiền Giang",
-  "Vĩnh Long",
-  "Đồng Tháp",
-  "An Giang",
-  "Kiên Giang",
-  "Bến Tre",
-  "Trà Vinh",
-  "Cà Mau",
-];
 
 function CredRow({ label, value, secret }: { label: string; value: string; secret?: boolean }) {
   const [show, setShow] = useState(!secret);
@@ -727,12 +697,45 @@ function ProvinceSelect({ value, onChange }: { value?: string; onChange?: (v: st
           className="w-full h-10 pl-3 pr-8 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 appearance-none cursor-pointer"
         >
           <option value="">-- Chọn tỉnh / thành phố --</option>
-          {PROVINCES_VN_2025.map((p) => (
+          {PROVINCES_VN.map((p) => (
             <option key={p} value={p}>{p}</option>
           ))}
         </select>
         <ChevronDown className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
       </div>
+    </div>
+  );
+}
+
+function CommuneSelect({ province, value, onChange }: { province?: string; value?: string; onChange?: (v: string) => void }) {
+  const options = province ? (COMMUNE_MAP[province] ?? []) : [];
+  return (
+    <div>
+      <div className="flex items-center gap-1 mb-1.5">
+        <span className="text-[13px] font-medium text-foreground/80">Xã / Phường</span>
+      </div>
+      {options.length > 0 ? (
+        <div className="relative">
+          <select
+            value={value ?? ""}
+            onChange={(e) => onChange?.(e.target.value)}
+            className="w-full h-10 pl-3 pr-8 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 appearance-none cursor-pointer"
+          >
+            <option value="">-- Chọn xã / phường --</option>
+            {options.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+          <ChevronDown className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+        </div>
+      ) : (
+        <input
+          value={value ?? ""}
+          onChange={(e) => onChange?.(e.target.value)}
+          placeholder="Nhập xã / phường / thị trấn"
+          className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+        />
+      )}
     </div>
   );
 }

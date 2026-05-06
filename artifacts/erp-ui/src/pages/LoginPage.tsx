@@ -22,10 +22,11 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-    const success = await login(email, password);
+    const u = await login(email, password);
     setLoading(false);
-    if (success) {
-      setLocation("/home");
+    if (u) {
+      const hasOtherModules = (u.modules ?? []).some((m) => m !== "portal");
+      setLocation(hasOtherModules ? "/home" : "/portal");
     } else {
       setError("Email hoặc mật khẩu không đúng");
     }

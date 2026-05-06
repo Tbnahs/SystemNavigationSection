@@ -202,7 +202,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   const userModules: string[] = user?.modules ?? ["portal"];
 
   const portalSubItems = isSuperAdmin
-    ? PORTAL_SUB_ITEMS
+    ? PORTAL_SUB_ITEMS.filter(item => item.type === "divider" || (item as { id?: string }).id !== "co-so")
     : PORTAL_SUB_ITEMS.filter(item => item.type === "divider" || (item as { id?: string }).id !== "doanh-nghiep");
 
   const visibleModules = MODULE_CONFIG.map(m => {

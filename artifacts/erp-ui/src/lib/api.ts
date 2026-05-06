@@ -54,6 +54,9 @@ export type Facility = {
   type: "ho_lien_ket" | "co_so_thue_ngoai" | "co_so_noi_bo";
   phone: string;
   address: string;
+  tinh: string;
+  xa: string;
+  gln: string;
   status: "active" | "inactive";
   notes: string;
   createdAt: string;

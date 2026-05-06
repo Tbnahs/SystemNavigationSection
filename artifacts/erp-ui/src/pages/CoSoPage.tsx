@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   Plus, Pencil, X, Loader2, Search, Factory, QrCode, Printer,
-  Building2, Home, MapPin, Phone, Users, Upload, Download, CheckCircle, Lock,
+  Building2, Home, MapPin, Phone, Users, Upload, Download, CheckCircle, Lock, ChevronDown,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
@@ -12,6 +12,7 @@ import {
   type Facility,
 } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { PROVINCES_VN, COMMUNE_MAP } from "@/lib/vietnam-data";
 
 const TYPE_OPTIONS: { value: Facility["type"]; label: string; color: string }[] = [
   { value: "ho_lien_ket", label: "Hộ liên kết", color: "bg-emerald-50 text-emerald-700 ring-emerald-200" },
@@ -57,14 +58,69 @@ type FForm = {
   code: string;
   type: Facility["type"];
   phone: string;
+  tinh: string;
+  xa: string;
   address: string;
+  gln: string;
   status: "active" | "inactive";
   notes: string;
 };
 const EMPTY_F: FForm = {
   enterpriseId: null, name: "", code: "", type: "ho_lien_ket",
-  phone: "", address: "", status: "active", notes: "",
+  phone: "", tinh: "", xa: "", address: "", gln: "", status: "active", notes: "",
 };
+
+function ProvinceSelect({ value, onChange }: { value?: string; onChange?: (v: string) => void }) {
+  return (
+    <div>
+      <label className="block text-[13px] font-medium mb-1.5">Tỉnh / Thành phố</label>
+      <div className="relative">
+        <select
+          value={value ?? ""}
+          onChange={(e) => onChange?.(e.target.value)}
+          className="w-full h-10 pl-3 pr-8 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary appearance-none cursor-pointer"
+        >
+          <option value="">-- Chọn tỉnh / thành phố --</option>
+          {PROVINCES_VN.map((p) => (
+            <option key={p} value={p}>{p}</option>
+          ))}
+        </select>
+        <ChevronDown className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+      </div>
+    </div>
+  );
+}
+
+function CommuneSelect({ province, value, onChange }: { province?: string; value?: string; onChange?: (v: string) => void }) {
+  const options = province ? (COMMUNE_MAP[province] ?? []) : [];
+  return (
+    <div>
+      <label className="block text-[13px] font-medium mb-1.5">Xã / Phường</label>
+      {options.length > 0 ? (
+        <div className="relative">
+          <select
+            value={value ?? ""}
+            onChange={(e) => onChange?.(e.target.value)}
+            className="w-full h-10 pl-3 pr-8 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary appearance-none cursor-pointer"
+          >
+            <option value="">-- Chọn xã / phường --</option>
+            {options.map((c) => (
+              <option key={c} value={c}>{c}</option>
+            ))}
+          </select>
+          <ChevronDown className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+        </div>
+      ) : (
+        <input
+          value={value ?? ""}
+          onChange={(e) => onChange?.(e.target.value)}
+          placeholder="Nhập xã / phường / thị trấn"
+          className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary"
+        />
+      )}
+    </div>
+  );
+}
 
 export default function CoSoPage() {
   const { user } = useAuth();
@@ -93,7 +149,13 @@ export default function CoSoPage() {
 
   const createMu = useMutation({
     mutationFn: (b: FForm) => createFacility(b),
-    onSuccess: () => { inv(); close_(); },
+    onSuccess: async (data) => {
+      if (selectedEmployeeIds.length > 0) {
+        await assignFacilityEmployees(data.item.id, selectedEmployeeIds);
+      }
+      inv();
+      close_();
+    },
     onError: (e: Error) => setErr(e.message),
   });
   const updateMu = useMutation({
@@ -118,13 +180,16 @@ export default function CoSoPage() {
       "Mã": f.code || `CS-${f.id}`,
       "Loại": typeLabel(f.type),
       "Doanh nghiệp": f.enterpriseName ?? "",
+      "GLN": f.gln,
       "Số điện thoại": f.phone,
+      "Tỉnh / Thành phố": f.tinh,
+      "Xã / Phường": f.xa,
       "Địa chỉ": f.address,
       "Trạng thái": statusLabel(f.status),
       "Ghi chú": f.notes,
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
-    ws["!cols"] = [{ wch: 30 }, { wch: 12 }, { wch: 28 }, { wch: 25 }, { wch: 15 }, { wch: 35 }, { wch: 18 }, { wch: 25 }];
+    ws["!cols"] = [{ wch: 30 }, { wch: 12 }, { wch: 28 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 25 }, { wch: 35 }, { wch: 18 }, { wch: 25 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Co So");
     XLSX.writeFile(wb, `danh-sach-co-so-${new Date().toISOString().slice(0, 10)}.xlsx`);
@@ -132,11 +197,11 @@ export default function CoSoPage() {
 
   function downloadTemplate() {
     const sample = [
-      { "Tên cơ sở": "Hộ Nguyễn Văn A", "Mã": "CS-001", "Loại": "ho_lien_ket", "Số điện thoại": "0912345678", "Địa chỉ": "Thôn Nà Hồng, Quân Chu", "Ghi chú": "" },
-      { "Tên cơ sở": "Xưởng chế biến B", "Mã": "CS-002", "Loại": "co_so_thue_ngoai", "Số điện thoại": "0987654321", "Địa chỉ": "Xã Quân Chu, Đại Từ", "Ghi chú": "Thuê ngoài" },
+      { "Tên cơ sở": "Hộ Nguyễn Văn A", "Mã": "CS-001", "Loại": "ho_lien_ket", "Số điện thoại": "0912345678", "Tỉnh / Thành phố": "Thái Nguyên", "Xã / Phường": "Xã Quân Chu (H. Đại Từ)", "Địa chỉ": "Thôn Nà Hồng", "GLN": "", "Ghi chú": "" },
+      { "Tên cơ sở": "Xưởng chế biến B", "Mã": "CS-002", "Loại": "co_so_thue_ngoai", "Số điện thoại": "0987654321", "Tỉnh / Thành phố": "Thái Nguyên", "Xã / Phường": "Xã Phú Lạc (H. Đại Từ)", "Địa chỉ": "Xã Quân Chu, Đại Từ", "GLN": "", "Ghi chú": "Thuê ngoài" },
     ];
     const ws = XLSX.utils.json_to_sheet(sample);
-    ws["!cols"] = [{ wch: 30 }, { wch: 12 }, { wch: 20 }, { wch: 15 }, { wch: 35 }, { wch: 25 }];
+    ws["!cols"] = [{ wch: 30 }, { wch: 12 }, { wch: 20 }, { wch: 15 }, { wch: 20 }, { wch: 30 }, { wch: 35 }, { wch: 15 }, { wch: 25 }];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Template");
     XLSX.writeFile(wb, "template-import-co-so.xlsx");
@@ -170,7 +235,10 @@ export default function CoSoPage() {
             code: (row["Mã"] || row["ma"] || "").trim(),
             type,
             phone: (row["Số điện thoại"] || row["sdt"] || "").trim(),
+            tinh: (row["Tỉnh / Thành phố"] || row["tinh"] || "").trim(),
+            xa: (row["Xã / Phường"] || row["xa"] || "").trim(),
             address: (row["Địa chỉ"] || row["dia_chi"] || "").trim(),
+            gln: (row["GLN"] || row["gln"] || "").trim(),
             status: "active",
             notes: (row["Ghi chú"] || row["ghi_chu"] || "").trim(),
           });
@@ -188,7 +256,11 @@ export default function CoSoPage() {
 
   function openEdit(f: Facility) {
     setEditItem(f);
-    setForm({ enterpriseId: f.enterpriseId, name: f.name, code: f.code, type: f.type, phone: f.phone, address: f.address, status: f.status, notes: f.notes });
+    setForm({
+      enterpriseId: f.enterpriseId, name: f.name, code: f.code, type: f.type,
+      phone: f.phone, tinh: f.tinh ?? "", xa: f.xa ?? "", address: f.address,
+      gln: f.gln ?? "", status: f.status, notes: f.notes,
+    });
     setErr(null);
     setDrawerOpen(true);
   }
@@ -204,11 +276,14 @@ export default function CoSoPage() {
   const items = listQ.data?.items ?? [];
   const filtered = items
     .filter(f => typeFilter === "all" || f.type === typeFilter)
-    .filter(f => !search.trim() || [f.name, f.code, f.address].some(s => s.toLowerCase().includes(search.toLowerCase())));
+    .filter(f => !search.trim() || [f.name, f.code, f.address, f.tinh, f.xa].some(s => (s ?? "").toLowerCase().includes(search.toLowerCase())));
   const isPending = createMu.isPending || updateMu.isPending;
 
   const enterprises = dnQ.data?.items ?? [];
   const employees = empQ.data?.items ?? [];
+
+  const currentEnterpriseId = editItem?.enterpriseId ?? (isSuperAdmin ? form.enterpriseId : (user?.enterpriseId ?? null));
+  const relevantEmployees = employees.filter(e => e.enterpriseId === currentEnterpriseId || !currentEnterpriseId);
 
   return (
     <AppLayout>
@@ -253,7 +328,7 @@ export default function CoSoPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Tìm tên, mã, địa chỉ…"
+              placeholder="Tìm tên, mã, địa chỉ, tỉnh…"
               className="w-full h-10 pl-9 pr-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
             />
           </div>
@@ -303,23 +378,24 @@ export default function CoSoPage() {
         {/* Table */}
         <div className="bg-white border border-border rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[800px]">
+            <table className="w-full text-sm min-w-[900px]">
               <thead>
                 <tr className="text-left text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/40">
                   <th className="px-4 py-3">Tên cơ sở</th>
                   <th className="px-4 py-3">Loại</th>
                   <th className="px-4 py-3">Doanh nghiệp</th>
-                  <th className="px-4 py-3">Liên hệ / Địa chỉ</th>
+                  <th className="px-4 py-3">Địa chỉ</th>
+                  <th className="px-4 py-3">GLN</th>
                   <th className="px-4 py-3">Trạng thái</th>
                   <th className="px-4 py-3 w-28"></th>
                 </tr>
               </thead>
               <tbody>
                 {listQ.isLoading && (
-                  <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>
                 )}
                 {!listQ.isLoading && filtered.length === 0 && (
-                  <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
                     <Factory className="w-8 h-8 mx-auto mb-2 opacity-30" />
                     {search || typeFilter !== "all" ? "Không tìm thấy cơ sở phù hợp." : "Chưa có cơ sở nào. Thêm cơ sở đầu tiên!"}
                   </td></tr>
@@ -338,9 +414,16 @@ export default function CoSoPage() {
                     <td className="px-4 py-3 text-[13px]">{f.enterpriseName ?? "—"}</td>
                     <td className="px-4 py-3">
                       {f.phone && <div className="flex items-center gap-1 text-[13px]"><Phone className="w-3.5 h-3.5 text-muted-foreground" />{f.phone}</div>}
-                      {f.address && <div className="flex items-center gap-1 text-[12px] text-muted-foreground mt-0.5"><MapPin className="w-3 h-3" />{f.address}</div>}
-                      {!f.phone && !f.address && <span className="text-muted-foreground">—</span>}
+                      {(f.xa || f.tinh) && (
+                        <div className="flex items-center gap-1 text-[12px] text-muted-foreground mt-0.5">
+                          <MapPin className="w-3 h-3" />
+                          {[f.xa, f.tinh].filter(Boolean).join(", ")}
+                        </div>
+                      )}
+                      {f.address && <div className="text-[12px] text-muted-foreground mt-0.5">{f.address}</div>}
+                      {!f.phone && !f.xa && !f.tinh && !f.address && <span className="text-muted-foreground">—</span>}
                     </td>
+                    <td className="px-4 py-3 text-[13px] font-mono">{f.gln || <span className="text-muted-foreground">—</span>}</td>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ring-1 ring-inset ${statusCls(f.status)}`}>
                         <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${f.status === "active" ? "bg-emerald-500" : "bg-slate-400"}`} />
@@ -423,10 +506,11 @@ export default function CoSoPage() {
       {drawerOpen && (
         <>
           <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={close_} />
-          <aside className="fixed top-0 right-0 h-full w-full sm:w-[520px] bg-white shadow-2xl z-50 flex flex-col">
+          <aside className="fixed top-0 right-0 h-full w-full sm:w-[540px] bg-white shadow-2xl z-50 flex flex-col">
             <div className="px-6 py-5 border-b border-border flex items-center justify-between">
               <div>
                 <div className="text-[18px] font-semibold">{editItem ? "Sửa thông tin cơ sở" : "Thêm cơ sở mới"}</div>
+                <div className="text-[12.5px] text-muted-foreground">{editItem ? "Cập nhật thông tin cơ sở và nhân viên phụ trách." : "Điền thông tin cơ sở và chọn nhân viên phụ trách."}</div>
               </div>
               <button onClick={close_} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
@@ -434,8 +518,8 @@ export default function CoSoPage() {
             {/* Tabs */}
             <div className="flex border-b border-border px-6 gap-4">
               {[
-                { key: "info" as const, label: "Thông tin" },
-                ...(editItem ? [{ key: "employees" as const, label: "Nhân viên phụ trách" }] : []),
+                { key: "info" as const, label: "Thông tin cơ sở" },
+                { key: "employees" as const, label: "Nhân viên phụ trách" },
               ].map(tab => (
                 <button
                   key={tab.key}
@@ -443,6 +527,9 @@ export default function CoSoPage() {
                   className={`py-3 text-[13.5px] font-medium border-b-2 transition-colors ${activeTab === tab.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
                 >
                   {tab.label}
+                  {tab.key === "employees" && selectedEmployeeIds.length > 0 && (
+                    <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">{selectedEmployeeIds.length}</span>
+                  )}
                 </button>
               ))}
             </div>
@@ -492,69 +579,98 @@ export default function CoSoPage() {
                       </select>
                     </div>
                   </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <ProvinceSelect value={form.tinh} onChange={(v) => { setF("tinh", v); setF("xa", ""); }} />
+                    <CommuneSelect province={form.tinh} value={form.xa} onChange={(v) => setF("xa", v)} />
+                  </div>
                   <div>
-                    <label className="block text-[13px] font-medium mb-1.5">Địa chỉ</label>
-                    <input value={form.address} onChange={e => setF("address", e.target.value)} placeholder="Thôn Đại An, xã Phú Lạc…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                    <label className="block text-[13px] font-medium mb-1.5">Địa chỉ chi tiết</label>
+                    <input value={form.address} onChange={e => setF("address", e.target.value)} placeholder="Số nhà, đường, thôn xóm…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-medium mb-1.5">
+                      GLN <span className="text-[11px] text-muted-foreground font-normal">(Global Location Number)</span>
+                    </label>
+                    <input
+                      value={form.gln}
+                      onChange={e => setF("gln", e.target.value)}
+                      placeholder="0000000000000 (13 chữ số)"
+                      maxLength={13}
+                      className="w-full h-10 px-3 rounded-lg border border-border text-sm font-mono outline-none focus:border-primary"
+                    />
+                    <div className="text-[11.5px] text-muted-foreground mt-1">Mã định danh địa điểm toàn cầu GS1 (dùng trong truy xuất chuỗi cung ứng).</div>
                   </div>
                   <div>
                     <label className="block text-[13px] font-medium mb-1.5">Ghi chú</label>
-                    <textarea value={form.notes} onChange={e => setF("notes", e.target.value)} rows={3} placeholder="Ghi chú thêm…" className="w-full px-3 py-2.5 rounded-lg border border-border text-sm outline-none focus:border-primary resize-none" />
+                    <textarea value={form.notes} onChange={e => setF("notes", e.target.value)} rows={2} placeholder="Ghi chú thêm…" className="w-full px-3 py-2.5 rounded-lg border border-border text-sm outline-none focus:border-primary resize-none" />
                   </div>
                 </>
               )}
 
-              {activeTab === "employees" && editItem && (
+              {activeTab === "employees" && (
                 <div className="space-y-3">
+                  {!editItem && (
+                    <div className="px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-[12.5px]">
+                      Chọn nhân viên phụ trách ngay khi tạo cơ sở. Phân công sẽ được lưu cùng lúc với thông tin cơ sở.
+                    </div>
+                  )}
                   <p className="text-[13px] text-muted-foreground">Chọn nhân viên phụ trách cơ sở này:</p>
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {employees.filter(e => e.enterpriseId === editItem.enterpriseId || !editItem.enterpriseId).map(emp => (
-                      <label key={emp.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border hover:bg-muted/40 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          className="accent-primary"
-                          checked={selectedEmployeeIds.includes(emp.id)}
-                          onChange={e => {
-                            if (e.target.checked) setSelectedEmployeeIds(p => [...p, emp.id]);
-                            else setSelectedEmployeeIds(p => p.filter(id => id !== emp.id));
-                          }}
-                        />
-                        <div className={`w-8 h-8 rounded-full text-white text-[11px] font-semibold flex items-center justify-center shrink-0 ${emp.avatarColor}`}>
-                          {emp.name.slice(-2).toUpperCase()}
-                        </div>
-                        <div>
-                          <div className="text-[13px] font-medium">{emp.name}</div>
-                          <div className="text-[11.5px] text-muted-foreground">{emp.role}</div>
-                        </div>
-                      </label>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => assignMu.mutate({ id: editItem.id, ids: selectedEmployeeIds })}
-                    disabled={assignMu.isPending}
-                    className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 hover:brightness-110 disabled:opacity-60"
-                  >
-                    {assignMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                    <Users className="w-4 h-4" /> Lưu phân công
-                  </button>
+                  {relevantEmployees.length === 0 ? (
+                    <div className="py-8 text-center text-[13px] text-muted-foreground">
+                      <Users className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                      Chưa có nhân viên nào. Thêm nhân viên ở mục Người dùng trước.
+                    </div>
+                  ) : (
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
+                      {relevantEmployees.map(emp => (
+                        <label key={emp.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border hover:bg-muted/40 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            className="accent-primary"
+                            checked={selectedEmployeeIds.includes(emp.id)}
+                            onChange={e => {
+                              if (e.target.checked) setSelectedEmployeeIds(p => [...p, emp.id]);
+                              else setSelectedEmployeeIds(p => p.filter(id => id !== emp.id));
+                            }}
+                          />
+                          <div className={`w-8 h-8 rounded-full text-white text-[11px] font-semibold flex items-center justify-center shrink-0 ${emp.avatarColor}`}>
+                            {emp.name.slice(-2).toUpperCase()}
+                          </div>
+                          <div>
+                            <div className="text-[13px] font-medium">{emp.name}</div>
+                            <div className="text-[11.5px] text-muted-foreground">{emp.role}</div>
+                          </div>
+                        </label>
+                      ))}
+                    </div>
+                  )}
+                  {editItem && (
+                    <button
+                      onClick={() => assignMu.mutate({ id: editItem.id, ids: selectedEmployeeIds })}
+                      disabled={assignMu.isPending}
+                      className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 hover:brightness-110 disabled:opacity-60"
+                    >
+                      {assignMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                      <Users className="w-4 h-4" /> Lưu phân công
+                    </button>
+                  )}
                 </div>
               )}
 
               {err && <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{err}</div>}
             </div>
 
-            {activeTab === "info" && (
-              <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-2 bg-muted/40">
-                <button onClick={close_} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
-                <button
-                  disabled={isPending}
-                  onClick={handleSubmit}
-                  className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold shadow-sm hover:brightness-110 disabled:opacity-60 flex items-center gap-2"
-                >
-                  {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {editItem ? "Lưu thay đổi" : "Thêm cơ sở"}
-                </button>
-              </div>
-            )}
+            <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-2 bg-muted/40">
+              <button onClick={close_} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
+              <button
+                disabled={isPending}
+                onClick={handleSubmit}
+                className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold shadow-sm hover:brightness-110 disabled:opacity-60 flex items-center gap-2"
+              >
+                {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                {editItem ? "Lưu thay đổi" : "Thêm cơ sở"}
+              </button>
+            </div>
           </aside>
         </>
       )}

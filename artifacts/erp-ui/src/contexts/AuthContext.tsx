@@ -23,7 +23,7 @@ function saveSession(user: AuthUser | null) {
 interface AuthContextType {
   user: AuthUser | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<AuthUser | null>;
   logout: () => void;
 }
 
@@ -32,14 +32,14 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AuthUser | null>(loadSession);
 
-  const login = async (email: string, password: string): Promise<boolean> => {
+  const login = async (email: string, password: string): Promise<AuthUser | null> => {
     try {
       const { user: u } = await loginUser(email, password);
       setUser(u);
       saveSession(u);
-      return true;
+      return u;
     } catch {
-      return false;
+      return null;
     }
   };
 
