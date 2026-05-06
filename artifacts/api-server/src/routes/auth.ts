@@ -13,7 +13,7 @@ function deriveModules(enterpriseModules: string[] | null | undefined, isSuperAd
   if (!enterpriseModules || enterpriseModules.length === 0) return result;
   if (enterpriseModules.includes("ERP"))  result.push("erp");
   if (enterpriseModules.includes("TXNG")) result.push("txng");
-  if (enterpriseModules.includes("VT"))   { result.push("vung_trong"); result.push("iot"); }
+  if (enterpriseModules.includes("VT"))   { result.push("vung_trong"); }
   return result;
 }
 

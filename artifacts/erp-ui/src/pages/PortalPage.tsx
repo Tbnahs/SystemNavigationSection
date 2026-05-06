@@ -33,8 +33,7 @@ const MODULE_META: Record<string, ModuleMetaItem[]> = {
   ERP:  [{ label: "ERP",                 color: "text-emerald-700", bg: "bg-emerald-100", icon: BarChart3 }],
   TXNG: [{ label: "Truy xuất nguồn gốc", color: "text-blue-700",    bg: "bg-blue-100",    icon: ScanLine  }],
   VT:   [
-    { label: "Vùng trồng",               color: "text-amber-700",   bg: "bg-amber-100",   icon: Leaf      },
-    { label: "Thiết bị IoT",             color: "text-rose-700",    bg: "bg-rose-100",    icon: Cpu       },
+    { label: "Vùng trồng & IoT",         color: "text-amber-700",   bg: "bg-amber-100",   icon: Leaf      },
   ],
 };
 

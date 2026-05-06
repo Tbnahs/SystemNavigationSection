@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useAuth } from "@/contexts/AuthContext";
 import AppLayout from "@/components/AppLayout";
 import { Plus, Pencil, X, Loader2, Search, Package, Eye, Building2, Tag, Scale, DollarSign, Info, Calendar } from "lucide-react";
 import {
@@ -33,11 +34,14 @@ type PForm = {
 const EMPTY_P: PForm = { enterpriseId: null, name: "", code: "", type: "ban_thanh_pham", unitId: null, price: "", description: "", status: "active" };
 
 export default function ThuongPhamPage() {
+  const { user } = useAuth();
+  const isSuperAdmin = !user?.enterpriseId;
+
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<Product | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
   const [viewItem, setViewItem] = useState<Product | null>(null);
-  const [form, setForm] = useState<PForm>(EMPTY_P);
+  const [form, setForm] = useState<PForm>(() => ({ ...EMPTY_P, enterpriseId: user?.enterpriseId ?? null }));
   const [err, setErr] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -64,7 +68,7 @@ export default function ThuongPhamPage() {
     onSuccess: () => { inv(); setDeleteTarget(null); },
   });
 
-  function close_() { setDrawerOpen(false); setEditItem(null); setForm(EMPTY_P); setErr(null); }
+  function close_() { setDrawerOpen(false); setEditItem(null); setForm({ ...EMPTY_P, enterpriseId: user?.enterpriseId ?? null }); setErr(null); }
   function openEdit(p: Product) {
     setEditItem(p);
     setForm({ enterpriseId: p.enterpriseId, name: p.name, code: p.code, type: p.type, unitId: p.unitId, price: p.price, description: p.description, status: p.status });
@@ -335,10 +339,17 @@ export default function ThuongPhamPage() {
               </div>
               <div>
                 <label className="block text-[13px] font-medium mb-1.5">Doanh nghiệp</label>
-                <select value={form.enterpriseId ?? ""} onChange={e => setF("enterpriseId", e.target.value ? Number(e.target.value) : null)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
-                  <option value="">-- Dùng chung (tất cả DN) --</option>
-                  {enterprises.map(d => <option key={d.id} value={d.id}>{d.tenHienThi}</option>)}
-                </select>
+                {isSuperAdmin ? (
+                  <select value={form.enterpriseId ?? ""} onChange={e => setF("enterpriseId", e.target.value ? Number(e.target.value) : null)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
+                    <option value="">-- Dùng chung (tất cả DN) --</option>
+                    {enterprises.map(d => <option key={d.id} value={d.id}>{d.tenHienThi}</option>)}
+                  </select>
+                ) : (
+                  <div className="w-full h-10 px-3 rounded-lg border border-border bg-muted/40 text-sm flex items-center text-foreground">
+                    {enterprises.find(d => d.id === form.enterpriseId)?.tenHienThi ?? user?.enterpriseName ?? "—"}
+                    <span className="ml-auto text-[11.5px] text-muted-foreground">Cố định theo tài khoản</span>
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-[13px] font-medium mb-1.5">Trạng thái</label>
