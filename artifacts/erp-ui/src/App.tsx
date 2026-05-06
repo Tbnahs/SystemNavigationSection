@@ -31,6 +31,7 @@ import ThuongPhamPage from "@/pages/ThuongPhamPage";
 import DonThuMuaPage from "@/pages/DonThuMuaPage";
 import PortalPage from "@/pages/PortalPage";
 import HoSoPage from "@/pages/HoSoPage";
+import ModuleSelectPage from "@/pages/ModuleSelectPage";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -54,6 +55,9 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={LoginPage} />
+      <Route path="/chon-phan-he">
+        {() => <ProtectedRoute component={ModuleSelectPage} />}
+      </Route>
       <Route path="/home">
         {() => <ProtectedRoute component={HomePage} />}
       </Route>

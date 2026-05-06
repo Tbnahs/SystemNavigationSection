@@ -1,9 +1,16 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { Bell, Search, ChevronDown, Globe, User, Settings, LogOut, Menu, X, Building2 } from "lucide-react";
+import { Bell, Search, ChevronDown, Globe, User, Settings, LogOut, Menu, X, Building2, LayoutGrid, BarChart3, ScanLine, Leaf } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language, languageLabels } from "@/i18n/translations";
+
+const MODULE_LIST = [
+  { id: "portal",     icon: Globe,     label: "Portal",              labelShort: "Portal",   href: "/portal",           color: "text-violet-600", bg: "bg-violet-50" },
+  { id: "erp",        icon: BarChart3, label: "ERP",                 labelShort: "ERP",      href: "/module/erp",        color: "text-emerald-600", bg: "bg-emerald-50" },
+  { id: "txng",       icon: ScanLine,  label: "Truy xuất nguồn gốc", labelShort: "TXNG",     href: "/module/txng",       color: "text-blue-600",   bg: "bg-blue-50" },
+  { id: "vung_trong", icon: Leaf,      label: "Vùng trồng & IoT",    labelShort: "Vùng trồng", href: "/module/vung-trong", color: "text-amber-600",  bg: "bg-amber-50" },
+];
 
 interface TopbarProps {
   onMenuToggle?: () => void;
@@ -20,11 +27,22 @@ export default function Topbar({ onMenuToggle, menuOpen }: TopbarProps) {
   const [showNotif, setShowNotif] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
   const [showLang, setShowLang] = useState(false);
+  const [showModules, setShowModules] = useState(false);
   const { user, logout } = useAuth();
   const { t, language, setLanguage } = useLanguage();
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
 
   const unreadCount = notifications.filter((n) => n.unread).length;
+
+  const userModules: string[] = user?.modules ?? ["portal"];
+  const visibleModules = MODULE_LIST.filter((m) => {
+    if (m.id === "vung_trong") return userModules.includes("vung_trong") || userModules.includes("iot");
+    return userModules.includes(m.id);
+  });
+
+  const activeModule = MODULE_LIST.find((m) =>
+    location === m.href || location.startsWith(m.href + "/")
+  );
 
   const handleLogout = () => {
     logout();
@@ -64,6 +82,66 @@ export default function Topbar({ onMenuToggle, menuOpen }: TopbarProps) {
       </div>
 
       <div className="flex-1 lg:flex-none" />
+
+      {/* Module Switcher */}
+      <div className="relative">
+        <button
+          data-testid="button-module-switcher"
+          onClick={() => { setShowModules(!showModules); setShowNotif(false); setShowProfile(false); setShowLang(false); }}
+          className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border hover:bg-accent transition-colors text-sm"
+        >
+          {activeModule ? (
+            <>
+              <div className={`w-5 h-5 rounded-md ${activeModule.bg} flex items-center justify-center shrink-0`}>
+                <activeModule.icon className={`w-3 h-3 ${activeModule.color}`} strokeWidth={2} />
+              </div>
+              <span className="font-medium text-foreground hidden sm:inline max-w-[120px] truncate">{activeModule.labelShort}</span>
+            </>
+          ) : (
+            <>
+              <LayoutGrid className="w-4 h-4 text-muted-foreground" />
+              <span className="text-muted-foreground hidden sm:inline">Chọn phân hệ</span>
+            </>
+          )}
+          <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-150 ${showModules ? "rotate-180" : ""}`} />
+        </button>
+
+        {showModules && (
+          <div className="absolute right-0 mt-2 w-64 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
+            <div className="px-4 py-2.5 border-b border-border">
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Chuyển phân hệ</p>
+            </div>
+            <div className="py-1.5">
+              {visibleModules.map((m) => {
+                const Icon = m.icon;
+                const isActive = location === m.href || location.startsWith(m.href + "/");
+                return (
+                  <button
+                    key={m.id}
+                    onClick={() => { setLocation(m.href); setShowModules(false); }}
+                    className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${isActive ? "bg-accent text-foreground font-medium" : "text-foreground hover:bg-accent"}`}
+                  >
+                    <div className={`w-7 h-7 rounded-lg ${m.bg} flex items-center justify-center shrink-0`}>
+                      <Icon className={`w-3.5 h-3.5 ${m.color}`} strokeWidth={2} />
+                    </div>
+                    <span className="flex-1 text-left">{m.label}</span>
+                    {isActive && <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />}
+                  </button>
+                );
+              })}
+            </div>
+            <div className="border-t border-border px-2 py-1.5">
+              <button
+                onClick={() => { setLocation("/chon-phan-he"); setShowModules(false); }}
+                className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
+              >
+                <LayoutGrid className="w-3.5 h-3.5" />
+                Xem tất cả phân hệ
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Actions */}
       <div className="flex items-center gap-1">

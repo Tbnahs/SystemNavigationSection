@@ -25,8 +25,7 @@ export default function LoginPage() {
     const u = await login(email, password);
     setLoading(false);
     if (u) {
-      const hasOtherModules = (u.modules ?? []).some((m) => m !== "portal");
-      setLocation(hasOtherModules ? "/home" : "/portal");
+      setLocation("/chon-phan-he");
     } else {
       setError("Email hoặc mật khẩu không đúng");
     }
