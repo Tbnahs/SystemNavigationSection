@@ -5,13 +5,12 @@ import { eq } from "drizzle-orm";
 
 const router: Router = Router();
 
-const ALL_MODULES = ["portal", "erp", "txng", "vung_trong", "iot"];
-
-function deriveModules(enterpriseModules: string[] | null | undefined): string[] {
-  if (!enterpriseModules || enterpriseModules.length === 0) {
-    return ALL_MODULES;
-  }
+function deriveModules(enterpriseModules: string[] | null | undefined, isSuperAdmin: boolean): string[] {
+  // Super Admin chỉ quản lý Portal, không dùng ERP/TXNG/Vùng trồng
+  if (isSuperAdmin) return ["portal"];
+  // Enterprise user: module dựa theo license DN
   const result: string[] = ["portal"];
+  if (!enterpriseModules || enterpriseModules.length === 0) return result;
   if (enterpriseModules.includes("ERP"))  result.push("erp");
   if (enterpriseModules.includes("TXNG")) result.push("txng");
   if (enterpriseModules.includes("VT"))   { result.push("vung_trong"); result.push("iot"); }
@@ -64,7 +63,7 @@ router.post("/auth/login", async (req: Request, res: Response, next: NextFunctio
       .set({ lastSeen: new Date().toISOString() })
       .where(eq(employeesTable.id, employee.id));
 
-    const modules = deriveModules(employee.enterpriseId ? enterpriseModules : null);
+    const modules = deriveModules(enterpriseModules, !employee.enterpriseId);
 
     res.json({
       user: {

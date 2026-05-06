@@ -199,7 +199,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   const [location] = useLocation();
 
   const isSuperAdmin = !user?.enterpriseId;
-  const userModules: string[] = user?.modules ?? ["portal", "erp", "txng", "vung_trong", "iot"];
+  const userModules: string[] = user?.modules ?? ["portal"];
 
   const portalSubItems = isSuperAdmin
     ? PORTAL_SUB_ITEMS
