@@ -1,6 +1,25 @@
 import { createContext, useContext, useState, ReactNode } from "react";
 import { loginUser, type AuthUser } from "@/lib/api";
 
+const SESSION_KEY = "erp_user_session";
+
+function loadSession(): AuthUser | null {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    return raw ? (JSON.parse(raw) as AuthUser) : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveSession(user: AuthUser | null) {
+  if (user) {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+  } else {
+    sessionStorage.removeItem(SESSION_KEY);
+  }
+}
+
 interface AuthContextType {
   user: AuthUser | null;
   isAuthenticated: boolean;
@@ -11,12 +30,13 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
+  const [user, setUser] = useState<AuthUser | null>(loadSession);
 
   const login = async (email: string, password: string): Promise<boolean> => {
     try {
       const { user: u } = await loginUser(email, password);
       setUser(u);
+      saveSession(u);
       return true;
     } catch {
       return false;
@@ -25,6 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setUser(null);
+    saveSession(null);
   };
 
   return (
