@@ -1,87 +1,62 @@
 import { useMemo } from "react";
 import { useLocation } from "wouter";
+import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useERP } from "@/contexts/ERPContext";
 import AppLayout from "@/components/AppLayout";
 import {
-  BarChart3,
-  ScanLine,
-  Leaf,
-  TrendingUp,
-  ShoppingCart,
-  Package,
-  ArrowRight,
-  Clock,
-  CheckCircle2,
-  AlertCircle,
-  MapPin,
-  Globe,
-  ShieldCheck,
+  BarChart3, ScanLine, Leaf, TrendingUp, ShoppingCart, Package,
+  ArrowRight, Clock, CheckCircle2, AlertCircle, MapPin, Globe,
+  Users, Building2, Ruler, Store, Wifi, WifiOff, ShieldCheck,
+  QrCode, Link2, Award, Factory, Layers,
 } from "lucide-react";
 import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  PieChart,
-  Pie,
-  Cell,
-  Legend,
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
+  ResponsiveContainer, PieChart, Pie, Cell, Legend,
 } from "recharts";
+import {
+  fetchEnterpriseStats, fetchEmployeeStats, fetchFacilities, fetchUnits,
+} from "@/lib/api";
 
+/* ── Constants ───────────────────────────────────────────── */
 const ALL_SYSTEMS = [
-  {
-    id: "portal",
-    icon: Globe,
-    label: "Portal",
-    desc: "Quản lý tài khoản và phân quyền truy cập",
-    href: "/portal",
-    count: "4",
-    gradient: "from-violet-500 to-purple-600",
-    badge: "bg-violet-100 text-violet-700",
-  },
-  {
-    id: "erp",
-    icon: BarChart3,
-    label: "ERP",
-    desc: "Thu mua, sản xuất, đóng gói, bán hàng",
-    href: "/module/erp",
-    count: "13",
-    gradient: "from-emerald-500 to-green-600",
-    badge: "bg-emerald-100 text-emerald-700",
-  },
-  {
-    id: "txng",
-    icon: ScanLine,
-    label: "Truy xuất nguồn gốc",
-    desc: "QR code, chuỗi cung ứng, chứng nhận",
-    href: "/module/txng",
-    count: "6",
-    gradient: "from-blue-500 to-cyan-600",
-    badge: "bg-blue-100 text-blue-700",
-  },
-  {
-    id: "vung_trong",
-    icon: Leaf,
-    label: "Vùng trồng & IoT",
-    desc: "Quản lý vùng nguyên liệu, cây trồng và thiết bị IoT",
-    href: "/module/vung-trong",
-    count: "10",
-    gradient: "from-amber-500 to-orange-500",
-    badge: "bg-amber-100 text-amber-700",
-  },
+  { id: "portal",     icon: Globe,    label: "Portal",              desc: "Quản lý tài khoản và phân quyền truy cập",          href: "/portal",          count: "4",  gradient: "from-violet-500 to-purple-600", badge: "bg-violet-100 text-violet-700" },
+  { id: "erp",        icon: BarChart3, label: "ERP",                desc: "Thu mua, sản xuất, đóng gói, bán hàng",             href: "/module/erp",      count: "13", gradient: "from-emerald-500 to-green-600", badge: "bg-emerald-100 text-emerald-700" },
+  { id: "txng",       icon: ScanLine,  label: "Truy xuất nguồn gốc",desc: "QR code, chuỗi cung ứng, chứng nhận",               href: "/module/txng",     count: "6",  gradient: "from-blue-500 to-cyan-600",     badge: "bg-blue-100 text-blue-700" },
+  { id: "vung_trong", icon: Leaf,      label: "Vùng trồng & IoT",   desc: "Quản lý vùng nguyên liệu, cây trồng và thiết bị IoT",href: "/module/vung-trong",count:"10", gradient: "from-amber-500 to-orange-500",  badge: "bg-amber-100 text-amber-700" },
 ];
 
-const activities = [
-  { icon: CheckCircle2, ok: true,  text: "Lô hàng VCC-2024-089 đã được xác nhận truy xuất",   time: "5 phút trước" },
-  { icon: ScanLine,    ok: true,  text: "QR Code mới tạo cho sản phẩm Xoài cát Hòa Lộc",      time: "30 phút trước" },
+const ERP_ACTIVITIES = [
+  { icon: CheckCircle2, ok: true,  text: "Lô sản xuất L018104 đã nhập kho thành công",     time: "5 phút trước" },
+  { icon: ShoppingCart, ok: true,  text: "Phiếu thu mua PO-0504-008 được tạo mới",          time: "32 phút trước" },
+  { icon: CheckCircle2, ok: true,  text: "Đơn bán #DH-20240401 đã giao thành công",         time: "2 giờ trước" },
+  { icon: AlertCircle,  ok: false, text: "Đơn PO-0404-007 chưa nhận hàng theo lịch",        time: "3 giờ trước" },
+  { icon: Package,      ok: true,  text: "Lô đóng gói S053103 xuất kho sang đại lý",        time: "5 giờ trước" },
+];
+
+const TXNG_ACTIVITIES = [
+  { icon: QrCode,       ok: true,  text: "QR Code mới tạo cho sản phẩm Hồng trà L018104",  time: "10 phút trước" },
+  { icon: CheckCircle2, ok: true,  text: "Xác nhận nguồn gốc lô VCC-2024-089 thành công",  time: "1 giờ trước" },
+  { icon: Link2,        ok: true,  text: "Đối tác mới thêm vào chuỗi cung ứng",             time: "3 giờ trước" },
+  { icon: Award,        ok: true,  text: "Chứng nhận OCOP gia hạn cho 5 sản phẩm",          time: "Hôm qua" },
+  { icon: AlertCircle,  ok: false, text: "Lô BC003104 chưa có xác nhận truy xuất",          time: "Hôm qua" },
+];
+
+const IOT_ACTIVITIES = [
+  { icon: Wifi,         ok: true,  text: "Cảm biến độ ẩm vùng Nà Hồng hoạt động bình thường", time: "Vừa xong" },
   { icon: CheckCircle2, ok: true,  text: "Vùng trồng B3 hoàn thành kiểm định chất lượng",      time: "2 giờ trước" },
-  { icon: AlertCircle, ok: false, text: "Cảnh báo: Vùng A1 cần bổ sung phân bón",              time: "3 giờ trước" },
-  { icon: CheckCircle2, ok: true,  text: "Đơn hàng #DH-20240401 đã giao thành công",           time: "5 giờ trước" },
+  { icon: AlertCircle,  ok: false, text: "Cảnh báo: Vùng A1 cần bổ sung phân bón",             time: "3 giờ trước" },
+  { icon: Wifi,         ok: true,  text: "24 thiết bị IoT đang truyền dữ liệu ổn định",        time: "5 giờ trước" },
+  { icon: AlertCircle,  ok: false, text: "Cảm biến nhiệt độ khu B2 mất kết nối",               time: "Hôm qua" },
+];
+
+const PORTAL_ACTIVITIES = [
+  { icon: Users,        ok: true,  text: "Tài khoản mới được kích hoạt thành công",         time: "15 phút trước" },
+  { icon: Building2,    ok: true,  text: "Doanh nghiệp Chè Quân Chu cập nhật thông tin",    time: "1 giờ trước" },
+  { icon: CheckCircle2, ok: true,  text: "Phân quyền module ERP cho HTX Hồng Hà",           time: "2 giờ trước" },
+  { icon: Store,        ok: true,  text: "Cơ sở chế biến Nà Hồng thêm mới",                time: "Hôm qua" },
+  { icon: AlertCircle,  ok: false, text: "2 tài khoản chờ kích hoạt",                       time: "Hôm qua" },
 ];
 
 function fmtCur(v: number) {
@@ -93,51 +68,92 @@ function fmtCur(v: number) {
 const PIE_COLORS = ["#16a34a", "#15803d", "#4ade80", "#86efac", "#bbf7d0"];
 
 const CustomTooltipBar = ({ active, payload, label }: any) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white border border-border rounded-lg px-3 py-2 shadow-md text-xs">
-        <p className="font-semibold text-foreground mb-1">{label}</p>
-        {payload.map((p: any) => (
-          <p key={p.name} style={{ color: p.fill }} className="font-medium">
-            {p.name}: <span className="text-foreground">{p.value.toFixed(1)} kg</span>
-          </p>
-        ))}
-      </div>
-    );
-  }
-  return null;
+  if (!active || !payload?.length) return null;
+  return (
+    <div className="bg-white border border-border rounded-lg px-3 py-2 shadow-md text-xs">
+      <p className="font-semibold text-foreground mb-1">{label}</p>
+      {payload.map((p: any) => (
+        <p key={p.name} style={{ color: p.fill }} className="font-medium">
+          {p.name}: <span className="text-foreground">{p.value.toFixed(1)} kg</span>
+        </p>
+      ))}
+    </div>
+  );
 };
 
 const CustomTooltipPie = ({ active, payload }: any) => {
-  if (active && payload && payload.length) {
-    const d = payload[0];
-    return (
-      <div className="bg-white border border-border rounded-lg px-3 py-2 shadow-md text-xs">
-        <p className="font-semibold text-foreground">{d.name}</p>
-        <p style={{ color: d.payload.fill }} className="font-medium">
-          {d.value.toFixed(1)} kg thành phẩm
-        </p>
-      </div>
-    );
-  }
-  return null;
+  if (!active || !payload?.length) return null;
+  const d = payload[0];
+  return (
+    <div className="bg-white border border-border rounded-lg px-3 py-2 shadow-md text-xs">
+      <p className="font-semibold text-foreground">{d.name}</p>
+      <p style={{ color: d.payload.fill }} className="font-medium">
+        {d.value.toFixed(1)} kg thành phẩm
+      </p>
+    </div>
+  );
 };
 
+/* ── StatCard ────────────────────────────────────────────── */
+function StatCard({ icon: Icon, label, value, sub, color = "text-primary", bg = "bg-primary/10" }: {
+  icon: React.ElementType; label: string; value: string; sub: string;
+  color?: string; bg?: string;
+}) {
+  return (
+    <div className="bg-white border border-border rounded-xl p-4 hover:border-primary/30 transition-colors">
+      <div className="flex items-center justify-between mb-3">
+        <div className={`w-8 h-8 rounded-lg ${bg} flex items-center justify-center`}>
+          <Icon className={`w-4 h-4 ${color}`} strokeWidth={1.5} />
+        </div>
+        <span className={`text-xs font-medium ${color}`}>{sub}</span>
+      </div>
+      <p className="text-xl font-bold text-foreground">{value}</p>
+      <p className="text-xs text-muted-foreground mt-0.5">{label}</p>
+    </div>
+  );
+}
+
+/* ── Module section label ─────────────────────────────────── */
+function SectionLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+      {children}
+    </h2>
+  );
+}
+
+/* ── Placeholder chart (for TXNG / IoT — coming soon) ────── */
+function PlaceholderChart({ label, icon: Icon, color }: { label: string; icon: React.ElementType; color: string }) {
+  return (
+    <div className="bg-white border border-border rounded-xl p-6 flex flex-col items-center justify-center gap-3 min-h-[160px]">
+      <Icon className={`w-8 h-8 ${color} opacity-40`} strokeWidth={1} />
+      <p className="text-sm text-muted-foreground text-center">{label}</p>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════════════ */
 export default function HomePage() {
   const { user } = useAuth();
   const { t } = useLanguage();
   const [, setLocation] = useLocation();
   const { summary, rawReceipts, productionBatches } = useERP();
 
+  const userModules: string[] = user?.modules ?? ["portal"];
+  const hasERP  = userModules.includes("erp");
+  const hasTXNG = userModules.includes("txng");
+  const hasIoT  = userModules.includes("vung_trong") || userModules.includes("iot");
+  const isPortalOnly = !hasERP && !hasTXNG && !hasIoT;
+
   const firstName = user?.name?.split(" ").pop() || "bạn";
 
-  const stats = [
-    { icon: TrendingUp,   label: "home.totalRevenue",   value: fmtCur(summary.totalSalesRevenue),         change: `${summary.completedSales} đơn HT` },
-    { icon: ShoppingCart, label: "home.activeOrders",   value: String(summary.totalSalesOrders),           change: `${summary.activePOs} PO đang xử lý` },
-    { icon: Package,      label: "home.tracedProducts", value: `${summary.totalPurchaseKg.toFixed(0)} kg`, change: `${summary.totalProductionBatches} lô SX` },
-    { icon: ScanLine,     label: "home.farmingAreas",   value: `${summary.pendingPackaging} lô ĐG`,        change: `${summary.totalSalesOrders} đơn bán` },
-  ];
+  /* Portal stats (real API — only fetched when needed) */
+  const { data: entStats } = useQuery({ queryKey: ["enterprise-stats"], queryFn: fetchEnterpriseStats, enabled: isPortalOnly });
+  const { data: empStats } = useQuery({ queryKey: ["employee-stats"],   queryFn: fetchEmployeeStats,   enabled: isPortalOnly });
+  const { data: facData  } = useQuery({ queryKey: ["facilities"],       queryFn: fetchFacilities,      enabled: isPortalOnly });
+  const { data: unitData } = useQuery({ queryKey: ["units"],            queryFn: fetchUnits,           enabled: isPortalOnly });
 
+  /* ERP charts data */
   const dailyPurchaseData = useMemo(() => {
     const map = new Map<string, Record<string, number>>();
     for (const r of rawReceipts) {
@@ -174,6 +190,9 @@ export default function HomePage() {
     return Array.from(map.entries()).map(([area, kg]) => ({ area, kg })).sort((a, b) => b.kg - a.kg);
   }, [rawReceipts]);
 
+  /* Activities */
+  const activities = hasERP ? ERP_ACTIVITIES : hasTXNG ? TXNG_ACTIVITIES : hasIoT ? IOT_ACTIVITIES : PORTAL_ACTIVITIES;
+
   return (
     <AppLayout>
       {/* Greeting */}
@@ -184,125 +203,149 @@ export default function HomePage() {
         <p className="text-muted-foreground text-sm">{t("home.subtitle")}</p>
       </div>
 
-      {/* Quick stats */}
-      <section className="mb-8">
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          {t("home.quickStats")}
-        </h2>
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {stats.map((stat) => {
-            const Icon = stat.icon;
-            return (
-              <div
-                key={stat.label}
-                data-testid={`card-stat-${stat.label}`}
-                className="bg-white border border-border rounded-xl p-4 hover:border-primary/30 transition-colors"
-              >
-                <div className="flex items-center justify-between mb-3">
-                  <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-                    <Icon className="w-4 h-4 text-primary" strokeWidth={1.5} />
+      {/* ── ERP stats ────────────────────────────────────── */}
+      {hasERP && (
+        <section className="mb-8">
+          <SectionLabel>📊 Tổng quan ERP</SectionLabel>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <StatCard icon={TrendingUp}   label="Doanh thu đơn bán"     value={fmtCur(summary.totalSalesRevenue)}         sub={`${summary.completedSales} đơn HT`} />
+            <StatCard icon={ShoppingCart} label="Khối lượng thu mua"    value={`${summary.totalPurchaseKg.toFixed(0)} kg`} sub={`${summary.activePOs} PO đang xử lý`} />
+            <StatCard icon={Factory}      label="Lô sản xuất"           value={String(summary.totalProductionBatches)}     sub={`${summary.completedProductionKg.toFixed(0)} kg TP`} />
+            <StatCard icon={Package}      label="Lô đóng gói chờ xuất"  value={String(summary.pendingPackaging)}           sub={`${summary.totalSalesOrders} đơn bán`} />
+          </div>
+        </section>
+      )}
+
+      {/* ── TXNG stats ───────────────────────────────────── */}
+      {hasTXNG && (
+        <section className="mb-8">
+          <SectionLabel>🔍 Tổng quan Truy xuất nguồn gốc</SectionLabel>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <StatCard icon={QrCode}       label="QR Code đã tạo"             value="156"  sub="12 mới tuần này"     color="text-blue-600"    bg="bg-blue-50" />
+            <StatCard icon={CheckCircle2} label="Sản phẩm xác nhận nguồn gốc" value="42"  sub="3 đang chờ duyệt"   color="text-blue-600"    bg="bg-blue-50" />
+            <StatCard icon={Link2}        label="Chuỗi cung ứng hoạt động"    value="7"   sub="24 điểm liên kết"   color="text-cyan-600"    bg="bg-cyan-50" />
+            <StatCard icon={Award}        label="Chứng nhận còn hiệu lực"     value="18"  sub="2 sắp hết hạn"      color="text-cyan-600"    bg="bg-cyan-50" />
+          </div>
+        </section>
+      )}
+
+      {/* ── IoT / Vùng trồng stats ───────────────────────── */}
+      {hasIoT && (
+        <section className="mb-8">
+          <SectionLabel>🌿 Tổng quan Vùng trồng & IoT</SectionLabel>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <StatCard icon={MapPin}   label="Vùng nguyên liệu"      value="3"      sub="Nà Hồng · Nà Bay · Bản Chang"  color="text-amber-600" bg="bg-amber-50" />
+            <StatCard icon={Leaf}     label="Cây đang theo dõi"      value="1.247"  sub="82% đang mùa thu hoạch"         color="text-amber-600" bg="bg-amber-50" />
+            <StatCard icon={Wifi}     label="Thiết bị IoT online"    value="24/24"  sub="Truyền dữ liệu bình thường"     color="text-orange-600" bg="bg-orange-50" />
+            <StatCard icon={AlertCircle} label="Cảnh báo cần xử lý" value="2"      sub="1 khẩn cấp"                     color="text-rose-600" bg="bg-rose-50" />
+          </div>
+        </section>
+      )}
+
+      {/* ── Portal-only stats (real API data) ───────────── */}
+      {isPortalOnly && (
+        <section className="mb-8">
+          <SectionLabel>🏢 Tổng quan hệ thống</SectionLabel>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            <StatCard icon={Building2} label="Doanh nghiệp đang hoạt động" value={String(entStats?.active ?? "—")}        sub={`${entStats?.total ?? 0} tổng`}            color="text-violet-600" bg="bg-violet-50" />
+            <StatCard icon={Users}     label="Người dùng hệ thống"          value={String(empStats?.total ?? "—")}          sub={`${empStats?.active ?? 0} đang hoạt động`}  color="text-violet-600" bg="bg-violet-50" />
+            <StatCard icon={Store}     label="Cơ sở vận hành"              value={String(facData?.items.length ?? "—")}    sub="Nhà xưởng & điểm thu mua"                   color="text-purple-600" bg="bg-purple-50" />
+            <StatCard icon={Ruler}     label="Đơn vị tính đã thiết lập"    value={String(unitData?.items.length ?? "—")}   sub="Dùng trong toàn hệ thống"                   color="text-purple-600" bg="bg-purple-50" />
+          </div>
+        </section>
+      )}
+
+      {/* ── ERP Charts (chỉ hiện khi có module ERP) ──────── */}
+      {hasERP && (
+        <section className="mb-8">
+          <SectionLabel>THỐNG KÊ THU MUA & SẢN XUẤT</SectionLabel>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            <div className="lg:col-span-2 bg-white border border-border rounded-xl p-4">
+              <p className="text-sm font-semibold text-foreground mb-1">Khối lượng thu mua theo ngày</p>
+              <p className="text-xs text-muted-foreground mb-4">Phân theo vùng nguyên liệu (kg)</p>
+              <ResponsiveContainer width="100%" height={220}>
+                <BarChart data={dailyPurchaseData} margin={{ top: 0, right: 8, left: -20, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                  <XAxis dataKey="date" tick={{ fontSize: 11 }} />
+                  <YAxis tick={{ fontSize: 11 }} />
+                  <Tooltip content={<CustomTooltipBar />} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
+                  <Bar dataKey="Nà Hồng"   fill="#16a34a" radius={[3,3,0,0]} />
+                  <Bar dataKey="Nà Bay"    fill="#4ade80" radius={[3,3,0,0]} />
+                  <Bar dataKey="Bản Chang" fill="#86efac" radius={[3,3,0,0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+            <div className="bg-white border border-border rounded-xl p-4">
+              <p className="text-sm font-semibold text-foreground mb-1">Sản lượng theo loại chè</p>
+              <p className="text-xs text-muted-foreground mb-2">Thành phẩm sản xuất (kg)</p>
+              <ResponsiveContainer width="100%" height={220}>
+                <PieChart>
+                  <Pie data={productionByType} cx="50%" cy="45%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
+                    {productionByType.map((_, i) => (
+                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip content={<CustomTooltipPie />} />
+                  <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          <div className="mt-4 bg-white border border-border rounded-xl p-4">
+            <div className="flex items-center gap-2 mb-1">
+              <MapPin className="w-4 h-4 text-primary" strokeWidth={1.5} />
+              <p className="text-sm font-semibold text-foreground">Tổng thu mua theo vùng nguyên liệu</p>
+            </div>
+            <p className="text-xs text-muted-foreground mb-4">Toàn bộ đợt thu mua (kg)</p>
+            <div className="space-y-3">
+              {areaTotal.map((item, i) => {
+                const max = areaTotal[0].kg;
+                const pct = (item.kg / max) * 100;
+                return (
+                  <div key={item.area}>
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-medium text-foreground">{item.area}</span>
+                      <span className="text-xs text-muted-foreground">{item.kg.toFixed(1)} kg</span>
+                    </div>
+                    <div className="h-2 bg-muted rounded-full overflow-hidden">
+                      <div className="h-full rounded-full transition-all duration-500" style={{ width: `${pct}%`, backgroundColor: PIE_COLORS[i % PIE_COLORS.length] }} />
+                    </div>
                   </div>
-                  <span className="text-xs font-medium text-primary">{stat.change}</span>
-                </div>
-                <p className="text-xl font-bold text-foreground">{stat.value}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{t(stat.label as any)}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
-      {/* Charts */}
+      {/* ── TXNG Charts placeholder ───────────────────────── */}
+      {hasTXNG && !hasERP && (
+        <section className="mb-8">
+          <SectionLabel>THỐNG KÊ TRUY XUẤT</SectionLabel>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <PlaceholderChart label="Biểu đồ QR theo thời gian sẽ hiển thị tại đây" icon={QrCode} color="text-blue-500" />
+            <PlaceholderChart label="Bản đồ chuỗi cung ứng sẽ hiển thị tại đây"    icon={Link2}  color="text-cyan-500" />
+          </div>
+        </section>
+      )}
+
+      {/* ── IoT Charts placeholder ────────────────────────── */}
+      {hasIoT && !hasERP && !hasTXNG && (
+        <section className="mb-8">
+          <SectionLabel>GIÁM SÁT VÙNG TRỒNG</SectionLabel>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <PlaceholderChart label="Biểu đồ nhiệt độ & độ ẩm theo cảm biến sẽ hiển thị tại đây" icon={Wifi}   color="text-amber-500" />
+            <PlaceholderChart label="Bản đồ vùng trồng & thiết bị IoT sẽ hiển thị tại đây"        icon={Layers} color="text-orange-500" />
+          </div>
+        </section>
+      )}
+
+      {/* ── Systems ──────────────────────────────────────── */}
       <section className="mb-8">
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          THỐNG KÊ THU MUA & SẢN XUẤT
-        </h2>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-
-          {/* Bar chart – Thu mua theo ngày & vùng */}
-          <div className="lg:col-span-2 bg-white border border-border rounded-xl p-4">
-            <p className="text-sm font-semibold text-foreground mb-1">Khối lượng thu mua theo ngày</p>
-            <p className="text-xs text-muted-foreground mb-4">Phân theo vùng nguyên liệu (kg)</p>
-            <ResponsiveContainer width="100%" height={220}>
-              <BarChart data={dailyPurchaseData} margin={{ top: 0, right: 8, left: -20, bottom: 0 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis dataKey="date" tick={{ fontSize: 11 }} />
-                <YAxis tick={{ fontSize: 11 }} />
-                <Tooltip content={<CustomTooltipBar />} />
-                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
-                <Bar dataKey="Nà Hồng"   fill="#16a34a" radius={[3,3,0,0]} />
-                <Bar dataKey="Nà Bay"    fill="#4ade80" radius={[3,3,0,0]} />
-                <Bar dataKey="Bản Chang" fill="#86efac" radius={[3,3,0,0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Pie chart – Sản lượng theo loại chè */}
-          <div className="bg-white border border-border rounded-xl p-4">
-            <p className="text-sm font-semibold text-foreground mb-1">Sản lượng theo loại chè</p>
-            <p className="text-xs text-muted-foreground mb-2">Thành phẩm sản xuất (kg)</p>
-            <ResponsiveContainer width="100%" height={220}>
-              <PieChart>
-                <Pie
-                  data={productionByType}
-                  cx="50%"
-                  cy="45%"
-                  innerRadius={50}
-                  outerRadius={75}
-                  paddingAngle={3}
-                  dataKey="value"
-                >
-                  {productionByType.map((_, i) => (
-                    <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip content={<CustomTooltipPie />} />
-                <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* Bar chart – Tổng thu mua theo vùng */}
-        <div className="mt-4 bg-white border border-border rounded-xl p-4">
-          <div className="flex items-center gap-2 mb-1">
-            <MapPin className="w-4 h-4 text-primary" strokeWidth={1.5} />
-            <p className="text-sm font-semibold text-foreground">Tổng thu mua theo vùng nguyên liệu</p>
-          </div>
-          <p className="text-xs text-muted-foreground mb-4">Toàn bộ đợt thu mua (kg)</p>
-          <div className="space-y-3">
-            {areaTotal.map((item, i) => {
-              const max = areaTotal[0].kg;
-              const pct = (item.kg / max) * 100;
-              return (
-                <div key={item.area}>
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium text-foreground">{item.area}</span>
-                    <span className="text-xs text-muted-foreground">{item.kg.toFixed(1)} kg</span>
-                  </div>
-                  <div className="h-2 bg-muted rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full transition-all duration-500"
-                      style={{
-                        width: `${pct}%`,
-                        backgroundColor: PIE_COLORS[i % PIE_COLORS.length],
-                      }}
-                    />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Systems */}
-      <section className="mb-8">
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          {t("home.modules")}
-        </h2>
+        <SectionLabel>{t("home.modules")}</SectionLabel>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-          {ALL_SYSTEMS.filter(sys => (user?.modules ?? ALL_SYSTEMS.map(s => s.id)).includes(sys.id)).map((sys) => {
+          {ALL_SYSTEMS.filter(sys => userModules.includes(sys.id)).map((sys) => {
             const Icon = sys.icon;
             return (
               <button
@@ -331,11 +374,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Recent Activity */}
+      {/* ── Recent Activity ──────────────────────────────── */}
       <section>
-        <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-          {t("home.recentActivity")}
-        </h2>
+        <SectionLabel>{t("home.recentActivity")}</SectionLabel>
         <div className="bg-white border border-border rounded-xl overflow-hidden">
           {activities.map((activity, i) => {
             const Icon = activity.icon;
