@@ -341,7 +341,7 @@ export default function DonThuMuaPage() {
       {drawerOpen && (
         <>
           <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={close_} />
-          <aside className="fixed top-0 right-0 h-full w-full sm:w-[680px] bg-white shadow-2xl z-50 flex flex-col">
+          <aside className="fixed top-0 right-0 h-full w-full sm:w-[820px] bg-white shadow-2xl z-50 flex flex-col">
             <div className="px-6 py-5 border-b border-border flex items-center justify-between">
               <div className="text-[18px] font-semibold">{editItem ? "Sửa phiếu thu mua" : "Tạo phiếu thu mua"}</div>
               <button onClick={close_} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
