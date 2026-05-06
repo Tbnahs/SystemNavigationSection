@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import AppLayout from "@/components/AppLayout";
-import { Plus, Pencil, X, Loader2, Search, Package, Eye, Building2, Tag, Scale, DollarSign, Info, Calendar } from "lucide-react";
+import { Plus, Pencil, X, Loader2, Search, Package, Eye, Building2, Tag, Scale, DollarSign, Info, Calendar, Hash, ImageIcon, Barcode } from "lucide-react";
 import {
   fetchProducts, createProduct, updateProduct, deleteProduct,
   fetchUnits, fetchEnterprises,
@@ -25,13 +25,15 @@ type PForm = {
   enterpriseId: number | null;
   name: string;
   code: string;
+  gtin: string;
   type: Product["type"];
   unitId: number | null;
   price: string;
+  imageUrl: string;
   description: string;
   status: "active" | "inactive";
 };
-const EMPTY_P: PForm = { enterpriseId: null, name: "", code: "", type: "ban_thanh_pham", unitId: null, price: "", description: "", status: "active" };
+const EMPTY_P: PForm = { enterpriseId: null, name: "", code: "", gtin: "", type: "ban_thanh_pham", unitId: null, price: "", imageUrl: "", description: "", status: "active" };
 
 export default function ThuongPhamPage() {
   const { user } = useAuth();
@@ -71,7 +73,7 @@ export default function ThuongPhamPage() {
   function close_() { setDrawerOpen(false); setEditItem(null); setForm({ ...EMPTY_P, enterpriseId: user?.enterpriseId ?? null }); setErr(null); }
   function openEdit(p: Product) {
     setEditItem(p);
-    setForm({ enterpriseId: p.enterpriseId, name: p.name, code: p.code, type: p.type, unitId: p.unitId, price: p.price, description: p.description, status: p.status });
+    setForm({ enterpriseId: p.enterpriseId, name: p.name, code: p.code, gtin: p.gtin ?? "", type: p.type, unitId: p.unitId, price: p.price, imageUrl: p.imageUrl ?? "", description: p.description, status: p.status });
     setErr(null); setDrawerOpen(true);
   }
   function setF<K extends keyof PForm>(k: K, v: PForm[K]) { setForm(p => ({ ...p, [k]: v })); }
@@ -86,7 +88,7 @@ export default function ThuongPhamPage() {
   const items = listQ.data?.items ?? [];
   const filtered = items
     .filter(p => typeFilter === "all" || p.type === typeFilter)
-    .filter(p => !search.trim() || [p.name, p.code].some(s => s.toLowerCase().includes(search.toLowerCase())));
+    .filter(p => !search.trim() || [p.name, p.code, p.gtin ?? ""].some(s => s.toLowerCase().includes(search.toLowerCase())));
   const isPending = createMu.isPending || updateMu.isPending;
   const units = unitsQ.data?.items ?? [];
   const enterprises = dnQ.data?.items ?? [];
@@ -116,7 +118,7 @@ export default function ThuongPhamPage() {
         <div className="bg-white border border-border rounded-xl p-3 lg:p-4 flex items-center gap-2 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Tìm tên, mã…" className="w-full h-10 pl-9 pr-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Tìm tên, mã, GTIN…" className="w-full h-10 pl-9 pr-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
           </div>
           <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)} className="h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
             <option value="all">Tất cả loại</option>
@@ -130,16 +132,16 @@ export default function ThuongPhamPage() {
         {/* Table */}
         <div className="bg-white border border-border rounded-xl overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm min-w-[750px]">
+            <table className="w-full text-sm min-w-[800px]">
               <thead>
                 <tr className="text-left text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/40">
-                  <th className="px-4 py-3">Tên thương phẩm</th>
+                  <th className="px-4 py-3">Thương phẩm</th>
+                  <th className="px-4 py-3">Mã thương phẩm / GTIN</th>
                   <th className="px-4 py-3">Loại</th>
                   <th className="px-4 py-3">Đơn vị tính</th>
                   <th className="px-4 py-3">Đơn giá</th>
-                  <th className="px-4 py-3">Doanh nghiệp</th>
                   <th className="px-4 py-3">Trạng thái</th>
-                  <th className="px-4 py-3 w-20"></th>
+                  <th className="px-4 py-3 w-24"></th>
                 </tr>
               </thead>
               <tbody>
@@ -157,15 +159,27 @@ export default function ThuongPhamPage() {
                   return (
                     <tr key={p.id} className="border-t border-border hover:bg-emerald-50/30">
                       <td className="px-4 py-3">
-                        <div className="font-medium">{p.name}</div>
-                        {p.code && <div className="text-[11.5px] text-muted-foreground">Mã: {p.code}</div>}
+                        <div className="flex items-center gap-3">
+                          {p.imageUrl ? (
+                            <img src={p.imageUrl} alt={p.name} className="w-9 h-9 rounded-lg object-cover border border-border flex-shrink-0" onError={e => (e.currentTarget.style.display = "none")} />
+                          ) : (
+                            <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
+                              <Package className="w-4 h-4 text-muted-foreground" />
+                            </div>
+                          )}
+                          <div className="font-medium">{p.name}</div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        {p.code && <div className="text-[12.5px] font-mono">{p.code}</div>}
+                        {p.gtin && <div className="text-[11.5px] text-muted-foreground font-mono">GTIN: {p.gtin}</div>}
+                        {!p.code && !p.gtin && <span className="text-muted-foreground">—</span>}
                       </td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ring-1 ring-inset ${typeColor(p.type)}`}>{typeLabel(p.type)}</span>
                       </td>
                       <td className="px-4 py-3 text-[13px]">{p.unitName ?? "—"}</td>
                       <td className="px-4 py-3 text-[13px] font-medium">{p.price || "—"}</td>
-                      <td className="px-4 py-3 text-[13px]">{p.enterpriseName ?? "Chung"}</td>
                       <td className="px-4 py-3">
                         {statusOpt && (
                           <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ring-1 ring-inset ${statusOpt.cls}`}>
@@ -195,7 +209,7 @@ export default function ThuongPhamPage() {
       {viewItem && (
         <>
           <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={() => setViewItem(null)} />
-          <aside className="fixed top-0 right-0 h-full w-full sm:w-[480px] bg-white shadow-2xl z-50 flex flex-col">
+          <aside className="fixed top-0 right-0 h-full w-full sm:w-[500px] bg-white shadow-2xl z-50 flex flex-col">
             <div className="px-6 py-5 border-b border-border flex items-center justify-between">
               <div>
                 <div className="text-[18px] font-semibold">Chi tiết thương phẩm</div>
@@ -204,18 +218,20 @@ export default function ThuongPhamPage() {
               <button onClick={() => setViewItem(null)} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
             <div className="flex-1 overflow-auto px-6 py-5 space-y-5">
-              {/* Header */}
               <div className="flex items-center gap-4">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Package className="w-7 h-7 text-primary" />
-                </div>
+                {viewItem.imageUrl ? (
+                  <img src={viewItem.imageUrl} alt={viewItem.name} className="w-16 h-16 rounded-2xl object-cover border border-border flex-shrink-0" onError={e => (e.currentTarget.style.display = "none")} />
+                ) : (
+                  <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Package className="w-8 h-8 text-primary" />
+                  </div>
+                )}
                 <div>
                   <div className="text-[17px] font-bold">{viewItem.name}</div>
                   {viewItem.code && <div className="text-[13px] text-muted-foreground mt-0.5">Mã: <span className="font-mono font-semibold">{viewItem.code}</span></div>}
+                  {viewItem.gtin && <div className="text-[12px] text-muted-foreground font-mono">GTIN: {viewItem.gtin}</div>}
                 </div>
               </div>
-
-              {/* Status + Type badges */}
               <div className="flex gap-2 flex-wrap">
                 <span className={`inline-flex items-center px-3 py-1 rounded-full text-[12px] font-semibold ring-1 ring-inset ${typeColor(viewItem.type)}`}>{typeLabel(viewItem.type)}</span>
                 {(() => { const s = STATUS_OPT.find(o => o.value === viewItem.status); return s ? (
@@ -225,50 +241,26 @@ export default function ThuongPhamPage() {
                   </span>
                 ) : null; })()}
               </div>
-
-              {/* Info grid */}
               <div className="rounded-xl border border-border overflow-hidden">
                 <div className="divide-y divide-border">
-                  <div className="flex items-center gap-3 px-4 py-3">
-                    <Tag className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    <span className="text-[13px] text-muted-foreground w-32">Loại sản phẩm</span>
-                    <span className="text-[13px] font-medium">{typeLabel(viewItem.type)}</span>
-                  </div>
-                  <div className="flex items-center gap-3 px-4 py-3">
-                    <Scale className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    <span className="text-[13px] text-muted-foreground w-32">Đơn vị tính</span>
-                    <span className="text-[13px] font-medium">{viewItem.unitName ?? "—"}</span>
-                  </div>
-                  <div className="flex items-center gap-3 px-4 py-3">
-                    <DollarSign className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    <span className="text-[13px] text-muted-foreground w-32">Đơn giá tham khảo</span>
-                    <span className="text-[13px] font-semibold text-emerald-700">{viewItem.price || "—"}</span>
-                  </div>
-                  <div className="flex items-center gap-3 px-4 py-3">
-                    <Building2 className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    <span className="text-[13px] text-muted-foreground w-32">Doanh nghiệp</span>
-                    <span className="text-[13px] font-medium">{viewItem.enterpriseName ?? "Dùng chung"}</span>
-                  </div>
-                  <div className="flex items-center gap-3 px-4 py-3">
-                    <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    <span className="text-[13px] text-muted-foreground w-32">Ngày tạo</span>
-                    <span className="text-[13px] font-medium">{viewItem.createdAt ? new Date(viewItem.createdAt).toLocaleDateString("vi-VN") : "—"}</span>
-                  </div>
-                  <div className="flex items-center gap-3 px-4 py-3">
-                    <Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" />
-                    <span className="text-[13px] text-muted-foreground w-32">Cập nhật lần cuối</span>
-                    <span className="text-[13px] font-medium">{viewItem.updatedAt ? new Date(viewItem.updatedAt).toLocaleDateString("vi-VN") : "—"}</span>
-                  </div>
+                  <div className="flex items-center gap-3 px-4 py-3"><Tag className="w-4 h-4 text-muted-foreground flex-shrink-0" /><span className="text-[13px] text-muted-foreground w-36">Loại sản phẩm</span><span className="text-[13px] font-medium">{typeLabel(viewItem.type)}</span></div>
+                  <div className="flex items-center gap-3 px-4 py-3"><Hash className="w-4 h-4 text-muted-foreground flex-shrink-0" /><span className="text-[13px] text-muted-foreground w-36">Mã thương phẩm</span><span className="text-[13px] font-mono font-medium">{viewItem.code || "—"}</span></div>
+                  <div className="flex items-center gap-3 px-4 py-3"><Barcode className="w-4 h-4 text-muted-foreground flex-shrink-0" /><span className="text-[13px] text-muted-foreground w-36">GTIN</span><span className="text-[13px] font-mono font-medium">{viewItem.gtin || "—"}</span></div>
+                  <div className="flex items-center gap-3 px-4 py-3"><Scale className="w-4 h-4 text-muted-foreground flex-shrink-0" /><span className="text-[13px] text-muted-foreground w-36">Đơn vị tính</span><span className="text-[13px] font-medium">{viewItem.unitName ?? "—"}</span></div>
+                  <div className="flex items-center gap-3 px-4 py-3"><DollarSign className="w-4 h-4 text-muted-foreground flex-shrink-0" /><span className="text-[13px] text-muted-foreground w-36">Đơn giá tham khảo</span><span className="text-[13px] font-semibold text-emerald-700">{viewItem.price || "—"}</span></div>
+                  <div className="flex items-center gap-3 px-4 py-3"><Building2 className="w-4 h-4 text-muted-foreground flex-shrink-0" /><span className="text-[13px] text-muted-foreground w-36">Doanh nghiệp</span><span className="text-[13px] font-medium">{viewItem.enterpriseName ?? "Dùng chung"}</span></div>
+                  <div className="flex items-center gap-3 px-4 py-3"><Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" /><span className="text-[13px] text-muted-foreground w-36">Ngày tạo</span><span className="text-[13px] font-medium">{viewItem.createdAt ? new Date(viewItem.createdAt).toLocaleDateString("vi-VN") : "—"}</span></div>
                 </div>
               </div>
-
-              {/* Description */}
+              {viewItem.imageUrl && (
+                <div>
+                  <div className="flex items-center gap-2 mb-2"><ImageIcon className="w-4 h-4 text-muted-foreground" /><span className="text-[13px] font-semibold">Hình ảnh</span></div>
+                  <img src={viewItem.imageUrl} alt={viewItem.name} className="w-full rounded-xl border border-border object-cover max-h-48" onError={e => (e.currentTarget.style.display = "none")} />
+                </div>
+              )}
               {viewItem.description && (
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Info className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-[13px] font-semibold">Mô tả</span>
-                  </div>
+                  <div className="flex items-center gap-2 mb-2"><Info className="w-4 h-4 text-muted-foreground" /><span className="text-[13px] font-semibold">Mô tả</span></div>
                   <div className="rounded-xl border border-border bg-muted/30 px-4 py-3 text-[13px] text-foreground/80 leading-relaxed">{viewItem.description}</div>
                 </div>
               )}
@@ -302,7 +294,7 @@ export default function ThuongPhamPage() {
       {drawerOpen && (
         <>
           <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={close_} />
-          <aside className="fixed top-0 right-0 h-full w-full sm:w-[500px] bg-white shadow-2xl z-50 flex flex-col">
+          <aside className="fixed top-0 right-0 h-full w-full sm:w-[520px] bg-white shadow-2xl z-50 flex flex-col">
             <div className="px-6 py-5 border-b border-border flex items-center justify-between">
               <div className="text-[18px] font-semibold">{editItem ? "Sửa thương phẩm" : "Thêm thương phẩm"}</div>
               <button onClick={close_} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
@@ -314,17 +306,21 @@ export default function ThuongPhamPage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[13px] font-medium mb-1.5">Mã sản phẩm</label>
-                  <input value={form.code} onChange={e => setF("code", e.target.value)} placeholder="SP-001" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                  <label className="block text-[13px] font-medium mb-1.5">Mã thương phẩm</label>
+                  <input value={form.code} onChange={e => setF("code", e.target.value)} placeholder="TP-001" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary font-mono" />
                 </div>
+                <div>
+                  <label className="block text-[13px] font-medium mb-1.5">Mã GTIN</label>
+                  <input value={form.gtin} onChange={e => setF("gtin", e.target.value)} placeholder="0123456789012" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary font-mono" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[13px] font-medium mb-1.5">Loại</label>
                   <select value={form.type} onChange={e => setF("type", e.target.value as Product["type"])} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
                     {TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                   </select>
                 </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-[13px] font-medium mb-1.5">Đơn vị tính</label>
                   <select value={form.unitId ?? ""} onChange={e => setF("unitId", e.target.value ? Number(e.target.value) : null)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
@@ -332,10 +328,19 @@ export default function ThuongPhamPage() {
                     {units.map(u => <option key={u.id} value={u.id}>{u.name} ({u.abbreviation})</option>)}
                   </select>
                 </div>
-                <div>
-                  <label className="block text-[13px] font-medium mb-1.5">Đơn giá tham khảo</label>
-                  <input value={form.price} onChange={e => setF("price", e.target.value)} placeholder="27,000 đ/kg" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
-                </div>
+              </div>
+              <div>
+                <label className="block text-[13px] font-medium mb-1.5">Đơn giá tham khảo</label>
+                <input value={form.price} onChange={e => setF("price", e.target.value)} placeholder="27,000 đ/kg" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+              </div>
+              <div>
+                <label className="block text-[13px] font-medium mb-1.5">Hình ảnh (URL)</label>
+                <input value={form.imageUrl} onChange={e => setF("imageUrl", e.target.value)} placeholder="https://… hoặc đường dẫn ảnh" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                {form.imageUrl && (
+                  <div className="mt-2 rounded-lg overflow-hidden border border-border w-full h-32 bg-muted/30 flex items-center justify-center">
+                    <img src={form.imageUrl} alt="preview" className="max-h-full max-w-full object-contain" onError={e => { e.currentTarget.style.display = "none"; }} />
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-[13px] font-medium mb-1.5">Doanh nghiệp</label>

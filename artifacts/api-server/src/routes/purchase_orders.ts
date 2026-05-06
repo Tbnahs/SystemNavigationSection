@@ -17,6 +17,8 @@ router.get("/purchase-orders", async (_req, res, next) => {
         enterpriseId: purchaseOrdersTable.enterpriseId,
         facilityId: purchaseOrdersTable.facilityId,
         facilityName: purchaseOrdersTable.facilityName,
+        diaChuThu: purchaseOrdersTable.diaChuThu,
+        maLoMe: purchaseOrdersTable.maLoMe,
         ngayThu: purchaseOrdersTable.ngayThu,
         status: purchaseOrdersTable.status,
         notes: purchaseOrdersTable.notes,

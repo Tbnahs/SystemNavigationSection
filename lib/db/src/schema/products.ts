@@ -9,11 +9,13 @@ export const productsTable = pgTable("products", {
   enterpriseId: integer("enterprise_id").references(() => enterprisesTable.id, { onDelete: "set null" }),
   name: text("name").notNull(),
   code: text("code").default("").notNull(),
+  gtin: text("gtin").default("").notNull(),
   type: text("type", { enum: ["ban_thanh_pham", "thanh_pham_cuoi"] })
     .default("ban_thanh_pham")
     .notNull(),
   unitId: integer("unit_id").references(() => unitsTable.id, { onDelete: "set null" }),
   price: text("price").default("").notNull(),
+  imageUrl: text("image_url").default("").notNull(),
   description: text("description").default("").notNull(),
   status: text("status", { enum: ["active", "inactive"] }).default("active").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),

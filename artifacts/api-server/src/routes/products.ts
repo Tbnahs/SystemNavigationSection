@@ -15,6 +15,8 @@ router.get("/products", async (_req: Request, res: Response, next: NextFunction)
         type: productsTable.type,
         unitId: productsTable.unitId,
         price: productsTable.price,
+        gtin: productsTable.gtin,
+        imageUrl: productsTable.imageUrl,
         description: productsTable.description,
         status: productsTable.status,
         createdAt: productsTable.createdAt,

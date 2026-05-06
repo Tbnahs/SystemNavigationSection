@@ -69,9 +69,11 @@ export type Product = {
   enterpriseId: number | null;
   name: string;
   code: string;
+  gtin: string;
   type: "ban_thanh_pham" | "thanh_pham_cuoi";
   unitId: number | null;
   price: string;
+  imageUrl: string;
   description: string;
   status: "active" | "inactive";
   createdAt: string;
@@ -84,6 +86,7 @@ export type Grade = {
   id: number;
   name: string;
   price: string;
+  prices: string;
   loaiChe: string;
   ghiChu: string;
   colorKey: string;
@@ -96,7 +99,8 @@ export type QualityLevel = {
   gradeId: number | null;
   danhGia: string;
   donGia: string;
-  xepLoai: string;
+  prices: string;
+  ghiChu: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -116,6 +120,8 @@ export type PurchaseOrder = {
   enterpriseId: number | null;
   facilityId: number | null;
   facilityName: string;
+  diaChuThu: string;
+  maLoMe: string;
   ngayThu: string;
   status: "draft" | "confirmed" | "cancelled";
   notes: string;
@@ -134,7 +140,7 @@ export type PurchaseOrderItem = {
   productName: string;
   gradeName: string;
   qualityPercent: string;
-  xepLoai: string;
+  ghiChu: string;
   khoiLuong: string;
   donGia: string;
   thanhTien: string;

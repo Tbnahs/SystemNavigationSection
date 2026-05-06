@@ -142,6 +142,17 @@ Five distinct systems. After login, user sees only the systems they have permiss
 - Quy cách + % Chất lượng + Tiêu chuẩn CRUD ✅ | Xuất Excel Quy cách ✅
 - Đơn thu mua: tạo/xem/sửa/xóa + auto-tính giá theo quy cách + % chất lượng ✅
 
+### Sprint 2 Print 2 — Refinements (COMPLETE)
+- **Quy cách**: Loại chè dropdown từ Thương phẩm ✅ | Nhiều mức đơn giá (JSON array) cho Quy cách + % CL ✅
+- **% Chất lượng**: Đổi label "Xếp loại" → "Ghi chú" (UI only, DB column `ghi_chu`) ✅
+- **Thương phẩm**: Thêm trường GTIN + Hình ảnh (URL) + preview ✅ | Đổi nhãn "Mã sản phẩm" → "Mã thương phẩm" ✅
+- **Đơn thu mua**: Bỏ Mã phiếu/DN/Trạng thái khỏi form ✅ | Thứ tự: Ngày → Cơ sở ✅
+- Auto-fill Địa chỉ thu mua + Mã lô mẻ (từ mã cơ sở + ngày) ✅
+- Đơn giá → dropdown từ danh sách giá của Quy cách/% CL ✅ | Hint text đơn giá áp dụng ✅
+- Card layout cho line items (không cuộn ngang) ✅ | Bỏ nút "Thêm dòng" header ✅
+- "Làm tròn" → "Tiền lẻ" với hai ô Trừ / Cộng ✅ | Bộ lọc ngày trên danh sách ✅
+- DB: `grades.prices`, `quality_levels.prices+ghi_chu`, `products.gtin+image_url`, `purchase_orders.dia_chu_thu+ma_lo_me` ✅
+
 ### SSO Architecture Restructure (COMPLETE)
 - Portal = tài khoản & phân quyền (route `/portal`, replaces `/quan-tri`) ✅
 - 5 system cards on Home page with gradient UI, permission-filtered ✅

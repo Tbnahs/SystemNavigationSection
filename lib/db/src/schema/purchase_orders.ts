@@ -12,6 +12,8 @@ export const purchaseOrdersTable = pgTable("purchase_orders", {
   enterpriseId: integer("enterprise_id").references(() => enterprisesTable.id, { onDelete: "set null" }),
   facilityId: integer("facility_id").references(() => facilitiesTable.id, { onDelete: "set null" }),
   facilityName: text("facility_name").default("").notNull(),
+  diaChuThu: text("dia_chu_thu").default("").notNull(),
+  maLoMe: text("ma_lo_me").default("").notNull(),
   ngayThu: text("ngay_thu").notNull(),
   status: text("status", { enum: ["draft", "confirmed", "cancelled"] })
     .default("draft")
@@ -33,7 +35,7 @@ export const purchaseOrderItemsTable = pgTable("purchase_order_items", {
   productName: text("product_name").notNull(),
   gradeName: text("grade_name").default("").notNull(),
   qualityPercent: text("quality_percent").default("").notNull(),
-  xepLoai: text("xep_loai").default("").notNull(),
+  ghiChu: text("ghi_chu").default("").notNull(),
   khoiLuong: text("khoi_luong").notNull(),
   donGia: text("don_gia").notNull(),
   thanhTien: text("thanh_tien").notNull(),
