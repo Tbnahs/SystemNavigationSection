@@ -410,17 +410,17 @@ export default function DonThuMuaPage() {
                     <Plus className="w-3.5 h-3.5" /> Thêm dòng
                   </button>
                 </div>
-                <div className="rounded-xl border border-border overflow-hidden">
-                  <table className="w-full text-[12.5px]">
+                <div className="rounded-xl border border-border overflow-x-auto">
+                  <table className="w-full text-[12.5px] min-w-[640px]">
                     <thead>
                       <tr className="bg-muted/40 text-[11px] uppercase tracking-wide text-muted-foreground">
-                        <th className="px-3 py-2.5 text-left">Thương phẩm</th>
-                        <th className="px-3 py-2.5 text-left">Quy cách</th>
-                        <th className="px-3 py-2.5 text-left">% CL</th>
-                        <th className="px-3 py-2.5 text-left">KL (kg)</th>
-                        <th className="px-3 py-2.5 text-left">Đơn giá</th>
-                        <th className="px-3 py-2.5 text-left">Thành tiền</th>
-                        <th className="px-3 py-2.5 text-left">Mô tả / Chất lượng</th>
+                        <th className="px-3 py-2.5 text-left min-w-[130px]">Thương phẩm</th>
+                        <th className="px-3 py-2.5 text-left min-w-[110px]">Quy cách</th>
+                        <th className="px-3 py-2.5 text-left min-w-[90px]">% CL</th>
+                        <th className="px-3 py-2.5 text-left min-w-[72px]">KL (kg)</th>
+                        <th className="px-3 py-2.5 text-left min-w-[88px]">Đơn giá</th>
+                        <th className="px-3 py-2.5 text-left min-w-[90px]">Thành tiền</th>
+                        <th className="px-3 py-2.5 text-left min-w-[120px]">Mô tả / Chất lượng</th>
                         <th className="px-3 py-2.5 w-8"></th>
                       </tr>
                     </thead>
@@ -498,12 +498,6 @@ export default function DonThuMuaPage() {
                       ))}
                     </tbody>
                     <tfoot>
-                      <tr className="border-t border-border/60 bg-muted/10">
-                        <td colSpan={5} className="px-3 py-2 text-right text-[12px] text-muted-foreground">Tổng dòng:</td>
-                        <td colSpan={3} className="px-3 py-2 text-[13px] font-semibold text-emerald-700">
-                          {lines.reduce((acc, l) => acc + parseNum(l.thanhTien), 0).toLocaleString("vi-VN")} đ
-                        </td>
-                      </tr>
                       <tr className="border-t border-border/60 bg-muted/10">
                         <td colSpan={5} className="px-3 py-2 text-right text-[12px] text-muted-foreground">Làm tròn (±):</td>
                         <td colSpan={3} className="px-3 py-2">

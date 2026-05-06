@@ -198,9 +198,16 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   const { user } = useAuth();
   const [location] = useLocation();
 
+  const isSuperAdmin = !user?.enterpriseId;
   const userModules: string[] = user?.modules ?? ["portal", "erp", "txng", "vung_trong", "iot"];
 
-  const visibleModules = MODULE_CONFIG.filter(m => {
+  const portalSubItems = isSuperAdmin
+    ? PORTAL_SUB_ITEMS
+    : PORTAL_SUB_ITEMS.filter(item => item.type === "divider" || (item as { id?: string }).id !== "doanh-nghiep");
+
+  const visibleModules = MODULE_CONFIG.map(m =>
+    m.key === "portal" ? { ...m, subItems: portalSubItems } : m
+  ).filter(m => {
     if (m.key === "vung_trong") return userModules.includes("vung_trong") || userModules.includes("iot");
     return userModules.includes(m.key);
   });
