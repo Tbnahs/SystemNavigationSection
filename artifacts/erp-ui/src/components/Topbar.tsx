@@ -162,14 +162,14 @@ export default function Topbar({ onMenuToggle, menuOpen }: TopbarProps) {
               </div>
               <div className="py-1">
                 {[
-                  { icon: User, label: t("topbar.profile"), testId: "button-profile-link" },
-                  { icon: Settings, label: t("topbar.settings"), testId: "button-settings-link" },
-                ].map(({ icon: Icon, label, testId }) => (
+                  { icon: User, label: t("topbar.profile"), testId: "button-profile-link", href: "/ho-so" },
+                  { icon: Settings, label: t("topbar.settings"), testId: "button-settings-link", href: null },
+                ].map(({ icon: Icon, label, testId, href }) => (
                   <button
                     key={label}
                     data-testid={testId}
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-foreground hover:bg-accent transition-colors"
-                    onClick={() => setShowProfile(false)}
+                    onClick={() => { setShowProfile(false); if (href) setLocation(href); }}
                   >
                     <Icon className="w-4 h-4 text-muted-foreground" />
                     {label}

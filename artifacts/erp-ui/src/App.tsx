@@ -30,6 +30,7 @@ import CoSoPage from "@/pages/CoSoPage";
 import ThuongPhamPage from "@/pages/ThuongPhamPage";
 import DonThuMuaPage from "@/pages/DonThuMuaPage";
 import PortalPage from "@/pages/PortalPage";
+import HoSoPage from "@/pages/HoSoPage";
 import NotFound from "@/pages/not-found";
 import { useEffect } from "react";
 
@@ -75,6 +76,11 @@ function Router() {
       </Route>
       <Route path="/portal/co-so">
         {() => <ProtectedRoute component={CoSoPage} />}
+      </Route>
+
+      {/* Profile */}
+      <Route path="/ho-so">
+        {() => <ProtectedRoute component={HoSoPage} />}
       </Route>
 
       {/* Legacy /quan-tri routes — redirect to /portal */}

@@ -295,3 +295,13 @@ export const updatePurchaseOrder = (id: number, body: Partial<PurchaseOrder> & {
   request<{ item: PurchaseOrder }>(`/purchase-orders/${id}`, { method: "PATCH", body: JSON.stringify(body) });
 export const deletePurchaseOrder = (id: number) =>
   request<{ ok: true }>(`/purchase-orders/${id}`, { method: "DELETE" });
+
+/* ── Profile / Change Password ───────────────────────────── */
+export const changePassword = (oldPassword: string, newPassword: string) => {
+  const stored = localStorage.getItem("erp_user");
+  const email = stored ? (JSON.parse(stored) as { email?: string }).email ?? "" : "";
+  return request<{ ok: true }>("/auth/change-password", {
+    method: "POST",
+    body: JSON.stringify({ email, oldPassword, newPassword }),
+  });
+};

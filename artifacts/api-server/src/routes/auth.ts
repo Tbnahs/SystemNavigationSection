@@ -83,4 +83,31 @@ router.post("/auth/login", async (req: Request, res: Response, next: NextFunctio
   }
 });
 
+router.post("/auth/change-password", async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const { email, oldPassword, newPassword } = req.body as {
+      email?: string; oldPassword?: string; newPassword?: string;
+    };
+    if (!email || !oldPassword || !newPassword) {
+      return res.status(400).json({ error: "Thiếu thông tin." });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: "Mật khẩu mới cần ít nhất 6 ký tự." });
+    }
+    const [employee] = await db.select().from(employeesTable).where(eq(employeesTable.email, email.trim().toLowerCase()));
+    if (!employee || !employee.passwordHash) {
+      return res.status(401).json({ error: "Tài khoản không tồn tại." });
+    }
+    const valid = await bcrypt.compare(oldPassword, employee.passwordHash);
+    if (!valid) {
+      return res.status(401).json({ error: "Mật khẩu hiện tại không đúng." });
+    }
+    const hash = await bcrypt.hash(newPassword, 10);
+    await db.update(employeesTable).set({ passwordHash: hash }).where(eq(employeesTable.id, employee.id));
+    res.json({ ok: true });
+  } catch (e) {
+    next(e);
+  }
+});
+
 export default router;
