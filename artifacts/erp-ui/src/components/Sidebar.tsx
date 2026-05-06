@@ -205,9 +205,14 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
     ? PORTAL_SUB_ITEMS
     : PORTAL_SUB_ITEMS.filter(item => item.type === "divider" || (item as { id?: string }).id !== "doanh-nghiep");
 
-  const visibleModules = MODULE_CONFIG.map(m =>
-    m.key === "portal" ? { ...m, subItems: portalSubItems } : m
-  ).filter(m => {
+  const visibleModules = MODULE_CONFIG.map(m => {
+    if (m.key === "portal") return {
+      ...m,
+      label: isSuperAdmin ? "Portal" : "Quản trị hệ thống",
+      subItems: portalSubItems,
+    };
+    return m;
+  }).filter(m => {
     if (m.key === "vung_trong") return userModules.includes("vung_trong") || userModules.includes("iot");
     return userModules.includes(m.key);
   });

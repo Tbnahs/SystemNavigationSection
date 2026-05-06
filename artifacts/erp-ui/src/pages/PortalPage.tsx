@@ -7,7 +7,7 @@ import {
   Building2, Factory, Users, Home, ChevronDown, ChevronRight,
   ShieldCheck, MapPin, Phone, Loader2, Plus, ArrowRight,
   CheckCircle2, Clock, Lock, User, Crown,
-  BarChart3, ScanLine, Leaf, Cpu, Globe,
+  BarChart3, ScanLine, Leaf, Cpu, Globe, Settings,
 } from "lucide-react";
 import { fetchAdminTree, type AdminEnterprise, type AdminFacility } from "@/lib/api";
 
@@ -178,6 +178,75 @@ function EnterpriseCard({ dn }: { dn: AdminEnterprise }) {
   );
 }
 
+function EnterpriseCardExpanded({ dn }: { dn: AdminEnterprise }) {
+  const statusMeta = STATUS_DN[dn.status] ?? STATUS_DN.active;
+  return (
+    <div className="bg-white border border-border rounded-2xl overflow-hidden shadow-sm">
+      {/* Header */}
+      <div className="px-5 py-4 flex items-start gap-4">
+        <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center shrink-0">
+          <Building2 className="w-6 h-6 text-emerald-700" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="text-[15px] font-semibold text-foreground">{dn.tenHienThi}</span>
+            <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-medium ring-1 ring-inset ${statusMeta.cls}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${statusMeta.dot}`} />{statusMeta.text}
+            </span>
+          </div>
+          {dn.mst && <p className="text-[12px] text-muted-foreground mt-0.5">MST: {dn.mst}</p>}
+          <div className="flex items-center gap-4 mt-2 flex-wrap">
+            {dn.phone && (
+              <div className="flex items-center gap-1 text-[12px] text-muted-foreground">
+                <Phone className="w-3 h-3" />{dn.phone}
+              </div>
+            )}
+            {dn.modules && dn.modules.length > 0 && (
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {dn.modules.flatMap(m => MODULE_META[m] ?? []).map((meta, i) => {
+                  const ModIcon = meta.icon;
+                  return (
+                    <span key={i} className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10.5px] font-medium ${meta.bg} ${meta.color}`}>
+                      <ModIcon className="w-2.5 h-2.5" />{meta.label}
+                    </span>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+        </div>
+        <div className="text-center shrink-0">
+          <p className="text-[18px] font-bold text-foreground">{dn.userCount ?? 0}</p>
+          <p className="text-[10px] text-muted-foreground">người dùng</p>
+        </div>
+      </div>
+
+      {/* Expanded body — always open */}
+      <div className="px-5 pb-5 border-t border-border bg-muted/10">
+        {dn.admins && dn.admins.length > 0 && (
+          <div className="mt-3 mb-4">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">Admin doanh nghiệp</p>
+            <div className="flex flex-wrap gap-2">
+              {dn.admins.map(u => <UserPill key={u.id} user={u} isAdmin />)}
+            </div>
+          </div>
+        )}
+        {dn.facilities && dn.facilities.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+              Cơ sở ({dn.facilities.length})
+            </p>
+            {dn.facilities.map(f => <FacilityCard key={f.id} facility={f} />)}
+          </div>
+        )}
+        {(!dn.admins || dn.admins.length === 0) && (!dn.facilities || dn.facilities.length === 0) && (
+          <p className="text-[13px] text-muted-foreground mt-3">Chưa có dữ liệu chi tiết.</p>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function PortalPage() {
   const { user: currentUser } = useAuth();
   const isSuperAdmin = !currentUser?.enterpriseId;
@@ -195,20 +264,33 @@ export default function PortalPage() {
     { icon: Factory,   label: "Cơ sở",        desc: "Hộ liên kết & CS SX", href: "/portal/co-so",      color: "bg-amber-50 text-amber-700 border-amber-200"   },
   ];
 
+  const myEnterprise = enterprises[0] ?? null;
+
   return (
     <AppLayout>
       <div className="space-y-6">
+        {/* Header — đổi theo role */}
         <div>
-          <div className="text-[12px] text-muted-foreground">Portal / Tổng quan</div>
+          <div className="text-[12px] text-muted-foreground">
+            {isSuperAdmin ? "Portal" : "Quản trị hệ thống"} / Tổng quan
+          </div>
           <h1 className="text-xl lg:text-2xl font-bold mt-0.5 flex items-center gap-2">
-            <Globe className="w-6 h-6 text-emerald-600" />
-            Portal ESG Valley
+            {isSuperAdmin
+              ? <Globe className="w-6 h-6 text-emerald-600" />
+              : <Settings className="w-6 h-6 text-violet-600" />
+            }
+            {isSuperAdmin ? "Portal ESG Valley" : "Quản trị hệ thống"}
           </h1>
-          <p className="text-[13px] text-muted-foreground mt-1">Quản lý tài khoản và phân quyền truy cập các hệ thống nghiệp vụ.</p>
+          <p className="text-[13px] text-muted-foreground mt-1">
+            {isSuperAdmin
+              ? "Quản lý tài khoản và phân quyền truy cập các hệ thống nghiệp vụ."
+              : `Quản trị tài khoản và cơ sở trong phạm vi ${currentUser?.enterpriseName ?? "doanh nghiệp của bạn"}.`
+            }
+          </p>
         </div>
 
         {/* Shortcuts */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+        <div className={`grid gap-3 ${isSuperAdmin ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-2 lg:grid-cols-3"}`}>
           {shortcuts.map(s => {
             const Icon = s.icon;
             return (
@@ -230,33 +312,56 @@ export default function PortalPage() {
           })}
         </div>
 
-        {/* Enterprise tree */}
+        {/* Enterprise section — khác nhau theo role */}
         <div>
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-[13.5px] font-semibold text-foreground">Danh sách Doanh nghiệp</h2>
+            <h2 className="text-[13.5px] font-semibold text-foreground">
+              {isSuperAdmin ? "Danh sách Doanh nghiệp" : "Thông tin Doanh nghiệp"}
+            </h2>
             {isSuperAdmin && (
-            <button
-              onClick={() => navigate("/portal/doanh-nghiep")}
-              className="h-8 px-3 rounded-lg border border-border text-[12.5px] font-medium hover:bg-muted flex items-center gap-1.5"
-            >
-              <Plus className="w-3.5 h-3.5" /> Thêm mới
-            </button>
-          )}
+              <button
+                onClick={() => navigate("/portal/doanh-nghiep")}
+                className="h-8 px-3 rounded-lg border border-border text-[12.5px] font-medium hover:bg-muted flex items-center gap-1.5"
+              >
+                <Plus className="w-3.5 h-3.5" /> Thêm mới
+              </button>
+            )}
           </div>
+
           {isLoading && (
             <div className="py-10 text-center text-muted-foreground">
               <Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…
             </div>
           )}
-          {!isLoading && enterprises.length === 0 && (
-            <div className="py-10 text-center text-muted-foreground">
-              <Building2 className="w-8 h-8 mx-auto mb-2 opacity-30" />
-              Chưa có doanh nghiệp nào. Bắt đầu bằng cách thêm mới!
-            </div>
+
+          {/* Super admin: danh sách tất cả DN */}
+          {isSuperAdmin && !isLoading && (
+            <>
+              {enterprises.length === 0 && (
+                <div className="py-10 text-center text-muted-foreground">
+                  <Building2 className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                  Chưa có doanh nghiệp nào. Bắt đầu bằng cách thêm mới!
+                </div>
+              )}
+              <div className="space-y-3">
+                {enterprises.map(dn => <EnterpriseCard key={dn.id} dn={dn} />)}
+              </div>
+            </>
           )}
-          <div className="space-y-3">
-            {enterprises.map(dn => <EnterpriseCard key={dn.id} dn={dn} />)}
-          </div>
+
+          {/* Enterprise admin: hiển thị card DN của mình (expanded sẵn) */}
+          {!isSuperAdmin && !isLoading && (
+            <>
+              {myEnterprise ? (
+                <EnterpriseCardExpanded dn={myEnterprise} />
+              ) : (
+                <div className="py-10 text-center text-muted-foreground">
+                  <Building2 className="w-8 h-8 mx-auto mb-2 opacity-30" />
+                  Chưa có thông tin doanh nghiệp.
+                </div>
+              )}
+            </>
+          )}
         </div>
       </div>
     </AppLayout>
