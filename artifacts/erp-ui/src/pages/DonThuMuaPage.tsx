@@ -90,7 +90,10 @@ function calcLamTron(cong: string, tru: string) {
   return v === 0 ? "0" : String(v);
 }
 
-type QrInfo = { facilityName: string; diaChuThu: string; khoiLuong: string; total: string };
+type QrInfo = {
+  order: PurchaseOrder;
+  lineItems: PurchaseOrderItem[];
+};
 
 export default function DonThuMuaPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -111,6 +114,7 @@ export default function DonThuMuaPage() {
 
   const [qrInfo, setQrInfo] = useState<QrInfo | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState("");
+  const [qrLoading, setQrLoading] = useState(false);
 
   const [printTarget, setPrintTarget] = useState<PurchaseOrder | null>(null);
   const [printLines, setPrintLines] = useState<PurchaseOrderItem[]>([]);
@@ -118,8 +122,32 @@ export default function DonThuMuaPage() {
 
   useEffect(() => {
     if (!qrInfo) { setQrDataUrl(""); return; }
-    const content = `Tên hộ: ${qrInfo.facilityName}\nĐịa chỉ: ${qrInfo.diaChuThu}\nKhối lượng: ${qrInfo.khoiLuong} kg\nTổng tiền: ${qrInfo.total}`;
-    QRCode.toDataURL(content, { width: 260, margin: 2, color: { dark: "#1a1a1a" } })
+    const o = qrInfo.order;
+    const lines = qrInfo.lineItems;
+    const lineText = lines.map((l, i) =>
+      `  SP${i + 1}: ${l.gradeName || l.productName || "—"}` +
+      (l.qualityPercent ? ` | ${l.qualityPercent}%CL` : "") +
+      (l.khoiLuong ? ` | ${parseFloat(l.khoiLuong).toLocaleString("vi-VN")}kg` : "") +
+      (l.donGia ? ` | ${parseNum(l.donGia).toLocaleString("vi-VN")}đ/kg` : "") +
+      (l.thanhTien ? ` | ${l.thanhTien}` : "")
+    ).join("\n");
+    const content = [
+      `PHIEU THU MUA CHE`,
+      `Ma phieu: ${o.maPhieu}`,
+      `Ngay: ${fmtDate(o.ngayThu)}`,
+      `Co so: ${o.facilityName}`,
+      o.diaChuThu ? `Dia chi: ${o.diaChuThu}` : "",
+      o.maLoMe ? `Ma lo me: ${o.maLoMe}` : "",
+      `---`,
+      `San pham:`,
+      lineText,
+      `---`,
+      o.khoiLuongTong && o.khoiLuongTong !== "0" ? `Tong KL: ${parseFloat(o.khoiLuongTong).toLocaleString("vi-VN")} kg` : "",
+      o.lamTron && o.lamTron !== "0" ? `Tien le: ${parseNum(o.lamTron) >= 0 ? "+" : ""}${parseNum(o.lamTron).toLocaleString("vi-VN")}d` : "",
+      `Tong cong: ${o.total}`,
+      o.notes ? `Ghi chu: ${o.notes}` : "",
+    ].filter(Boolean).join("\n");
+    QRCode.toDataURL(content, { width: 280, margin: 2, color: { dark: "#1a1a1a" }, errorCorrectionLevel: "M" })
       .then(setQrDataUrl).catch(() => {});
   }, [qrInfo]);
 
@@ -149,9 +177,9 @@ export default function DonThuMuaPage() {
     },
     onSuccess: (_data, payload) => {
       inv();
-      const kl = payload.lineItems.reduce((acc, l) => acc + parseFloat(l.khoiLuong || "0"), 0);
-      const total = calcGrandTotal(lines, lamTronCong, lamTronTru);
-      setQrInfo({ facilityName: payload.order.facilityName, diaChuThu: payload.order.diaChuThu, khoiLuong: kl.toFixed(1), total });
+      const savedOrder = _data as PurchaseOrder;
+      const liItems = payload.lineItems.map(l => ({ ...l, id: 0, orderId: savedOrder?.id ?? 0 })) as PurchaseOrderItem[];
+      setQrInfo({ order: savedOrder ?? { ...payload.order, id: 0, khoiLuongTong: String(payload.lineItems.reduce((a, l) => a + parseFloat(l.khoiLuong || "0"), 0)), lamTron: calcLamTron(lamTronCong, lamTronTru), total: calcGrandTotal(lines, lamTronCong, lamTronTru) } as unknown as PurchaseOrder, lineItems: liItems });
       close_();
     },
     onError: (e: Error) => setErr(e.message),
@@ -163,9 +191,9 @@ export default function DonThuMuaPage() {
     },
     onSuccess: (_data, { payload }) => {
       inv();
-      const kl = payload.lineItems.reduce((acc, l) => acc + parseFloat(l.khoiLuong || "0"), 0);
-      const total = calcGrandTotal(lines, lamTronCong, lamTronTru);
-      setQrInfo({ facilityName: payload.order.facilityName, diaChuThu: payload.order.diaChuThu, khoiLuong: kl.toFixed(1), total });
+      const savedOrder = _data as PurchaseOrder;
+      const liItems = payload.lineItems.map(l => ({ ...l, id: 0, orderId: savedOrder?.id ?? 0 })) as PurchaseOrderItem[];
+      setQrInfo({ order: savedOrder ?? { ...payload.order, id: 0, khoiLuongTong: String(payload.lineItems.reduce((a, l) => a + parseFloat(l.khoiLuong || "0"), 0)), lamTron: calcLamTron(lamTronCong, lamTronTru), total: calcGrandTotal(lines, lamTronCong, lamTronTru) } as unknown as PurchaseOrder, lineItems: liItems });
       close_();
     },
     onError: (e: Error) => setErr(e.message),
@@ -430,13 +458,22 @@ export default function DonThuMuaPage() {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
                         <button
-                          onClick={() => {
-                            const kl = o.khoiLuongTong && o.khoiLuongTong !== "0" ? parseFloat(o.khoiLuongTong).toFixed(1) : "?";
-                            setQrInfo({ facilityName: o.facilityName, diaChuThu: o.diaChuThu, khoiLuong: kl, total: o.total });
+                          onClick={async () => {
+                            setQrLoading(true);
+                            setQrInfo(null);
+                            setQrDataUrl("");
+                            try {
+                              const { lineItems } = await fetchPurchaseOrder(o.id);
+                              setQrInfo({ order: o, lineItems: lineItems ?? [] });
+                            } catch {
+                              setQrInfo({ order: o, lineItems: [] });
+                            } finally {
+                              setQrLoading(false);
+                            }
                           }}
                           className="p-1.5 rounded hover:bg-blue-50" title="Xem QR"
                         >
-                          <QrCode className="w-4 h-4 text-blue-500" />
+                          {qrLoading ? <Loader2 className="w-4 h-4 text-blue-400 animate-spin" /> : <QrCode className="w-4 h-4 text-blue-500" />}
                         </button>
                         <button onClick={() => openPrint(o)} className="p-1.5 rounded hover:bg-amber-50" title="In phiếu"><Printer className="w-4 h-4 text-amber-600" /></button>
                         <button onClick={() => openEdit(o)} className="p-1.5 rounded hover:bg-muted" title="Sửa"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
@@ -455,37 +492,100 @@ export default function DonThuMuaPage() {
       {/* QR Modal */}
       {qrInfo && (
         <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-            <div className="flex items-center justify-between mb-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
+            <div className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0">
               <h3 className="text-[17px] font-semibold flex items-center gap-2"><QrCode className="w-5 h-5 text-primary" /> Mã QR phiếu thu mua</h3>
               <button onClick={() => setQrInfo(null)} className="p-1.5 rounded hover:bg-muted"><X className="w-4 h-4 text-muted-foreground" /></button>
             </div>
-            <div className="flex flex-col items-center gap-4">
-              {qrDataUrl ? (
-                <img src={qrDataUrl} alt="QR Code" className="w-52 h-52 rounded-xl" />
-              ) : (
-                <div className="w-52 h-52 rounded-xl bg-muted flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+            <div className="overflow-auto flex-1 px-5 py-4 space-y-4">
+              {/* QR image */}
+              <div className="flex justify-center">
+                {qrDataUrl ? (
+                  <img src={qrDataUrl} alt="QR Code" className="w-56 h-56 rounded-xl border border-border" />
+                ) : (
+                  <div className="w-56 h-56 rounded-xl bg-muted flex items-center justify-center border border-border"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+                )}
+              </div>
+
+              {/* Order header info */}
+              <div className="bg-muted/30 rounded-xl border border-border p-3.5 space-y-1.5 text-[13px]">
+                <div className="flex gap-2">
+                  <span className="text-muted-foreground w-24 shrink-0">Mã phiếu:</span>
+                  <span className="font-mono font-semibold">{qrInfo.order.maPhieu}</span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="text-muted-foreground w-24 shrink-0">Ngày thu mua:</span>
+                  <span className="font-semibold">{fmtDate(qrInfo.order.ngayThu)}</span>
+                </div>
+                <div className="flex gap-2">
+                  <span className="text-muted-foreground w-24 shrink-0">Cơ sở:</span>
+                  <span className="font-semibold">{qrInfo.order.facilityName}</span>
+                </div>
+                {qrInfo.order.diaChuThu && (
+                  <div className="flex gap-2">
+                    <span className="text-muted-foreground w-24 shrink-0">Địa chỉ:</span>
+                    <span>{qrInfo.order.diaChuThu}</span>
+                  </div>
+                )}
+                {qrInfo.order.maLoMe && (
+                  <div className="flex gap-2">
+                    <span className="text-muted-foreground w-24 shrink-0">Mã lô mẻ:</span>
+                    <span className="font-mono">{qrInfo.order.maLoMe}</span>
+                  </div>
+                )}
+                {qrInfo.order.notes && (
+                  <div className="flex gap-2">
+                    <span className="text-muted-foreground w-24 shrink-0">Ghi chú:</span>
+                    <span>{qrInfo.order.notes}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Line items */}
+              {qrInfo.lineItems.length > 0 && (
+                <div>
+                  <div className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">Danh sách sản phẩm</div>
+                  <div className="space-y-1.5">
+                    {qrInfo.lineItems.map((l, i) => (
+                      <div key={i} className="rounded-lg border border-border bg-muted/20 px-3 py-2 text-[12.5px]">
+                        <div className="font-semibold">{l.gradeName || l.productName || "—"}{l.qualityPercent ? <span className="ml-2 text-blue-600 font-normal">{l.qualityPercent}% CL</span> : null}</div>
+                        <div className="flex gap-4 mt-0.5 text-muted-foreground">
+                          {l.khoiLuong && <span>KL: <span className="text-sky-700 font-semibold">{parseFloat(l.khoiLuong).toLocaleString("vi-VN")} kg</span></span>}
+                          {l.donGia && <span>Đơn giá: {parseNum(l.donGia).toLocaleString("vi-VN")} đ/kg</span>}
+                          {l.thanhTien && <span>Thành tiền: <span className="text-emerald-700 font-semibold">{l.thanhTien}</span></span>}
+                        </div>
+                        {l.moTa && <div className="text-[11.5px] text-muted-foreground mt-0.5">{l.moTa}</div>}
+                      </div>
+                    ))}
+                  </div>
+                </div>
               )}
-              <div className="w-full space-y-1.5 text-[13px]">
-                <div className="flex items-start gap-2">
-                  <span className="text-muted-foreground w-24 shrink-0">Tên hộ:</span>
-                  <span className="font-medium">{qrInfo.facilityName}</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-muted-foreground w-24 shrink-0">Địa chỉ:</span>
-                  <span className="font-medium">{qrInfo.diaChuThu || "—"}</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-muted-foreground w-24 shrink-0">Khối lượng:</span>
-                  <span className="font-semibold text-sky-700">{qrInfo.khoiLuong} kg</span>
-                </div>
-                <div className="flex items-start gap-2">
-                  <span className="text-muted-foreground w-24 shrink-0">Tổng tiền:</span>
-                  <span className="font-semibold text-emerald-700">{qrInfo.total}</span>
+
+              {/* Totals */}
+              <div className="border-t border-border pt-3 space-y-1 text-[13px]">
+                {qrInfo.order.khoiLuongTong && qrInfo.order.khoiLuongTong !== "0" && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Tổng khối lượng:</span>
+                    <span className="font-semibold text-sky-700">{parseFloat(qrInfo.order.khoiLuongTong).toLocaleString("vi-VN")} kg</span>
+                  </div>
+                )}
+                {qrInfo.order.lamTron && qrInfo.order.lamTron !== "0" && (
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Tiền lẻ điều chỉnh:</span>
+                    <span className={parseNum(qrInfo.order.lamTron) >= 0 ? "text-emerald-600" : "text-rose-600"}>
+                      {parseNum(qrInfo.order.lamTron) >= 0 ? "+" : ""}{parseNum(qrInfo.order.lamTron).toLocaleString("vi-VN")} đ
+                    </span>
+                  </div>
+                )}
+                <div className="flex justify-between text-[14px] font-bold">
+                  <span>Tổng cộng:</span>
+                  <span className="text-emerald-700">{qrInfo.order.total || "—"}</span>
                 </div>
               </div>
             </div>
-            <button onClick={() => setQrInfo(null)} className="mt-5 w-full h-10 rounded-xl bg-primary text-primary-foreground text-[13.5px] font-semibold hover:brightness-110">Đóng</button>
+            <div className="px-5 py-3 border-t border-border shrink-0">
+              <button onClick={() => setQrInfo(null)} className="w-full h-10 rounded-xl bg-primary text-primary-foreground text-[13.5px] font-semibold hover:brightness-110">Đóng</button>
+            </div>
           </div>
         </div>
       )}
