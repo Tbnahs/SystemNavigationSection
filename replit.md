@@ -10,31 +10,25 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **Node.js version**: 24
 - **Package manager**: pnpm
 - **TypeScript version**: 5.9
-- **API framework**: Express 5
-- **Database**: PostgreSQL + Drizzle ORM
-- **Validation**: Zod (`zod/v4`), `drizzle-zod`
-- **API codegen**: Orval (from OpenAPI spec)
-- **Build**: esbuild (CJS bundle)
+- **Frontend**: React + Vite + Tailwind + shadcn-style components
+- **Data**: Mock data hoàn toàn trong `src/lib/api.ts` (không cần backend)
 
 ## Structure
 
 ```text
 artifacts-monorepo/
-├── artifacts/              # Deployable applications
-│   ├── api-server/         # Express API server (REST endpoints)
-│   ├── erp-ui/             # ERP web app (React + Vite + Tailwind)
+├── artifacts/
+│   ├── erp-ui/             # ERP web app (React + Vite + Tailwind) — FE only, mock data
 │   └── mockup-sandbox/     # Component preview server (canvas)
-├── lib/                    # Shared libraries
-│   ├── api-spec/           # OpenAPI spec + Orval codegen config
-│   ├── api-client-react/   # Generated React Query hooks
-│   ├── api-zod/            # Generated Zod schemas from OpenAPI
-│   └── db/                 # Drizzle ORM schema + DB connection
-├── scripts/                # Utility scripts (single workspace package)
-│   └── src/                # Individual .ts scripts, run via `pnpm --filter @workspace/scripts run <script>`
-├── pnpm-workspace.yaml     # pnpm workspace (artifacts/*, lib/*, lib/integrations/*, scripts)
-├── tsconfig.base.json      # Shared TS options (composite, bundler resolution, es2022)
+├── export/                 # Bản tách riêng để upload lên 2 Replit project
+│   ├── portal-ui/          # Project Portal standalone
+│   ├── erp-ui/             # Project ERP standalone
+│   ├── portal-ui.tar.gz    # File nén sẵn để upload
+│   └── erp-ui.tar.gz       # File nén sẵn để upload
+├── pnpm-workspace.yaml     # pnpm workspace (artifacts/* only)
+├── tsconfig.base.json      # Shared TS options
 ├── tsconfig.json           # Root TS project references
-└── package.json            # Root package with hoisted devDeps
+└── package.json            # Root package
 ```
 
 ## TypeScript & Composite Projects
