@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import AppLayout from "@/components/AppLayout";
-import { Plus, Pencil, X, Loader2, Search, Package, Eye, Building2, Tag, Scale, DollarSign, Info, Calendar, Hash, ImageIcon, Barcode } from "lucide-react";
+import { Plus, Pencil, X, Loader2, Search, Package, Eye, Building2, Tag, Scale, DollarSign, Info, Calendar, Hash, ImageIcon, Barcode, Upload } from "lucide-react";
 import {
   fetchProducts, createProduct, updateProduct, deleteProduct,
   fetchUnits, fetchEnterprises,
@@ -35,6 +35,12 @@ type PForm = {
 };
 const EMPTY_P: PForm = { enterpriseId: null, name: "", code: "", gtin: "", type: "ban_thanh_pham", unitId: null, price: "", imageUrl: "", description: "", status: "active" };
 
+function parseImages(raw: string | null | undefined): string[] {
+  if (!raw) return [];
+  try { const arr = JSON.parse(raw); if (Array.isArray(arr)) return arr; } catch {}
+  return [raw];
+}
+
 export default function ThuongPhamPage() {
   const { user } = useAuth();
   const isSuperAdmin = !user?.enterpriseId;
@@ -44,6 +50,7 @@ export default function ThuongPhamPage() {
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
   const [viewItem, setViewItem] = useState<Product | null>(null);
   const [form, setForm] = useState<PForm>(() => ({ ...EMPTY_P, enterpriseId: user?.enterpriseId ?? null }));
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
   const [err, setErr] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -70,10 +77,11 @@ export default function ThuongPhamPage() {
     onSuccess: () => { inv(); setDeleteTarget(null); },
   });
 
-  function close_() { setDrawerOpen(false); setEditItem(null); setForm({ ...EMPTY_P, enterpriseId: user?.enterpriseId ?? null }); setErr(null); }
+  function close_() { setDrawerOpen(false); setEditItem(null); setForm({ ...EMPTY_P, enterpriseId: user?.enterpriseId ?? null }); setImageUrls([]); setErr(null); }
   function openEdit(p: Product) {
     setEditItem(p);
     setForm({ enterpriseId: p.enterpriseId, name: p.name, code: p.code, gtin: p.gtin ?? "", type: p.type, unitId: p.unitId, price: p.price, imageUrl: p.imageUrl ?? "", description: p.description, status: p.status });
+    setImageUrls(parseImages(p.imageUrl));
     setErr(null); setDrawerOpen(true);
   }
   function setF<K extends keyof PForm>(k: K, v: PForm[K]) { setForm(p => ({ ...p, [k]: v })); }
@@ -81,8 +89,26 @@ export default function ThuongPhamPage() {
   function handleSubmit() {
     setErr(null);
     if (!form.name.trim()) { setErr("Vui lòng nhập tên thương phẩm."); return; }
-    if (editItem) updateMu.mutate({ id: editItem.id, b: form });
-    else createMu.mutate(form);
+    const payload = { ...form, imageUrl: imageUrls.length ? JSON.stringify(imageUrls) : "" };
+    if (editItem) updateMu.mutate({ id: editItem.id, b: payload });
+    else createMu.mutate(payload);
+  }
+
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = Array.from(e.target.files ?? []);
+    if (!files.length) return;
+    const remaining = 5 - imageUrls.length;
+    const toProcess = files.slice(0, remaining);
+    const newUrls = await Promise.all(
+      toProcess.map(file => new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      }))
+    );
+    setImageUrls(prev => [...prev, ...newUrls]);
+    e.target.value = "";
   }
 
   const items = listQ.data?.items ?? [];
@@ -160,13 +186,13 @@ export default function ThuongPhamPage() {
                     <tr key={p.id} className="border-t border-border hover:bg-emerald-50/30">
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          {p.imageUrl ? (
-                            <img src={p.imageUrl} alt={p.name} className="w-9 h-9 rounded-lg object-cover border border-border flex-shrink-0" onError={e => (e.currentTarget.style.display = "none")} />
+                          {(() => { const imgs = parseImages(p.imageUrl); return imgs[0] ? (
+                            <img src={imgs[0]} alt={p.name} className="w-9 h-9 rounded-lg object-cover border border-border flex-shrink-0" onError={e => (e.currentTarget.style.display = "none")} />
                           ) : (
                             <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center flex-shrink-0">
                               <Package className="w-4 h-4 text-muted-foreground" />
                             </div>
-                          )}
+                          ); })()}
                           <div className="font-medium">{p.name}</div>
                         </div>
                       </td>
@@ -219,13 +245,13 @@ export default function ThuongPhamPage() {
             </div>
             <div className="flex-1 overflow-auto px-6 py-5 space-y-5">
               <div className="flex items-center gap-4">
-                {viewItem.imageUrl ? (
-                  <img src={viewItem.imageUrl} alt={viewItem.name} className="w-16 h-16 rounded-2xl object-cover border border-border flex-shrink-0" onError={e => (e.currentTarget.style.display = "none")} />
+                {(() => { const imgs = parseImages(viewItem.imageUrl); return imgs[0] ? (
+                  <img src={imgs[0]} alt={viewItem.name} className="w-16 h-16 rounded-2xl object-cover border border-border flex-shrink-0" onError={e => (e.currentTarget.style.display = "none")} />
                 ) : (
                   <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <Package className="w-8 h-8 text-primary" />
                   </div>
-                )}
+                ); })()}
                 <div>
                   <div className="text-[17px] font-bold">{viewItem.name}</div>
                   {viewItem.code && <div className="text-[13px] text-muted-foreground mt-0.5">Mã: <span className="font-mono font-semibold">{viewItem.code}</span></div>}
@@ -252,12 +278,20 @@ export default function ThuongPhamPage() {
                   <div className="flex items-center gap-3 px-4 py-3"><Calendar className="w-4 h-4 text-muted-foreground flex-shrink-0" /><span className="text-[13px] text-muted-foreground w-36">Ngày tạo</span><span className="text-[13px] font-medium">{viewItem.createdAt ? new Date(viewItem.createdAt).toLocaleDateString("vi-VN") : "—"}</span></div>
                 </div>
               </div>
-              {viewItem.imageUrl && (
-                <div>
-                  <div className="flex items-center gap-2 mb-2"><ImageIcon className="w-4 h-4 text-muted-foreground" /><span className="text-[13px] font-semibold">Hình ảnh</span></div>
-                  <img src={viewItem.imageUrl} alt={viewItem.name} className="w-full rounded-xl border border-border object-cover max-h-48" onError={e => (e.currentTarget.style.display = "none")} />
-                </div>
-              )}
+              {(() => {
+                const imgs = parseImages(viewItem.imageUrl);
+                if (!imgs.length) return null;
+                return (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2"><ImageIcon className="w-4 h-4 text-muted-foreground" /><span className="text-[13px] font-semibold">Hình ảnh ({imgs.length})</span></div>
+                    <div className={`grid gap-2 ${imgs.length === 1 ? "grid-cols-1" : "grid-cols-2"}`}>
+                      {imgs.map((url, i) => (
+                        <img key={i} src={url} alt={`${viewItem.name} ${i + 1}`} className="w-full rounded-xl border border-border object-cover max-h-40" onError={e => (e.currentTarget.style.display = "none")} />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
               {viewItem.description && (
                 <div>
                   <div className="flex items-center gap-2 mb-2"><Info className="w-4 h-4 text-muted-foreground" /><span className="text-[13px] font-semibold">Mô tả</span></div>
@@ -334,11 +368,24 @@ export default function ThuongPhamPage() {
                 <input value={form.price} onChange={e => setF("price", e.target.value)} placeholder="27,000 đ/kg" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
               </div>
               <div>
-                <label className="block text-[13px] font-medium mb-1.5">Hình ảnh (URL)</label>
-                <input value={form.imageUrl} onChange={e => setF("imageUrl", e.target.value)} placeholder="https://… hoặc đường dẫn ảnh" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
-                {form.imageUrl && (
-                  <div className="mt-2 rounded-lg overflow-hidden border border-border w-full h-32 bg-muted/30 flex items-center justify-center">
-                    <img src={form.imageUrl} alt="preview" className="max-h-full max-w-full object-contain" onError={e => { e.currentTarget.style.display = "none"; }} />
+                <label className="block text-[13px] font-medium mb-1.5">
+                  Hình ảnh <span className="text-muted-foreground font-normal">(tối đa 5 ảnh)</span>
+                </label>
+                <label className={`flex flex-col items-center justify-center w-full h-20 border-2 border-dashed rounded-xl transition-colors ${imageUrls.length >= 5 ? "opacity-40 cursor-not-allowed border-border" : "border-border hover:border-primary hover:bg-primary/5 cursor-pointer"}`}>
+                  <Upload className="w-4 h-4 text-muted-foreground mb-1" />
+                  <span className="text-[12px] text-muted-foreground">{imageUrls.length >= 5 ? "Đã đủ 5 ảnh" : `Chọn ảnh từ máy (${imageUrls.length}/5)`}</span>
+                  <input type="file" accept="image/*" multiple disabled={imageUrls.length >= 5} className="hidden" onChange={handleFileChange} />
+                </label>
+                {imageUrls.length > 0 && (
+                  <div className="mt-2 grid grid-cols-5 gap-2">
+                    {imageUrls.map((url, i) => (
+                      <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-border bg-muted/30">
+                        <img src={url} alt={`ảnh ${i + 1}`} className="w-full h-full object-cover" />
+                        <button type="button" onClick={() => setImageUrls(imgs => imgs.filter((_, idx) => idx !== i))} className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                          <X className="w-3 h-3" />
+                        </button>
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
