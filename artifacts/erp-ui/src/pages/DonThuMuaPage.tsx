@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   Plus, Pencil, X, Loader2, Search, ShoppingBasket, Trash2,
-  MapPin, QrCode, ChevronDown, Printer,
+  MapPin, QrCode, ChevronDown, Printer, Download,
 } from "lucide-react";
 import QRCode from "qrcode";
 import {
@@ -514,8 +514,15 @@ export default function DonThuMuaPage() {
                 <p className="flex flex-wrap gap-x-1.5"><span className="text-muted-foreground shrink-0">Khối lượng:</span><span className="font-semibold text-sky-700">{qrInfo.order.khoiLuongTong && qrInfo.order.khoiLuongTong !== "0" ? parseFloat(qrInfo.order.khoiLuongTong).toLocaleString("vi-VN") + " kg" : "—"}</span></p>
               </div>
             </div>
-            <div className="px-5 py-3 border-t border-border shrink-0">
-              <button onClick={() => setQrInfo(null)} className="w-full h-10 rounded-xl bg-primary text-primary-foreground text-[13.5px] font-semibold hover:brightness-110">Đóng</button>
+            <div className="px-5 py-3 border-t border-border shrink-0 flex gap-2">
+              <a
+                href={qrDataUrl || undefined}
+                download={`QR-${qrInfo.order.maPhieu || "phieu-thu-mua"}.png`}
+                className={`flex-1 h-10 rounded-xl border border-border text-[13.5px] font-semibold flex items-center justify-center gap-1.5 ${qrDataUrl ? "hover:bg-muted text-foreground" : "opacity-40 pointer-events-none text-muted-foreground"}`}
+              >
+                <Download className="w-4 h-4" /> Tải ảnh QR
+              </a>
+              <button onClick={() => setQrInfo(null)} className="flex-1 h-10 rounded-xl bg-primary text-primary-foreground text-[13.5px] font-semibold hover:brightness-110">Đóng</button>
             </div>
           </div>
         </div>
