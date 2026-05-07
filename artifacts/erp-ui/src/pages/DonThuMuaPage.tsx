@@ -672,12 +672,6 @@ export default function DonThuMuaPage() {
                   );
                 })}
 
-                <button
-                  onClick={() => setLines(p => [...p, emptyLine()])}
-                  className="w-full h-10 rounded-xl border border-dashed border-border text-[13px] font-medium text-muted-foreground hover:bg-muted flex items-center justify-center gap-2"
-                >
-                  <Plus className="w-4 h-4" /> Thêm dòng
-                </button>
               </div>
 
               {/* Tổng kết */}
