@@ -390,20 +390,6 @@ export default function ThuongPhamPage() {
                 )}
               </div>
               <div>
-                <label className="block text-[13px] font-medium mb-1.5">Doanh nghiệp</label>
-                {isSuperAdmin ? (
-                  <select value={form.enterpriseId ?? ""} onChange={e => setF("enterpriseId", e.target.value ? Number(e.target.value) : null)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
-                    <option value="">-- Dùng chung (tất cả DN) --</option>
-                    {enterprises.map(d => <option key={d.id} value={d.id}>{d.tenHienThi}</option>)}
-                  </select>
-                ) : (
-                  <div className="w-full h-10 px-3 rounded-lg border border-border bg-muted/40 text-sm flex items-center text-foreground">
-                    {enterprises.find(d => d.id === form.enterpriseId)?.tenHienThi ?? user?.enterpriseName ?? "—"}
-                    <span className="ml-auto text-[11.5px] text-muted-foreground">Cố định theo tài khoản</span>
-                  </div>
-                )}
-              </div>
-              <div>
                 <label className="block text-[13px] font-medium mb-1.5">Trạng thái</label>
                 <select value={form.status} onChange={e => setF("status", e.target.value as "active" | "inactive")} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
                   {STATUS_OPT.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
