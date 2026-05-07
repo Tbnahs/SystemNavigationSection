@@ -541,10 +541,9 @@ export default function NhanVienPage() {
           <h1 className="text-xl lg:text-2xl font-bold mt-0.5">Quản lý Nhân viên</h1>
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
           <Stat label="Tổng nhân viên" value={String(statsQ.data?.total ?? "—")} delta="Dữ liệu thực tế" tone="emerald" icon={Users} />
           <Stat label="Đang hoạt động" value={String(statsQ.data?.active ?? "—")} delta={statsQ.data ? `${Math.round(((statsQ.data.active || 0) / Math.max(statsQ.data.total, 1)) * 100)}% tổng` : ""} tone="blue" icon={Shield} />
-          <Stat label="Đã mời, chờ kích hoạt" value={String(statsQ.data?.invited ?? "—")} delta="Cần nhắc lại" tone="amber" icon={Mail} />
           <Stat label="Tạm khóa" value={String(statsQ.data?.locked ?? "—")} delta="" tone="rose" icon={X} />
         </div>
 
