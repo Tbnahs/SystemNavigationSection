@@ -507,80 +507,11 @@ export default function DonThuMuaPage() {
                 )}
               </div>
 
-              {/* Order header info */}
-              <div className="bg-muted/30 rounded-xl border border-border p-3.5 space-y-1.5 text-[13px]">
-                <div className="flex gap-2">
-                  <span className="text-muted-foreground w-24 shrink-0">Mã phiếu:</span>
-                  <span className="font-mono font-semibold">{qrInfo.order.maPhieu}</span>
-                </div>
-                <div className="flex gap-2">
-                  <span className="text-muted-foreground w-24 shrink-0">Ngày thu mua:</span>
-                  <span className="font-semibold">{fmtDate(qrInfo.order.ngayThu)}</span>
-                </div>
-                <div className="flex gap-2">
-                  <span className="text-muted-foreground w-24 shrink-0">Cơ sở:</span>
-                  <span className="font-semibold">{qrInfo.order.facilityName}</span>
-                </div>
-                {qrInfo.order.diaChuThu && (
-                  <div className="flex gap-2">
-                    <span className="text-muted-foreground w-24 shrink-0">Địa chỉ:</span>
-                    <span>{qrInfo.order.diaChuThu}</span>
-                  </div>
-                )}
-                {qrInfo.order.maLoMe && (
-                  <div className="flex gap-2">
-                    <span className="text-muted-foreground w-24 shrink-0">Mã lô mẻ:</span>
-                    <span className="font-mono">{qrInfo.order.maLoMe}</span>
-                  </div>
-                )}
-                {qrInfo.order.notes && (
-                  <div className="flex gap-2">
-                    <span className="text-muted-foreground w-24 shrink-0">Ghi chú:</span>
-                    <span>{qrInfo.order.notes}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Line items */}
-              {qrInfo.lineItems.length > 0 && (
-                <div>
-                  <div className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide mb-2">Danh sách sản phẩm</div>
-                  <div className="space-y-1.5">
-                    {qrInfo.lineItems.map((l, i) => (
-                      <div key={i} className="rounded-lg border border-border bg-muted/20 px-3 py-2 text-[12.5px]">
-                        <div className="font-semibold">{l.gradeName || l.productName || "—"}{l.qualityPercent ? <span className="ml-2 text-blue-600 font-normal">{l.qualityPercent}% CL</span> : null}</div>
-                        <div className="flex gap-4 mt-0.5 text-muted-foreground">
-                          {l.khoiLuong && <span>KL: <span className="text-sky-700 font-semibold">{parseFloat(l.khoiLuong).toLocaleString("vi-VN")} kg</span></span>}
-                          {l.donGia && <span>Đơn giá: {parseNum(l.donGia).toLocaleString("vi-VN")} đ/kg</span>}
-                          {l.thanhTien && <span>Thành tiền: <span className="text-emerald-700 font-semibold">{l.thanhTien}</span></span>}
-                        </div>
-                        {l.moTa && <div className="text-[11.5px] text-muted-foreground mt-0.5">{l.moTa}</div>}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Totals */}
-              <div className="border-t border-border pt-3 space-y-1 text-[13px]">
-                {qrInfo.order.khoiLuongTong && qrInfo.order.khoiLuongTong !== "0" && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Tổng khối lượng:</span>
-                    <span className="font-semibold text-sky-700">{parseFloat(qrInfo.order.khoiLuongTong).toLocaleString("vi-VN")} kg</span>
-                  </div>
-                )}
-                {qrInfo.order.lamTron && qrInfo.order.lamTron !== "0" && (
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Tiền lẻ điều chỉnh:</span>
-                    <span className={parseNum(qrInfo.order.lamTron) >= 0 ? "text-emerald-600" : "text-rose-600"}>
-                      {parseNum(qrInfo.order.lamTron) >= 0 ? "+" : ""}{parseNum(qrInfo.order.lamTron).toLocaleString("vi-VN")} đ
-                    </span>
-                  </div>
-                )}
-                <div className="flex justify-between text-[14px] font-bold">
-                  <span>Tổng cộng:</span>
-                  <span className="text-emerald-700">{qrInfo.order.total || "—"}</span>
-                </div>
+              {/* Info */}
+              <div className="space-y-1.5 text-[13px]">
+                <p className="flex flex-wrap gap-x-1.5"><span className="text-muted-foreground shrink-0">Tên hộ:</span><span className="font-semibold break-words">{qrInfo.order.facilityName || "—"}</span></p>
+                <p className="flex flex-wrap gap-x-1.5"><span className="text-muted-foreground shrink-0">Địa chỉ:</span><span className="break-words">{qrInfo.order.diaChuThu || "—"}</span></p>
+                <p className="flex flex-wrap gap-x-1.5"><span className="text-muted-foreground shrink-0">Khối lượng:</span><span className="font-semibold text-sky-700">{qrInfo.order.khoiLuongTong && qrInfo.order.khoiLuongTong !== "0" ? parseFloat(qrInfo.order.khoiLuongTong).toLocaleString("vi-VN") + " kg" : "—"}</span></p>
               </div>
             </div>
             <div className="px-5 py-3 border-t border-border shrink-0">
