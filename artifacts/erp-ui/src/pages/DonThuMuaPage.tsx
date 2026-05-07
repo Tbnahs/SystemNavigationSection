@@ -59,7 +59,24 @@ function EMPTY_FORM(): OForm {
   };
 }
 
-function parseNum(s: string) { return parseFloat(s.replace(/[^0-9.\-]/g, "")) || 0; }
+function parseNum(s: string) {
+  if (!s) return 0;
+  let v = s.replace(/[^0-9.,\-]/g, "");
+  if (!v) return 0;
+  const dotCount = (v.match(/\./g) || []).length;
+  const commaCount = (v.match(/,/g) || []).length;
+  if (dotCount > 1) {
+    // Multiple dots = thousands separators (vi-VN); comma = decimal
+    v = v.replace(/\./g, "").replace(",", ".");
+  } else if (dotCount === 1 && commaCount === 0) {
+    // Single dot: thousands if followed by exactly 3 digits, else decimal
+    if ((v.split(".")[1] || "").length === 3) v = v.replace(".", "");
+  } else if (commaCount === 1 && dotCount === 0) {
+    // Comma: decimal if ≤2 digits after, else thousands
+    v = (v.split(",")[1] || "").length <= 2 ? v.replace(",", ".") : v.replace(",", "");
+  }
+  return parseFloat(v) || 0;
+}
 
 function calcGrandTotal(lines: LineItem[], lamTronCong: string, lamTronTru: string) {
   const sum = lines.reduce((acc, l) => acc + parseNum(l.thanhTien), 0);
