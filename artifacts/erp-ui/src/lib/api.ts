@@ -198,7 +198,7 @@ export const loginUser = (email: string, password: string) =>
 
 /* ── Employees ───────────────────────────────────────────── */
 export const fetchEmployees = () => request<{ items: Employee[] }>("/employees");
-export const createEmployee = (body: Partial<Employee>) =>
+export const createEmployee = (body: Partial<Employee> & { matKhau?: string }) =>
   request<{ item: Employee }>("/employees", { method: "POST", body: JSON.stringify(body) });
 export const updateEmployee = (id: number, body: Partial<Employee>) =>
   request<{ item: Employee }>(`/employees/${id}`, { method: "PATCH", body: JSON.stringify(body) });

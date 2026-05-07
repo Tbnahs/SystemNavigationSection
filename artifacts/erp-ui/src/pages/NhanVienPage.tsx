@@ -6,6 +6,7 @@ import {
   Search, Plus, Filter, Download, X, Upload,
   Users, Mail, Phone, ArrowLeft, ArrowRight,
   Shield, Pencil, Loader2, ChevronDown, Check, RotateCcw, Factory,
+  Eye, EyeOff, KeyRound,
 } from "lucide-react";
 import {
   fetchEmployees, fetchEmployeeStats, createEmployee,
@@ -78,11 +79,12 @@ type EForm = {
   permissions: string[];
   avatarUrl: string | null;
   facilityIds: number[];
+  matKhau: string;
 };
 const EMPTY_E: EForm = {
   name: "", email: "", phone: "", enterpriseId: null,
   role: "Nhân viên", permissions: presetFor("Nhân viên"), avatarUrl: null,
-  facilityIds: [],
+  facilityIds: [], matKhau: "",
 };
 
 /* ─── Helpers ───────────────────────────────────────────────────── */
@@ -360,6 +362,7 @@ export default function NhanVienPage() {
   }));
   const [submitErr, setSubmitErr] = useState<string | null>(null);
   const [roles, setRoles] = useState<string[]>(DEFAULT_ROLES);
+  const [showPwdInDrawer, setShowPwdInDrawer] = useState(false);
 
   const qc = useQueryClient();
   const listQ = useQuery({ queryKey: ["employees"], queryFn: fetchEmployees });
@@ -399,7 +402,8 @@ export default function NhanVienPage() {
     mutationFn: async (body: EForm) => {
       const result = await createEmployee({
         ...body,
-        status: "invited",
+        matKhau: body.matKhau || undefined,
+        status: "active",
         avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)],
         lastSeen: "Chưa đăng nhập",
       });
@@ -900,14 +904,28 @@ export default function NhanVienPage() {
                 activeGroups={activeGroups}
               />
 
-              {/* Email invite */}
-              <div className="rounded-xl border border-emerald-200 bg-emerald-50/40 p-3 flex items-start gap-3">
-                <input type="checkbox" defaultChecked className="mt-1 accent-primary" />
-                <div className="text-[13px] text-foreground">
-                  <div className="font-medium">Gửi email mời kích hoạt tài khoản</div>
-                  <div className="text-[12px] text-muted-foreground mt-0.5">Nhân viên sẽ nhận được email kèm liên kết đặt mật khẩu lần đầu.</div>
+              {/* Password field — only when creating */}
+              {!editItem && (
+                <div>
+                  <div className="flex items-center gap-1 mb-1.5">
+                    <KeyRound className="w-3.5 h-3.5 text-muted-foreground" />
+                    <span className="text-[13px] font-medium text-foreground/80">Mật khẩu đăng nhập</span>
+                  </div>
+                  <div className="relative">
+                    <input
+                      type={showPwdInDrawer ? "text" : "password"}
+                      value={form.matKhau}
+                      onChange={(e) => setF("matKhau", e.target.value)}
+                      placeholder="Để trống → dùng mặc định: esgvalley@2025"
+                      className="w-full h-10 pl-3 pr-10 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    />
+                    <button type="button" onClick={() => setShowPwdInDrawer(p => !p)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                      {showPwdInDrawer ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    </button>
+                  </div>
+                  <div className="text-[11.5px] text-muted-foreground mt-1">Mật khẩu sẽ dùng để đăng nhập. Để trống sẽ dùng mặc định.</div>
                 </div>
-              </div>
+              )}
 
               {submitErr && (
                 <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{submitErr}</div>

@@ -34,11 +34,14 @@ router.get("/employees", async (_req: Request, res: Response, next: NextFunction
 
 router.post("/employees", async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const parsed = insertEmployeeSchema.safeParse(req.body);
+    const { matKhau, ...rest } = req.body as { matKhau?: string; [key: string]: unknown };
+    const parsed = insertEmployeeSchema.safeParse(rest);
     if (!parsed.success) {
       return res.status(400).json({ error: "Validation failed", issues: parsed.error.issues });
     }
-    const [created] = await db.insert(employeesTable).values(parsed.data).returning();
+    const DEFAULT_PASSWORD = "esgvalley@2025";
+    const passwordHash = await bcrypt.hash(matKhau || DEFAULT_PASSWORD, 10);
+    const [created] = await db.insert(employeesTable).values({ ...parsed.data, passwordHash }).returning();
     res.status(201).json({ item: created });
   } catch (e) {
     next(e);
