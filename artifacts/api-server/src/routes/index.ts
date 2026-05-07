@@ -9,6 +9,7 @@ import productsRouter from "./products";
 import gradesRouter from "./grades";
 import purchaseOrdersRouter from "./purchase_orders";
 import adminRouter from "./admin";
+import teaVarietiesRouter from "./tea_varieties";
 
 const router: IRouter = Router();
 
@@ -21,6 +22,7 @@ router.use(facilitiesRouter);
 router.use(productsRouter);
 router.use(gradesRouter);
 router.use(purchaseOrdersRouter);
+router.use(teaVarietiesRouter);
 router.use(adminRouter);
 
 export default router;

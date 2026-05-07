@@ -5,11 +5,13 @@ import AppLayout from "@/components/AppLayout";
 import { Plus, Pencil, X, Loader2, Scale, Search, Globe, Building2 } from "lucide-react";
 import { fetchUnits, createUnit, updateUnit, deleteUnit, type Unit } from "@/lib/api";
 
-type UForm = { name: string; abbreviation: string; description: string };
-const EMPTY: UForm = { name: "", abbreviation: "", description: "" };
+const LOAI_DON_VI_OPTIONS = ["Số lượng", "Khối lượng", "Diện tích", "Nhiệt độ", "Thể tích", "Chiều dài"];
+
+type UForm = { name: string; abbreviation: string; loaiDonVi: string; description: string };
+const EMPTY: UForm = { name: "", abbreviation: "", loaiDonVi: "", description: "" };
 
 function toForm(u: Unit): UForm {
-  return { name: u.name, abbreviation: u.abbreviation, description: u.description };
+  return { name: u.name, abbreviation: u.abbreviation, loaiDonVi: u.loaiDonVi ?? "", description: u.description };
 }
 
 export default function DonViTinhPage() {
@@ -22,6 +24,8 @@ export default function DonViTinhPage() {
   const [form, setForm] = useState<UForm>(EMPTY);
   const [err, setErr] = useState<string | null>(null);
   const [search, setSearch] = useState("");
+  const [loaiSearch, setLoaiSearch] = useState("");
+  const [loaiOpen, setLoaiOpen] = useState(false);
 
   const qc = useQueryClient();
   const listQ = useQuery({ queryKey: ["units"], queryFn: fetchUnits });
@@ -60,9 +64,13 @@ export default function DonViTinhPage() {
 
   const items = listQ.data?.items ?? [];
   const filtered = search.trim()
-    ? items.filter(u => [u.name, u.abbreviation].some(s => s.toLowerCase().includes(search.toLowerCase())))
+    ? items.filter(u => [u.name, u.abbreviation, u.loaiDonVi ?? ""].some(s => s.toLowerCase().includes(search.toLowerCase())))
     : items;
   const isPending = createMu.isPending || updateMu.isPending;
+
+  const filteredLoai = loaiSearch.trim()
+    ? LOAI_DON_VI_OPTIONS.filter(o => o.toLowerCase().includes(loaiSearch.toLowerCase()))
+    : LOAI_DON_VI_OPTIONS;
 
   function canEdit(u: Unit) {
     if (isSuperAdmin) return true;
@@ -110,6 +118,7 @@ export default function DonViTinhPage() {
                   <th className="px-4 py-3 w-12">STT</th>
                   <th className="px-4 py-3">Tên đơn vị</th>
                   <th className="px-4 py-3">Ký hiệu</th>
+                  <th className="px-4 py-3">Loại</th>
                   <th className="px-4 py-3">Mô tả</th>
                   <th className="px-4 py-3">Phạm vi</th>
                   <th className="px-4 py-3 w-20"></th>
@@ -117,10 +126,10 @@ export default function DonViTinhPage() {
               </thead>
               <tbody>
                 {listQ.isLoading && (
-                  <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>
                 )}
                 {!listQ.isLoading && filtered.length === 0 && (
-                  <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
                     <Scale className="w-8 h-8 mx-auto mb-2 opacity-30" />
                     {search ? "Không tìm thấy đơn vị phù hợp." : "Chưa có đơn vị tính nào. Thêm đơn vị đầu tiên!"}
                   </td></tr>
@@ -133,6 +142,11 @@ export default function DonViTinhPage() {
                       <span className="inline-flex items-center px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 text-[12px] font-semibold ring-1 ring-emerald-200">
                         {u.abbreviation}
                       </span>
+                    </td>
+                    <td className="px-4 py-3 text-[13px]">
+                      {u.loaiDonVi ? (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium bg-sky-50 text-sky-700 ring-1 ring-sky-200">{u.loaiDonVi}</span>
+                      ) : <span className="text-muted-foreground/50">—</span>}
                     </td>
                     <td className="px-4 py-3 text-muted-foreground text-[13px]">{u.description || "—"}</td>
                     <td className="px-4 py-3">
@@ -229,6 +243,57 @@ export default function DonViTinhPage() {
               <div>
                 <label className="block text-[13px] font-medium mb-1.5">Ký hiệu <span className="text-rose-500">*</span></label>
                 <input value={form.abbreviation} onChange={e => setF("abbreviation", e.target.value)} placeholder="kg" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+              </div>
+              <div className="relative">
+                <label className="block text-[13px] font-medium mb-1.5">Loại đơn vị tính</label>
+                <div
+                  className="w-full h-10 px-3 rounded-lg border border-border text-sm bg-white flex items-center cursor-pointer"
+                  onClick={() => setLoaiOpen(p => !p)}
+                >
+                  <span className={form.loaiDonVi ? "text-foreground" : "text-muted-foreground/60"}>
+                    {form.loaiDonVi || "-- Chọn loại --"}
+                  </span>
+                </div>
+                {loaiOpen && (
+                  <div className="absolute z-20 top-full mt-1 w-full bg-white rounded-xl border border-border shadow-lg overflow-hidden">
+                    <div className="p-2">
+                      <input
+                        autoFocus
+                        value={loaiSearch}
+                        onChange={e => setLoaiSearch(e.target.value)}
+                        placeholder="Tìm hoặc nhập loại mới…"
+                        className="w-full h-8 px-2.5 rounded-lg border border-border text-[13px] outline-none focus:border-primary"
+                      />
+                    </div>
+                    <div className="max-h-48 overflow-y-auto">
+                      {filteredLoai.map(opt => (
+                        <div
+                          key={opt}
+                          onClick={() => { setF("loaiDonVi", opt); setLoaiOpen(false); setLoaiSearch(""); }}
+                          className={`px-3 py-2 text-[13px] cursor-pointer hover:bg-muted ${form.loaiDonVi === opt ? "bg-primary/10 text-primary font-medium" : ""}`}
+                        >
+                          {opt}
+                        </div>
+                      ))}
+                      {loaiSearch.trim() && !LOAI_DON_VI_OPTIONS.some(o => o.toLowerCase() === loaiSearch.toLowerCase()) && (
+                        <div
+                          onClick={() => { setF("loaiDonVi", loaiSearch.trim()); setLoaiOpen(false); setLoaiSearch(""); }}
+                          className="px-3 py-2 text-[13px] cursor-pointer hover:bg-muted text-primary border-t border-border"
+                        >
+                          + Tạo loại mới: <span className="font-semibold">{loaiSearch.trim()}</span>
+                        </div>
+                      )}
+                    </div>
+                    {form.loaiDonVi && (
+                      <div
+                        onClick={() => { setF("loaiDonVi", ""); setLoaiOpen(false); }}
+                        className="px-3 py-2 text-[13px] cursor-pointer hover:bg-rose-50 text-muted-foreground border-t border-border"
+                      >
+                        Xóa lựa chọn
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
               <div>
                 <label className="block text-[13px] font-medium mb-1.5">Mô tả</label>

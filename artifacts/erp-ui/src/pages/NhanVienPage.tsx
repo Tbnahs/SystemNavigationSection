@@ -903,28 +903,30 @@ export default function NhanVienPage() {
                 activeGroups={activeGroups}
               />
 
-              {/* Password field — only when creating */}
-              {!editItem && (
-                <div>
-                  <div className="flex items-center gap-1 mb-1.5">
-                    <KeyRound className="w-3.5 h-3.5 text-muted-foreground" />
-                    <span className="text-[13px] font-medium text-foreground/80">Mật khẩu đăng nhập</span>
-                  </div>
-                  <div className="relative">
-                    <input
-                      type={showPwdInDrawer ? "text" : "password"}
-                      value={form.matKhau}
-                      onChange={(e) => setF("matKhau", e.target.value)}
-                      placeholder="Để trống → dùng mặc định: esgvalley@2025"
-                      className="w-full h-10 pl-3 pr-10 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
-                    />
-                    <button type="button" onClick={() => setShowPwdInDrawer(p => !p)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                      {showPwdInDrawer ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </button>
-                  </div>
-                  <div className="text-[11.5px] text-muted-foreground mt-1">Mật khẩu sẽ dùng để đăng nhập. Để trống sẽ dùng mặc định.</div>
+              {/* Password field */}
+              <div>
+                <div className="flex items-center gap-1 mb-1.5">
+                  <KeyRound className="w-3.5 h-3.5 text-muted-foreground" />
+                  <span className="text-[13px] font-medium text-foreground/80">
+                    {editItem ? "Đổi mật khẩu" : "Mật khẩu đăng nhập"}
+                  </span>
                 </div>
-              )}
+                <div className="relative">
+                  <input
+                    type={showPwdInDrawer ? "text" : "password"}
+                    value={form.matKhau}
+                    onChange={(e) => setF("matKhau", e.target.value)}
+                    placeholder={editItem ? "Để trống nếu không đổi mật khẩu" : "Để trống → dùng mặc định: esgvalley@2025"}
+                    className="w-full h-10 pl-3 pr-10 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                  />
+                  <button type="button" onClick={() => setShowPwdInDrawer(p => !p)} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                    {showPwdInDrawer ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+                <div className="text-[11.5px] text-muted-foreground mt-1">
+                  {editItem ? "Nhập mật khẩu mới để thay đổi. Để trống = giữ nguyên mật khẩu cũ." : "Để trống sẽ dùng mặc định."}
+                </div>
+              </div>
 
               {submitErr && (
                 <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{submitErr}</div>

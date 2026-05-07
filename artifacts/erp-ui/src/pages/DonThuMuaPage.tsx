@@ -1,20 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   Plus, Pencil, X, Loader2, Search, ShoppingBasket, Trash2,
-  MapPin, Info,
+  MapPin, QrCode, ChevronDown,
 } from "lucide-react";
+import QRCode from "qrcode";
 import {
   fetchPurchaseOrders, fetchPurchaseOrder, createPurchaseOrder, updatePurchaseOrder, deletePurchaseOrder,
-  fetchProducts, fetchGrades, fetchQualityLevels, fetchFacilities,
-  type PurchaseOrder, type PurchaseOrderItem,
+  fetchTeaVarieties, fetchGrades, fetchQualityLevels, fetchFacilities,
+  type PurchaseOrder, type PurchaseOrderItem, type TeaVariety, type Grade,
 } from "@/lib/api";
-
-type PriceEntry = { label: string; value: string };
-function parsePrices(s: string): PriceEntry[] {
-  try { const r = JSON.parse(s); return Array.isArray(r) ? r : []; } catch { return []; }
-}
 
 function fmtDate(d: string) {
   if (!d) return "—";
@@ -31,12 +27,12 @@ function genMaLoMe(facilityCode: string, ngayThu: string) {
   return `${facilityCode}-${ngayThu.replace(/-/g, "")}`;
 }
 
-type LineItem = Omit<PurchaseOrderItem, "id" | "orderId"> & { _key: string };
+type LineItem = Omit<PurchaseOrderItem, "id" | "orderId"> & { _key: string; teaVarietyId: number | null };
 
 function emptyLine(): LineItem {
   return {
     _key: String(Date.now() + Math.random()),
-    productId: null, gradeId: null,
+    productId: null, gradeId: null, teaVarietyId: null,
     productName: "", gradeName: "", qualityPercent: "", ghiChu: "",
     khoiLuong: "", donGia: "", thanhTien: "", moTa: "",
   };
@@ -77,6 +73,8 @@ function calcLamTron(cong: string, tru: string) {
   return v === 0 ? "0" : String(v);
 }
 
+type QrInfo = { facilityName: string; diaChuThu: string; khoiLuong: string; total: string };
+
 export default function DonThuMuaPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<PurchaseOrder | null>(null);
@@ -90,9 +88,33 @@ export default function DonThuMuaPage() {
   const [dateFrom, setDateFrom] = useState("");
   const [dateTo, setDateTo] = useState("");
 
+  const [facilitySearch, setFacilitySearch] = useState("");
+  const [facilityOpen, setFacilityOpen] = useState(false);
+  const facilityRef = useRef<HTMLDivElement>(null);
+
+  const [qrInfo, setQrInfo] = useState<QrInfo | null>(null);
+  const [qrDataUrl, setQrDataUrl] = useState("");
+
+  useEffect(() => {
+    if (!qrInfo) { setQrDataUrl(""); return; }
+    const content = `Tên hộ: ${qrInfo.facilityName}\nĐịa chỉ: ${qrInfo.diaChuThu}\nKhối lượng: ${qrInfo.khoiLuong} kg\nTổng tiền: ${qrInfo.total}`;
+    QRCode.toDataURL(content, { width: 260, margin: 2, color: { dark: "#1a1a1a" } })
+      .then(setQrDataUrl).catch(() => {});
+  }, [qrInfo]);
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (facilityRef.current && !facilityRef.current.contains(e.target as Node)) {
+        setFacilityOpen(false);
+      }
+    }
+    if (facilityOpen) document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [facilityOpen]);
+
   const qc = useQueryClient();
   const listQ = useQuery({ queryKey: ["purchase-orders"], queryFn: fetchPurchaseOrders });
-  const productsQ = useQuery({ queryKey: ["products"], queryFn: fetchProducts });
+  const teaVarietiesQ = useQuery({ queryKey: ["tea-varieties"], queryFn: fetchTeaVarieties });
   const gradesQ = useQuery({ queryKey: ["grades"], queryFn: fetchGrades });
   const qlQ = useQuery({ queryKey: ["quality-levels"], queryFn: fetchQualityLevels });
   const facilitiesQ = useQuery({ queryKey: ["facilities"], queryFn: fetchFacilities });
@@ -100,19 +122,31 @@ export default function DonThuMuaPage() {
   function inv() { qc.invalidateQueries({ queryKey: ["purchase-orders"] }); }
 
   const createMu = useMutation({
-    mutationFn: (payload: { order: OForm; lineItems: Omit<LineItem, "_key">[]; lamTron: string }) => {
+    mutationFn: (payload: { order: OForm; lineItems: Omit<LineItem, "_key" | "teaVarietyId">[]; lamTron: string }) => {
       const { order, lineItems, lamTron } = payload;
       return createPurchaseOrder({ ...order, lamTron, total: calcGrandTotal(lines, lamTronCong, lamTronTru), lineItems });
     },
-    onSuccess: () => { inv(); close_(); },
+    onSuccess: (_data, payload) => {
+      inv();
+      const kl = payload.lineItems.reduce((acc, l) => acc + parseFloat(l.khoiLuong || "0"), 0);
+      const total = calcGrandTotal(lines, lamTronCong, lamTronTru);
+      setQrInfo({ facilityName: payload.order.facilityName, diaChuThu: payload.order.diaChuThu, khoiLuong: kl.toFixed(1), total });
+      close_();
+    },
     onError: (e: Error) => setErr(e.message),
   });
   const updateMu = useMutation({
-    mutationFn: ({ id, payload }: { id: number; payload: { order: OForm; lineItems: Omit<LineItem, "_key">[]; lamTron: string } }) => {
+    mutationFn: ({ id, payload }: { id: number; payload: { order: OForm; lineItems: Omit<LineItem, "_key" | "teaVarietyId">[]; lamTron: string } }) => {
       const { order, lineItems, lamTron } = payload;
       return updatePurchaseOrder(id, { ...order, lamTron, total: calcGrandTotal(lines, lamTronCong, lamTronTru), lineItems });
     },
-    onSuccess: () => { inv(); close_(); },
+    onSuccess: (_data, { payload }) => {
+      inv();
+      const kl = payload.lineItems.reduce((acc, l) => acc + parseFloat(l.khoiLuong || "0"), 0);
+      const total = calcGrandTotal(lines, lamTronCong, lamTronTru);
+      setQrInfo({ facilityName: payload.order.facilityName, diaChuThu: payload.order.diaChuThu, khoiLuong: kl.toFixed(1), total });
+      close_();
+    },
     onError: (e: Error) => setErr(e.message),
   });
   const deleteMu = useMutation({
@@ -123,6 +157,7 @@ export default function DonThuMuaPage() {
   function close_() {
     setDrawerOpen(false); setEditItem(null); setForm(EMPTY_FORM()); setLines([emptyLine()]);
     setLamTronCong(""); setLamTronTru(""); setErr(null);
+    setFacilitySearch(""); setFacilityOpen(false);
   }
 
   function openEdit(o: PurchaseOrder) {
@@ -142,7 +177,7 @@ export default function DonThuMuaPage() {
     fetchPurchaseOrder(o.id)
       .then(({ lineItems }) => {
         if (lineItems && lineItems.length > 0)
-          setLines(lineItems.map(li => ({ ...li, _key: String(Date.now() + Math.random()) })));
+          setLines(lineItems.map(li => ({ ...li, _key: String(Date.now() + Math.random()), teaVarietyId: null })));
       })
       .catch(() => {});
   }
@@ -158,6 +193,8 @@ export default function DonThuMuaPage() {
       diaChuThu: fac?.address ?? "",
       maLoMe: genMaLoMe(fac?.code ?? "", p.ngayThu),
     }));
+    setFacilitySearch("");
+    setFacilityOpen(false);
   }
 
   function setNgayThu(v: string) {
@@ -171,26 +208,58 @@ export default function DonThuMuaPage() {
     }));
   }
 
-  function updateLine(key: string, field: keyof LineItem, value: unknown) {
+  const grades = gradesQ.data?.items ?? [];
+  const teaVarieties = teaVarietiesQ.data?.items ?? [];
+
+  function getFilteredGrades(line: LineItem): Grade[] {
+    if (!line.teaVarietyId) return grades;
+    const variety = teaVarieties.find(v => v.id === line.teaVarietyId);
+    if (!variety?.productName) return grades;
+    const filtered = grades.filter(g => g.loaiChe === variety.productName);
+    return filtered.length > 0 ? filtered : grades;
+  }
+
+  function updateLine(key: string, field: keyof LineItem | "teaVarietyId", value: unknown) {
     setLines(prev => prev.map(l => {
       if (l._key !== key) return l;
       const updated = { ...l, [field]: value };
 
-      if (field === "productId" && value) {
-        const p = productsQ.data?.items.find(p => p.id === Number(value));
-        if (p) updated.productName = p.name;
+      if (field === "teaVarietyId") {
+        if (value) {
+          const variety = teaVarieties.find(v => v.id === Number(value));
+          if (variety) {
+            updated.productName = variety.name;
+            updated.productId = null;
+            if (variety.productName) {
+              const filteredG = grades.filter(g => g.loaiChe === variety.productName);
+              if (filteredG.length === 1) {
+                updated.gradeId = filteredG[0].id;
+                updated.gradeName = filteredG[0].name;
+                updated.qualityPercent = "";
+                updated.ghiChu = "";
+              } else {
+                updated.gradeId = null;
+                updated.gradeName = "";
+                updated.qualityPercent = "";
+                updated.ghiChu = "";
+              }
+            }
+          }
+        } else {
+          updated.productName = "";
+          updated.productId = null;
+          updated.gradeId = null;
+          updated.gradeName = "";
+        }
       }
 
       if (field === "gradeId") {
         if (value) {
-          const g = gradesQ.data?.items.find(g => g.id === Number(value));
+          const g = grades.find(g => g.id === Number(value));
           if (g) {
             updated.gradeName = g.name;
             updated.qualityPercent = "";
             updated.ghiChu = "";
-            const prices = parsePrices(g.prices);
-            if (prices.length === 0 && !updated.qualityPercent) updated.donGia = g.price;
-            else updated.donGia = "";
           }
         } else {
           updated.gradeName = "";
@@ -199,22 +268,11 @@ export default function DonThuMuaPage() {
       }
 
       if (field === "qualityPercent") {
-        const ql = qlQ.data?.items.find(q => q.gradeId === updated.gradeId && q.danhGia === String(value));
+        const ql = (qlQ.data?.items ?? []).find(q => q.gradeId === updated.gradeId && q.danhGia === String(value));
         if (ql) {
           updated.ghiChu = ql.ghiChu;
-          const prices = parsePrices(ql.prices);
-          if (prices.length === 0) updated.donGia = ql.donGia;
-          else updated.donGia = "";
         } else if (!value) {
           updated.ghiChu = "";
-          if (updated.gradeId) {
-            const g = gradesQ.data?.items.find(g => g.id === Number(updated.gradeId));
-            if (g) {
-              const prices = parsePrices(g.prices);
-              if (prices.length === 0) updated.donGia = g.price;
-              else updated.donGia = "";
-            }
-          }
         }
       }
 
@@ -222,6 +280,7 @@ export default function DonThuMuaPage() {
         const kg = parseNum(field === "khoiLuong" ? String(value) : updated.khoiLuong);
         const dg = parseNum(field === "donGia" ? String(value) : updated.donGia);
         if (kg > 0 && dg > 0) updated.thanhTien = (kg * dg).toLocaleString("vi-VN") + " đ";
+        else updated.thanhTien = "";
       }
 
       if (field === "gradeId" || field === "qualityPercent") {
@@ -240,8 +299,7 @@ export default function DonThuMuaPage() {
     if (!form.facilityId) { setErr("Vui lòng chọn cơ sở thu mua."); return; }
     const validLines = lines.filter(l => l.gradeId || l.productName.trim());
     if (validLines.length === 0) { setErr("Vui lòng thêm ít nhất một sản phẩm thu mua."); return; }
-    if (validLines.some(l => !l.productName.trim())) { setErr("Vui lòng chọn thương phẩm cho tất cả các dòng."); return; }
-    const lineItems = validLines.map(({ _key, ...rest }) => rest);
+    const lineItems = validLines.map(({ _key, teaVarietyId, ...rest }) => rest);
     const lamTron = calcLamTron(lamTronCong, lamTronTru);
     if (editItem) updateMu.mutate({ id: editItem.id, payload: { order: form, lineItems, lamTron } });
     else createMu.mutate({ order: form, lineItems, lamTron });
@@ -255,35 +313,13 @@ export default function DonThuMuaPage() {
     return true;
   });
   const isPending = createMu.isPending || updateMu.isPending;
-  const products = productsQ.data?.items ?? [];
-  const grades = gradesQ.data?.items ?? [];
   const qualityLevels = qlQ.data?.items ?? [];
   const allFacilities = facilitiesQ.data?.items ?? [];
+  const filteredFacilities = facilitySearch.trim()
+    ? allFacilities.filter(f => f.name.toLowerCase().includes(facilitySearch.toLowerCase()) || f.code.toLowerCase().includes(facilitySearch.toLowerCase()))
+    : allFacilities;
 
-  function getPricesForLine(line: LineItem): PriceEntry[] {
-    if (line.qualityPercent) {
-      const ql = qualityLevels.find(q => q.gradeId === line.gradeId && q.danhGia === line.qualityPercent);
-      if (ql) {
-        const p = parsePrices(ql.prices);
-        if (p.length > 0) return p;
-      }
-    }
-    if (line.gradeId) {
-      const g = grades.find(g => g.id === line.gradeId);
-      if (g) return parsePrices(g.prices);
-    }
-    return [];
-  }
-
-  function getPriceHint(line: LineItem): string {
-    if (line.qualityPercent) {
-      const ql = qualityLevels.find(q => q.gradeId === line.gradeId && q.danhGia === line.qualityPercent);
-      if (ql && parsePrices(ql.prices).length > 0) return "Đơn giá áp dụng theo % chất lượng";
-    }
-    if (line.gradeId && parsePrices(grades.find(g => g.id === line.gradeId)?.prices ?? "").length > 0)
-      return "Đơn giá áp dụng theo quy cách";
-    return "";
-  }
+  const selectedFacility = allFacilities.find(f => f.id === form.facilityId);
 
   return (
     <AppLayout>
@@ -325,14 +361,15 @@ export default function DonThuMuaPage() {
                   <th className="px-4 py-3">Ngày thu mua</th>
                   <th className="px-4 py-3">Cơ sở thu mua</th>
                   <th className="px-4 py-3">Mã lô mẻ</th>
+                  <th className="px-4 py-3">Khối lượng</th>
                   <th className="px-4 py-3">Tổng tiền</th>
                   <th className="px-4 py-3 w-20"></th>
                 </tr>
               </thead>
               <tbody>
-                {listQ.isLoading && <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>}
+                {listQ.isLoading && <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>}
                 {!listQ.isLoading && filtered.length === 0 && (
-                  <tr><td colSpan={5} className="px-4 py-10 text-center text-muted-foreground">
+                  <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
                     <ShoppingBasket className="w-8 h-8 mx-auto mb-2 opacity-30" />
                     {search || dateFrom || dateTo ? "Không tìm thấy phiếu phù hợp." : "Chưa có phiếu thu mua nào."}
                   </td></tr>
@@ -345,9 +382,23 @@ export default function DonThuMuaPage() {
                       {o.diaChuThu && <div className="text-[11.5px] text-muted-foreground">{o.diaChuThu}</div>}
                     </td>
                     <td className="px-4 py-3 text-[13px] font-mono">{o.maLoMe || "—"}</td>
+                    <td className="px-4 py-3 text-[13px]">
+                      {o.khoiLuongTong && o.khoiLuongTong !== "0"
+                        ? <span className="font-semibold text-sky-700">{parseFloat(o.khoiLuongTong).toLocaleString("vi-VN")} kg</span>
+                        : <span className="text-muted-foreground/50">—</span>}
+                    </td>
                     <td className="px-4 py-3 font-semibold text-emerald-700">{o.total || "—"}</td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => {
+                            const kl = o.khoiLuongTong && o.khoiLuongTong !== "0" ? parseFloat(o.khoiLuongTong).toFixed(1) : "?";
+                            setQrInfo({ facilityName: o.facilityName, diaChuThu: o.diaChuThu, khoiLuong: kl, total: o.total });
+                          }}
+                          className="p-1.5 rounded hover:bg-blue-50" title="Xem QR"
+                        >
+                          <QrCode className="w-4 h-4 text-blue-500" />
+                        </button>
                         <button onClick={() => openEdit(o)} className="p-1.5 rounded hover:bg-muted" title="Sửa"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
                         <button onClick={() => setDeleteTarget(o)} className="p-1.5 rounded hover:bg-rose-50" title="Xóa"><X className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
                       </div>
@@ -360,6 +411,44 @@ export default function DonThuMuaPage() {
           <div className="px-4 py-3 border-t border-border text-[13px] text-muted-foreground">{filtered.length} / {items.length} phiếu</div>
         </div>
       </div>
+
+      {/* QR Modal */}
+      {qrInfo && (
+        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-[17px] font-semibold flex items-center gap-2"><QrCode className="w-5 h-5 text-primary" /> Mã QR phiếu thu mua</h3>
+              <button onClick={() => setQrInfo(null)} className="p-1.5 rounded hover:bg-muted"><X className="w-4 h-4 text-muted-foreground" /></button>
+            </div>
+            <div className="flex flex-col items-center gap-4">
+              {qrDataUrl ? (
+                <img src={qrDataUrl} alt="QR Code" className="w-52 h-52 rounded-xl" />
+              ) : (
+                <div className="w-52 h-52 rounded-xl bg-muted flex items-center justify-center"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
+              )}
+              <div className="w-full space-y-1.5 text-[13px]">
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground w-24 shrink-0">Tên hộ:</span>
+                  <span className="font-medium">{qrInfo.facilityName}</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground w-24 shrink-0">Địa chỉ:</span>
+                  <span className="font-medium">{qrInfo.diaChuThu || "—"}</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground w-24 shrink-0">Khối lượng:</span>
+                  <span className="font-semibold text-sky-700">{qrInfo.khoiLuong} kg</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-muted-foreground w-24 shrink-0">Tổng tiền:</span>
+                  <span className="font-semibold text-emerald-700">{qrInfo.total}</span>
+                </div>
+              </div>
+            </div>
+            <button onClick={() => setQrInfo(null)} className="mt-5 w-full h-10 rounded-xl bg-primary text-primary-foreground text-[13.5px] font-semibold hover:brightness-110">Đóng</button>
+          </div>
+        </div>
+      )}
 
       {/* Delete */}
       {deleteTarget && (
@@ -398,14 +487,45 @@ export default function DonThuMuaPage() {
                   </div>
                   <div>
                     <label className="block text-[13px] font-medium mb-1.5">Cơ sở thu mua <span className="text-rose-500">*</span></label>
-                    <select
-                      value={form.facilityId ?? ""}
-                      onChange={e => selectFacility(e.target.value ? Number(e.target.value) : null)}
-                      className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white"
-                    >
-                      <option value="">-- Chọn cơ sở / hộ --</option>
-                      {allFacilities.map(f => <option key={f.id} value={f.id}>{f.name}{f.code ? ` (${f.code})` : ""}</option>)}
-                    </select>
+                    <div className="relative" ref={facilityRef}>
+                      <div
+                        className={`w-full h-10 px-3 pr-8 rounded-lg border text-sm bg-white flex items-center cursor-pointer ${facilityOpen ? "border-primary" : "border-border"}`}
+                        onClick={() => setFacilityOpen(p => !p)}
+                      >
+                        <span className={selectedFacility ? "text-foreground truncate" : "text-muted-foreground/70 truncate"}>
+                          {selectedFacility ? `${selectedFacility.name}${selectedFacility.code ? ` (${selectedFacility.code})` : ""}` : "-- Chọn cơ sở / hộ --"}
+                        </span>
+                        <ChevronDown className={`w-4 h-4 text-muted-foreground absolute right-2 top-1/2 -translate-y-1/2 transition-transform ${facilityOpen ? "rotate-180" : ""}`} />
+                      </div>
+                      {facilityOpen && (
+                        <div className="absolute z-20 top-full mt-1 w-full bg-white rounded-xl border border-border shadow-lg overflow-hidden">
+                          <div className="p-2">
+                            <input
+                              autoFocus
+                              value={facilitySearch}
+                              onChange={e => setFacilitySearch(e.target.value)}
+                              placeholder="Tìm cơ sở…"
+                              className="w-full h-8 px-2.5 rounded-lg border border-border text-[13px] outline-none focus:border-primary"
+                            />
+                          </div>
+                          <div className="max-h-52 overflow-y-auto">
+                            {filteredFacilities.length === 0 && (
+                              <div className="px-3 py-4 text-[13px] text-muted-foreground text-center">Không tìm thấy</div>
+                            )}
+                            {filteredFacilities.map(f => (
+                              <div
+                                key={f.id}
+                                onClick={() => selectFacility(f.id)}
+                                className={`px-3 py-2.5 text-[13px] cursor-pointer hover:bg-muted border-t border-border/50 first:border-0 ${form.facilityId === f.id ? "bg-primary/10 text-primary font-medium" : ""}`}
+                              >
+                                <div>{f.name}{f.code ? ` (${f.code})` : ""}</div>
+                                {f.address && <div className="text-[11px] text-muted-foreground">{f.address}</div>}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -445,8 +565,7 @@ export default function DonThuMuaPage() {
                 <div className="text-[14px] font-semibold">Danh sách sản phẩm thu mua</div>
 
                 {lines.map((line, idx) => {
-                  const priceOptions = getPricesForLine(line);
-                  const priceHint = getPriceHint(line);
+                  const filteredGrades = getFilteredGrades(line);
                   const linkedQls = qualityLevels.filter(q => q.gradeId === line.gradeId || q.gradeId === null);
 
                   return (
@@ -460,17 +579,17 @@ export default function DonThuMuaPage() {
                         )}
                       </div>
                       <div className="p-4 space-y-3">
-                        {/* Row 1: Thương phẩm + Quy cách */}
+                        {/* Row 1: Giống chè + Quy cách */}
                         <div className="grid grid-cols-2 gap-3">
                           <div>
-                            <label className="block text-[12px] font-medium mb-1 text-muted-foreground">Thương phẩm</label>
+                            <label className="block text-[12px] font-medium mb-1 text-muted-foreground">Giống chè</label>
                             <select
-                              value={line.productId ?? ""}
-                              onChange={e => updateLine(line._key, "productId", e.target.value ? Number(e.target.value) : null)}
+                              value={line.teaVarietyId ?? ""}
+                              onChange={e => updateLine(line._key, "teaVarietyId", e.target.value ? Number(e.target.value) : null)}
                               className="w-full h-9 px-2.5 rounded-lg border border-border text-[13px] outline-none bg-white"
                             >
-                              <option value="">-- Chọn thương phẩm --</option>
-                              {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                              <option value="">-- Chọn giống chè --</option>
+                              {teaVarieties.map(v => <option key={v.id} value={v.id}>{v.name}{v.code ? ` (${v.code})` : ""}</option>)}
                             </select>
                           </div>
                           <div>
@@ -481,7 +600,7 @@ export default function DonThuMuaPage() {
                               className={`w-full h-9 px-2.5 rounded-lg border text-[13px] outline-none bg-white ${!line.gradeId ? "border-amber-300" : "border-border"}`}
                             >
                               <option value="">-- Chọn quy cách --</option>
-                              {grades.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
+                              {filteredGrades.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
                             </select>
                           </div>
                         </div>
@@ -503,7 +622,7 @@ export default function DonThuMuaPage() {
                           </select>
                           {line.ghiChu && (
                             <div className="mt-1 text-[11.5px] text-blue-600 font-medium flex items-center gap-1">
-                              <Info className="w-3 h-3" /> {line.ghiChu}
+                              {line.ghiChu}
                             </div>
                           )}
                         </div>
@@ -511,30 +630,12 @@ export default function DonThuMuaPage() {
                         {/* Row 3: Đơn giá */}
                         <div>
                           <label className="block text-[12px] font-medium mb-1 text-muted-foreground">Đơn giá (đ/kg)</label>
-                          {priceOptions.length > 0 ? (
-                            <select
-                              value={line.donGia}
-                              onChange={e => updateLine(line._key, "donGia", e.target.value)}
-                              className="w-full h-9 px-2.5 rounded-lg border border-border text-[13px] outline-none bg-white"
-                            >
-                              <option value="">-- Chọn mức giá --</option>
-                              {priceOptions.map((e, i) => (
-                                <option key={i} value={e.value}>{e.label ? `${e.label}: ` : ""}{e.value}</option>
-                              ))}
-                            </select>
-                          ) : (
-                            <input
-                              value={line.donGia}
-                              onChange={e => updateLine(line._key, "donGia", e.target.value)}
-                              placeholder="Nhập đơn giá…"
-                              className="w-full h-9 px-2.5 rounded-lg border border-border text-[13px] outline-none focus:border-primary"
-                            />
-                          )}
-                          {priceHint && (
-                            <div className="mt-1 text-[11px] text-emerald-600 flex items-center gap-1">
-                              <Info className="w-3 h-3" /> {priceHint}
-                            </div>
-                          )}
+                          <input
+                            value={line.donGia}
+                            onChange={e => updateLine(line._key, "donGia", e.target.value)}
+                            placeholder="Nhập đơn giá…"
+                            className="w-full h-9 px-2.5 rounded-lg border border-border text-[13px] outline-none focus:border-primary"
+                          />
                         </div>
 
                         {/* Row 4: Khối lượng + Thành tiền */}
@@ -575,13 +676,22 @@ export default function DonThuMuaPage() {
                   onClick={() => setLines(p => [...p, emptyLine()])}
                   className="w-full h-10 rounded-xl border border-dashed border-border text-[13px] font-medium text-muted-foreground hover:bg-muted flex items-center justify-center gap-2"
                 >
-                  <Plus className="w-4 h-4" /> Thêm sản phẩm
+                  <Plus className="w-4 h-4" /> Thêm dòng
                 </button>
               </div>
 
               {/* Tổng kết */}
               <div className="bg-muted/30 rounded-xl border border-border p-4 space-y-3">
                 <div className="text-[13.5px] font-semibold mb-2">Tổng kết phiếu</div>
+                <div className="flex items-center justify-between text-[13px]">
+                  <span className="text-muted-foreground">Tổng khối lượng:</span>
+                  <span className="font-semibold text-sky-700">
+                    {(() => {
+                      const total = lines.reduce((acc, l) => acc + parseFloat(l.khoiLuong || "0"), 0);
+                      return total > 0 ? total.toLocaleString("vi-VN") + " kg" : "0 kg";
+                    })()}
+                  </span>
+                </div>
                 <div className="flex items-center justify-between text-[13px]">
                   <span className="text-muted-foreground">Tổng tiền hàng:</span>
                   <span className="font-semibold text-emerald-700">

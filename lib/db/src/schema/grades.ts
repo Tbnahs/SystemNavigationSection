@@ -18,7 +18,7 @@ export const qualityLevelsTable = pgTable("quality_levels", {
   id: serial("id").primaryKey(),
   gradeId: integer("grade_id").references(() => gradesTable.id, { onDelete: "cascade" }),
   danhGia: text("danh_gia").notNull(),
-  donGia: text("don_gia").notNull(),
+  donGia: text("don_gia").default("").notNull(),
   prices: text("prices").default("[]").notNull(),
   ghiChu: text("ghi_chu").default("").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -40,7 +40,6 @@ export const insertGradeSchema = createInsertSchema(gradesTable, {
 
 export const insertQualityLevelSchema = createInsertSchema(qualityLevelsTable, {
   danhGia: (s) => s.min(1, "Đánh giá bắt buộc"),
-  donGia: (s) => s.min(1, "Đơn giá bắt buộc"),
 }).omit({ id: true, createdAt: true, updatedAt: true });
 
 export const insertStandardSchema = createInsertSchema(standardsTable, {

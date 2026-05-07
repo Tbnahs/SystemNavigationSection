@@ -41,6 +41,7 @@ export type Unit = {
   enterpriseId: number | null;
   name: string;
   abbreviation: string;
+  loaiDonVi: string;
   description: string;
   createdAt: string;
   updatedAt: string;
@@ -127,9 +128,21 @@ export type PurchaseOrder = {
   notes: string;
   total: string;
   lamTron: string;
+  khoiLuongTong: string;
   createdAt: string;
   updatedAt: string;
   enterpriseName?: string | null;
+};
+
+export type TeaVariety = {
+  id: number;
+  name: string;
+  code: string;
+  notes: string;
+  productId: number | null;
+  productName?: string | null;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type PurchaseOrderItem = {
@@ -200,7 +213,7 @@ export const loginUser = (email: string, password: string) =>
 export const fetchEmployees = () => request<{ items: Employee[] }>("/employees");
 export const createEmployee = (body: Partial<Employee> & { matKhau?: string }) =>
   request<{ item: Employee }>("/employees", { method: "POST", body: JSON.stringify(body) });
-export const updateEmployee = (id: number, body: Partial<Employee>) =>
+export const updateEmployee = (id: number, body: Partial<Employee> & { matKhau?: string }) =>
   request<{ item: Employee }>(`/employees/${id}`, { method: "PATCH", body: JSON.stringify(body) });
 export const deleteEmployee = (id: number) =>
   request<{ ok: true }>(`/employees/${id}`, { method: "DELETE" });
@@ -304,6 +317,15 @@ export const updatePurchaseOrder = (id: number, body: Partial<PurchaseOrder> & {
   request<{ item: PurchaseOrder }>(`/purchase-orders/${id}`, { method: "PATCH", body: JSON.stringify(body) });
 export const deletePurchaseOrder = (id: number) =>
   request<{ ok: true }>(`/purchase-orders/${id}`, { method: "DELETE" });
+
+/* ── Tea Varieties (Giống chè) ───────────────────────────── */
+export const fetchTeaVarieties = () => request<{ items: TeaVariety[] }>("/tea-varieties");
+export const createTeaVariety = (body: Partial<TeaVariety>) =>
+  request<{ item: TeaVariety }>("/tea-varieties", { method: "POST", body: JSON.stringify(body) });
+export const updateTeaVariety = (id: number, body: Partial<TeaVariety>) =>
+  request<{ item: TeaVariety }>(`/tea-varieties/${id}`, { method: "PATCH", body: JSON.stringify(body) });
+export const deleteTeaVariety = (id: number) =>
+  request<{ ok: true }>(`/tea-varieties/${id}`, { method: "DELETE" });
 
 /* ── Profile / Change Password ───────────────────────────── */
 export const changePassword = (oldPassword: string, newPassword: string) => {

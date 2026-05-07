@@ -7,6 +7,7 @@ export const unitsTable = pgTable("units_of_measure", {
   enterpriseId: integer("enterprise_id"),
   name: text("name").notNull(),
   abbreviation: text("abbreviation").notNull(),
+  loaiDonVi: text("loai_don_vi").default("").notNull(),
   description: text("description").default("").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

@@ -5,3 +5,4 @@ export * from "./facilities";
 export * from "./products";
 export * from "./grades";
 export * from "./purchase_orders";
+export * from "./tea_varieties";

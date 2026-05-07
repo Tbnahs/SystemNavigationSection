@@ -53,14 +53,20 @@ router.patch("/employees/:id", async (req: Request, res: Response, next: NextFun
     const id = Number(req.params.id);
     if (!Number.isFinite(id)) return res.status(400).json({ error: "Invalid id" });
 
-    const parsed = insertEmployeeSchema.partial().safeParse(req.body);
+    const { matKhau, ...restBody } = req.body as { matKhau?: string; [key: string]: unknown };
+    const parsed = insertEmployeeSchema.partial().safeParse(restBody);
     if (!parsed.success) {
       return res.status(400).json({ error: "Validation failed", issues: parsed.error.issues });
     }
 
+    const updateData: Record<string, unknown> = { ...parsed.data, updatedAt: new Date() };
+    if (matKhau && String(matKhau).trim()) {
+      updateData.passwordHash = await bcrypt.hash(String(matKhau), 10);
+    }
+
     const [updated] = await db
       .update(employeesTable)
-      .set({ ...parsed.data, updatedAt: new Date() })
+      .set(updateData)
       .where(eq(employeesTable.id, id))
       .returning();
 

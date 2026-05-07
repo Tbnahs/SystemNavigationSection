@@ -29,6 +29,7 @@ import DonViTinhPage from "@/pages/DonViTinhPage";
 import CoSoPage from "@/pages/CoSoPage";
 import ThuongPhamPage from "@/pages/ThuongPhamPage";
 import DonThuMuaPage from "@/pages/DonThuMuaPage";
+import GiongChePage from "@/pages/GiongChePage";
 import PortalPage from "@/pages/PortalPage";
 import HoSoPage from "@/pages/HoSoPage";
 import ModuleSelectPage from "@/pages/ModuleSelectPage";
@@ -152,6 +153,9 @@ function Router() {
       </Route>
       <Route path="/module/erp/thu-mua">
         {() => <ProtectedRoute component={DonThuMuaPage} />}
+      </Route>
+      <Route path="/module/erp/giong-che">
+        {() => <ProtectedRoute component={GiongChePage} />}
       </Route>
 
       {/* Generic sub-module and module fallbacks */}

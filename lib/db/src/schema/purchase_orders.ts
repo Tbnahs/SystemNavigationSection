@@ -21,6 +21,7 @@ export const purchaseOrdersTable = pgTable("purchase_orders", {
   notes: text("notes").default("").notNull(),
   total: text("total").default("0").notNull(),
   lamTron: text("lam_tron").default("0").notNull(),
+  khoiLuongTong: text("khoi_luong_tong").default("0").notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

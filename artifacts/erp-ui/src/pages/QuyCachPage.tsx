@@ -85,7 +85,7 @@ export default function QuyCachPage() {
   const [, navigate] = useLocation();
 
   const [gD, setGD] = useState(false); const [gE, setGE] = useState<Grade | null>(null); const [gF, setGF] = useState<GForm>(EMPTY_G); const [gErr, setGErr] = useState<string | null>(null); const [gDel, setGDel] = useState<Grade | null>(null);
-  const [qlD, setQlD] = useState(false); const [qlE, setQlE] = useState<QualityLevel | null>(null); const [qlF, setQlF] = useState<QLForm>(EMPTY_QL); const [qlErr, setQlErr] = useState<string | null>(null); const [qlDel, setQlDel] = useState<QualityLevel | null>(null);
+  const [qlD, setQlD] = useState(false); const [qlE, setQlE] = useState<QualityLevel | null>(null); const [qlF, setQlF] = useState<QLForm>(EMPTY_QL); const [qlErr, setQlErr] = useState<string | null>(null); const [qlDel, setQlDel] = useState<QualityLevel | null>(null); const [gradeFilter, setGradeFilter] = useState<number | "">("");
   const [sD, setSD] = useState(false); const [sE, setSE] = useState<Standard | null>(null); const [sF, setSF] = useState<SForm>(EMPTY_S); const [sErr, setSErr] = useState<string | null>(null); const [sDel, setSDel] = useState<Standard | null>(null);
 
   const qc = useQueryClient();
@@ -362,42 +362,19 @@ export default function QuyCachPage() {
                 <input value={gF.name} onChange={e => setGF(p => ({ ...p, name: e.target.value }))} placeholder="1 tôm, 1 tôm 1 lá…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
               </div>
               <div>
-                <label className="block text-[13px] font-medium mb-1.5">Loại chè</label>
-                {productNames.length > 0 ? (
-                  <select
-                    value={gF.loaiChe}
-                    onChange={e => setGF(p => ({ ...p, loaiChe: e.target.value }))}
-                    className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white"
-                  >
-                    <option value="">-- Chọn loại chè --</option>
-                    {productNames.map(n => <option key={n} value={n}>{n}</option>)}
-                    <option value="__custom__">Nhập tay…</option>
-                  </select>
-                ) : (
-                  <input value={gF.loaiChe} onChange={e => setGF(p => ({ ...p, loaiChe: e.target.value }))} placeholder="Chè xanh, Hồng trà…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
-                )}
-                {gF.loaiChe === "__custom__" && (
-                  <input
-                    autoFocus
-                    value=""
-                    onChange={e => setGF(p => ({ ...p, loaiChe: e.target.value }))}
-                    placeholder="Nhập loại chè…"
-                    className="w-full h-10 px-3 rounded-lg border border-primary text-sm outline-none mt-2"
-                  />
-                )}
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium mb-1.5">Đơn giá tham khảo</label>
-                <p className="text-[11.5px] text-muted-foreground mb-2">Thêm nhiều mức giá (VD: Loại 1: 27,000 / Loại 2: 25,000). Mức giá này sẽ xuất hiện trong phiếu thu mua.</p>
-                <PricesEditor prices={gF.prices} onChange={p => setGF(prev => ({ ...prev, prices: p }))} />
+                <label className="block text-[13px] font-medium mb-1.5">Thương phẩm</label>
+                <select
+                  value={gF.loaiChe}
+                  onChange={e => setGF(p => ({ ...p, loaiChe: e.target.value }))}
+                  className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white"
+                >
+                  <option value="">-- Chọn thương phẩm --</option>
+                  {productNames.map(n => <option key={n} value={n}>{n}</option>)}
+                </select>
               </div>
               <div>
                 <label className="block text-[13px] font-medium mb-1.5">Ghi chú</label>
                 <input value={gF.ghiChu} onChange={e => setGF(p => ({ ...p, ghiChu: e.target.value }))} placeholder="Ghi chú thêm…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium mb-2">Màu hiển thị</label>
-                <div className="flex flex-wrap gap-2">{COLOR_OPTIONS.map(c => <button key={c.key} onClick={() => setGF(p => ({ ...p, colorKey: c.key }))} className={`px-3 py-1.5 rounded-lg border text-[12px] font-medium ${colorRow(c.key)} ${gF.colorKey === c.key ? "ring-2 ring-offset-1 ring-primary" : ""}`}>{c.label}</button>)}</div>
               </div>
               {gErr && <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{gErr}</div>}
             </div>
@@ -424,19 +401,6 @@ export default function QuyCachPage() {
               <div>
                 <label className="block text-[13px] font-medium mb-1.5">% Đánh giá <span className="text-rose-500">*</span></label>
                 <input value={qlF.danhGia} onChange={e => setQlF(p => ({ ...p, danhGia: e.target.value }))} placeholder="70 – 79%, 100%…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium mb-1.5">Đơn giá theo % chất lượng</label>
-                <p className="text-[11.5px] text-muted-foreground mb-2">Thêm nhiều mức giá cho % đánh giá này.</p>
-                <PricesEditor prices={qlF.prices} onChange={p => setQlF(prev => ({ ...prev, prices: p }))} />
-                {qlF.prices.length === 0 && (
-                  <input
-                    value={qlF.donGia}
-                    onChange={e => setQlF(p => ({ ...p, donGia: e.target.value }))}
-                    placeholder="Hoặc nhập đơn giá đơn lẻ: 27,000 đ/kg"
-                    className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary mt-2"
-                  />
-                )}
               </div>
               <div>
                 <label className="block text-[13px] font-medium mb-1.5">Ghi chú</label>
