@@ -116,9 +116,6 @@ export default function DonThuMuaPage() {
   const [qrDataUrl, setQrDataUrl] = useState("");
   const [qrLoading, setQrLoading] = useState(false);
 
-  const [printTarget, setPrintTarget] = useState<PurchaseOrder | null>(null);
-  const [printLines, setPrintLines] = useState<PurchaseOrderItem[]>([]);
-  const [printLoading, setPrintLoading] = useState(false);
 
   useEffect(() => {
     if (!qrInfo) { setQrDataUrl(""); return; }
@@ -354,23 +351,6 @@ export default function DonThuMuaPage() {
     else createMu.mutate({ order: form, lineItems, lamTron });
   }
 
-  async function openPrint(o: PurchaseOrder) {
-    setPrintTarget(o);
-    setPrintLines([]);
-    setPrintLoading(true);
-    try {
-      const { lineItems } = await fetchPurchaseOrder(o.id);
-      setPrintLines(lineItems ?? []);
-    } catch {
-      setPrintLines([]);
-    } finally {
-      setPrintLoading(false);
-    }
-  }
-
-  function doPrint() {
-    window.print();
-  }
 
   const items = listQ.data?.items ?? [];
   const filtered = items.filter(o => {
@@ -475,7 +455,24 @@ export default function DonThuMuaPage() {
                         >
                           {qrLoading ? <Loader2 className="w-4 h-4 text-blue-400 animate-spin" /> : <QrCode className="w-4 h-4 text-blue-500" />}
                         </button>
-                        <button onClick={() => openPrint(o)} className="p-1.5 rounded hover:bg-amber-50" title="In phiếu"><Printer className="w-4 h-4 text-amber-600" /></button>
+                        <button
+                          onClick={async () => {
+                            setQrLoading(true);
+                            setQrInfo(null);
+                            setQrDataUrl("");
+                            try {
+                              const { lineItems } = await fetchPurchaseOrder(o.id);
+                              setQrInfo({ order: o, lineItems: lineItems ?? [] });
+                            } catch {
+                              setQrInfo({ order: o, lineItems: [] });
+                            } finally {
+                              setQrLoading(false);
+                            }
+                          }}
+                          className="p-1.5 rounded hover:bg-amber-50" title="In QR"
+                        >
+                          <Printer className="w-4 h-4 text-amber-600" />
+                        </button>
                         <button onClick={() => openEdit(o)} className="p-1.5 rounded hover:bg-muted" title="Sửa"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
                         <button onClick={() => setDeleteTarget(o)} className="p-1.5 rounded hover:bg-rose-50" title="Xóa"><X className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
                       </div>
@@ -491,13 +488,21 @@ export default function DonThuMuaPage() {
 
       {/* QR Modal */}
       {qrInfo && (
-        <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
+        <>
+          <style>{`
+            @media print {
+              body > * { display: none !important; }
+              #qr-print-area { display: flex !important; flex-direction: column; align-items: center; justify-content: center; position: fixed; inset: 0; background: white; z-index: 9999; padding: 32px; }
+              #qr-print-hide { display: none !important; }
+            }
+          `}</style>
+          <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
-            <div className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0">
+            <div id="qr-print-hide" className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0">
               <h3 className="text-[17px] font-semibold flex items-center gap-2"><QrCode className="w-5 h-5 text-primary" /> Mã QR phiếu thu mua</h3>
               <button onClick={() => setQrInfo(null)} className="p-1.5 rounded hover:bg-muted"><X className="w-4 h-4 text-muted-foreground" /></button>
             </div>
-            <div className="overflow-auto flex-1 px-5 py-4 space-y-4">
+            <div id="qr-print-area" className="overflow-auto flex-1 px-5 py-4 space-y-4">
               {/* QR image */}
               <div className="flex justify-center">
                 {qrDataUrl ? (
@@ -514,7 +519,7 @@ export default function DonThuMuaPage() {
                 <p className="flex flex-wrap gap-x-1.5"><span className="text-muted-foreground shrink-0">Khối lượng:</span><span className="font-semibold text-sky-700">{qrInfo.order.khoiLuongTong && qrInfo.order.khoiLuongTong !== "0" ? parseFloat(qrInfo.order.khoiLuongTong).toLocaleString("vi-VN") + " kg" : "—"}</span></p>
               </div>
             </div>
-            <div className="px-5 py-3 border-t border-border shrink-0 flex gap-2">
+            <div id="qr-print-hide" className="px-5 py-3 border-t border-border shrink-0 flex gap-2">
               <a
                 href={qrDataUrl || undefined}
                 download={`QR-${qrInfo.order.maPhieu || "phieu-thu-mua"}.png`}
@@ -522,143 +527,20 @@ export default function DonThuMuaPage() {
               >
                 <Download className="w-4 h-4" /> Tải ảnh QR
               </a>
+              <button
+                onClick={() => window.print()}
+                disabled={!qrDataUrl}
+                className="flex-1 h-10 rounded-xl bg-amber-500 text-white text-[13.5px] font-semibold hover:bg-amber-600 disabled:opacity-40 flex items-center justify-center gap-1.5"
+              >
+                <Printer className="w-4 h-4" /> In QR
+              </button>
               <button onClick={() => setQrInfo(null)} className="flex-1 h-10 rounded-xl bg-primary text-primary-foreground text-[13.5px] font-semibold hover:brightness-110">Đóng</button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Print Modal */}
-      {printTarget && (
-        <>
-          <style>{`
-            @media print {
-              body > *:not(#print-overlay) { display: none !important; }
-              #print-overlay { position: fixed !important; inset: 0 !important; background: white !important; z-index: 9999 !important; display: block !important; }
-              #print-modal-actions { display: none !important; }
-              #print-area { box-shadow: none !important; border: none !important; margin: 0 !important; padding: 24px !important; }
-            }
-          `}</style>
-          <div id="print-overlay" className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col">
-              <div id="print-modal-actions" className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0">
-                <h3 className="text-[16px] font-semibold flex items-center gap-2"><Printer className="w-4 h-4 text-amber-600" /> Xem trước phiếu thu mua</h3>
-                <div className="flex items-center gap-2">
-                  <button onClick={doPrint} className="h-9 px-4 rounded-lg bg-amber-500 text-white text-[13px] font-semibold hover:bg-amber-600 flex items-center gap-1.5">
-                    <Printer className="w-3.5 h-3.5" /> In phiếu
-                  </button>
-                  <button onClick={() => setPrintTarget(null)} className="p-1.5 rounded hover:bg-muted"><X className="w-4 h-4 text-muted-foreground" /></button>
-                </div>
-              </div>
-
-              <div className="overflow-auto flex-1 p-4">
-                {printLoading ? (
-                  <div className="flex items-center justify-center py-16"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>
-                ) : (
-                  <div id="print-area" className="bg-white border border-border rounded-xl p-6 font-sans text-sm" style={{ minWidth: 480 }}>
-                    {/* Header */}
-                    <div className="text-center mb-5">
-                      <div className="text-[11px] uppercase tracking-widest text-muted-foreground mb-0.5">Chè Quân Chu</div>
-                      <h1 className="text-[20px] font-bold uppercase tracking-wide">Phiếu Thu Mua Chè</h1>
-                      <div className="text-[12px] text-muted-foreground mt-0.5">Mã phiếu: <span className="font-mono font-semibold text-foreground">{printTarget.maPhieu}</span></div>
-                    </div>
-
-                    <div className="border-t border-b border-gray-300 py-3 mb-4 grid grid-cols-2 gap-x-6 gap-y-1.5 text-[13px]">
-                      <div className="flex gap-2">
-                        <span className="text-muted-foreground w-28 shrink-0">Ngày thu mua:</span>
-                        <span className="font-semibold">{fmtDate(printTarget.ngayThu)}</span>
-                      </div>
-                      <div className="flex gap-2">
-                        <span className="text-muted-foreground w-28 shrink-0">Mã lô mẻ:</span>
-                        <span className="font-mono font-semibold">{printTarget.maLoMe || "—"}</span>
-                      </div>
-                      <div className="flex gap-2 col-span-2">
-                        <span className="text-muted-foreground w-28 shrink-0">Cơ sở thu mua:</span>
-                        <span className="font-semibold">{printTarget.facilityName || "—"}</span>
-                      </div>
-                      <div className="flex gap-2 col-span-2">
-                        <span className="text-muted-foreground w-28 shrink-0">Địa chỉ:</span>
-                        <span>{printTarget.diaChuThu || "—"}</span>
-                      </div>
-                      {printTarget.notes && (
-                        <div className="flex gap-2 col-span-2">
-                          <span className="text-muted-foreground w-28 shrink-0">Ghi chú:</span>
-                          <span>{printTarget.notes}</span>
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Line items table */}
-                    <table className="w-full text-[12.5px] border-collapse mb-4">
-                      <thead>
-                        <tr className="border-b-2 border-gray-400">
-                          <th className="text-left py-1.5 pr-2 font-semibold">Quy cách</th>
-                          <th className="text-center py-1.5 px-2 font-semibold">% CL</th>
-                          <th className="text-right py-1.5 px-2 font-semibold">KL (kg)</th>
-                          <th className="text-right py-1.5 px-2 font-semibold">Đơn giá</th>
-                          <th className="text-right py-1.5 pl-2 font-semibold">Thành tiền</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {printLines.length === 0 && (
-                          <tr><td colSpan={5} className="py-3 text-center text-muted-foreground text-[12px]">Không có dòng sản phẩm</td></tr>
-                        )}
-                        {printLines.map((l, i) => (
-                          <tr key={i} className="border-b border-gray-200">
-                            <td className="py-1.5 pr-2">{l.gradeName || l.productName || "—"}</td>
-                            <td className="py-1.5 px-2 text-center">{l.qualityPercent || "—"}</td>
-                            <td className="py-1.5 px-2 text-right">{l.khoiLuong ? parseFloat(l.khoiLuong).toLocaleString("vi-VN") : "—"}</td>
-                            <td className="py-1.5 px-2 text-right">{l.donGia ? parseNum(l.donGia).toLocaleString("vi-VN") + " đ" : "—"}</td>
-                            <td className="py-1.5 pl-2 text-right font-semibold">{l.thanhTien || "—"}</td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-
-                    {/* Totals */}
-                    <div className="border-t border-gray-300 pt-3 space-y-1 text-[13px]">
-                      <div className="flex justify-between">
-                        <span className="text-muted-foreground">Tổng khối lượng:</span>
-                        <span className="font-semibold text-sky-700">
-                          {printTarget.khoiLuongTong && printTarget.khoiLuongTong !== "0"
-                            ? parseFloat(printTarget.khoiLuongTong).toLocaleString("vi-VN") + " kg"
-                            : "—"}
-                        </span>
-                      </div>
-                      {printTarget.lamTron && printTarget.lamTron !== "0" && (
-                        <div className="flex justify-between">
-                          <span className="text-muted-foreground">Tiền lẻ điều chỉnh:</span>
-                          <span className={parseNum(printTarget.lamTron) >= 0 ? "text-emerald-600" : "text-rose-600"}>
-                            {parseNum(printTarget.lamTron) >= 0 ? "+" : ""}{parseNum(printTarget.lamTron).toLocaleString("vi-VN")} đ
-                          </span>
-                        </div>
-                      )}
-                      <div className="flex justify-between text-[14px] font-bold border-t border-gray-400 pt-2 mt-1">
-                        <span>Tổng cộng:</span>
-                        <span className="text-emerald-700">{printTarget.total || "—"}</span>
-                      </div>
-                    </div>
-
-                    {/* Signatures */}
-                    <div className="grid grid-cols-2 gap-8 mt-8 text-[12.5px]">
-                      <div className="text-center">
-                        <div className="font-semibold mb-1">Người bán</div>
-                        <div className="text-muted-foreground text-[11px] mb-10">(Ký, ghi rõ họ tên)</div>
-                        <div className="border-t border-gray-400 pt-1 text-muted-foreground text-[11px]">{printTarget.facilityName}</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="font-semibold mb-1">Người mua</div>
-                        <div className="text-muted-foreground text-[11px] mb-10">(Ký, ghi rõ họ tên)</div>
-                        <div className="border-t border-gray-400 pt-1 text-muted-foreground text-[11px]">Chè Quân Chu</div>
-                      </div>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
           </div>
         </>
       )}
+
 
       {/* Delete */}
       {deleteTarget && (
