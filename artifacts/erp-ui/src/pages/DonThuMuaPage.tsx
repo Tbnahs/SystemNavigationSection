@@ -115,10 +115,48 @@ export default function DonThuMuaPage() {
   const [qrInfo, setQrInfo] = useState<QrInfo | null>(null);
   const [qrDataUrl, setQrDataUrl] = useState("");
   const [qrLoading, setQrLoading] = useState(false);
+  const [compositeQrDataUrl, setCompositeQrDataUrl] = useState("");
+  const [showPrintPreview, setShowPrintPreview] = useState(false);
 
 
   useEffect(() => {
-    if (!qrInfo) { setQrDataUrl(""); return; }
+    if (!qrDataUrl || !qrInfo) { setCompositeQrDataUrl(""); return; }
+    const o = qrInfo.order;
+    const pad = 24;
+    const qrSize = 260;
+    const fontSize = 14;
+    const lh = 22;
+    const infoLines = [
+      { label: "Tên hộ:", value: o.facilityName || "—" },
+      { label: "Địa chỉ:", value: o.diaChuThu || "—" },
+      { label: "Khối lượng:", value: o.khoiLuongTong && o.khoiLuongTong !== "0" ? parseFloat(o.khoiLuongTong).toLocaleString("vi-VN") + " kg" : "—" },
+    ];
+    const canvas = document.createElement("canvas");
+    canvas.width = qrSize + pad * 2;
+    canvas.height = qrSize + pad * 2 + infoLines.length * lh + pad;
+    const ctx = canvas.getContext("2d")!;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    const img = new Image();
+    img.onload = () => {
+      ctx.drawImage(img, pad, pad, qrSize, qrSize);
+      const startY = qrSize + pad + lh;
+      infoLines.forEach(({ label, value }, i) => {
+        ctx.font = `bold ${fontSize}px sans-serif`;
+        ctx.fillStyle = "#888";
+        ctx.fillText(label, pad, startY + i * lh);
+        const lw = ctx.measureText(label + " ").width;
+        ctx.font = `${fontSize}px sans-serif`;
+        ctx.fillStyle = "#1a1a1a";
+        ctx.fillText(value, pad + lw, startY + i * lh);
+      });
+      setCompositeQrDataUrl(canvas.toDataURL("image/png"));
+    };
+    img.src = qrDataUrl;
+  }, [qrDataUrl, qrInfo]);
+
+  useEffect(() => {
+    if (!qrInfo) { setQrDataUrl(""); setCompositeQrDataUrl(""); return; }
     const o = qrInfo.order;
     const lines = qrInfo.lineItems;
     const lineText = lines.map((l, i) =>
@@ -503,15 +541,15 @@ export default function DonThuMuaPage() {
             </div>
             <div id="qr-print-hide" className="px-5 py-3 border-t border-border shrink-0 flex gap-2">
               <a
-                href={qrDataUrl || undefined}
+                href={compositeQrDataUrl || undefined}
                 download={`QR-${qrInfo.order.maPhieu || "phieu-thu-mua"}.png`}
-                className={`flex-1 h-10 rounded-xl border border-border text-[13.5px] font-semibold flex items-center justify-center gap-1.5 ${qrDataUrl ? "hover:bg-muted text-foreground" : "opacity-40 pointer-events-none text-muted-foreground"}`}
+                className={`flex-1 h-10 rounded-xl border border-border text-[13.5px] font-semibold flex items-center justify-center gap-1.5 ${compositeQrDataUrl ? "hover:bg-muted text-foreground" : "opacity-40 pointer-events-none text-muted-foreground"}`}
               >
                 <Download className="w-4 h-4" /> Tải ảnh QR
               </a>
               <button
-                onClick={() => window.print()}
-                disabled={!qrDataUrl}
+                onClick={() => setShowPrintPreview(true)}
+                disabled={!compositeQrDataUrl}
                 className="flex-1 h-10 rounded-xl bg-amber-500 text-white text-[13.5px] font-semibold hover:bg-amber-600 disabled:opacity-40 flex items-center justify-center gap-1.5"
               >
                 <Printer className="w-4 h-4" /> In QR
@@ -519,6 +557,43 @@ export default function DonThuMuaPage() {
               <button onClick={() => setQrInfo(null)} className="flex-1 h-10 rounded-xl bg-primary text-primary-foreground text-[13.5px] font-semibold hover:brightness-110">Đóng</button>
             </div>
           </div>
+          </div>
+        </>
+      )}
+
+      {/* Print Preview */}
+      {showPrintPreview && qrInfo && compositeQrDataUrl && (
+        <>
+          <style>{`
+            @media print {
+              body > * { display: none !important; }
+              #qr-preview-paper { display: flex !important; position: fixed; inset: 0; background: white; z-index: 99999; align-items: center; justify-content: center; }
+            }
+          `}</style>
+          <div className="fixed inset-0 bg-slate-900/70 z-[60] flex items-center justify-center p-6">
+            <div className="bg-white rounded-2xl shadow-2xl flex flex-col overflow-hidden max-w-sm w-full">
+              {/* Actions bar */}
+              <div className="px-5 py-3 border-b border-border flex items-center justify-between bg-muted/40">
+                <span className="text-[14px] font-semibold flex items-center gap-2"><Printer className="w-4 h-4 text-amber-500" /> Xem trước khi in</span>
+                <button onClick={() => setShowPrintPreview(false)} className="p-1.5 rounded hover:bg-muted"><X className="w-4 h-4 text-muted-foreground" /></button>
+              </div>
+
+              {/* Paper preview */}
+              <div id="qr-preview-paper" className="flex flex-col items-center justify-center py-8 px-6 gap-3">
+                <img src={compositeQrDataUrl} alt="QR preview" className="w-[308px] rounded-sm" />
+              </div>
+
+              {/* Bottom actions */}
+              <div className="px-5 py-3 border-t border-border flex gap-2">
+                <button onClick={() => setShowPrintPreview(false)} className="flex-1 h-10 rounded-xl border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
+                <button
+                  onClick={() => window.print()}
+                  className="flex-1 h-10 rounded-xl bg-amber-500 text-white text-[13.5px] font-semibold hover:bg-amber-600 flex items-center justify-center gap-1.5"
+                >
+                  <Printer className="w-4 h-4" /> In ngay
+                </button>
+              </div>
+            </div>
           </div>
         </>
       )}
