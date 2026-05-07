@@ -129,11 +129,10 @@ export default function QuyCachPage() {
   function submitQL() {
     setQlErr(null);
     if (!qlF.danhGia.trim()) { setQlErr("% Đánh giá bắt buộc."); return; }
-    if (!qlF.donGia.trim() && qlF.prices.length === 0) { setQlErr("Vui lòng nhập ít nhất một đơn giá."); return; }
     const payload = {
       gradeId: qlF.gradeId, danhGia: qlF.danhGia,
-      donGia: qlF.prices[0]?.value ?? qlF.donGia,
-      prices: serializePrices(qlF.prices),
+      donGia: qlF.donGia,
+      prices: "[]",
       ghiChu: qlF.ghiChu,
     };
     if (qlE) qlU.mutate({ id: qlE.id, b: payload });
@@ -412,10 +411,6 @@ export default function QuyCachPage() {
                   <option value="">-- Áp dụng chung --</option>
                   {grades.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
                 </select>
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium mb-1.5">Danh sách đơn giá <span className="text-rose-500">*</span></label>
-                <PricesEditor prices={qlF.prices} onChange={p => setQlF(f => ({ ...f, prices: p }))} />
               </div>
               {qlErr && <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{qlErr}</div>}
             </div>
