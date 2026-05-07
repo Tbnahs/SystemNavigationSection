@@ -413,6 +413,10 @@ export default function QuyCachPage() {
                   {grades.map(g => <option key={g.id} value={g.id}>{g.name}</option>)}
                 </select>
               </div>
+              <div>
+                <label className="block text-[13px] font-medium mb-1.5">Danh sách đơn giá <span className="text-rose-500">*</span></label>
+                <PricesEditor prices={qlF.prices} onChange={p => setQlF(f => ({ ...f, prices: p }))} />
+              </div>
               {qlErr && <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{qlErr}</div>}
             </div>
             <div className="px-6 py-4 border-t border-border flex justify-end gap-2 bg-muted/40">
