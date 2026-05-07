@@ -455,24 +455,6 @@ export default function DonThuMuaPage() {
                         >
                           {qrLoading ? <Loader2 className="w-4 h-4 text-blue-400 animate-spin" /> : <QrCode className="w-4 h-4 text-blue-500" />}
                         </button>
-                        <button
-                          onClick={async () => {
-                            setQrLoading(true);
-                            setQrInfo(null);
-                            setQrDataUrl("");
-                            try {
-                              const { lineItems } = await fetchPurchaseOrder(o.id);
-                              setQrInfo({ order: o, lineItems: lineItems ?? [] });
-                            } catch {
-                              setQrInfo({ order: o, lineItems: [] });
-                            } finally {
-                              setQrLoading(false);
-                            }
-                          }}
-                          className="p-1.5 rounded hover:bg-amber-50" title="In QR"
-                        >
-                          <Printer className="w-4 h-4 text-amber-600" />
-                        </button>
                         <button onClick={() => openEdit(o)} className="p-1.5 rounded hover:bg-muted" title="Sửa"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
                         <button onClick={() => setDeleteTarget(o)} className="p-1.5 rounded hover:bg-rose-50" title="Xóa"><X className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
                       </div>
