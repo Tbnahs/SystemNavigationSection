@@ -352,7 +352,7 @@ export default function NhanVienPage() {
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<Employee | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<Employee | null>(null);
+  const [lockTarget, setLockTarget] = useState<Employee | null>(null);
   const [resetTarget, setResetTarget] = useState<Employee | null>(null);
   const [resetDonePassword, setResetDonePassword] = useState<string | null>(null);
   const [search, setSearch] = useState("");
@@ -426,10 +426,10 @@ export default function NhanVienPage() {
     onError: (e: Error) => setSubmitErr(e.message),
   });
 
-  const deleteMu = useMutation({
-    mutationFn: (id: number) => deleteEmployee(id),
-    onSuccess: () => { invalidate(); setDeleteTarget(null); },
-    onError: (e: Error) => alert("Lỗi xóa: " + e.message),
+  const lockMu = useMutation({
+    mutationFn: (id: number) => updateEmployee(id, { status: "locked" }),
+    onSuccess: () => { invalidate(); setLockTarget(null); },
+    onError: (e: Error) => alert("Lỗi cập nhật trạng thái: " + e.message),
   });
 
   const resetMu = useMutation({
@@ -656,7 +656,7 @@ export default function NhanVienPage() {
                       <div className="flex items-center gap-1 text-muted-foreground">
                         <button onClick={() => openEdit(u)} className="p-1.5 rounded hover:bg-muted text-muted-foreground" title="Sửa"><Pencil className="w-4 h-4" /></button>
                         <button onClick={() => setResetTarget(u)} className="p-1.5 rounded hover:bg-amber-50 text-muted-foreground hover:text-amber-600" title="Đặt lại mật khẩu"><RotateCcw className="w-4 h-4" /></button>
-                        <button onClick={() => setDeleteTarget(u)} className="p-1.5 rounded hover:bg-rose-50 text-muted-foreground hover:text-rose-600" title="Xóa"><X className="w-4 h-4" /></button>
+                        <button onClick={() => setLockTarget(u)} className="p-1.5 rounded hover:bg-amber-50 text-muted-foreground hover:text-amber-600" title="Ngừng hoạt động"><X className="w-4 h-4" /></button>
                       </div>
                     </td>
                   </tr>
@@ -679,27 +679,26 @@ export default function NhanVienPage() {
         </div>
       </div>
 
-      {/* Delete confirmation */}
-      {deleteTarget && (
+      {/* Lock confirmation */}
+      {lockTarget && (
         <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
-            <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4">
+            <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4">
               <X className="w-6 h-6" />
             </div>
-            <h3 className="text-[17px] font-semibold text-center mb-1">Xóa tài khoản?</h3>
+            <h3 className="text-[17px] font-semibold text-center mb-1">Ngừng hoạt động tài khoản?</h3>
             <p className="text-[13.5px] text-muted-foreground text-center mb-6">
-              Bạn sắp xóa nhân viên <span className="font-semibold text-foreground">{deleteTarget.name}</span> khỏi hệ thống.
-              Thao tác này không thể hoàn tác.
+              Tài khoản <span className="font-semibold text-foreground">{lockTarget.name}</span> sẽ bị khóa và không thể đăng nhập vào hệ thống.
             </p>
             <div className="flex gap-3">
-              <button onClick={() => setDeleteTarget(null)} className="flex-1 h-11 rounded-xl border border-border font-medium text-[14px] hover:bg-muted">Hủy</button>
+              <button onClick={() => setLockTarget(null)} className="flex-1 h-11 rounded-xl border border-border font-medium text-[14px] hover:bg-muted">Hủy</button>
               <button
-                disabled={deleteMu.isPending}
-                onClick={() => deleteMu.mutate(deleteTarget.id)}
-                className="flex-1 h-11 rounded-xl bg-rose-600 text-white font-semibold text-[14px] hover:bg-rose-700 disabled:opacity-60 flex items-center justify-center gap-2"
+                disabled={lockMu.isPending}
+                onClick={() => lockMu.mutate(lockTarget.id)}
+                className="flex-1 h-11 rounded-xl bg-amber-500 text-white font-semibold text-[14px] hover:bg-amber-600 disabled:opacity-60 flex items-center justify-center gap-2"
               >
-                {deleteMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                Xóa tài khoản
+                {lockMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                Xác nhận ngừng
               </button>
             </div>
           </div>
