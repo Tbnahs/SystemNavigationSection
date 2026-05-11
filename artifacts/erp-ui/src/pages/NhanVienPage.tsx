@@ -230,10 +230,10 @@ function RoleCombobox({ value, onChange, roles, onAddRole }: {
 }
 
 /* ─── PermissionMatrix ──────────────────────────────────────────── */
-const GROUP_ICON: Record<string, string> = {
-  "ERP": "🏢",
-  "TXNG": "🔍",
-  "Vùng Trồng": "🌱",
+const GROUP_META: Record<string, { icon: string; color: string; activeCls: string; badgeCls: string }> = {
+  "ERP":         { icon: "🏢", color: "text-blue-600",   activeCls: "border-blue-500 text-blue-700 bg-blue-50/60",   badgeCls: "bg-blue-100 text-blue-700" },
+  "TXNG":        { icon: "🔍", color: "text-violet-600", activeCls: "border-violet-500 text-violet-700 bg-violet-50/60", badgeCls: "bg-violet-100 text-violet-700" },
+  "Vùng Trồng":  { icon: "🌱", color: "text-emerald-600",activeCls: "border-emerald-500 text-emerald-700 bg-emerald-50/60", badgeCls: "bg-emerald-100 text-emerald-700" },
 };
 
 function PermissionMatrix({ permissions, onChange, role, activeGroups }: {
@@ -243,6 +243,9 @@ function PermissionMatrix({ permissions, onChange, role, activeGroups }: {
   activeGroups: string[] | null;
 }) {
   const visibleGroups = activeGroups ? PERM_GROUPS.filter(g => activeGroups.includes(g)) : PERM_GROUPS;
+  const [activeTab, setActiveTab] = useState<string>(() => visibleGroups[0] ?? "");
+
+  const currentTab = visibleGroups.includes(activeTab) ? activeTab : (visibleGroups[0] ?? "");
 
   const visiblePreset = presetFor(role).filter(id => {
     const perm = ALL_PERMS.find(p => p.id === id);
@@ -263,15 +266,27 @@ function PermissionMatrix({ permissions, onChange, role, activeGroups }: {
     );
   }
 
+  const tabPerms = ALL_PERMS.filter(p => p.group === currentTab);
+  const tabChecked = tabPerms.filter(p => permissions.includes(p.id)).length;
+  const tabAllChecked = tabChecked === tabPerms.length;
+  const tabSomeChecked = tabChecked > 0 && !tabAllChecked;
+
+  function toggleTabGroup() {
+    const ids = tabPerms.map(p => p.id);
+    if (tabAllChecked) onChange(permissions.filter(id => !ids.includes(id)));
+    else onChange([...new Set([...permissions, ...ids])]);
+  }
+
+  const meta = GROUP_META[currentTab] ?? { icon: "•", color: "text-foreground", activeCls: "border-primary text-primary bg-primary/5", badgeCls: "bg-primary/10 text-primary" };
+
   return (
-    <div className="rounded-xl border border-border bg-slate-50/60 overflow-hidden">
+    <div className="rounded-xl border border-border overflow-hidden bg-white">
+      {/* Header */}
       <div className="px-4 py-3 border-b border-border flex items-center justify-between bg-white">
         <div>
           <div className="text-[13px] font-semibold">Phạm vi tài khoản</div>
           <div className="text-[11.5px] text-muted-foreground mt-0.5">
-            {activeGroups
-              ? <>Theo phân hệ DN đã đăng ký: <span className="font-medium text-foreground">{visibleGroups.join(", ")}</span></>
-              : "Chọn chức năng nhân viên được phép truy cập"}
+            Chọn chức năng được phép truy cập theo từng phân hệ
           </div>
         </div>
         <div className="flex items-center gap-2">
@@ -295,51 +310,80 @@ function PermissionMatrix({ permissions, onChange, role, activeGroups }: {
         </div>
       </div>
 
-      <div className="p-4 space-y-4">
+      {/* Tab bar */}
+      <div className="flex border-b border-border bg-muted/30 overflow-x-auto">
         {visibleGroups.map(group => {
-          const perms = ALL_PERMS.filter(p => p.group === group);
-          const checkedCount = perms.filter(p => permissions.includes(p.id)).length;
-          const allChecked = checkedCount === perms.length;
-          const someChecked = checkedCount > 0 && !allChecked;
-
-          function toggleGroup() {
-            const ids = perms.map(p => p.id);
-            if (allChecked) onChange(permissions.filter(id => !ids.includes(id)));
-            else onChange([...new Set([...permissions, ...ids])]);
-          }
-
+          const gPerms = ALL_PERMS.filter(p => p.group === group);
+          const gChecked = gPerms.filter(p => permissions.includes(p.id)).length;
+          const gMeta = GROUP_META[group] ?? { icon: "•", activeCls: "border-primary text-primary bg-white", badgeCls: "bg-primary/10 text-primary" };
+          const isActive = group === currentTab;
           return (
-            <div key={group}>
-              <button onClick={toggleGroup} className="flex items-center gap-2 mb-2 w-full text-left group">
-                <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
-                  allChecked ? "bg-primary border-primary" : someChecked ? "bg-primary/30 border-primary/50" : "border-border"
-                }`}>
-                  {allChecked && <Check className="w-2.5 h-2.5 text-white" />}
-                  {someChecked && <div className="w-2 h-0.5 bg-primary rounded" />}
-                </div>
-                <span className="text-[12.5px] font-semibold text-foreground">
-                  {GROUP_ICON[group] ?? "•"} {group}
-                </span>
-                <span className="text-[11.5px] text-muted-foreground">({checkedCount}/{perms.length})</span>
-              </button>
-              <div className="ml-6 space-y-1.5">
-                {perms.map(p => (
-                  <label key={p.id} className="flex items-center gap-2.5 cursor-pointer group">
-                    <div
-                      onClick={() => toggle(p.id)}
-                      className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer ${
-                        permissions.includes(p.id) ? "bg-primary border-primary" : "border-border hover:border-primary/50"
-                      }`}
-                    >
-                      {permissions.includes(p.id) && <Check className="w-2.5 h-2.5 text-white" />}
-                    </div>
-                    <span className="text-[13px] text-foreground/90 group-hover:text-foreground">{p.label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
+            <button
+              key={group}
+              onClick={() => setActiveTab(group)}
+              className={`relative flex items-center gap-2 px-4 py-3 text-[13px] font-medium border-b-2 transition-all whitespace-nowrap shrink-0 ${
+                isActive
+                  ? `${gMeta.activeCls} border-b-2`
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
+              }`}
+            >
+              <span>{gMeta.icon}</span>
+              <span>{group}</span>
+              <span className={`text-[10.5px] px-1.5 py-0.5 rounded-full font-semibold ${isActive ? gMeta.badgeCls : "bg-muted text-muted-foreground"}`}>
+                {gChecked}/{gPerms.length}
+              </span>
+            </button>
           );
         })}
+      </div>
+
+      {/* Tab content */}
+      <div className="p-4">
+        {/* Select-all row */}
+        <button
+          onClick={toggleTabGroup}
+          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg mb-3 border transition-colors ${
+            tabAllChecked ? "bg-primary/5 border-primary/20" : tabSomeChecked ? "bg-primary/5 border-primary/10" : "border-border hover:bg-muted/50"
+          }`}
+        >
+          <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
+            tabAllChecked ? "bg-primary border-primary" : tabSomeChecked ? "bg-primary/30 border-primary/50" : "border-border"
+          }`}>
+            {tabAllChecked && <Check className="w-2.5 h-2.5 text-white" />}
+            {tabSomeChecked && <div className="w-2 h-0.5 bg-primary rounded" />}
+          </div>
+          <span className="text-[12.5px] font-semibold text-foreground">
+            {tabAllChecked ? "Bỏ chọn tất cả" : "Chọn tất cả"} chức năng {meta.icon} {currentTab}
+          </span>
+          <span className="ml-auto text-[11.5px] text-muted-foreground">{tabChecked}/{tabPerms.length} đã chọn</span>
+        </button>
+
+        {/* Permission list */}
+        <div className="space-y-1">
+          {tabPerms.map(p => (
+            <label
+              key={p.id}
+              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors ${
+                permissions.includes(p.id) ? "bg-emerald-50/60 hover:bg-emerald-50" : "hover:bg-muted/40"
+              }`}
+            >
+              <div
+                onClick={() => toggle(p.id)}
+                className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer ${
+                  permissions.includes(p.id) ? "bg-primary border-primary" : "border-border hover:border-primary/50"
+                }`}
+              >
+                {permissions.includes(p.id) && <Check className="w-2.5 h-2.5 text-white" />}
+              </div>
+              <span className="text-[13px] text-foreground/90">{p.label}</span>
+              {permissions.includes(p.id) && (
+                <span className="ml-auto w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
+                  <svg viewBox="0 0 12 12" className="w-2.5 h-2.5 fill-none stroke-white stroke-2"><polyline points="1.5,6 4.5,9 10.5,3"/></svg>
+                </span>
+              )}
+            </label>
+          ))}
+        </div>
       </div>
     </div>
   );
