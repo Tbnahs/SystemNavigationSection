@@ -859,10 +859,10 @@ export default function NhanVienPage() {
                 <Field label="Email" placeholder="ten@congty.vn" value={form.email} onChange={(v) => setF("email", v)} />
               </div>
 
-              {/* Doanh nghiệp */}
-              <div>
-                <Label>Doanh nghiệp</Label>
-                {isSuperAdmin ? (
+              {/* Doanh nghiệp — chỉ Super Admin mới thấy */}
+              {isSuperAdmin && (
+                <div>
+                  <Label>Doanh nghiệp</Label>
                   <select
                     value={form.enterpriseId ?? ""}
                     onChange={(e) => setEnterprise(e.target.value ? Number(e.target.value) : null)}
@@ -876,13 +876,8 @@ export default function NhanVienPage() {
                       </option>
                     ))}
                   </select>
-                ) : (
-                  <div className="w-full h-10 px-3 rounded-lg border border-border bg-muted/40 text-sm flex items-center text-foreground">
-                    {(dnQ.data?.items ?? []).find(d => d.id === form.enterpriseId)?.tenHienThi ?? "—"}
-                    <span className="ml-auto text-[11.5px] text-muted-foreground">Cố định theo tài khoản</span>
-                  </div>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Cơ sở phụ trách */}
               {facilitiesForEnt.length > 0 && (

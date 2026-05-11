@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   Plus, Pencil, X, Loader2, Search, Factory, QrCode, Printer,
-  Building2, Home, MapPin, Phone, Users, Upload, Download, CheckCircle, Lock, ChevronDown,
+  Building2, Home, MapPin, Phone, Users, Upload, Download, CheckCircle, ChevronDown,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
@@ -629,20 +629,15 @@ export default function CoSoPage() {
                       )}
                     </div>
                   )}
-                  <div>
-                    <label className="block text-[13px] font-medium mb-1.5">Doanh nghiệp</label>
-                    {isSuperAdmin ? (
+                  {isSuperAdmin && (
+                    <div>
+                      <label className="block text-[13px] font-medium mb-1.5">Doanh nghiệp</label>
                       <select value={form.enterpriseId ?? ""} onChange={e => setF("enterpriseId", e.target.value ? Number(e.target.value) : null)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
                         <option value="">-- Chưa gắn doanh nghiệp --</option>
                         {enterprises.map(d => <option key={d.id} value={d.id}>{d.tenHienThi}</option>)}
                       </select>
-                    ) : (
-                      <div className="w-full h-10 px-3 rounded-lg border border-border bg-muted/50 text-sm flex items-center justify-between text-foreground">
-                        <span>{user?.enterpriseName ?? "—"}</span>
-                        <Lock className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
-                      </div>
-                    )}
-                  </div>
+                    </div>
+                  )}
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[13px] font-medium mb-1.5">Số điện thoại</label>
