@@ -5,6 +5,7 @@ export type Enterprise = {
   mst: string;
   ten: string;
   tenHienThi: string;
+  tenDangNhap: string;
   daiDien: string;
   sdt: string;
   email: string;
@@ -15,6 +16,12 @@ export type Enterprise = {
   status: "active" | "pending" | "locked";
   logoColor: string;
   logoUrl: string | null;
+  gcp: string;
+  gln: string;
+  website: string;
+  videoUrl: string;
+  chungChiUrls: string[];
+  cauChuyen: string;
   createdAt: string;
   updatedAt: string;
 };
@@ -212,32 +219,42 @@ const nextId = () => ++_seq;
 let enterprises: Enterprise[] = [
   {
     id: 1, mst: "0101234567", ten: "Công ty TNHH Chè Quân Chu",
-    tenHienThi: "Chè Quân Chu", daiDien: "Nguyễn Văn An",
+    tenHienThi: "Chè Quân Chu", tenDangNhap: "chequanchu",
+    daiDien: "Nguyễn Văn An",
     sdt: "0912345678", email: "admin@chequanchu.vn",
     diaChi: "Thôn Quân Chu, xã Quân Chu, huyện Đại Từ",
     tinh: "Thái Nguyên", xa: "Quân Chu",
     modules: ["ERP", "TXNG", "VT"], status: "active",
     logoColor: "#16a34a", logoUrl: null,
+    gcp: "8938500100", gln: "8938500100001",
+    website: "https://chequanchu.vn", videoUrl: "",
+    chungChiUrls: [], cauChuyen: "Chè Quân Chu xuất phát từ vùng chè đặc sản xã Quân Chu, huyện Đại Từ, Thái Nguyên — nơi có khí hậu mát mẻ, đất đai màu mỡ phù hợp trồng chè chất lượng cao.",
     createdAt: "2024-01-10T07:00:00.000Z", updatedAt: "2024-03-01T07:00:00.000Z",
   },
   {
     id: 2, mst: "0109876543", ten: "HTX Chè La Bằng",
-    tenHienThi: "La Bằng Tea", daiDien: "Trần Thị Bình",
+    tenHienThi: "La Bằng Tea", tenDangNhap: "labangtea",
+    daiDien: "Trần Thị Bình",
     sdt: "0987654321", email: "contact@labang.vn",
     diaChi: "Xóm La Bằng, xã La Bằng, huyện Đại Từ",
     tinh: "Thái Nguyên", xa: "La Bằng",
     modules: ["ERP", "TXNG"], status: "active",
     logoColor: "#ca8a04", logoUrl: null,
+    gcp: "", gln: "",
+    website: "", videoUrl: "", chungChiUrls: [], cauChuyen: "",
     createdAt: "2024-02-15T07:00:00.000Z", updatedAt: "2024-03-05T07:00:00.000Z",
   },
   {
     id: 3, mst: "0105556789", ten: "Hộ kinh doanh Chè Tiến Đạt",
-    tenHienThi: "Tiến Đạt Tea", daiDien: "Lê Văn Tiến",
+    tenHienThi: "Tiến Đạt Tea", tenDangNhap: "tiendat",
+    daiDien: "Lê Văn Tiến",
     sdt: "0966111222", email: "tiendat@gmail.com",
     diaChi: "Thôn 2, xã Văn Yên, huyện Đại Từ",
     tinh: "Thái Nguyên", xa: "Văn Yên",
     modules: ["ERP"], status: "pending",
     logoColor: "#0284c7", logoUrl: null,
+    gcp: "", gln: "",
+    website: "", videoUrl: "", chungChiUrls: [], cauChuyen: "",
     createdAt: "2024-04-01T07:00:00.000Z", updatedAt: "2024-04-01T07:00:00.000Z",
   },
 ];
@@ -480,10 +497,14 @@ export const fetchEnterprise = (id: number | string) => {
 export const createEnterprise = (body: Partial<Enterprise> & { matKhau?: string }) => {
   const item: Enterprise = {
     id: nextId(), mst: body.mst ?? "", ten: body.ten ?? "", tenHienThi: body.tenHienThi ?? body.ten ?? "",
+    tenDangNhap: body.tenDangNhap ?? "",
     daiDien: body.daiDien ?? "", sdt: body.sdt ?? "", email: body.email ?? "",
     diaChi: body.diaChi ?? "", tinh: body.tinh ?? "", xa: body.xa ?? "",
     modules: body.modules ?? [], status: body.status ?? "pending",
     logoColor: body.logoColor ?? "#6b7280", logoUrl: body.logoUrl ?? null,
+    gcp: body.gcp ?? "", gln: body.gln ?? "",
+    website: body.website ?? "", videoUrl: body.videoUrl ?? "",
+    chungChiUrls: body.chungChiUrls ?? [], cauChuyen: body.cauChuyen ?? "",
     createdAt: now(), updatedAt: now(),
   };
   enterprises.push(item);

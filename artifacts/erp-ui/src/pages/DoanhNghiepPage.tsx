@@ -7,6 +7,7 @@ import {
   Search, Plus, Filter, Download, ChevronDown, X, Upload,
   Building2, Users, Package, Sprout, Leaf, Bell, KeyRound, Copy, CheckCheck,
   Pencil, Eye, EyeOff, MapPin, ArrowLeft, ArrowRight, LayoutGrid, Loader2,
+  Globe, Video, Image, BookOpen, Barcode, AtSign,
 } from "lucide-react";
 import {
   fetchEnterprises, fetchEnterpriseStats, createEnterprise,
@@ -31,6 +32,7 @@ type FormState = {
   mst: string;
   ten: string;
   tenHienThi: string;
+  tenDangNhap: string;
   daiDien: string;
   sdt: string;
   email: string;
@@ -40,14 +42,22 @@ type FormState = {
   modules: ("ERP" | "TXNG" | "VT")[];
   logoUrl: string | null;
   matKhau: string;
+  gcp: string;
+  gln: string;
+  website: string;
+  videoUrl: string;
+  chungChiUrls: string[];
+  cauChuyen: string;
 };
 
 const EMPTY_FORM: FormState = {
-  mst: "", ten: "", tenHienThi: "", daiDien: "", sdt: "", email: "",
+  mst: "", ten: "", tenHienThi: "", tenDangNhap: "", daiDien: "", sdt: "", email: "",
   diaChi: "", tinh: "Thái Nguyên", xa: "",
   modules: ["ERP", "TXNG"],
   logoUrl: null,
   matKhau: "",
+  gcp: "", gln: "",
+  website: "", videoUrl: "", chungChiUrls: [], cauChuyen: "",
 };
 
 const LOGO_COLORS = [
@@ -66,7 +76,7 @@ export default function DoanhNghiepPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<Enterprise | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Enterprise | null>(null);
-  const [activeTab, setActiveTab] = useState<"general" | "location" | "modules">("general");
+  const [activeTab, setActiveTab] = useState<"general" | "location" | "modules" | "quangba">("general");
   const [search, setSearch] = useState("");
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [submitErr, setSubmitErr] = useState<string | null>(null);
@@ -123,7 +133,7 @@ export default function DoanhNghiepPage() {
     setDrawerOpen(false);
     setEditItem(null);
     setForm(EMPTY_FORM);
-    setActiveTab("general");
+    setActiveTab("general" as const);
     setSubmitErr(null);
   }
 
@@ -131,11 +141,15 @@ export default function DoanhNghiepPage() {
     setEditItem(dn);
     setForm({
       mst: dn.mst, ten: dn.ten, tenHienThi: dn.tenHienThi,
+      tenDangNhap: dn.tenDangNhap ?? "",
       daiDien: dn.daiDien, sdt: dn.sdt, email: dn.email,
       diaChi: dn.diaChi, tinh: dn.tinh, xa: dn.xa,
       modules: dn.modules,
       logoUrl: dn.logoUrl ?? null,
       matKhau: "",
+      gcp: dn.gcp ?? "", gln: dn.gln ?? "",
+      website: dn.website ?? "", videoUrl: dn.videoUrl ?? "",
+      chungChiUrls: dn.chungChiUrls ?? [], cauChuyen: dn.cauChuyen ?? "",
     });
     setActiveTab("general");
     setSubmitErr(null);
@@ -172,6 +186,11 @@ export default function DoanhNghiepPage() {
     if (!form.mst.trim() || !form.ten.trim() || !form.tenHienThi.trim()) {
       setActiveTab("general");
       setSubmitErr("Vui lòng nhập đủ Mã số thuế, Tên doanh nghiệp và Tên hiển thị.");
+      return;
+    }
+    if (!form.tenDangNhap.trim()) {
+      setActiveTab("general");
+      setSubmitErr("Tên đăng nhập là bắt buộc.");
       return;
     }
     if (!form.email.trim()) {
@@ -401,19 +420,21 @@ export default function DoanhNghiepPage() {
             </div>
 
             <div className="px-6 pt-4 border-b border-border">
-              <div className="flex gap-1">
+              <div className="flex gap-1 overflow-x-auto">
                 {[
-                  { k: "general", label: "Hồ sơ chung", n: 1 },
+                  { k: "general",  label: "Hồ sơ chung", n: 1 },
                   { k: "location", label: "Vị trí địa lý", n: 2 },
-                  { k: "modules", label: "Phân hệ", n: 3 },
+                  { k: "modules",  label: "Phân hệ", n: 3 },
+                  { k: "quangba",  label: "Quảng bá", n: 4 },
                 ].map((t) => (
                   <button
                     key={t.k}
                     onClick={() => setActiveTab(t.k as typeof activeTab)}
-                    className={`px-3 py-2.5 text-[13px] font-medium border-b-2 -mb-px flex items-center gap-2 transition ${activeTab === t.k ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                    className={`px-3 py-2.5 text-[13px] font-medium border-b-2 -mb-px flex items-center gap-2 transition whitespace-nowrap ${activeTab === t.k ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
                   >
-                    <span className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center ${activeTab === t.k ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{t.n}</span>
+                    <span className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center shrink-0 ${activeTab === t.k ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{t.n}</span>
                     {t.label}
+                    {t.k === "quangba" && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-normal">tuỳ chọn</span>}
                   </button>
                 ))}
               </div>
@@ -475,6 +496,51 @@ export default function DoanhNghiepPage() {
                   <div className="grid grid-cols-2 gap-4">
                     <Field label="Người đại diện" placeholder="Họ và tên" value={form.daiDien} onChange={(v) => setF("daiDien", v)} />
                     <Field label="Email" required placeholder="lienhe@congty.vn" value={form.email} onChange={(v) => setF("email", v)} />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center gap-1 mb-1.5">
+                      <AtSign className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="text-[13px] font-medium text-foreground/80">Tên đăng nhập</span>
+                      <span className="text-rose-500">*</span>
+                    </div>
+                    <input
+                      value={form.tenDangNhap}
+                      onChange={(e) => setF("tenDangNhap", e.target.value.replace(/\s/g, "").toLowerCase())}
+                      placeholder="vd: chequanchu (không dấu, không khoảng trắng)"
+                      className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm font-mono outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                    />
+                    <div className="text-[11.5px] text-muted-foreground mt-1">Dùng để đăng nhập thay cho email. Chỉ chứa chữ thường, số và dấu gạch dưới.</div>
+                  </div>
+
+                  {/* GS1 Info */}
+                  <div className="rounded-xl border border-border bg-slate-50/60 p-4 space-y-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Barcode className="w-4 h-4 text-muted-foreground" />
+                      <span className="text-[13px] font-semibold text-foreground">Thông tin GS1</span>
+                      <span className="text-[11px] text-muted-foreground font-normal ml-1">(không bắt buộc)</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <div className="text-[12.5px] font-medium mb-1 text-foreground/80">Mã đăng ký GCP</div>
+                        <input
+                          value={form.gcp}
+                          onChange={(e) => setF("gcp", e.target.value)}
+                          placeholder="vd: 8938500100"
+                          className="w-full h-9 px-3 rounded-lg border border-border bg-white text-sm font-mono outline-none focus:border-primary"
+                        />
+                      </div>
+                      <div>
+                        <div className="text-[12.5px] font-medium mb-1 text-foreground/80">GLN doanh nghiệp</div>
+                        <input
+                          value={form.gln}
+                          onChange={(e) => setF("gln", e.target.value)}
+                          placeholder="vd: 8938500100001"
+                          className="w-full h-9 px-3 rounded-lg border border-border bg-white text-sm font-mono outline-none focus:border-primary"
+                        />
+                      </div>
+                    </div>
+                    <div className="text-[11px] text-muted-foreground">GCP (Global Company Prefix) và GLN (Global Location Number) do GS1 Việt Nam cấp.</div>
                   </div>
 
                   {!editItem && (
@@ -540,6 +606,123 @@ export default function DoanhNghiepPage() {
                 </div>
               )}
 
+              {activeTab === "quangba" && (
+                <div className="space-y-5">
+                  <div className="text-[13px] text-muted-foreground">Thông tin quảng bá hiển thị trên trang giới thiệu doanh nghiệp và profile truy xuất nguồn gốc. Tất cả các trường đều không bắt buộc.</div>
+
+                  {/* Website & Video */}
+                  <div className="space-y-4">
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <Globe className="w-3.5 h-3.5 text-muted-foreground" />
+                        <span className="text-[13px] font-medium text-foreground/80">Website</span>
+                      </div>
+                      <input
+                        value={form.website}
+                        onChange={(e) => setF("website", e.target.value)}
+                        placeholder="https://chequanchu.vn"
+                        className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                      />
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-1.5">
+                        <Video className="w-3.5 h-3.5 text-muted-foreground" />
+                        <span className="text-[13px] font-medium text-foreground/80">URL Video giới thiệu</span>
+                      </div>
+                      <input
+                        value={form.videoUrl}
+                        onChange={(e) => setF("videoUrl", e.target.value)}
+                        placeholder="https://youtube.com/watch?v=..."
+                        className="w-full h-10 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Chứng chỉ / Chứng nhận */}
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center gap-1.5">
+                        <Image className="w-3.5 h-3.5 text-muted-foreground" />
+                        <span className="text-[13px] font-medium text-foreground/80">Hình ảnh chứng chỉ / chứng nhận</span>
+                        <span className="text-[11px] text-muted-foreground ml-1">(tối đa 5 ảnh)</span>
+                      </div>
+                      {form.chungChiUrls.length < 5 && (
+                        <button
+                          type="button"
+                          onClick={() => setF("chungChiUrls", [...form.chungChiUrls, ""])}
+                          className="text-[12px] text-primary font-medium flex items-center gap-1 hover:opacity-80"
+                        >
+                          <Plus className="w-3.5 h-3.5" /> Thêm ảnh
+                        </button>
+                      )}
+                    </div>
+
+                    {form.chungChiUrls.length === 0 && (
+                      <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center">
+                        <Image className="w-6 h-6 text-muted-foreground mx-auto mb-1.5" />
+                        <div className="text-[12.5px] text-muted-foreground">Chưa có hình ảnh. Nhấn "Thêm ảnh" để nhập URL.</div>
+                      </div>
+                    )}
+
+                    <div className="space-y-2">
+                      {form.chungChiUrls.map((url, idx) => (
+                        <div key={idx} className="flex items-center gap-2">
+                          <div className="w-6 h-6 rounded flex items-center justify-center bg-muted text-[11px] text-muted-foreground font-mono shrink-0">{idx + 1}</div>
+                          <input
+                            value={url}
+                            onChange={(e) => {
+                              const next = [...form.chungChiUrls];
+                              next[idx] = e.target.value;
+                              setF("chungChiUrls", next);
+                            }}
+                            placeholder="https://... (URL hình ảnh chứng chỉ)"
+                            className="flex-1 h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
+                          />
+                          {url && (
+                            <a href={url} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary shrink-0">
+                              <Eye className="w-4 h-4" />
+                            </a>
+                          )}
+                          <button
+                            type="button"
+                            onClick={() => setF("chungChiUrls", form.chungChiUrls.filter((_, i) => i !== idx))}
+                            className="text-muted-foreground hover:text-rose-500 shrink-0"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Preview grid */}
+                    {form.chungChiUrls.filter(Boolean).length > 0 && (
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {form.chungChiUrls.filter(Boolean).map((url, i) => (
+                          <img key={i} src={url} alt={`Chứng chỉ ${i + 1}`} className="w-16 h-16 object-cover rounded-lg border border-border" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Câu chuyện thương hiệu */}
+                  <div>
+                    <div className="flex items-center gap-1.5 mb-1.5">
+                      <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span className="text-[13px] font-medium text-foreground/80">Câu chuyện thương hiệu</span>
+                    </div>
+                    <textarea
+                      value={form.cauChuyen}
+                      onChange={(e) => setF("cauChuyen", e.target.value)}
+                      rows={5}
+                      placeholder="Kể về lịch sử hình thành, vùng nguyên liệu, cam kết chất lượng của doanh nghiệp…"
+                      className="w-full px-3 py-2.5 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 resize-none leading-relaxed"
+                    />
+                    <div className="text-[11.5px] text-muted-foreground mt-1">{form.cauChuyen.length} ký tự</div>
+                  </div>
+                </div>
+              )}
+
               {submitErr && (
                 <div className="mt-4 px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">
                   {submitErr}
@@ -549,21 +732,36 @@ export default function DoanhNghiepPage() {
 
             <div className="px-6 py-4 border-t border-border flex items-center justify-between bg-muted/40">
               <div className="text-[12.5px] text-muted-foreground">
-                Bước <span className="font-semibold text-foreground">{activeTab === "general" ? 1 : activeTab === "location" ? 2 : 3}</span> / 3
+                Bước <span className="font-semibold text-foreground">
+                  {activeTab === "general" ? 1 : activeTab === "location" ? 2 : activeTab === "modules" ? 3 : 4}
+                </span> / 4
               </div>
               <div className="flex items-center gap-2">
                 <button onClick={closeDrawer} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
+                {activeTab !== "general" && !editItem && (
+                  <button
+                    onClick={() => {
+                      if (activeTab === "location") setActiveTab("general");
+                      else if (activeTab === "modules") setActiveTab("location");
+                      else if (activeTab === "quangba") setActiveTab("modules");
+                    }}
+                    className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted flex items-center gap-2"
+                  >
+                    <ArrowLeft className="w-4 h-4" /> Quay lại
+                  </button>
+                )}
                 <button
                   disabled={isPending}
                   onClick={() => {
                     if (!editItem && activeTab === "general") setActiveTab("location");
                     else if (!editItem && activeTab === "location") setActiveTab("modules");
+                    else if (!editItem && activeTab === "modules") setActiveTab("quangba");
                     else handleSubmit();
                   }}
                   className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold shadow-sm hover:brightness-110 disabled:opacity-60 flex items-center gap-2"
                 >
                   {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                  {editItem ? "Lưu thay đổi" : activeTab === "modules" ? "Tạo doanh nghiệp" : "Tiếp tục"}
+                  {editItem ? "Lưu thay đổi" : activeTab === "quangba" ? "Tạo doanh nghiệp" : <><span>Tiếp tục</span><ArrowRight className="w-4 h-4" /></>}
                 </button>
               </div>
             </div>
