@@ -9,7 +9,8 @@ import * as XLSX from "xlsx";
 import {
   fetchFacilities, createFacility, updateFacility, deleteFacility,
   fetchEnterprises, fetchEmployees, assignFacilityEmployees,
-  type Facility,
+  fetchTeaVarieties,
+  type Facility, type TeaVariety,
 } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { PROVINCES_VN, COMMUNE_MAP } from "@/lib/vietnam-data";
@@ -64,10 +65,12 @@ type FForm = {
   gln: string;
   status: "active" | "inactive";
   notes: string;
+  giong_che_ids: number[];
 };
 const EMPTY_F: FForm = {
   enterpriseId: null, name: "", code: "", type: "ho_lien_ket",
   phone: "", tinh: "", xa: "", address: "", gln: "", status: "active", notes: "",
+  giong_che_ids: [],
 };
 
 function ProvinceSelect({ value, onChange }: { value?: string; onChange?: (v: string) => void }) {
@@ -144,6 +147,7 @@ export default function CoSoPage() {
   const listQ = useQuery({ queryKey: ["facilities"], queryFn: fetchFacilities });
   const dnQ = useQuery({ queryKey: ["enterprises"], queryFn: fetchEnterprises });
   const empQ = useQuery({ queryKey: ["employees"], queryFn: fetchEmployees });
+  const tvQ = useQuery({ queryKey: ["teaVarieties"], queryFn: fetchTeaVarieties });
 
   function inv() { qc.invalidateQueries({ queryKey: ["facilities"] }); }
 
@@ -260,6 +264,7 @@ export default function CoSoPage() {
       enterpriseId: f.enterpriseId, name: f.name, code: f.code, type: f.type,
       phone: f.phone, tinh: f.tinh ?? "", xa: f.xa ?? "", address: f.address,
       gln: f.gln ?? "", status: f.status, notes: f.notes,
+      giong_che_ids: f.giong_che_ids ?? [],
     });
     setErr(null);
     setDrawerOpen(true);
@@ -281,6 +286,7 @@ export default function CoSoPage() {
 
   const enterprises = dnQ.data?.items ?? [];
   const employees = empQ.data?.items ?? [];
+  const teaVarieties = tvQ.data?.items ?? [];
 
   const currentEnterpriseId = editItem?.enterpriseId ?? (isSuperAdmin ? form.enterpriseId : (user?.enterpriseId ?? null));
   const relevantEmployees = employees.filter(e => e.enterpriseId === currentEnterpriseId || !currentEnterpriseId);
@@ -421,7 +427,20 @@ export default function CoSoPage() {
                         </div>
                       )}
                       {f.address && <div className="text-[12px] text-muted-foreground mt-0.5">{f.address}</div>}
-                      {!f.phone && !f.xa && !f.tinh && !f.address && <span className="text-muted-foreground">—</span>}
+                      {f.type === "ho_lien_ket" && f.giong_che_ids?.length > 0 && (
+                        <div className="flex flex-wrap gap-1 mt-1.5">
+                          {f.giong_che_ids.map(id => {
+                            const tv = teaVarieties.find((t: TeaVariety) => t.id === id);
+                            if (!tv) return null;
+                            return (
+                              <span key={id} className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10.5px] font-medium ring-1 ring-emerald-200">
+                                {tv.name}
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {!f.phone && !f.xa && !f.tinh && !f.address && (!f.giong_che_ids?.length || f.type !== "ho_lien_ket") && <span className="text-muted-foreground">—</span>}
                     </td>
                     <td className="px-4 py-3 text-[13px] font-mono">{f.gln || <span className="text-muted-foreground">—</span>}</td>
                     <td className="px-4 py-3">
@@ -548,11 +567,68 @@ export default function CoSoPage() {
                     </div>
                     <div>
                       <label className="block text-[13px] font-medium mb-1.5">Loại cơ sở</label>
-                      <select value={form.type} onChange={e => setF("type", e.target.value as Facility["type"])} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
+                      <select value={form.type} onChange={e => { setF("type", e.target.value as Facility["type"]); if (e.target.value !== "ho_lien_ket") setF("giong_che_ids", []); }} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
                         {TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                       </select>
                     </div>
                   </div>
+
+                  {form.type === "ho_lien_ket" && (
+                    <div>
+                      <label className="block text-[13px] font-medium mb-1.5">
+                        Giống chè
+                        <span className="ml-1.5 text-[11px] text-muted-foreground font-normal">Chọn một hoặc nhiều giống</span>
+                      </label>
+                      {teaVarieties.length === 0 ? (
+                        <div className="px-3 py-2.5 rounded-lg border border-border bg-muted/40 text-[12.5px] text-muted-foreground">
+                          Chưa có giống chè nào. Thêm giống chè ở mục ERP → Giống chè trước.
+                        </div>
+                      ) : (
+                        <div className="border border-border rounded-lg divide-y divide-border max-h-48 overflow-y-auto">
+                          {teaVarieties.map((tv: TeaVariety) => {
+                            const checked = form.giong_che_ids.includes(tv.id);
+                            return (
+                              <label key={tv.id} className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-muted/40 transition-colors ${checked ? "bg-emerald-50/60" : ""}`}>
+                                <input
+                                  type="checkbox"
+                                  className="accent-primary shrink-0"
+                                  checked={checked}
+                                  onChange={e => {
+                                    setF("giong_che_ids", e.target.checked
+                                      ? [...form.giong_che_ids, tv.id]
+                                      : form.giong_che_ids.filter(id => id !== tv.id));
+                                  }}
+                                />
+                                <div className="flex-1 min-w-0">
+                                  <div className="text-[13px] font-medium leading-snug">{tv.name}
+                                    {tv.code && <span className="ml-1.5 text-[11px] text-muted-foreground font-normal">({tv.code})</span>}
+                                  </div>
+                                  {tv.notes && <div className="text-[11.5px] text-muted-foreground truncate">{tv.notes}</div>}
+                                </div>
+                                {checked && <span className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center shrink-0"><svg viewBox="0 0 12 12" className="w-2.5 h-2.5 text-white fill-none stroke-white stroke-2"><polyline points="1.5,6 4.5,9 10.5,3"/></svg></span>}
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                      {form.giong_che_ids.length > 0 && (
+                        <div className="flex flex-wrap gap-1.5 mt-2">
+                          {form.giong_che_ids.map(id => {
+                            const tv = teaVarieties.find((t: TeaVariety) => t.id === id);
+                            if (!tv) return null;
+                            return (
+                              <span key={id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11.5px] font-medium">
+                                {tv.name}
+                                <button onClick={() => setF("giong_che_ids", form.giong_che_ids.filter(i => i !== id))} className="hover:text-emerald-600 ml-0.5">
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </span>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
                   <div>
                     <label className="block text-[13px] font-medium mb-1.5">Doanh nghiệp</label>
                     {isSuperAdmin ? (

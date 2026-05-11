@@ -62,6 +62,7 @@ export type Facility = {
   gln: string;
   status: "active" | "inactive";
   notes: string;
+  giong_che_ids: number[];
   createdAt: string;
   updatedAt: string;
   enterpriseName?: string | null;
@@ -293,6 +294,7 @@ let facilities: Facility[] = [
     type: "ho_lien_ket", phone: "0912111222",
     address: "Xóm Quân Chu 1, xã Quân Chu", tinh: "Thái Nguyên", xa: "Quân Chu",
     gln: "8938500100011", status: "active", notes: "Hộ trồng chè búp tươi lâu năm",
+    giong_che_ids: [1, 2],
     createdAt: "2024-01-15T00:00:00.000Z", updatedAt: "2024-01-15T00:00:00.000Z",
     enterpriseName: "Chè Quân Chu",
   },
@@ -301,6 +303,7 @@ let facilities: Facility[] = [
     type: "ho_lien_ket", phone: "0933444555",
     address: "Xóm Quân Chu 2, xã Quân Chu", tinh: "Thái Nguyên", xa: "Quân Chu",
     gln: "8938500100022", status: "active", notes: "",
+    giong_che_ids: [1],
     createdAt: "2024-01-20T00:00:00.000Z", updatedAt: "2024-01-20T00:00:00.000Z",
     enterpriseName: "Chè Quân Chu",
   },
@@ -309,6 +312,7 @@ let facilities: Facility[] = [
     type: "co_so_noi_bo", phone: "0912345678",
     address: "Thôn Quân Chu, xã Quân Chu, huyện Đại Từ", tinh: "Thái Nguyên", xa: "Quân Chu",
     gln: "8938500100033", status: "active", notes: "Xưởng chế biến chính",
+    giong_che_ids: [],
     createdAt: "2024-01-10T00:00:00.000Z", updatedAt: "2024-01-10T00:00:00.000Z",
     enterpriseName: "Chè Quân Chu",
   },
@@ -317,6 +321,7 @@ let facilities: Facility[] = [
     type: "ho_lien_ket", phone: "0977888999",
     address: "Xóm La Bằng, xã La Bằng", tinh: "Thái Nguyên", xa: "La Bằng",
     gln: "8938500200011", status: "active", notes: "",
+    giong_che_ids: [3],
     createdAt: "2024-02-20T00:00:00.000Z", updatedAt: "2024-02-20T00:00:00.000Z",
     enterpriseName: "La Bằng Tea",
   },
@@ -607,6 +612,7 @@ export const createFacility = (body: Partial<Facility>) => {
     type: body.type ?? "ho_lien_ket", phone: body.phone ?? "",
     address: body.address ?? "", tinh: body.tinh ?? "", xa: body.xa ?? "",
     gln: body.gln ?? "", status: body.status ?? "active", notes: body.notes ?? "",
+    giong_che_ids: body.giong_che_ids ?? [],
     createdAt: now(), updatedAt: now(), enterpriseName: ent?.tenHienThi ?? null,
   };
   facilities.push(item);
