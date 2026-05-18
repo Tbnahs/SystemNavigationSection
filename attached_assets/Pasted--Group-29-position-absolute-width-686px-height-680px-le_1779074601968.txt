@@ -1,0 +1,1640 @@
+/* Group 29 */
+
+position: absolute;
+width: 686px;
+height: 680px;
+left: 835px;
+top: 0px;
+
+
+
+/* Group 27 */
+
+position: absolute;
+width: 686px;
+height: 680px;
+left: 835px;
+top: 0px;
+
+
+
+/* Background+Border+Shadow */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+position: absolute;
+width: 686px;
+height: 680px;
+left: calc(50% - 686px/2 + 417.5px);
+top: 0px;
+
+background: #FFFFFF;
+border: 1px solid #DCDFE4;
+box-shadow: 0px 25px 50px -12px rgba(0, 0, 0, 0.25);
+border-radius: 12px;
+
+
+/* HorizontalBorder */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+align-items: center;
+padding: 16px 24px;
+gap: 486.81px;
+
+width: 686px;
+height: 60px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Heading 1 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+margin: 0 auto;
+width: 134.29px;
+height: 28px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Thêm quy cách */
+
+width: 134.29px;
+height: 28px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 18px;
+line-height: 28px;
+/* identical to box height, or 156% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Button */
+
+margin: 0 auto;
+width: 15px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 1.5px 0px 2.5px;
+
+position: absolute;
+width: 15px;
+height: 24px;
+left: calc(50% - 15px/2);
+top: calc(50% - 24px/2 + 0.5px);
+
+
+
+/* Img */
+
+width: 15px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.31%;
+right: 8.32%;
+top: 18.74%;
+bottom: 18.74%;
+
+background: #606067;
+
+
+/* Group 26 */
+
+width: 686px;
+height: 549px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 24px;
+gap: 32px;
+
+position: absolute;
+height: 549px;
+left: 0px;
+right: 0px;
+top: 60px;
+
+
+
+/* Container */
+
+width: 638px;
+height: 65.5px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 6.5px;
+
+position: absolute;
+height: 66.5px;
+left: 0px;
+right: 332px;
+top: -1px;
+
+
+
+/* Label → Tên quy cách * */
+
+width: 94px;
+height: 20px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+letter-spacing: 0.00488281em;
+
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Input */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: flex-start;
+padding: 10.5px 12px;
+
+width: 306px;
+height: 40px;
+
+background: #FFFFFF;
+border: 1px solid #DCDFE4;
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 282px;
+height: 17px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* 1 tôm, 1 tôm 1 lá... */
+
+width: 282px;
+height: 17px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 17px;
+/* identical to box height */
+display: flex;
+align-items: center;
+
+color: #9CA3AF;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 6.5px;
+
+position: absolute;
+height: 66.5px;
+left: 330px;
+right: 2px;
+top: -1px;
+
+
+
+/* Label → Ghi chú */
+
+width: 48px;
+height: 20px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+letter-spacing: 0.00976562em;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Input */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: flex-start;
+padding: 10.5px 12px;
+
+width: 306px;
+height: 40px;
+
+background: #FFFFFF;
+border: 1px solid #DCDFE4;
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 282px;
+height: 17px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* Ghi chú thêm... */
+
+width: 282px;
+height: 17px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 17px;
+/* identical to box height */
+display: flex;
+align-items: center;
+
+color: #9CA3AF;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 16px;
+
+width: 638px;
+height: 147px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Heading 2 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 638px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Cấu hình giống và thương phẩm */
+
+width: 638px;
+height: 20px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+letter-spacing: 0.7px;
+text-transform: uppercase;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Border */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 638px;
+height: 111px;
+
+border: 1px solid #DCDFE4;
+border-radius: 12px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Table */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 638px;
+height: 111px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Header */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 638px;
+height: 39px;
+
+background: #F9F9FB;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+margin: -1px 0px;
+
+
+/* Row */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: flex-start;
+padding: 0px 72px 0px 0px;
+
+width: 638px;
+height: 39px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Cell */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 12px 16px;
+
+width: 211.33px;
+height: 39px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+margin: 0px -2.84217e-14px;
+
+
+/* Giống chè */
+
+width: 68px;
+height: 15px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 12px;
+line-height: 15px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: 0.00292969em;
+text-transform: uppercase;
+
+color: #606067;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Cell */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 12px 16px;
+
+width: 350.67px;
+height: 39px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Thương phẩm (Multi-select) */
+
+width: 194px;
+height: 15px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 12px;
+line-height: 15px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: -0.000976562em;
+text-transform: uppercase;
+
+color: #606067;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Body */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 638px;
+height: 73px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Row */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 0px 0px 0px 16px;
+
+width: 638px;
+height: 73px;
+
+background: #FFFFFF;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Data */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+align-items: center;
+padding: 0px 12px;
+gap: 69.1px;
+
+width: 268px;
+height: 40px;
+
+background: #FFFFFF;
+border: 1px solid #DCDFE4;
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+margin: 0px -10px;
+
+
+/* Shan Tuyết */
+
+margin: 0 auto;
+width: 141px;
+height: 21px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 20px;
+/* or 143% */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #000000;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Img */
+
+margin: 0 auto;
+width: 10px;
+height: 10px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 6.23%;
+right: 6.24%;
+top: 31.23%;
+bottom: 18.76%;
+
+background: #606067;
+
+
+/* Data */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 16.5px 16px;
+
+width: 29px;
+height: 73px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+margin: 0px -10px;
+
+
+/* Button */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 0px;
+
+width: 40px;
+height: 40px;
+
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 14px;
+height: 16px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Img */
+
+width: 14px;
+height: 16px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Data */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+flex-wrap: wrap;
+align-items: center;
+align-content: flex-start;
+padding: 8.5px 6px 8.5px 22px;
+gap: 0px 12px;
+
+width: 334.67px;
+height: 40px;
+min-height: 40px;
+
+border: 1px solid #21C45D;
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* Background+Border */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 2px 8px;
+gap: 6px;
+
+width: 109.5px;
+height: 19px;
+
+background: #F0FDF4;
+border: 1px solid #BBF7D0;
+border-radius: 4px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 80px;
+height: 15px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Bạch Trà - TD */
+
+width: 80px;
+height: 15px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 15px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: 0.00976562em;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mountain Meadow */
+color: #21C45D;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 7.5px;
+height: 10px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Img */
+
+width: 7.5px;
+height: 10px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.31%;
+right: 8.32%;
+top: 18.73%;
+bottom: 18.74%;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mountain Meadow */
+background: #21C45D;
+
+
+/* Background+Border */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 2px 8px;
+gap: 6px;
+
+width: 111.5px;
+height: 19px;
+
+background: #F0FDF4;
+border: 1px solid #BBF7D0;
+border-radius: 4px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 82px;
+height: 15px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Hồng Trà - TD */
+
+width: 82px;
+height: 15px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 15px;
+/* identical to box height */
+display: flex;
+align-items: center;
+letter-spacing: 0.00976562em;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mountain Meadow */
+color: #21C45D;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 7.5px;
+height: 10px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Img */
+
+width: 7.5px;
+height: 10px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.31%;
+right: 8.32%;
+top: 18.73%;
+bottom: 18.74%;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mountain Meadow */
+background: #21C45D;
+
+
+/* Vector */
+
+width: 8.75px;
+height: 5px;
+
+background: #606067;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* Group 28 */
+
+width: 633px;
+height: 65.5px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* Label → Ghi chú */
+
+position: absolute;
+height: 19.5px;
+left: 24px;
+right: 595.11px;
+top: 300.5px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Input */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 40px;
+left: 24px;
+right: 29px;
+top: 326px;
+
+border: 1px solid #DCDFE4;
+border-radius: 10px;
+
+
+/* Container */
+
+position: absolute;
+height: 16.8px;
+left: 12.8px;
+right: 12.8px;
+top: 11.6px;
+
+
+
+/* Ghi chú thêm… */
+
+position: absolute;
+width: 100.29px;
+height: 16.8px;
+left: 0px;
+top: 0px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 17px;
+/* identical to box height */
+display: flex;
+align-items: center;
+
+color: rgba(29, 32, 37, 0.5);
+
+
+
+/* Background+HorizontalBorder */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: flex-end;
+align-items: flex-start;
+padding: 16px 24px;
+gap: 11.99px;
+
+width: 686px;
+height: 70px;
+
+background: #F9F9FB;
+border-top: 1px solid #DCDFE4;
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* Button */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 8px 20px;
+
+width: 68px;
+height: 36px;
+
+background: #FFFFFF;
+border: 1px solid #DCDFE4;
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Huỷ */
+
+width: 28px;
+height: 20px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+text-align: center;
+letter-spacing: 0.0478516em;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Button */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 8.5px 20px 9.5px;
+
+width: 80px;
+height: 38px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mountain Meadow */
+background: #21C45D;
+box-shadow: 0px 1px 2px rgba(33, 196, 93, 0.2);
+border-radius: 8px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Lưu quy cách */
+
+width: 90.61px;
+height: 20px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Button */
+
+position: absolute;
+width: 119px;
+height: 29px;
+left: 1376px;
+top: calc(50% - 29px/2 - 147.5px);
+
+background: #21C45D;
+border-radius: 10px;
+
+
+/* Group 34 */
+
+position: absolute;
+width: 133.17px;
+height: 16.8px;
+left: 6px;
+top: 6.6px;
+
+
+
+/* SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 16px;
+top: calc(50% - 16px/2 + 0.5px);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 20.84%;
+right: 20.83%;
+top: 50%;
+bottom: 50%;
+
+border: 1.33333px solid #FFFFFF;
+
+
+/* Vector */
+
+position: absolute;
+left: 50%;
+right: 50%;
+top: 20.83%;
+bottom: 20.84%;
+
+border: 1.33333px solid #FFFFFF;
+
+
+/* Thêm dòng */
+
+position: absolute;
+width: 133.17px;
+height: 16.8px;
+left: calc(50% - 133.17px/2 + 13.08px);
+top: calc(50% - 16.8px/2 + 0.5px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 20px;
+/* or 143% */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* Group 29 */
+
+position: absolute;
+width: 332px;
+height: 161.98px;
+left: 1153px;
+top: 314px;
+
+
+
+/* Background+Border+Shadow */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 4px 0px;
+
+position: absolute;
+width: 332px;
+height: 161.98px;
+left: 1153px;
+top: 314px;
+
+background: #FFFFFF;
+border: 1px solid #DCDFE4;
+box-shadow: 0px 10px 15px -3px rgba(0, 0, 0, 0.1), 0px 4px 6px -4px rgba(0, 0, 0, 0.1);
+border-radius: 8px;
+
+
+/* Overlay */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+align-items: center;
+padding: 8px 16px;
+gap: 181.84px;
+
+width: 332px;
+height: 36px;
+
+background: rgba(240, 253, 244, 0.5);
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+margin: 0 auto;
+width: 92.22px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Bạch Trà - TD */
+
+width: 92.22px;
+height: 20px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mountain Meadow */
+color: #21C45D;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+margin: 0 auto;
+width: 8.75px;
+height: 10px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Img */
+
+width: 8.75px;
+height: 10px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: -0.02%;
+right: 0.01%;
+top: 18.75%;
+bottom: 18.74%;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mountain Meadow */
+background: #21C45D;
+
+
+/* Overlay */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: space-between;
+align-items: center;
+padding: 8px 16px;
+gap: 179.48px;
+
+width: 332px;
+height: 36px;
+
+background: rgba(240, 253, 244, 0.5);
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+margin: 0 auto;
+width: 95px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Hồng Trà - TD */
+
+width: 95px;
+height: 20px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+letter-spacing: 0.00488281em;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mountain Meadow */
+color: #21C45D;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Container */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+margin: 0 auto;
+width: 8.75px;
+height: 10px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Img */
+
+width: 8.75px;
+height: 10px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: -0.02%;
+right: 0.01%;
+top: 18.75%;
+bottom: 18.74%;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mountain Meadow */
+background: #21C45D;
+
+
+/* Trà Vàng - TD */
+
+width: 122px;
+height: 35px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 21px;
+/* or 150% */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;

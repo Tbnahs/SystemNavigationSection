@@ -1,0 +1,5708 @@
+/* Quy cách và tiêu chuẩn */
+
+box-sizing: border-box;
+
+position: relative;
+left: 1138.9px;
+right: 18804.1px;
+top: 12164px;
+bottom: 6701px;
+overflow-y: scroll;
+
+background: linear-gradient(0deg, #F3F4F7, #F3F4F7), #FFFFFF;
+border: 1px solid #FFFFFF;
+
+
+/* Background */
+
+position: absolute;
+height: 1493px;
+left: 0px;
+right: 0px;
+top: 0px;
+
+background: #F3F4F7;
+
+
+/* Main */
+
+position: absolute;
+height: 1405px;
+left: 264px;
+right: 24px;
+top: 88px;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+height: 20px;
+left: 8px;
+right: 1205px;
+top: 14px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 50%;
+top: 20.83%;
+bottom: 20.83%;
+
+border: 1.66667px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.83%;
+top: 50%;
+bottom: 50%;
+
+border: 1.66667px solid #6B7280;
+
+
+/* ERP / Quy cách & Tiêu chuẩn */
+
+position: absolute;
+height: 18px;
+left: 48px;
+right: 1019.47px;
+top: 0px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 18px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Heading 1 */
+
+position: absolute;
+height: 28px;
+left: 48px;
+right: 932.92px;
+top: 20px;
+
+
+
+/* SVG */
+
+position: absolute;
+width: 20px;
+height: 20px;
+left: 0px;
+top: calc(50% - 20px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 16.58%;
+right: 12.5%;
+top: 8.33%;
+bottom: 16.66%;
+
+border: 1.66667px solid #009966;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 45.83%;
+top: 50%;
+bottom: 12.5%;
+
+border: 1.66667px solid #009966;
+
+
+/* Quy cách & Tiêu chuẩn */
+
+position: absolute;
+width: 224.45px;
+height: 24px;
+left: 28px;
+top: calc(50% - 24px/2 - 0.4px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 20px;
+line-height: 28px;
+/* or 140% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Button */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 36px;
+left: 1117.78px;
+right: 0.19px;
+top: 6px;
+
+border: 1px solid #DCDFE4;
+border-radius: 10px;
+
+
+/* SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 12.8px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 50%;
+right: 50%;
+top: 12.5%;
+bottom: 37.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 62.5%;
+bottom: 12.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 29.17%;
+right: 29.16%;
+top: 41.67%;
+bottom: 37.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Xuất Excel */
+
+position: absolute;
+width: 65.72px;
+height: 16px;
+left: calc(50% - 65.72px/2 + 12.15px);
+top: calc(50% - 16px/2 - 0.15px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 13px;
+line-height: 20px;
+/* or 150% */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #1D2025;
+
+
+
+/* Heading 2 → Quy cách */
+
+position: absolute;
+height: 22.5px;
+left: 0px;
+right: 1163.26px;
+top: 76px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 15px;
+line-height: 22px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* 4 quy cách */
+
+position: absolute;
+height: 15.2px;
+left: 0px;
+right: 1169.25px;
+top: 101.3px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 18px;
+/* or 150% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Button */
+
+position: absolute;
+height: 36px;
+left: 1079.89px;
+right: 0.2px;
+top: 79.25px;
+
+background: #21C45D;
+border-radius: 10px;
+
+
+/* SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 16px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 50%;
+bottom: 50%;
+
+border: 1.33333px solid #FFFFFF;
+
+
+/* Vector */
+
+position: absolute;
+left: 50%;
+right: 50%;
+top: 20.83%;
+bottom: 20.84%;
+
+border: 1.33333px solid #FFFFFF;
+
+
+/* Thêm quy cách */
+
+position: absolute;
+width: 97.26px;
+height: 16px;
+left: calc(50% - 97.26px/2 + 12.17px);
+top: calc(50% - 16px/2 - 0.15px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 13px;
+line-height: 20px;
+/* or 150% */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* Button */
+
+position: absolute;
+height: 36px;
+left: 1054.61px;
+right: 0.2px;
+top: 367px;
+
+background: #21C45D;
+border-radius: 10px;
+
+
+/* Group 24 */
+
+position: absolute;
+width: 1217.19px;
+height: 40.5px;
+left: -1054.61px;
+top: -3.25px;
+
+
+
+/* Heading 2 → % Chất lượng */
+
+position: absolute;
+height: 22.5px;
+left: -1054.61px;
+right: 1133.51px;
+top: -3.25px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 15px;
+line-height: 22px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* 8 mức */
+
+position: absolute;
+height: 15.2px;
+left: -1054.61px;
+right: 1196.88px;
+top: 22.05px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 18px;
+/* or 150% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 16px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 50%;
+bottom: 50%;
+
+border: 1.33333px solid #FFFFFF;
+
+
+/* Vector */
+
+position: absolute;
+left: 50%;
+right: 50%;
+top: 20.83%;
+bottom: 20.84%;
+
+border: 1.33333px solid #FFFFFF;
+
+
+/* Thêm % chất lượng */
+
+position: absolute;
+width: 122.58px;
+height: 16px;
+left: calc(50% - 122.58px/2 + 12.19px);
+top: calc(50% - 16px/2 - 0.15px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 13px;
+line-height: 20px;
+/* or 150% */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* Background+Border */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 471.41px;
+left: 0px;
+right: 0.2px;
+top: 418px;
+
+background: #FFFFFF;
+border: 1px solid #DCDFE4;
+border-radius: 14px;
+
+
+/* Table */
+
+position: absolute;
+height: 469.81px;
+left: 0.8px;
+right: 0.8px;
+top: 0.8px;
+
+
+
+/* Header → Row */
+
+position: absolute;
+height: 41.54px;
+left: 0px;
+right: 0px;
+top: 0px;
+
+background: rgba(244, 244, 246, 0.4);
+
+
+/* Cell → % Đánh giá */
+
+position: absolute;
+height: 15.2px;
+left: 16px;
+right: 1139.48px;
+top: 12.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 12px;
+line-height: 17px;
+/* or 143% */
+display: flex;
+align-items: center;
+text-transform: uppercase;
+
+color: #6B7280;
+
+
+
+/* Cell → Đơn giá */
+
+position: absolute;
+height: 15.2px;
+left: 226.93px;
+right: 952.11px;
+top: 12.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 12px;
+line-height: 17px;
+/* or 143% */
+display: flex;
+align-items: center;
+text-transform: uppercase;
+
+color: #6B7280;
+
+
+
+/* Cell → Ghi chú */
+
+position: absolute;
+height: 15.2px;
+left: 472.98px;
+right: 707.05px;
+top: 12.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 12px;
+line-height: 17px;
+/* or 143% */
+display: flex;
+align-items: center;
+text-transform: uppercase;
+
+color: #6B7280;
+
+
+
+/* Cell → Quy cách */
+
+position: absolute;
+height: 15.2px;
+left: 849.14px;
+right: 316.9px;
+top: 12.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 12px;
+line-height: 17px;
+/* or 143% */
+display: flex;
+align-items: center;
+text-transform: uppercase;
+
+color: #6B7280;
+
+
+
+/* Body */
+
+position: absolute;
+height: 428.27px;
+left: 0px;
+right: 0px;
+top: 41.54px;
+
+
+
+/* Row */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 52.8px;
+left: 0px;
+right: 0px;
+top: 0px;
+
+border-top: 0.8px solid #DCDFE4;
+
+
+/* Data → 95-100% */
+
+position: absolute;
+height: 16.8px;
+left: 16px;
+right: 1152.31px;
+top: 18px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 20px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Data → Cơ bản: 120000 */
+
+position: absolute;
+height: 17.14px;
+left: 226.93px;
+right: 912.78px;
+top: 17.82px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 17px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+
+color: #007A55;
+
+
+
+/* Data → Đạt chuẩn xuất khẩu */
+
+position: absolute;
+height: 16px;
+left: 472.98px;
+right: 631.81px;
+top: 17.91px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data → Loại A – Đặc sản */
+
+position: absolute;
+height: 16px;
+left: 849.14px;
+right: 279.89px;
+top: 17.91px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data */
+
+position: absolute;
+height: 28px;
+left: 1155.2px;
+right: 16px;
+top: 12.4px;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 6px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Group 23 */
+
+position: absolute;
+width: 46.67px;
+height: 16px;
+left: 7.33px;
+top: 6px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 12.22%;
+right: 65.56%;
+top: 26.19%;
+bottom: 26.19%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 38px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Row */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 52.8px;
+left: 0px;
+right: 0px;
+top: 52.8px;
+
+border-top: 0.8px solid #DCDFE4;
+
+
+/* Data → 90-94% */
+
+position: absolute;
+height: 16.8px;
+left: 16px;
+right: 1157.77px;
+top: 18px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 20px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Data → Cơ bản: 112000 */
+
+position: absolute;
+height: 17.14px;
+left: 226.93px;
+right: 914.87px;
+top: 17.82px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 17px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+
+color: #007A55;
+
+
+
+/* Data → Đạt chuẩn nội địa cao cấp */
+
+position: absolute;
+height: 16px;
+left: 472.98px;
+right: 598.36px;
+top: 17.91px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data → Loại A – Đặc sản */
+
+position: absolute;
+height: 16px;
+left: 849.14px;
+right: 279.89px;
+top: 17.91px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data */
+
+position: absolute;
+height: 28px;
+left: 1155.2px;
+right: 16px;
+top: 12.4px;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 6px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 38px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Row */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 52.8px;
+left: 0px;
+right: 0px;
+top: 105.6px;
+
+border-top: 0.8px solid #DCDFE4;
+
+
+/* Data → 80-89% */
+
+position: absolute;
+height: 16.8px;
+left: 16px;
+right: 1158.13px;
+top: 18px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 20px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Data → Cơ bản: 100000 */
+
+position: absolute;
+height: 17.14px;
+left: 226.93px;
+right: 912.43px;
+top: 17.82px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 17px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+
+color: #007A55;
+
+
+
+/* Data → — */
+
+position: absolute;
+height: 16px;
+left: 472.98px;
+right: 744.87px;
+top: 17.91px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data → Loại A – Đặc sản */
+
+position: absolute;
+height: 16px;
+left: 849.14px;
+right: 279.89px;
+top: 17.91px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data */
+
+position: absolute;
+height: 28px;
+left: 1155.2px;
+right: 16px;
+top: 12.4px;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 6px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 38px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Row */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 52.8px;
+left: 0px;
+right: 0px;
+top: 158.4px;
+
+border-top: 0.8px solid #DCDFE4;
+
+
+/* Data → 90-100% */
+
+position: absolute;
+height: 16.8px;
+left: 16px;
+right: 1151.65px;
+top: 18px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 20px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Data → Cơ bản: 85000 */
+
+position: absolute;
+height: 17.14px;
+left: 226.93px;
+right: 918.39px;
+top: 17.82px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 17px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+
+color: #007A55;
+
+
+
+/* Data → — */
+
+position: absolute;
+height: 16px;
+left: 472.98px;
+right: 744.87px;
+top: 17.91px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data → Loại B – Thường */
+
+position: absolute;
+height: 16px;
+left: 849.14px;
+right: 282.6px;
+top: 17.91px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data */
+
+position: absolute;
+height: 28px;
+left: 1155.2px;
+right: 16px;
+top: 12.4px;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 6px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 38px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Row */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 52.8px;
+left: 0px;
+right: 0px;
+top: 211.2px;
+
+border-top: 0.8px solid #DCDFE4;
+
+
+/* Data → 80-89% */
+
+position: absolute;
+height: 16.8px;
+left: 16px;
+right: 1158.13px;
+top: 18px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 20px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Data → Cơ bản: 75000 */
+
+position: absolute;
+height: 17.14px;
+left: 226.93px;
+right: 919.21px;
+top: 17.82px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 17px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+
+color: #007A55;
+
+
+
+/* Data → — */
+
+position: absolute;
+height: 16px;
+left: 472.98px;
+right: 744.87px;
+top: 17.91px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data → Loại B – Thường */
+
+position: absolute;
+height: 16px;
+left: 849.14px;
+right: 282.6px;
+top: 17.91px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data */
+
+position: absolute;
+height: 28px;
+left: 1155.2px;
+right: 16px;
+top: 12.4px;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 6px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 38px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Row */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 52.8px;
+left: 0px;
+right: 0px;
+top: 264px;
+
+border-top: 0.8px solid #DCDFE4;
+
+
+/* Data → Tất cả */
+
+position: absolute;
+height: 16.8px;
+left: 16px;
+right: 1172.92px;
+top: 18px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 20px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Data → Cơ bản: 55000 */
+
+position: absolute;
+height: 17.14px;
+left: 226.93px;
+right: 918.72px;
+top: 17.82px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 17px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+
+color: #007A55;
+
+
+
+/* Data → — */
+
+position: absolute;
+height: 16px;
+left: 472.98px;
+right: 744.87px;
+top: 17.91px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data → Loại C – Thứ phẩm */
+
+position: absolute;
+height: 16px;
+left: 849.14px;
+right: 266.99px;
+top: 17.91px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data */
+
+position: absolute;
+height: 28px;
+left: 1155.2px;
+right: 16px;
+top: 12.4px;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 6px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 38px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Row */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 59.07px;
+left: 0px;
+right: 0px;
+top: 316.8px;
+
+background: rgba(236, 253, 245, 0.2);
+border-top: 0.8px solid #DCDFE4;
+
+
+/* Data → 100% */
+
+position: absolute;
+height: 16.8px;
+left: 16px;
+right: 1176.42px;
+top: 21.14px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 20px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Data → Cơ bản: 250000
+VIP: 280000 */
+
+position: absolute;
+height: 32.33px;
+left: 226.93px;
+right: 910.94px;
+top: 13.2px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 17px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #007A55;
+
+
+
+/* Data → Búp tuyết */
+
+position: absolute;
+height: 16px;
+left: 472.98px;
+right: 698.95px;
+top: 21.05px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data → Loại Đặc – Chè Đinh */
+
+position: absolute;
+height: 16px;
+left: 849.14px;
+right: 257.83px;
+top: 21.05px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data */
+
+position: absolute;
+height: 28px;
+left: 1155.2px;
+right: 16px;
+top: 15.53px;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 6px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 38px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Row */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 52.4px;
+left: 0px;
+right: 0px;
+top: 375.87px;
+
+border-top: 0.8px solid #DCDFE4;
+
+
+/* Data → 90-99% */
+
+position: absolute;
+height: 16.8px;
+left: 16px;
+right: 1158.14px;
+top: 18px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 20px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Data → Cơ bản: 220000 */
+
+position: absolute;
+height: 17.14px;
+left: 226.93px;
+right: 910.65px;
+top: 17.83px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 17px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+
+color: #007A55;
+
+
+
+/* Data → — */
+
+position: absolute;
+height: 16px;
+left: 472.98px;
+right: 744.87px;
+top: 17.92px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data → Loại Đặc – Chè Đinh */
+
+position: absolute;
+height: 16px;
+left: 849.14px;
+right: 257.83px;
+top: 17.92px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 19px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Data */
+
+position: absolute;
+height: 28px;
+left: 1155.2px;
+right: 16px;
+top: 12.4px;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 6px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 38px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Group 25 */
+
+position: absolute;
+width: 1232.8px;
+height: 40.5px;
+left: 0px;
+top: 910px;
+
+
+
+/* Heading 2 → Tiêu chuẩn */
+
+position: absolute;
+height: 22.5px;
+left: 0px;
+right: 1151.21px;
+top: 910px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 15px;
+line-height: 22px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* 5 tiêu chuẩn */
+
+position: absolute;
+height: 15.2px;
+left: 0px;
+right: 1163.01px;
+top: 935.3px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 18px;
+/* or 150% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Button */
+
+position: absolute;
+height: 36px;
+left: 1071.76px;
+right: 0.2px;
+top: 913.25px;
+
+background: #21C45D;
+border-radius: 10px;
+
+
+/* SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 16px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 50%;
+bottom: 50%;
+
+border: 1.33333px solid #FFFFFF;
+
+
+/* Vector */
+
+position: absolute;
+left: 50%;
+right: 50%;
+top: 20.83%;
+bottom: 20.84%;
+
+border: 1.33333px solid #FFFFFF;
+
+
+/* Thêm tiêu chuẩn */
+
+position: absolute;
+width: 105.4px;
+height: 16px;
+left: calc(50% - 105.4px/2 + 12.18px);
+top: calc(50% - 16px/2 - 0.15px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 13px;
+line-height: 20px;
+/* or 150% */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* Background+Border */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 78.1px;
+left: -13px;
+right: 13.2px;
+top: 966px;
+
+background: #FFFFFF;
+border: 1px solid #DCDFE4;
+border-radius: 14px;
+
+
+/* Background */
+
+position: absolute;
+width: 6px;
+left: 16.8px;
+top: 16.8px;
+bottom: 16.8px;
+
+background: #00BC7D;
+border-radius: 2.68435e+07px;
+
+
+/* VietGAP */
+
+position: absolute;
+height: 21px;
+left: 38.8px;
+right: 1137.07px;
+top: 16.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 21px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Thực hành nông nghiệp tốt theo tiêu chuẩn Việt Nam */
+
+position: absolute;
+height: 19.5px;
+left: 38.8px;
+right: 868.81px;
+top: 41.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 1162px;
+top: 22.8px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 1194px;
+top: 22.8px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Background+Border */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 78.1px;
+left: -13px;
+right: 13.2px;
+top: 1056.1px;
+
+background: #FFFFFF;
+border: 1px solid #DCDFE4;
+border-radius: 14px;
+
+
+/* Background */
+
+position: absolute;
+width: 6px;
+left: 16.8px;
+top: 16.8px;
+bottom: 16.8px;
+
+background: #00BC7D;
+border-radius: 2.68435e+07px;
+
+
+/* GlobalGAP */
+
+position: absolute;
+height: 21px;
+left: 38.8px;
+right: 1121.13px;
+top: 16.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 21px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Tiêu chuẩn nông nghiệp tốt toàn cầu */
+
+position: absolute;
+height: 19.5px;
+left: 38.8px;
+right: 968.19px;
+top: 41.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 1162px;
+top: 22.8px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 1194px;
+top: 22.8px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Background+Border */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 78.1px;
+left: -13px;
+right: 13.2px;
+top: 1146.2px;
+
+background: #FFFFFF;
+border: 1px solid #DCDFE4;
+border-radius: 14px;
+
+
+/* Background */
+
+position: absolute;
+width: 6px;
+left: 16.8px;
+top: 16.8px;
+bottom: 16.8px;
+
+background: #FE9A00;
+border-radius: 2.68435e+07px;
+
+
+/* Hữu cơ USDA */
+
+position: absolute;
+height: 21px;
+left: 38.8px;
+right: 1102.61px;
+top: 16.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 21px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Chứng nhận hữu cơ Bộ Nông nghiệp Hoa Kỳ */
+
+position: absolute;
+height: 19.5px;
+left: 38.8px;
+right: 922.09px;
+top: 41.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 1162px;
+top: 22.8px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 1194px;
+top: 22.8px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Background+Border */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 78.1px;
+left: -13px;
+right: 13.2px;
+top: 1236.3px;
+
+background: #FFFFFF;
+border: 1px solid #DCDFE4;
+border-radius: 14px;
+
+
+/* Background */
+
+position: absolute;
+width: 6px;
+left: 16.8px;
+top: 16.8px;
+bottom: 16.8px;
+
+background: #00BC7D;
+border-radius: 2.68435e+07px;
+
+
+/* Rainforest Alliance */
+
+position: absolute;
+height: 21px;
+left: 38.8px;
+right: 1066.72px;
+top: 16.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 21px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Chứng nhận bền vững và bảo vệ môi trường */
+
+position: absolute;
+height: 19.5px;
+left: 38.8px;
+right: 923.55px;
+top: 41.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 1162px;
+top: 22.8px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 1194px;
+top: 22.8px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Background+Border */
+
+box-sizing: border-box;
+
+position: absolute;
+height: 78.1px;
+left: -13px;
+right: 13.2px;
+top: 1326.4px;
+
+background: #FFFFFF;
+border: 1px solid #DCDFE4;
+border-radius: 14px;
+
+
+/* Background */
+
+position: absolute;
+width: 6px;
+left: 16.8px;
+top: 16.8px;
+bottom: 16.8px;
+
+background: #00BC7D;
+border-radius: 2.68435e+07px;
+
+
+/* ISO 22000 */
+
+position: absolute;
+height: 21px;
+left: 38.8px;
+right: 1121.27px;
+top: 16.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 14px;
+line-height: 21px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Hệ thống quản lý an toàn thực phẩm */
+
+position: absolute;
+height: 19.5px;
+left: 38.8px;
+right: 970.14px;
+top: 41.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 1162px;
+top: 22.8px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 1194px;
+top: 22.8px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Group 22 */
+
+position: absolute;
+width: 1231px;
+height: 193px;
+left: 8px;
+top: 145px;
+
+
+
+/* Rectangle */
+
+position: absolute;
+width: 1231px;
+height: 193px;
+left: 8px;
+top: 145px;
+
+background: #FFFFFF;
+box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1), 0px 2px 4px rgba(0, 0, 0, 0.1);
+border-radius: 14px;
+
+
+/* Rectangle */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 1231px;
+height: 45px;
+left: 8px;
+top: 145px;
+
+background: #FAFBFB;
+border-bottom: 1.2px solid #DCDFE4;
+
+
+/* Rectangle */
+
+position: absolute;
+width: 60px;
+height: 45px;
+left: 8px;
+top: 145px;
+
+border-radius: 14px 14px 14px 0px;
+
+
+/* Stt */
+
+position: absolute;
+width: 18px;
+height: 24px;
+left: 28px;
+top: 155px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 12px;
+line-height: 24px;
+/* identical to box height, or 200% */
+text-align: center;
+
+color: #6B7280;
+
+
+
+/* TÊN QUY CÁCH */
+
+position: absolute;
+width: 92px;
+height: 24px;
+left: 85px;
+top: 155px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 12px;
+line-height: 24px;
+/* identical to box height, or 200% */
+
+color: #6B7280;
+
+
+
+/* GIỐNG CHÈ */
+
+position: absolute;
+width: 68px;
+height: 24px;
+left: 455px;
+top: 155px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 12px;
+line-height: 24px;
+/* identical to box height, or 200% */
+text-align: center;
+
+color: #6B7280;
+
+
+
+/* THƯƠNG PHẨM */
+
+position: absolute;
+width: 95px;
+height: 24px;
+left: 828px;
+top: 159px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 12px;
+line-height: 24px;
+/* identical to box height, or 200% */
+text-align: center;
+
+color: #6B7280;
+
+
+
+/* Rectangle */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 1231px;
+height: 49px;
+left: 8px;
+top: 189px;
+
+background: #FFFFFF;
+border-bottom: 0.8px solid #DCDFE4;
+border-radius: 0px;
+
+
+/* Rectangle */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 1231px;
+height: 49px;
+left: 8px;
+top: 239px;
+
+background: #FFFFFF;
+border-bottom: 0.8px solid #DCDFE4;
+border-radius: 0px;
+
+
+/* Rectangle */
+
+position: absolute;
+width: 60px;
+height: 49px;
+left: 8px;
+top: 190px;
+
+border-radius: 14px;
+
+
+/* 1 */
+
+position: absolute;
+width: 8px;
+height: 24px;
+left: 33px;
+top: 202px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 24px;
+/* identical to box height, or 150% */
+text-align: center;
+
+color: #111827;
+
+
+
+/* Quy cách A */
+
+position: absolute;
+width: 79px;
+height: 24px;
+left: 85px;
+top: 202px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 14px;
+line-height: 24px;
+/* identical to box height, or 171% */
+
+color: #111827;
+
+
+
+/* Giống Shan Tuyết ; Giống Trung Du */
+
+position: absolute;
+width: 200px;
+height: 24px;
+left: 449px;
+top: 202px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 24px;
+/* identical to box height, or 200% */
+
+color: #111827;
+
+
+
+/* Chè xanh ST; Bạch Trà - ST */
+
+position: absolute;
+width: 157px;
+height: 24px;
+left: 828px;
+top: 198px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 24px;
+/* identical to box height, or 200% */
+
+color: #111827;
+
+
+
+/* Xóa */
+
+position: absolute;
+width: 23px;
+height: 20px;
+left: 1188px;
+top: 203px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 154% */
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* 2 */
+
+position: absolute;
+width: 10px;
+height: 24px;
+left: 32px;
+top: 251px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 24px;
+/* identical to box height, or 150% */
+text-align: center;
+
+color: #111827;
+
+
+
+/* Quy cách B */
+
+position: absolute;
+width: 77px;
+height: 24px;
+left: 85px;
+top: 251px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 14px;
+line-height: 24px;
+/* identical to box height, or 171% */
+
+color: #111827;
+
+
+
+/* Giống Trung Du */
+
+position: absolute;
+width: 89px;
+height: 24px;
+left: 449px;
+top: 251px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 24px;
+/* identical to box height, or 200% */
+
+color: #111827;
+
+
+
+/* Chè xanh TD; Hồng Trà - TD */
+
+position: absolute;
+width: 161px;
+height: 24px;
+left: 828px;
+top: 247px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 24px;
+/* identical to box height, or 200% */
+
+color: #111827;
+
+
+
+/* Sửa */
+
+position: absolute;
+width: 23px;
+height: 20px;
+left: 1133px;
+top: 252px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 154% */
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* Xóa */
+
+position: absolute;
+width: 23px;
+height: 20px;
+left: 1188px;
+top: 252px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 154% */
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* Data */
+
+position: absolute;
+height: 28px;
+left: 1142px;
+right: 31px;
+top: 200px;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 6px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Group 23 */
+
+position: absolute;
+width: 46.67px;
+height: 16px;
+left: 7.33px;
+top: 6px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 12.22%;
+right: 65.56%;
+top: 26.19%;
+bottom: 26.19%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 38px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* 3 */
+
+position: absolute;
+width: 11px;
+height: 24px;
+left: 32px;
+top: 300px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 16px;
+line-height: 24px;
+/* identical to box height, or 150% */
+text-align: center;
+
+color: #111827;
+
+
+
+/* Quy cách C */
+
+position: absolute;
+width: 79px;
+height: 24px;
+left: 85px;
+top: 300px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 14px;
+line-height: 24px;
+/* identical to box height, or 171% */
+
+color: #111827;
+
+
+
+/* Giống chè khác */
+
+position: absolute;
+width: 89px;
+height: 24px;
+left: 449px;
+top: 300px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 24px;
+/* identical to box height, or 200% */
+
+color: #111827;
+
+
+
+/* Thương phẩm màu khác */
+
+position: absolute;
+width: 137px;
+height: 24px;
+left: 828px;
+top: 296px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 24px;
+/* identical to box height, or 200% */
+
+color: #111827;
+
+
+
+/* Sửa */
+
+position: absolute;
+width: 23px;
+height: 20px;
+left: 1133px;
+top: 302px;
+
+font-family: 'Roboto';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 154% */
+text-align: center;
+
+color: #FFFFFF;
+
+
+
+/* Data */
+
+position: absolute;
+height: 28px;
+left: 1141px;
+right: 32px;
+top: 250px;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 6px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Group 23 */
+
+position: absolute;
+width: 46.67px;
+height: 16px;
+left: 7.33px;
+top: 6px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 12.22%;
+right: 65.56%;
+top: 26.19%;
+bottom: 26.19%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 38px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Data */
+
+position: absolute;
+height: 28px;
+left: 1142px;
+right: 31px;
+top: 299px;
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 6px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 20.83%;
+bottom: 62.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Group 23 */
+
+position: absolute;
+width: 46.67px;
+height: 16px;
+left: 7.33px;
+top: 6px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 12.22%;
+right: 65.56%;
+top: 26.19%;
+bottom: 26.19%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 38px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 41.67%;
+right: 58.33%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.33%;
+right: 41.67%;
+top: 45.83%;
+bottom: 29.17%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.83%;
+right: 20.84%;
+top: 25%;
+bottom: 8.33%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 25%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 75%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Header */
+
+position: absolute;
+height: 64px;
+left: 0px;
+right: 0.2px;
+top: 0px;
+
+background: #FFFFFF;
+
+
+/* Input */
+
+position: absolute;
+height: 36px;
+left: 24px;
+right: 1048.8px;
+top: calc(50% - 36px/2 - 0.4px);
+
+background: #F3F4F6;
+border-radius: 14px;
+
+
+/* Container */
+
+position: absolute;
+height: 16.8px;
+left: 36px;
+right: 16px;
+top: 9.6px;
+
+
+
+/* Tìm kiếm... */
+
+position: absolute;
+width: 72.55px;
+height: 16.8px;
+left: 0px;
+top: 0px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 17px;
+/* identical to box height */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* SVG */
+
+position: absolute;
+height: 16px;
+left: 36px;
+right: 1468.8px;
+top: calc(50% - 16px/2 - 0.4px);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 69.42%;
+right: 12.5%;
+top: 69.42%;
+bottom: 12.5%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 20.83%;
+top: 12.5%;
+bottom: 20.83%;
+
+border: 1.33333px solid #6B7280;
+
+
+/* Button */
+
+box-sizing: border-box;
+
+position: absolute;
+width: 102.1px;
+height: 33.6px;
+left: 504px;
+top: calc(50% - 33.6px/2 - 0.4px);
+
+border: 1px solid #DCDFE4;
+border-radius: 14px;
+
+
+/* Background */
+
+position: absolute;
+width: 20px;
+height: 20px;
+left: 12.8px;
+top: calc(50% - 20px/2 - 0px);
+
+background: #ECFDF5;
+border-radius: 8px;
+
+
+/* SVG */
+
+position: absolute;
+width: 12px;
+height: 12px;
+left: calc(50% - 12px/2);
+top: calc(50% - 12px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 12.5%;
+bottom: 12.5%;
+
+border: 1px solid #009966;
+
+
+/* Vector */
+
+position: absolute;
+left: 75%;
+right: 25%;
+top: 37.5%;
+bottom: 29.17%;
+
+border: 1px solid #009966;
+
+
+/* Vector */
+
+position: absolute;
+left: 54.17%;
+right: 45.83%;
+top: 20.83%;
+bottom: 29.17%;
+
+border: 1px solid #009966;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 66.67%;
+top: 58.33%;
+bottom: 29.17%;
+
+border: 1px solid #009966;
+
+
+/* Container */
+
+position: absolute;
+width: 26.5px;
+height: 20px;
+left: 40.8px;
+top: calc(50% - 20px/2 - 0px);
+
+
+
+/* SVG */
+
+position: absolute;
+width: 14px;
+height: 14px;
+left: 75.3px;
+top: calc(50% - 14px/2 - 0px);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 25%;
+right: 25%;
+top: 37.5%;
+bottom: 37.5%;
+
+border: 1.16667px solid #6B7280;
+
+
+/* Button */
+
+position: absolute;
+width: 54.91px;
+height: 36px;
+left: 622.1px;
+top: calc(50% - 36px/2 - 0.4px);
+
+border-radius: 10px;
+
+
+/* SVG */
+
+position: absolute;
+width: 20px;
+height: 20px;
+left: 8px;
+top: calc(50% - 20px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.33%;
+top: 8.33%;
+bottom: 8.33%;
+
+border: 1.66667px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.33%;
+top: 8.33%;
+bottom: 8.33%;
+
+border: 1.66667px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.33%;
+top: 50%;
+bottom: 50%;
+
+border: 1.66667px solid #6B7280;
+
+
+/* 🇻🇳 */
+
+position: absolute;
+width: 15.28px;
+height: 20px;
+left: 32px;
+top: calc(50% - 20px/2);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+text-align: center;
+
+color: #6B7280;
+
+
+
+/* Button */
+
+position: absolute;
+width: 36px;
+height: 36px;
+left: 681.01px;
+top: calc(50% - 36px/2 - 0.4px);
+
+border-radius: 10px;
+
+
+/* SVG */
+
+position: absolute;
+width: 20px;
+height: 20px;
+left: 8px;
+top: 8px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 42.78%;
+right: 42.78%;
+top: 87.5%;
+bottom: 8.33%;
+
+border: 1.66667px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 8.33%;
+bottom: 29.17%;
+
+border: 1.66667px solid #6B7280;
+
+
+/* Background */
+
+position: absolute;
+width: 8px;
+height: 8px;
+right: 6px;
+top: 6px;
+
+background: #FB2C36;
+border-radius: 2.68435e+07px;
+
+
+/* Button */
+
+position: absolute;
+width: 193.3px;
+height: 40.5px;
+left: 725.01px;
+top: calc(50% - 40.5px/2 - 0.4px);
+
+border-radius: 14px;
+
+
+/* Background */
+
+position: absolute;
+width: 32px;
+height: 32px;
+left: 4px;
+top: calc(50% - 32px/2);
+
+background: #21C45D;
+border-radius: 2.68435e+07px;
+
+
+/* Nguyễn Văn Minh */
+
+position: absolute;
+width: 119.68px;
+height: 17.5px;
+left: 44px;
+top: calc(50% - 17.5px/2 - 7.5px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 18px;
+/* identical to box height, or 125% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* Giám đốc */
+
+position: absolute;
+width: 54.26px;
+height: 15px;
+left: 44px;
+top: calc(50% - 15px/2 + 8.75px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 15px;
+/* identical to box height, or 125% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* SVG */
+
+position: absolute;
+width: 14px;
+height: 14px;
+left: 171.3px;
+top: calc(50% - 14px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 25%;
+right: 25%;
+top: 37.5%;
+bottom: 37.5%;
+
+border: 1.16667px solid #6B7280;
+
+
+/* Aside */
+
+position: absolute;
+width: 240px;
+left: 0px;
+top: 64px;
+bottom: 996.6px;
+
+background: #FFFFFF;
+
+
+/* HorizontalBorder */
+
+position: absolute;
+height: 76.8px;
+left: 0px;
+right: 0.8px;
+top: 0px;
+
+
+
+/* ESG VALLEY logo */
+
+position: absolute;
+height: 36px;
+left: 16px;
+right: 187.2px;
+top: 20px;
+
+background: url();
+
+
+/* ESG VALLEY */
+
+position: absolute;
+height: 20px;
+left: 64px;
+right: 89.01px;
+top: 20px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 700;
+font-size: 14px;
+line-height: 20px;
+/* identical to box height, or 143% */
+display: flex;
+align-items: center;
+
+color: #1D2025;
+
+
+
+/* v2.0.1 */
+
+position: absolute;
+height: 15.2px;
+left: 64px;
+right: 143.02px;
+top: 40px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 12px;
+line-height: 16px;
+/* identical to box height, or 133% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Nav */
+
+position: absolute;
+left: 0px;
+right: 0.8px;
+top: 76.8px;
+bottom: 48.79px;
+overflow: scroll;
+
+
+
+/* Link */
+
+position: absolute;
+height: 40px;
+left: 12px;
+right: 27.2px;
+top: 16px;
+
+border-radius: 14px;
+
+
+/* SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 12px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 37.5%;
+right: 37.5%;
+top: 50%;
+bottom: 12.5%;
+
+border: 1px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 8.33%;
+bottom: 12.5%;
+
+border: 1px solid #6B7280;
+
+
+/* Trang chủ */
+
+position: absolute;
+width: 67.7px;
+height: 16.8px;
+left: 40px;
+top: calc(50% - 16.8px/2 - 0px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 14px;
+line-height: 20px;
+/* or 143% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Link */
+
+position: absolute;
+height: 40px;
+left: 12px;
+right: 57.2px;
+top: 58px;
+
+
+
+/* SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 12px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 33.34%;
+top: 8.33%;
+bottom: 8.34%;
+
+border: 1px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 8.34%;
+top: 50%;
+bottom: 50%;
+
+border: 1px solid #6B7280;
+
+
+/* Container */
+
+position: absolute;
+width: 115.86px;
+height: 20px;
+left: 40px;
+top: calc(50% - 20px/2);
+
+
+
+/* Button → SVG */
+
+position: absolute;
+height: 14px;
+left: 190px;
+right: 35.2px;
+top: 71px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 25%;
+right: 25%;
+top: 37.5%;
+bottom: 37.5%;
+
+border: 1.16667px solid #6B7280;
+
+
+/* Overlay */
+
+position: absolute;
+height: 40px;
+left: 12px;
+right: 27.2px;
+top: 100px;
+
+background: rgba(33, 196, 93, 0.1);
+border-radius: 14px;
+
+
+/* Link */
+
+position: absolute;
+height: 40px;
+left: 0px;
+right: 30px;
+top: calc(50% - 40px/2);
+
+
+
+/* SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 12px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 12.5%;
+bottom: 12.5%;
+
+border: 1px solid #21C45D;
+
+
+/* Vector */
+
+position: absolute;
+left: 75%;
+right: 25%;
+top: 37.5%;
+bottom: 29.17%;
+
+border: 1px solid #21C45D;
+
+
+/* Vector */
+
+position: absolute;
+left: 54.17%;
+right: 45.83%;
+top: 20.83%;
+bottom: 29.17%;
+
+border: 1px solid #21C45D;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.33%;
+right: 66.67%;
+top: 58.33%;
+bottom: 29.17%;
+
+border: 1px solid #21C45D;
+
+
+/* Container */
+
+position: absolute;
+width: 26.5px;
+height: 20px;
+left: 40px;
+top: calc(50% - 20px/2);
+
+
+
+/* Button → SVG */
+
+position: absolute;
+width: 14px;
+height: 14px;
+left: 178px;
+top: calc(50% - 14px/2);
+
+transform: rotate(180deg);
+
+
+/* Vector */
+
+position: absolute;
+left: 25%;
+right: 25%;
+top: 37.5%;
+bottom: 37.5%;
+
+border: 1.16667px solid #21C45D;
+transform: rotate(180deg);
+
+
+/* VerticalBorder */
+
+position: absolute;
+height: 437.9px;
+left: 24px;
+right: 27.2px;
+top: 142px;
+
+
+
+/* Thu mua */
+
+position: absolute;
+height: 12px;
+left: 20.8px;
+right: 112.23px;
+top: 12.8px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 10px;
+line-height: 15px;
+/* or 150% */
+display: flex;
+align-items: center;
+letter-spacing: 1px;
+text-transform: uppercase;
+
+color: rgba(107, 114, 128, 0.6);
+
+
+
+/* Link */
+
+position: absolute;
+height: 31.99px;
+left: 12.8px;
+right: 0px;
+top: 31px;
+
+border-radius: 10px;
+
+
+/* SVG */
+
+position: absolute;
+width: 14px;
+height: 14px;
+left: 10px;
+top: calc(50% - 14px/2 - 0px);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 58.34%;
+right: 37.5%;
+top: 45.84%;
+bottom: 16.66%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 62.5%;
+right: 20.83%;
+top: 16.66%;
+bottom: 54.17%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.34%;
+right: 8.33%;
+top: 45.84%;
+bottom: 54.16%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 14.59%;
+right: 14.16%;
+top: 45.84%;
+bottom: 16.66%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 18.75%;
+right: 18.75%;
+top: 64.59%;
+bottom: 35.41%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 20.84%;
+right: 62.5%;
+top: 16.66%;
+bottom: 54.17%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 37.5%;
+right: 58.33%;
+top: 45.84%;
+bottom: 16.66%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Đơn thu mua */
+
+position: absolute;
+width: 73.3px;
+height: 15.2px;
+left: 34px;
+top: calc(50% - 15.2px/2 - 0.39px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 16px;
+/* identical to box height, or 133% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Sản xuất */
+
+position: absolute;
+height: 12px;
+left: 20.8px;
+right: 106.48px;
+top: 77.79px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 10px;
+line-height: 15px;
+/* or 150% */
+display: flex;
+align-items: center;
+letter-spacing: 1px;
+text-transform: uppercase;
+
+color: rgba(107, 114, 128, 0.6);
+
+
+
+/* Link */
+
+position: absolute;
+height: 31.99px;
+left: 12.8px;
+right: 0px;
+top: 95.99px;
+
+border-radius: 10px;
+
+
+/* SVG */
+
+position: absolute;
+width: 14px;
+height: 14px;
+left: 10px;
+top: calc(50% - 14px/2 - 0.01px);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 50%;
+right: 49.96%;
+top: 66.66%;
+bottom: 33.34%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 66.66%;
+right: 33.29%;
+top: 66.66%;
+bottom: 33.34%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 12.5%;
+bottom: 12.5%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.34%;
+right: 66.62%;
+top: 66.66%;
+bottom: 33.34%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Lệnh sản xuất */
+
+position: absolute;
+width: 80.3px;
+height: 15.2px;
+left: 34px;
+top: calc(50% - 15.2px/2 - 0.39px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 16px;
+/* identical to box height, or 133% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Đóng gói */
+
+position: absolute;
+height: 12px;
+left: 20.8px;
+right: 108.07px;
+top: 142.78px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 10px;
+line-height: 15px;
+/* or 150% */
+display: flex;
+align-items: center;
+letter-spacing: 1px;
+text-transform: uppercase;
+
+color: rgba(107, 114, 128, 0.6);
+
+
+
+/* Link */
+
+position: absolute;
+height: 31.99px;
+left: 12.8px;
+right: 0px;
+top: 160.97px;
+
+border-radius: 10px;
+
+
+/* SVG */
+
+position: absolute;
+width: 14px;
+height: 14px;
+left: 10px;
+top: calc(50% - 14px/2 - 0px);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 8.34%;
+bottom: 8.34%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 50%;
+right: 50%;
+top: 50%;
+bottom: 8.33%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 13.71%;
+right: 13.71%;
+top: 29.16%;
+bottom: 50%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 31.25%;
+right: 31.25%;
+top: 17.79%;
+bottom: 60.75%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Lô đóng gói */
+
+position: absolute;
+width: 67.76px;
+height: 15.2px;
+left: 34px;
+top: calc(50% - 15.2px/2 - 0.39px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 16px;
+/* identical to box height, or 133% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Bán hàng */
+
+position: absolute;
+height: 12px;
+left: 20.8px;
+right: 105.01px;
+top: 207.76px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 10px;
+line-height: 15px;
+/* or 150% */
+display: flex;
+align-items: center;
+letter-spacing: 1px;
+text-transform: uppercase;
+
+color: rgba(107, 114, 128, 0.6);
+
+
+
+/* Link */
+
+position: absolute;
+height: 31.99px;
+left: 12.8px;
+right: 0px;
+top: 225.96px;
+
+border-radius: 10px;
+
+
+/* SVG */
+
+position: absolute;
+width: 14px;
+height: 14px;
+left: 10px;
+top: calc(50% - 14px/2 - 0px);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 29.16%;
+right: 62.5%;
+top: 83.34%;
+bottom: 8.33%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 75%;
+right: 16.67%;
+top: 83.34%;
+bottom: 8.33%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.54%;
+right: 7.96%;
+top: 8.54%;
+bottom: 33.12%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Đơn hàng */
+
+position: absolute;
+width: 55.62px;
+height: 15.2px;
+left: 34px;
+top: calc(50% - 15.2px/2 - 0.39px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 16px;
+/* identical to box height, or 133% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Báo cáo */
+
+position: absolute;
+height: 12px;
+left: 20.8px;
+right: 114.46px;
+top: 272.75px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 10px;
+line-height: 15px;
+/* or 150% */
+display: flex;
+align-items: center;
+letter-spacing: 1px;
+text-transform: uppercase;
+
+color: rgba(107, 114, 128, 0.6);
+
+
+
+/* Link */
+
+position: absolute;
+height: 31.99px;
+left: 12.8px;
+right: 0px;
+top: 290.95px;
+
+border-radius: 10px;
+
+
+/* SVG */
+
+position: absolute;
+width: 14px;
+height: 14px;
+left: 10px;
+top: calc(50% - 14px/2 - 0px);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 16.66%;
+right: 16.67%;
+top: 8.34%;
+bottom: 8.33%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 58.34%;
+right: 16.66%;
+top: 8.34%;
+bottom: 66.66%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 33.34%;
+right: 66.66%;
+top: 66.66%;
+bottom: 25%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 50%;
+right: 50%;
+top: 58.34%;
+bottom: 25%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 66.66%;
+right: 33.34%;
+top: 50%;
+bottom: 25%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Báo cáo */
+
+position: absolute;
+width: 46.59px;
+height: 15.2px;
+left: 34px;
+top: calc(50% - 15.2px/2 - 0.39px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 16px;
+/* identical to box height, or 133% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Danh mục */
+
+position: absolute;
+height: 12px;
+left: 20.8px;
+right: 103.17px;
+top: 337.74px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 600;
+font-size: 10px;
+line-height: 15px;
+/* or 150% */
+display: flex;
+align-items: center;
+letter-spacing: 1px;
+text-transform: uppercase;
+
+color: rgba(107, 114, 128, 0.6);
+
+
+
+/* Link */
+
+position: absolute;
+height: 31.99px;
+left: 12.8px;
+right: 0px;
+top: 355.94px;
+
+border-radius: 10px;
+
+
+/* SVG */
+
+position: absolute;
+width: 14px;
+height: 14px;
+left: 10px;
+top: calc(50% - 14px/2 - 0px);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 8.34%;
+bottom: 8.34%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 50%;
+right: 50%;
+top: 50%;
+bottom: 8.33%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 13.71%;
+right: 13.71%;
+top: 29.16%;
+bottom: 50%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 31.25%;
+right: 31.25%;
+top: 17.79%;
+bottom: 60.75%;
+
+border: 0.875px solid #6B7280;
+
+
+/* Thương phẩm */
+
+position: absolute;
+width: 80.03px;
+height: 15.2px;
+left: 34px;
+top: calc(50% - 15.2px/2 - 0.39px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 16px;
+/* identical to box height, or 133% */
+display: flex;
+align-items: center;
+
+color: #6B7280;
+
+
+
+/* Link */
+
+position: absolute;
+height: 47.97px;
+left: 12.8px;
+right: 0px;
+top: 389.93px;
+
+background: rgba(33, 196, 93, 0.1);
+border-radius: 10px;
+
+
+/* SVG */
+
+position: absolute;
+width: 14px;
+height: 14px;
+left: 10px;
+top: calc(50% - 14px/2 - 0px);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 50%;
+right: 50%;
+top: 29.16%;
+bottom: 12.5%;
+
+border: 0.875px solid #21C45D;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.34%;
+right: 8.33%;
+top: 12.5%;
+bottom: 12.5%;
+
+border: 0.875px solid #21C45D;
+
+
+/* Quy cách & Tiêu chuẩn */
+
+position: absolute;
+width: 94.11px;
+height: 31.18px;
+left: 34px;
+top: calc(50% - 31.18px/2 - 0.4px);
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 12px;
+line-height: 16px;
+/* or 133% */
+display: flex;
+align-items: center;
+
+color: #21C45D;
+
+
+
+/* Link */
+
+position: absolute;
+height: 40px;
+left: 12px;
+right: 57.2px;
+top: 581.9px;
+
+
+
+/* SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 12px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 70.83%;
+top: 12.5%;
+bottom: 70.83%;
+
+border: 1px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 70.83%;
+right: 12.5%;
+top: 12.5%;
+bottom: 70.83%;
+
+border: 1px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 70.83%;
+right: 12.5%;
+top: 70.83%;
+bottom: 12.5%;
+
+border: 1px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 70.83%;
+top: 70.83%;
+bottom: 12.5%;
+
+border: 1px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 29.17%;
+right: 29.16%;
+top: 50%;
+bottom: 50%;
+
+border: 1px solid #6B7280;
+
+
+/* Container */
+
+position: absolute;
+width: 118px;
+height: 20px;
+left: 40px;
+top: calc(50% - 20px/2);
+
+
+
+/* Button → SVG */
+
+position: absolute;
+height: 14px;
+left: 190px;
+right: 35.2px;
+top: 594.9px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 25%;
+right: 25%;
+top: 37.5%;
+bottom: 37.5%;
+
+border: 1.16667px solid #6B7280;
+
+
+/* Link */
+
+position: absolute;
+height: 40px;
+left: 12px;
+right: 57.2px;
+top: 623.9px;
+
+
+
+/* SVG */
+
+position: absolute;
+width: 16px;
+height: 16px;
+left: 12px;
+top: calc(50% - 16px/2);
+
+
+
+/* Vector */
+
+position: absolute;
+left: 16.58%;
+right: 12.5%;
+top: 8.33%;
+bottom: 16.67%;
+
+border: 1px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 8.33%;
+right: 45.84%;
+top: 50%;
+bottom: 12.5%;
+
+border: 1px solid #6B7280;
+
+
+/* Container */
+
+position: absolute;
+width: 74.91px;
+height: 20px;
+left: 40px;
+top: calc(50% - 20px/2);
+
+
+
+/* Button → SVG */
+
+position: absolute;
+height: 14px;
+left: 190px;
+right: 35.2px;
+top: 636.9px;
+
+
+
+/* Vector */
+
+position: absolute;
+left: 25%;
+right: 25%;
+top: 37.5%;
+bottom: 37.5%;
+
+border: 1.16667px solid #6B7280;

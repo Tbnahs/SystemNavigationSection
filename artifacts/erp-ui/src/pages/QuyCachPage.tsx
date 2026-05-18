@@ -351,37 +351,70 @@ export default function QuyCachPage() {
       {gD && (
         <>
           <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={closeG} />
-          <aside className="fixed top-0 right-0 h-full w-full sm:w-[500px] bg-white shadow-2xl z-50 flex flex-col">
-            <div className="px-6 py-5 border-b border-border flex items-center justify-between">
-              <div className="text-[17px] font-semibold">{gE ? "Sửa quy cách" : "Thêm quy cách"}</div>
+          <aside className="fixed top-0 right-0 h-full w-full sm:w-[560px] bg-white shadow-2xl z-50 flex flex-col">
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between shrink-0">
+              <div className="text-[18px] font-semibold">{gE ? "Sửa quy cách" : "Thêm quy cách"}</div>
               <button onClick={closeG} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
-            <div className="flex-1 overflow-auto px-6 py-5 space-y-4">
-              <div>
-                <label className="block text-[13px] font-medium mb-1.5">Tên quy cách <span className="text-rose-500">*</span></label>
-                <input value={gF.name} onChange={e => setGF(p => ({ ...p, name: e.target.value }))} placeholder="1 tôm, 1 tôm 1 lá…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+            <div className="flex-1 overflow-auto px-6 py-6 space-y-8">
+
+              {/* Row 1: Tên + Ghi chú side by side */}
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[13px] font-medium mb-1.5 tracking-[0.005em]">Tên quy cách <span className="text-rose-500">*</span></label>
+                  <input value={gF.name} onChange={e => setGF(p => ({ ...p, name: e.target.value }))} placeholder="1 tôm, 1 tôm 1 lá…" className="w-full h-10 px-3 rounded-lg border border-[#DCDFE4] text-sm outline-none focus:border-primary" />
+                </div>
+                <div>
+                  <label className="block text-[13px] font-medium mb-1.5 tracking-[0.01em]">Ghi chú</label>
+                  <input value={gF.ghiChu} onChange={e => setGF(p => ({ ...p, ghiChu: e.target.value }))} placeholder="Ghi chú thêm…" className="w-full h-10 px-3 rounded-lg border border-[#DCDFE4] text-sm outline-none focus:border-primary" />
+                </div>
               </div>
-              <div>
-                <label className="block text-[13px] font-medium mb-1.5">Thương phẩm</label>
-                <select
-                  value={gF.loaiChe}
-                  onChange={e => setGF(p => ({ ...p, loaiChe: e.target.value }))}
-                  className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white"
-                >
-                  <option value="">-- Chọn thương phẩm --</option>
-                  {productNames.map(n => <option key={n} value={n}>{n}</option>)}
-                </select>
+
+              {/* Section: Cấu hình giống và thương phẩm */}
+              <div className="space-y-4">
+                <div className="text-[14px] font-semibold tracking-[0.7px] uppercase text-[#1D2025]">
+                  Cấu hình giống và thương phẩm
+                </div>
+                <div className="border border-[#DCDFE4] rounded-xl p-4 space-y-3">
+                  <div>
+                    <label className="block text-[12.5px] font-medium mb-1.5 text-muted-foreground">Thương phẩm</label>
+                    <select
+                      value={gF.loaiChe}
+                      onChange={e => setGF(p => ({ ...p, loaiChe: e.target.value }))}
+                      className="w-full h-10 px-3 rounded-lg border border-[#DCDFE4] text-sm outline-none bg-white focus:border-primary"
+                    >
+                      <option value="">-- Chọn thương phẩm --</option>
+                      {productNames.map(n => <option key={n} value={n}>{n}</option>)}
+                    </select>
+                  </div>
+                </div>
               </div>
+
+              {/* Prices */}
               <div>
-                <label className="block text-[13px] font-medium mb-1.5">Ghi chú</label>
-                <input value={gF.ghiChu} onChange={e => setGF(p => ({ ...p, ghiChu: e.target.value }))} placeholder="Ghi chú thêm…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                <label className="block text-[13px] font-medium mb-2">Bảng giá thu mua</label>
+                <PricesEditor prices={gF.prices} onChange={p => setGF(prev => ({ ...prev, prices: p }))} />
               </div>
+
+              {/* Color */}
+              <div>
+                <label className="block text-[13px] font-medium mb-2">Màu hiển thị</label>
+                <div className="flex gap-2 flex-wrap">
+                  {COLOR_OPTIONS.map(c => (
+                    <button key={c.key} type="button" onClick={() => setGF(p => ({ ...p, colorKey: c.key }))}
+                      className={`h-8 px-3 rounded-lg text-[12px] font-medium border transition-all ${c.row} ${gF.colorKey === c.key ? "ring-2 ring-primary ring-offset-1" : ""}`}>
+                      {c.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {gErr && <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{gErr}</div>}
             </div>
-            <div className="px-6 py-4 border-t border-border flex justify-end gap-2 bg-muted/40">
+            <div className="px-6 py-4 border-t border-border flex justify-end gap-2 bg-muted/30 shrink-0">
               <button onClick={closeG} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
               <button disabled={gC.isPending || gU.isPending} onClick={submitGrade} className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold hover:brightness-110 disabled:opacity-60 flex items-center gap-2">
-                {(gC.isPending || gU.isPending) && <Loader2 className="w-4 h-4 animate-spin" />}{gE ? "Lưu" : "Thêm"}
+                {(gC.isPending || gU.isPending) && <Loader2 className="w-4 h-4 animate-spin" />}{gE ? "Lưu thay đổi" : "Thêm"}
               </button>
             </div>
           </aside>

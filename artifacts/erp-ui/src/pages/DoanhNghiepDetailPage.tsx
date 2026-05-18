@@ -397,8 +397,15 @@ const CERT_CFG: Record<Cert["loai"], { label: string; bg: string; text: string; 
   khac:    { label: "Khác",    bg: "bg-slate-50",   text: "text-slate-600",   border: "border-slate-200" },
 };
 
+const SAMPLE_CERTS: Cert[] = [
+  { id: "s1", ten: "OCOP 4 Sao 2024", loai: "ocop", imageUrl: "https://picsum.photos/seed/ocop1/400/560" },
+  { id: "s2", ten: "VietGAP", loai: "vietgap", imageUrl: "https://picsum.photos/seed/vietgap2/400/560" },
+  { id: "s3", ten: "Organic Certified", loai: "organic", imageUrl: "https://picsum.photos/seed/organic3/400/560" },
+  { id: "s4", ten: "ISO 22000:2018", loai: "iso", imageUrl: "https://picsum.photos/seed/iso4/400/560" },
+];
+
 function CertsTab() {
-  const [certs, setCerts] = useState<Cert[]>([]);
+  const [certs, setCerts] = useState<Cert[]>(SAMPLE_CERTS);
   const [showAdd, setShowAdd] = useState(false);
   const [lightbox, setLightbox] = useState<Cert | null>(null);
   const [fTen, setFTen] = useState("");
@@ -431,10 +438,6 @@ function CertsTab() {
             <span className="text-[14px] font-semibold">Chứng nhận / Chứng chỉ</span>
             <span className="text-[12px] text-muted-foreground">({certs.length} tài liệu)</span>
           </div>
-          <button onClick={() => setShowAdd(true)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-lg hover:bg-primary/90">
-            <Plus className="w-3.5 h-3.5" /> Tải lên
-          </button>
         </div>
 
         {certs.length === 0 ? (
