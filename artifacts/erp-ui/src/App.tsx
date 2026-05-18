@@ -31,6 +31,7 @@ import ThuongPhamPage from "@/pages/ThuongPhamPage";
 import DonThuMuaPage from "@/pages/DonThuMuaPage";
 import GiongChePage from "@/pages/GiongChePage";
 import TxngSuKienPage from "@/pages/TxngSuKienPage";
+import TxngPage from "@/pages/TxngPage";
 import PortalPage from "@/pages/PortalPage";
 import HoSoPage from "@/pages/HoSoPage";
 import ModuleSelectPage from "@/pages/ModuleSelectPage";
@@ -162,6 +163,10 @@ function Router() {
         {() => <ProtectedRoute component={CoSoPage} />}
       </Route>
 
+      {/* TXNG module */}
+      <Route path="/module/txng">
+        {() => <ProtectedRoute component={TxngPage} />}
+      </Route>
       <Route path="/module/txng/su-kien">
         {() => <ProtectedRoute component={TxngSuKienPage} />}
       </Route>
