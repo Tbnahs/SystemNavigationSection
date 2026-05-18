@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import AppLayout from "@/components/AppLayout";
+import RichTextEditor from "@/components/RichTextEditor";
 import { Plus, Pencil, X, Loader2, Search, Package, Eye, Building2, Tag, Scale, DollarSign, Info, Calendar, Hash, ImageIcon, Barcode, Upload } from "lucide-react";
 import {
   fetchProducts, createProduct, updateProduct, deleteProduct,
@@ -397,7 +398,12 @@ export default function ThuongPhamPage() {
               </div>
               <div>
                 <label className="block text-[13px] font-medium mb-1.5">Mô tả</label>
-                <textarea value={form.description} onChange={e => setF("description", e.target.value)} rows={3} placeholder="Mô tả thêm…" className="w-full px-3 py-2.5 rounded-lg border border-border text-sm outline-none focus:border-primary resize-none" />
+                <RichTextEditor
+                  value={form.description}
+                  onChange={(val) => setF("description", val)}
+                  placeholder="Mô tả thêm…"
+                  minHeight={100}
+                />
               </div>
               {err && <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{err}</div>}
             </div>

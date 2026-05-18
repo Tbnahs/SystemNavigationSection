@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import AppLayout from "@/components/AppLayout";
+import RichTextEditor from "@/components/RichTextEditor";
 import { ArrowLeft, Leaf, Plus, Pencil, Trash2, X, Loader2, Download } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
@@ -435,7 +436,15 @@ export default function QuyCachPage() {
             </div>
             <div className="flex-1 overflow-auto px-6 py-5 space-y-4">
               <div><label className="block text-[13px] font-medium mb-1.5">Tiêu đề <span className="text-rose-500">*</span></label><input value={sF.title} onChange={e => setSF(p => ({ ...p, title: e.target.value }))} placeholder="VietGAP, OCOP…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" /></div>
-              <div><label className="block text-[13px] font-medium mb-1.5">Mô tả</label><textarea value={sF.description} onChange={e => setSF(p => ({ ...p, description: e.target.value }))} rows={3} placeholder="Mô tả tiêu chuẩn…" className="w-full px-3 py-2.5 rounded-lg border border-border text-sm outline-none focus:border-primary resize-none" /></div>
+              <div>
+                <label className="block text-[13px] font-medium mb-1.5">Mô tả</label>
+                <RichTextEditor
+                  value={sF.description}
+                  onChange={(val) => setSF(p => ({ ...p, description: val }))}
+                  placeholder="Mô tả tiêu chuẩn…"
+                  minHeight={100}
+                />
+              </div>
               <div>
                 <label className="block text-[13px] font-medium mb-2">Màu hiển thị</label>
                 <div className="flex flex-wrap gap-2">{COLOR_OPTIONS.map(c => <button key={c.key} onClick={() => setSF(p => ({ ...p, colorKey: c.key }))} className={`px-3 py-1.5 rounded-lg border text-[12px] font-medium ${colorRow(c.key)} ${sF.colorKey === c.key ? "ring-2 ring-offset-1 ring-primary" : ""}`}>{c.label}</button>)}</div>
