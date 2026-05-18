@@ -1,0 +1,1019 @@
+import { useState, useMemo } from "react";
+import { useLocation } from "wouter";
+import { exportToExcel, exportToPDF } from "@/utils/exportUtils";
+import { useERP, PurchaseOrder, RawReceipt } from "@/contexts/ERPContext";
+import AppLayout from "@/components/AppLayout";
+import {
+  ArrowLeft, ArrowRight, Search, ChevronUp, ChevronDown, Users, Leaf,
+  TrendingUp, Filter, X, Plus, MapPin, Phone, FileSpreadsheet,
+  FileText, Printer, Trash2, Eye, CheckCircle2, Clock, Truck,
+  Package, QrCode, ChevronRight, Warehouse, BadgeDollarSign,
+  AlertCircle, ClipboardList, ShoppingCart,
+} from "lucide-react";
+
+/* ────────── Types ────────── */
+type POStatus = "yeu-cau" | "dat-hang" | "nhan-hang" | "qc" | "nhap-kho" | "thanh-toan";
+type QCResult = "pending" | "pass" | "fail" | "reduce";
+type ThanhToan = "chua" | "mot-phan" | "da-thanh-toan";
+
+const PO_STATUS_CFG: Record<POStatus, { label: string; color: string; icon: React.ComponentType<{ className?: string }> }> = {
+  "yeu-cau":     { label: "Yêu cầu",   color: "bg-gray-100 text-gray-600",       icon: ClipboardList },
+  "dat-hang":    { label: "Đặt hàng",  color: "bg-blue-100 text-blue-700",       icon: ShoppingCart },
+  "nhan-hang":   { label: "Nhận hàng", color: "bg-amber-100 text-amber-700",     icon: Truck },
+  "qc":          { label: "Kiểm tra",  color: "bg-violet-100 text-violet-700",   icon: AlertCircle },
+  "nhap-kho":    { label: "Nhập kho",  color: "bg-emerald-100 text-emerald-700", icon: Warehouse },
+  "thanh-toan":  { label: "Thanh toán",color: "bg-sky-100 text-sky-700",         icon: BadgeDollarSign },
+};
+const PO_FLOW: POStatus[] = ["yeu-cau","dat-hang","nhan-hang","qc","nhap-kho","thanh-toan"];
+
+const QC_CFG: Record<QCResult, { label: string; color: string }> = {
+  pending: { label: "Chưa QC",     color: "bg-gray-100 text-gray-600" },
+  pass:    { label: "Đạt",         color: "bg-emerald-100 text-emerald-700" },
+  fail:    { label: "Không đạt",   color: "bg-red-100 text-red-600" },
+  reduce:  { label: "Giảm giá",    color: "bg-amber-100 text-amber-700" },
+};
+
+/* ────────── Farmer & Zone data ────────── */
+const FARMERS = [
+  { maHo: "NH001", tenHo: "Hoàng Thị Luyến",  diaChi: "Nà Hồng",   sdt: "0354125321", dienTich: 0.5 },
+  { maHo: "NH002", tenHo: "Hoàng Thị Đào",    diaChi: "Nà Hồng",   sdt: "0374704822", dienTich: 0.4 },
+  { maHo: "NH003", tenHo: "Phạm Thị Huyền",   diaChi: "Nà Hồng",   sdt: "0379251872", dienTich: 1.0 },
+  { maHo: "NH004", tenHo: "Triệu Văn Thạo",   diaChi: "Nà Hồng",   sdt: "0354871949", dienTich: 0.8 },
+  { maHo: "NH005", tenHo: "Hoàng Văn Thái",   diaChi: "Nà Hồng",   sdt: "0972061820", dienTich: 0.5 },
+  { maHo: "NH006", tenHo: "Triệu Văn Hòa",    diaChi: "Nà Hồng",   sdt: "0378360830", dienTich: 0.8 },
+  { maHo: "NH007", tenHo: "Hoàng Văn Tuấn",   diaChi: "Nà Hồng",   sdt: "0387851867", dienTich: 1.0 },
+  { maHo: "NH008", tenHo: "Đồng Thị Khuyết",  diaChi: "Nà Hồng",   sdt: "0962041090", dienTich: 0.7 },
+  { maHo: "NH009", tenHo: "Hạ Văn Thắng",     diaChi: "Nà Hồng",   sdt: "0337318858", dienTich: 1.5 },
+  { maHo: "NH010", tenHo: "Dương Thị Tươi",   diaChi: "Nà Hồng",   sdt: "",           dienTich: 0.5 },
+  { maHo: "NB001", tenHo: "Nông Thị Dung",    diaChi: "Nà Bay",    sdt: "0961466732", dienTich: 1.5 },
+  { maHo: "NB002", tenHo: "Nông Văn Nghiễm",  diaChi: "Nà Bay",    sdt: "0814665955", dienTich: 1.0 },
+  { maHo: "NB003", tenHo: "Mùng Văn Thời",    diaChi: "Nà Bay",    sdt: "0369254973", dienTich: 0.6 },
+  { maHo: "NB004", tenHo: "Triệu Văn Mỹ",     diaChi: "Nà Bay",    sdt: "0383760794", dienTich: 1.0 },
+  { maHo: "NB005", tenHo: "Nông Văn Đẳng",    diaChi: "Nà Bay",    sdt: "0374258744", dienTich: 1.0 },
+  { maHo: "NB006", tenHo: "Hoàng Văn Thống",  diaChi: "Nà Bay",    sdt: "0967186387", dienTich: 1.0 },
+  { maHo: "NB007", tenHo: "Nguyễn Văn Hân",   diaChi: "Nà Bay",    sdt: "0984922577", dienTich: 1.0 },
+  { maHo: "NB008", tenHo: "Nguyễn Thị Đa",    diaChi: "Nà Bay",    sdt: "0372122030", dienTich: 0.7 },
+  { maHo: "NB009", tenHo: "Triệu Văn Hánh",   diaChi: "Nà Bay",    sdt: "0345665232", dienTich: 0.8 },
+  { maHo: "NB010", tenHo: "Mạnh Văn Hồ",      diaChi: "Nà Bay",    sdt: "0349055299", dienTich: 2.0 },
+  { maHo: "NB011", tenHo: "Hoàng Thị Điềm",   diaChi: "Nà Bay",    sdt: "0375182932", dienTich: 0.4 },
+  { maHo: "NB012", tenHo: "Lâm Thị Tới",      diaChi: "Nà Bay",    sdt: "0353839713", dienTich: 0.3 },
+  { maHo: "NB013", tenHo: "Triệu Văn Cường",  diaChi: "Nà Bay",    sdt: "",           dienTich: 0.5 },
+  { maHo: "BC001", tenHo: "Hoàng Phúc Khôi",  diaChi: "Bản Chang", sdt: "0333770931", dienTich: 0.6 },
+  { maHo: "BC002", tenHo: "Triệu Văn Dựng",   diaChi: "Bản Chang", sdt: "0343233785", dienTich: 2.0 },
+  { maHo: "BC003", tenHo: "Hoàng Văn Mỹ",     diaChi: "Bản Chang", sdt: "",           dienTich: 0.5 },
+];
+
+const ZONES: Record<string, { maVuon: string; tenVuon: string; dienTich: number }[]> = {
+  NH001: [{ maVuon: "NH001-V1", tenVuon: "Vườn Nà Hồng 1", dienTich: 0.3 }, { maVuon: "NH001-V2", tenVuon: "Vườn Nà Hồng 2", dienTich: 0.2 }],
+  NH002: [{ maVuon: "NH002-V1", tenVuon: "Vườn Nà Hồng 1", dienTich: 0.4 }],
+  NH003: [{ maVuon: "NH003-V1", tenVuon: "Vườn Nà Hồng 1", dienTich: 0.5 }, { maVuon: "NH003-V2", tenVuon: "Vườn Nà Hồng 2", dienTich: 0.5 }],
+  NH004: [{ maVuon: "NH004-V1", tenVuon: "Vườn Nà Hồng 1", dienTich: 0.5 }, { maVuon: "NH004-V2", tenVuon: "Vườn Nà Hồng 2", dienTich: 0.3 }],
+  NH005: [{ maVuon: "NH005-V1", tenVuon: "Vườn Nà Hồng 1", dienTich: 0.5 }],
+  NH006: [{ maVuon: "NH006-V1", tenVuon: "Vườn Nà Hồng 1", dienTich: 0.4 }, { maVuon: "NH006-V2", tenVuon: "Vườn Nà Hồng 2", dienTich: 0.4 }],
+  NH007: [{ maVuon: "NH007-V1", tenVuon: "Vườn Nà Hồng 1", dienTich: 0.6 }, { maVuon: "NH007-V2", tenVuon: "Vườn Nà Hồng 2", dienTich: 0.4 }],
+  NH008: [{ maVuon: "NH008-V1", tenVuon: "Vườn Nà Hồng 1", dienTich: 0.7 }],
+  NH009: [{ maVuon: "NH009-V1", tenVuon: "Vườn Nà Hồng 1", dienTich: 0.8 }, { maVuon: "NH009-V2", tenVuon: "Vườn Nà Hồng 2", dienTich: 0.7 }],
+  NH010: [{ maVuon: "NH010-V1", tenVuon: "Vườn Nà Hồng 1", dienTich: 0.5 }],
+  NB001: [{ maVuon: "NB001-V1", tenVuon: "Vườn Nà Bay 1", dienTich: 0.8 }, { maVuon: "NB001-V2", tenVuon: "Vườn Nà Bay 2", dienTich: 0.7 }],
+  NB002: [{ maVuon: "NB002-V1", tenVuon: "Vườn Nà Bay 1", dienTich: 0.6 }, { maVuon: "NB002-V2", tenVuon: "Vườn Nà Bay 2", dienTich: 0.4 }],
+  NB003: [{ maVuon: "NB003-V1", tenVuon: "Vườn Nà Bay 1", dienTich: 0.6 }],
+  NB004: [{ maVuon: "NB004-V1", tenVuon: "Vườn Nà Bay 1", dienTich: 0.5 }, { maVuon: "NB004-V2", tenVuon: "Vườn Nà Bay 2", dienTich: 0.5 }],
+  NB005: [{ maVuon: "NB005-V1", tenVuon: "Vườn Nà Bay 1", dienTich: 1.0 }],
+  NB006: [{ maVuon: "NB006-V1", tenVuon: "Vườn Nà Bay 1", dienTich: 0.6 }, { maVuon: "NB006-V2", tenVuon: "Vườn Nà Bay 2", dienTich: 0.4 }],
+  NB007: [{ maVuon: "NB007-V1", tenVuon: "Vườn Nà Bay 1", dienTich: 0.5 }, { maVuon: "NB007-V2", tenVuon: "Vườn Nà Bay 2", dienTich: 0.5 }],
+  NB008: [{ maVuon: "NB008-V1", tenVuon: "Vườn Nà Bay 1", dienTich: 0.7 }],
+  NB009: [{ maVuon: "NB009-V1", tenVuon: "Vườn Nà Bay 1", dienTich: 0.5 }, { maVuon: "NB009-V2", tenVuon: "Vườn Nà Bay 2", dienTich: 0.3 }],
+  NB010: [{ maVuon: "NB010-V1", tenVuon: "Vườn Nà Bay 1", dienTich: 1.0 }, { maVuon: "NB010-V2", tenVuon: "Vườn Nà Bay 2", dienTich: 0.6 }, { maVuon: "NB010-V3", tenVuon: "Vườn Nà Bay 3", dienTich: 0.4 }],
+  NB011: [{ maVuon: "NB011-V1", tenVuon: "Vườn Nà Bay 1", dienTich: 0.4 }],
+  NB012: [{ maVuon: "NB012-V1", tenVuon: "Vườn Nà Bay 1", dienTich: 0.3 }],
+  NB013: [{ maVuon: "NB013-V1", tenVuon: "Vườn Nà Bay 1", dienTich: 0.5 }],
+  BC001: [{ maVuon: "BC001-V1", tenVuon: "Vườn Bản Chang 1", dienTich: 0.6 }],
+  BC002: [{ maVuon: "BC002-V1", tenVuon: "Vườn Bản Chang 1", dienTich: 1.2 }, { maVuon: "BC002-V2", tenVuon: "Vườn Bản Chang 2", dienTich: 0.8 }],
+  BC003: [{ maVuon: "BC003-V1", tenVuon: "Vườn Bản Chang 1", dienTich: 0.5 }],
+};
+
+/* ── Quy cách specs (per official price table) ── */
+const QUY_CACH_CFG: Record<string, { loaiChe: string; priceNote: string; color: string; fixedPrice?: number }> = {
+  "1 tôm":        { loaiChe: "Chè xanh",  priceNote: "27,000 – 30,000 đ/kg",   color: "bg-emerald-100 text-emerald-800 border-emerald-300" },
+  "1 tôm 1 lá":   { loaiChe: "Hồng trà",  priceNote: "50,000 đ/kg",            color: "bg-rose-100 text-rose-800 border-rose-300", fixedPrice: 50000 },
+  "1 tôm 2 lá":   { loaiChe: "Bạch trà",  priceNote: "27,000 – 30,000 đ/kg",   color: "bg-sky-100 text-sky-800 border-sky-300" },
+  "2 lá":         { loaiChe: "Chè thường", priceNote: "27,000 đ/kg",            color: "bg-amber-100 text-amber-800 border-amber-300", fixedPrice: 27000 },
+  "Cây di sản":   { loaiChe: "Đặc sản",   priceNote: "40,000 – 60,000 đ/kg",   color: "bg-violet-100 text-violet-800 border-violet-300", fixedPrice: 50000 },
+};
+
+/* Đơn giá theo % chất lượng (áp dụng cho "1 tôm", "1 tôm 2 lá") */
+const QUALITY_PRICE_TABLE = [
+  { min: 70, max: 79, gia: 27000, label: "70–79%" },
+  { min: 80, max: 89, gia: 28000, label: "80–89%" },
+  { min: 90, max: 99, gia: 29000, label: "90–99%" },
+  { min: 100, max: 100, gia: 30000, label: "100%" },
+];
+
+const calcDonGia = (quyCach: string, cl: number) => {
+  const cfg = QUY_CACH_CFG[quyCach];
+  if (cfg?.fixedPrice) return cfg.fixedPrice;
+  if (cl >= 100) return 30000;
+  if (cl >= 90)  return 29000;
+  if (cl >= 80)  return 28000;
+  return 27000;
+};
+
+
+
+let _nextId = 200;
+const genId = () => String(++_nextId);
+
+function fmt(v: number) { return v.toLocaleString("vi-VN") + " đ"; }
+function fmtKg(v: number) { return v.toFixed(2).replace(".", ",") + " kg"; }
+
+const AREA_COLORS: Record<string, string> = {
+  "Nà Hồng":   "bg-emerald-100 text-emerald-700",
+  "Nà Bay":    "bg-blue-100 text-blue-700",
+  "Bản Chang": "bg-amber-100 text-amber-700",
+};
+
+/* ────────── Component ────────── */
+export default function PurchasePage() {
+  const [, setLocation] = useLocation();
+  const [activeTab, setActiveTab] = useState<"po" | "receipt" | "tong-ket">("po");
+  const [search, setSearch]   = useState("");
+  const [statusFilter, setStatusFilter] = useState<POStatus | "">("");
+  const [diaChi, setDiaChi]   = useState("");
+  const [dateFrom, setDateFrom] = useState("");
+  const [dateTo, setDateTo]     = useState("");
+  const [sortKey, setSortKey]   = useState("ngayTao");
+  const [sortDir, setSortDir]   = useState<"asc"|"desc">("desc");
+
+  const { purchaseOrders: poList, setPurchaseOrders: setPoList, rawReceipts: receipts } = useERP();
+  const [selectedPO, setSelectedPO] = useState<PurchaseOrder | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+
+  /* form state */
+  const [step, setStep]           = useState<"chon-ho" | "chi-tiet">("chon-ho");
+  const [hoSearch, setHoSearch]   = useState("");
+  const [qrMode, setQrMode]       = useState(false);
+  const [selHo, setSelHo]         = useState<typeof FARMERS[number] | null>(null);
+  const [selVuon, setSelVuon]     = useState("");
+  const [fDate, setFDate]         = useState(new Date().toISOString().slice(0,10));
+  const [fGiao, setFGiao]         = useState("");
+  const [fQuyCach, setFQuyCach]   = useState("1 tôm 2 lá");
+  const [fKL, setFKL]             = useState("");
+  const [fCL, setFCL]             = useState(85);
+  const [fNote, setFNote]         = useState("");
+  const [farmerSearch, setFarmerSearch] = useState("");
+
+  const fDonGia   = useMemo(() => calcDonGia(fQuyCach, fCL), [fQuyCach, fCL]);
+  const fTotal    = useMemo(() => (parseFloat(fKL) || 0) * fDonGia, [fKL, fDonGia]);
+  const filteredHo = useMemo(() => {
+    if (!hoSearch) return FARMERS;
+    const q = hoSearch.toLowerCase();
+    return FARMERS.filter(h => h.tenHo.toLowerCase().includes(q) || h.maHo.toLowerCase().includes(q) || h.diaChi.toLowerCase().includes(q));
+  }, [hoSearch]);
+  const zonesOfSel = selHo ? (ZONES[selHo.maHo] ?? []) : [];
+
+  const resetForm = () => {
+    setStep("chon-ho"); setHoSearch(""); setSelHo(null); setSelVuon("");
+    setFDate(new Date().toISOString().slice(0,10)); setFGiao(""); setFQuyCach("1 tôm 2 lá");
+    setFKL(""); setFCL(85); setFNote(""); setQrMode(false);
+  };
+
+  const handleCreate = () => {
+    if (!selHo || !fKL) return;
+    const vuon = zonesOfSel.find(v => v.maVuon === selVuon) ?? zonesOfSel[0];
+    const [y, m, d] = fDate.split("-");
+    const newPO: PurchaseOrder = {
+      id: genId(),
+      maPO: `PO-${d}${m}-${String(poList.length + 1).padStart(3,"0")}`,
+      maHo: selHo.maHo, tenHo: selHo.tenHo, diaChi: selHo.diaChi, sdt: selHo.sdt,
+      maVuon: vuon?.maVuon ?? "", tenVuon: vuon?.tenVuon ?? "",
+      ngayTao: `${d}/${m}/${y}`, ngayGiao: fGiao ? (() => { const [gy,gm,gd] = fGiao.split("-"); return `${gd}/${gm}/${gy}`; })() : "",
+      quyCach: fQuyCach, khoiLuongDat: parseFloat(fKL), khoiLuongNhan: 0,
+      donGia: fDonGia, chatLuong: fCL, qcResult: "pending",
+      trangThai: "yeu-cau", thanhToan: "chua", batchId: "", ghiChu: fNote, nguoiTao: "Admin",
+    };
+    setPoList(prev => [newPO, ...prev]);
+    setShowCreate(false); resetForm();
+  };
+
+  const handleStatusChange = (id: string, s: POStatus) => {
+    setPoList(prev => prev.map(o => {
+      if (o.id !== id) return o;
+      const updated = { ...o, trangThai: s };
+      if (s === "nhap-kho" && !updated.batchId) {
+        const ts = Date.now().toString().slice(-4);
+        updated.batchId = `RAW-${o.maHo}-${ts}`;
+      }
+      return updated;
+    }));
+    if (selectedPO?.id === id) setSelectedPO(prev => {
+      if (!prev) return prev;
+      const upd = { ...prev, trangThai: s };
+      if (s === "nhap-kho" && !upd.batchId) { const ts = Date.now().toString().slice(-4); upd.batchId = `RAW-${prev.maHo}-${ts}`; }
+      return upd;
+    });
+  };
+
+  const handleQCChange = (id: string, qc: QCResult) => {
+    setPoList(prev => prev.map(o => o.id !== id ? o : { ...o, qcResult: qc }));
+    if (selectedPO?.id === id) setSelectedPO(p => p ? { ...p, qcResult: qc } : p);
+  };
+
+  const handleDelete = (id: string) => {
+    if (!window.confirm("Xóa đơn mua này?")) return;
+    setPoList(prev => prev.filter(o => o.id !== id));
+    if (selectedPO?.id === id) setSelectedPO(null);
+  };
+
+  const handleExportPDF = () => {
+    const rows = poList.map(po => ({
+      ...po,
+      thanhTien: po.khoiLuongNhan * po.donGia,
+    }));
+    exportToPDF(
+      "Danh sách Phiếu Thu mua",
+      `HTX Hồng Hà · ${poList.length} phiếu thu mua nguyên liệu`,
+      [
+        { header: "Mã PO",         key: "maPO",           width: 16 },
+        { header: "Mã hộ",         key: "maHo",           width: 10 },
+        { header: "Tên hộ",        key: "tenHo",          width: 28 },
+        { header: "Địa chỉ",       key: "diaChi",         width: 14 },
+        { header: "Ngày giao",     key: "ngayGiao",       width: 14 },
+        { header: "Quy cách",      key: "quyCach",        width: 16 },
+        { header: "KL đặt (kg)",   key: "khoiLuongDat",   width: 14 },
+        { header: "KL nhận (kg)",  key: "khoiLuongNhan",  width: 14 },
+        { header: "Đơn giá (đ)",   key: "donGia",         width: 14 },
+        { header: "Thành tiền (đ)",key: "thanhTien",      width: 16 },
+        { header: "Mã mẻ",         key: "batchId",        width: 18 },
+        { header: "Trạng thái",    key: "trangThai",      width: 14 },
+      ],
+      rows as unknown as Record<string, unknown>[],
+      "ThuMua_HTXHongHa"
+    );
+  };
+
+  const handleExport = () => {
+    const rows = poList.map(po => ({
+      ...po,
+      thanhTien: po.khoiLuongNhan * po.donGia,
+    }));
+    exportToExcel(
+      [
+        { header: "Mã PO",          key: "maPO",           width: 16 },
+        { header: "Mã hộ",          key: "maHo",           width: 10 },
+        { header: "Tên hộ",         key: "tenHo",          width: 28 },
+        { header: "Địa chỉ",        key: "diaChi",         width: 14 },
+        { header: "Ngày giao",      key: "ngayGiao",       width: 14 },
+        { header: "Quy cách",       key: "quyCach",        width: 16 },
+        { header: "KL đặt (kg)",    key: "khoiLuongDat",   width: 14 },
+        { header: "KL nhận (kg)",   key: "khoiLuongNhan",  width: 14 },
+        { header: "Đơn giá (đ)",    key: "donGia",         width: 14 },
+        { header: "Thành tiền (đ)", key: "thanhTien",      width: 16 },
+        { header: "Mã mẻ",          key: "batchId",        width: 18 },
+        { header: "Trạng thái",     key: "trangThai",      width: 14 },
+        { header: "Ghi chú",        key: "ghiChu",         width: 28 },
+      ],
+      rows as unknown as Record<string, unknown>[],
+      "ThuMua_HTXHongHa"
+    );
+  };
+
+  const parseDateVN = (s: string) => { const [d,m,y] = s.split("/"); return `${y}-${m}-${d}`; };
+  const handleSort = (k: string) => {
+    if (sortKey === k) setSortDir(d => d === "asc" ? "desc" : "asc");
+    else { setSortKey(k); setSortDir("asc"); }
+  };
+  const SortIcon = ({ col }: { col: string }) =>
+    sortKey !== col ? <ChevronUp className="w-3 h-3 opacity-30" /> :
+    sortDir === "asc" ? <ChevronUp className="w-3 h-3 text-primary" /> : <ChevronDown className="w-3 h-3 text-primary" />;
+
+  const filteredPO = useMemo(() => {
+    let data = poList;
+    if (search) { const q = search.toLowerCase(); data = data.filter(o => o.maPO.toLowerCase().includes(q) || o.tenHo.toLowerCase().includes(q) || o.maHo.toLowerCase().includes(q)); }
+    if (statusFilter) data = data.filter(o => o.trangThai === statusFilter);
+    if (diaChi) data = data.filter(o => o.diaChi === diaChi);
+    if (dateFrom) data = data.filter(o => parseDateVN(o.ngayTao) >= dateFrom);
+    if (dateTo)   data = data.filter(o => parseDateVN(o.ngayTao) <= dateTo);
+    return [...data].sort((a, b) => {
+      const av = (a as Record<string,unknown>)[sortKey];
+      const bv = (b as Record<string,unknown>)[sortKey];
+      if (typeof av === "number" && typeof bv === "number") return sortDir === "asc" ? av - bv : bv - av;
+      return sortDir === "asc" ? String(av).localeCompare(String(bv)) : String(bv).localeCompare(String(av));
+    });
+  }, [poList, search, statusFilter, diaChi, dateFrom, dateTo, sortKey, sortDir]);
+
+  const filteredFarmers = useMemo(() => {
+    if (!farmerSearch) return FARMERS;
+    const q = farmerSearch.toLowerCase();
+    return FARMERS.filter(f => f.tenHo.toLowerCase().includes(q) || f.maHo.toLowerCase().includes(q) || f.diaChi.toLowerCase().includes(q));
+  }, [farmerSearch]);
+
+  /* Stats */
+  const totalKL   = receipts.reduce((s,r) => s + r.khoiLuong, 0);
+  const totalTien = receipts.reduce((s,r) => s + r.thanhTien, 0);
+  const pendingCount = poList.filter(o => ["yeu-cau","dat-hang","nhan-hang","qc"].includes(o.trangThai)).length;
+  const uniqueHoCount = new Set(receipts.map(r => r.maHo)).size;
+
+  return (
+    <AppLayout>
+      {/* Header */}
+      <div className="mb-5">
+        <button onClick={() => setLocation("/module/erp")} className="flex items-center gap-2 text-muted-foreground hover:text-foreground text-sm transition-colors mb-4">
+          <ArrowLeft className="w-4 h-4" /> Quay lại ERP
+        </button>
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-xl font-bold text-foreground">Quản lý Mua hàng</h1>
+            <p className="text-sm text-muted-foreground mt-0.5">HTX Hồng Hà · Yêu cầu mua → Đặt hàng → Nhận hàng → QC → Nhập kho → Thanh toán</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button onClick={handleExport} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg hover:bg-emerald-100 transition-colors"><FileSpreadsheet className="w-3.5 h-3.5" /> Excel</button>
+            <button onClick={handleExportPDF} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-rose-50 text-rose-600 border border-rose-200 rounded-lg hover:bg-rose-100 transition-colors"><FileText className="w-3.5 h-3.5" /> PDF</button>
+            <button className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-50 text-gray-600 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"><Printer className="w-3.5 h-3.5" /> In</button>
+            <button onClick={() => { setShowCreate(true); resetForm(); }} className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors whitespace-nowrap"><Plus className="w-4 h-4" /> Tạo đơn mua</button>
+          </div>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-5">
+        {[
+          { icon: Leaf,           label: "Tổng thu mua",  value: fmtKg(totalKL),             sub: "nguyên liệu tươi",    color: "text-emerald-600 bg-emerald-50" },
+          { icon: TrendingUp,     label: "Chi phí",        value: (totalTien/1e6).toFixed(1)+" tr đ", sub: "đã thanh toán",  color: "text-blue-600 bg-blue-50" },
+          { icon: Clock,          label: "Đang xử lý",     value: `${pendingCount} đơn`,       sub: "cần xử lý tiếp",       color: "text-amber-600 bg-amber-50" },
+          { icon: Users,          label: "Nông hộ",         value: `${uniqueHoCount} hộ`,      sub: "đã giao chè",          color: "text-violet-600 bg-violet-50" },
+        ].map((s,i) => (
+          <div key={i} className="bg-white border border-border rounded-xl p-4 flex items-start gap-3">
+            <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${s.color}`}><s.icon className="w-4 h-4" strokeWidth={1.5} /></div>
+            <div><p className="text-xs text-muted-foreground">{s.label}</p><p className="text-base font-bold text-foreground">{s.value}</p><p className="text-xs text-muted-foreground">{s.sub}</p></div>
+          </div>
+        ))}
+      </div>
+
+      {/* Tabs */}
+      <div className="flex items-center gap-1 mb-4 border-b border-border overflow-x-auto">
+        {[
+          { key: "po",        label: "Đơn mua",   count: poList.length },
+          { key: "receipt",   label: "Nhận hàng", count: receipts.length },
+          { key: "tong-ket",  label: "Tổng kết",  count: 4 },
+        ].map(tab => (
+          <button key={tab.key} onClick={() => setActiveTab(tab.key as typeof activeTab)}
+            className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
+            {tab.label}
+            <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full text-xs font-bold ${activeTab === tab.key ? "bg-primary text-white" : "bg-muted text-muted-foreground"}`}>{tab.count}</span>
+          </button>
+        ))}
+      </div>
+
+      {/* ── PO Tab ── */}
+      {activeTab === "po" && (
+        <div className="bg-white border border-border rounded-xl overflow-hidden">
+          {/* Toolbar */}
+          <div className="flex items-center gap-2 p-4 border-b border-border flex-wrap">
+            <div className="relative flex-1 min-w-40">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Tìm mã PO, nông hộ..." className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
+            </div>
+            <select value={statusFilter} onChange={e => setStatusFilter(e.target.value as POStatus | "")} className="px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary">
+              <option value="">Tất cả TT</option>
+              {Object.entries(PO_STATUS_CFG).map(([k,v]) => <option key={k} value={k}>{v.label}</option>)}
+            </select>
+            <select value={diaChi} onChange={e => setDiaChi(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background focus:outline-none focus:ring-1 focus:ring-primary">
+              <option value="">Tất cả vùng</option>
+              {["Nà Hồng","Nà Bay","Bản Chang"].map(d => <option key={d} value={d}>{d}</option>)}
+            </select>
+            <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background" />
+            <span className="text-muted-foreground text-sm">—</span>
+            <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="px-3 py-2 text-sm border border-border rounded-lg bg-background" />
+            <button onClick={() => { setSearch(""); setStatusFilter(""); setDiaChi(""); setDateFrom(""); setDateTo(""); }} className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium border border-border rounded-lg hover:bg-muted/50 transition-colors"><Filter className="w-3.5 h-3.5" /> Lọc</button>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead><tr className="border-b border-border bg-muted/30">
+                {[
+                  { key:"maPO",           label:"Mã PO" },
+                  { key:"tenHo",          label:"Nông hộ" },
+                  { key:"ngayGiao",       label:"Ngày giao" },
+                  { key:"quyCach",        label:"Quy cách" },
+                  { key:"khoiLuongDat",   label:"KL đặt (kg)" },
+                  { key:"khoiLuongNhan",  label:"KL nhận (kg)" },
+                  { key:"donGia",         label:"Đơn giá (đ)" },
+                  { key:"thanhTien",      label:"Thành tiền (đ)" },
+                  { key:"batchId",        label:"Mã mẻ" },
+                  { key:"trangThai",      label:"Trạng thái" },
+                  { key:"qcResult",       label:"QC" },
+                ].map(col => (
+                  <th key={col.key} onClick={() => handleSort(col.key)} className="text-left py-2.5 px-4 font-semibold text-xs text-muted-foreground uppercase tracking-wide cursor-pointer hover:text-foreground select-none whitespace-nowrap">
+                    <span className="flex items-center gap-1">{col.label} <SortIcon col={col.key} /></span>
+                  </th>
+                ))}
+                <th className="py-2.5 px-4 text-right font-semibold text-xs text-muted-foreground uppercase tracking-wide">Thao tác</th>
+              </tr></thead>
+              <tbody>
+                {filteredPO.map(po => {
+                  const sc = PO_STATUS_CFG[po.trangThai];
+                  const Ic = sc.icon;
+                  const qc = QC_CFG[po.qcResult];
+                  const thanhTien = po.khoiLuongNhan * po.donGia;
+                  return (
+                    <tr key={po.id} className="border-b border-border/60 hover:bg-muted/20 transition-colors cursor-pointer" onClick={() => setSelectedPO(po)}>
+                      <td className="py-3 px-4"><span className="font-mono text-xs font-semibold text-primary">{po.maPO}</span></td>
+                      <td className="py-3 px-4">
+                        <p className="font-medium text-sm">{po.tenHo}</p>
+                        <div className="flex items-center gap-1 mt-0.5">
+                          <span className="font-mono text-xs text-muted-foreground">{po.maHo}</span>
+                          <span className={`inline-flex text-xs px-1.5 py-0.5 rounded-md font-medium ${AREA_COLORS[po.diaChi] ?? "bg-gray-100 text-gray-600"}`}>{po.diaChi}</span>
+                        </div>
+                      </td>
+                      <td className="py-3 px-4 text-xs text-muted-foreground whitespace-nowrap">{po.ngayGiao || po.ngayTao}</td>
+                      <td className="py-3 px-4">
+                        {po.quyCach ? <span className={`inline-flex text-xs px-2 py-0.5 rounded-full border font-medium ${QUY_CACH_CFG[po.quyCach]?.color ?? "bg-gray-100 text-gray-600 border-gray-200"}`}>{po.quyCach}</span> : <span className="text-muted-foreground text-xs">—</span>}
+                      </td>
+                      <td className="py-3 px-4 font-medium text-sm">{po.khoiLuongDat}</td>
+                      <td className="py-3 px-4 text-sm">{po.khoiLuongNhan > 0 ? <span className="font-semibold text-emerald-700">{po.khoiLuongNhan}</span> : <span className="text-muted-foreground">—</span>}</td>
+                      <td className="py-3 px-4 text-xs text-right">{po.donGia.toLocaleString("vi-VN")}</td>
+                      <td className="py-3 px-4 text-sm text-right">{thanhTien > 0 ? <span className="font-semibold text-emerald-700">{fmt(thanhTien)}</span> : <span className="text-muted-foreground">—</span>}</td>
+                      <td className="py-3 px-4">{po.batchId ? <span className="font-mono text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md">{po.batchId}</span> : <span className="text-xs text-muted-foreground">—</span>}</td>
+                      <td className="py-3 px-4"><span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${sc.color}`}><Ic className="w-3 h-3" />{sc.label}</span></td>
+                      <td className="py-3 px-4"><span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${qc.color}`}>{qc.label}</span></td>
+                      <td className="py-3 px-4" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-end gap-0.5">
+                          <button onClick={() => setSelectedPO(po)} className="p-1.5 rounded-md hover:bg-muted/60 text-muted-foreground hover:text-foreground transition-colors" title="Xem"><Eye className="w-3.5 h-3.5" /></button>
+                          <button onClick={() => handleDelete(po.id)} className="p-1.5 rounded-md hover:bg-red-50 text-muted-foreground hover:text-red-500 transition-colors" title="Xóa"><Trash2 className="w-3.5 h-3.5" /></button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+            {filteredPO.length === 0 && <div className="text-center py-12 text-muted-foreground text-sm">Không có đơn mua nào</div>}
+          </div>
+          <div className="px-4 py-2 border-t border-border flex items-center justify-between bg-muted/10">
+            <p className="text-xs text-muted-foreground">Hiển thị {filteredPO.length} / {poList.length} đơn</p>
+            <div className="flex items-center gap-4">
+              <p className="text-xs font-semibold">KL nhận: <span className="text-emerald-700">{filteredPO.reduce((s,o) => s+o.khoiLuongNhan, 0).toFixed(1)} kg</span></p>
+              <p className="text-xs font-semibold">Tổng tiền: <span className="text-emerald-700">{fmt(filteredPO.reduce((s,o) => s + o.khoiLuongNhan * o.donGia, 0))}</span></p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Nhận hàng Tab ── */}
+      {activeTab === "receipt" && (
+        <div className="bg-white border border-border rounded-xl overflow-hidden">
+          <div className="flex items-center gap-2 p-4 border-b border-border">
+            <div className="relative flex-1 min-w-40">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+              <input placeholder="Tìm nông hộ, mã PO..." className="w-full pl-9 pr-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
+            </div>
+            <button onClick={handleExport} className="flex items-center gap-1.5 px-3 py-2 text-sm border border-border rounded-lg hover:bg-muted/50 transition-colors"><FileSpreadsheet className="w-3.5 h-3.5" /> Xuất Excel</button>
+          </div>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead><tr className="border-b border-border bg-muted/30">
+                {["STT","Mã PO","Nông hộ","Vùng","Ngày nhận","Quy cách","KL (kg)","Đơn giá","Thành tiền","Batch ID"].map((h,i) => (
+                  <th key={i} className="text-left py-2.5 px-4 font-semibold text-xs text-muted-foreground uppercase tracking-wide whitespace-nowrap">{h}</th>
+                ))}
+              </tr></thead>
+              <tbody>
+                {receipts.map((r, i) => (
+                  <tr key={r.id} className="border-b border-border/60 hover:bg-muted/20">
+                    <td className="py-2.5 px-4 text-xs text-muted-foreground">{i+1}</td>
+                    <td className="py-2.5 px-4"><span className="font-mono text-xs text-primary">{r.maPO || "—"}</span></td>
+                    <td className="py-2.5 px-4">
+                      <p className="font-medium text-sm">{r.tenHo}</p>
+                      <span className="text-xs text-muted-foreground">{r.maHo}</span>
+                    </td>
+                    <td className="py-2.5 px-4"><span className={`inline-flex text-xs px-1.5 py-0.5 rounded-md font-medium ${AREA_COLORS[r.diaChi] ?? "bg-gray-100 text-gray-600"}`}>{r.diaChi}</span></td>
+                    <td className="py-2.5 px-4 text-xs text-muted-foreground whitespace-nowrap">{r.ngay}</td>
+                    <td className="py-2.5 px-4 text-xs">{r.quyCach}</td>
+                    <td className="py-2.5 px-4 font-semibold">{r.khoiLuong.toFixed(2)}</td>
+                    <td className="py-2.5 px-4 text-xs">{r.donGia.toLocaleString("vi-VN")}</td>
+                    <td className="py-2.5 px-4 font-semibold text-emerald-700">{fmt(r.thanhTien)}</td>
+                    <td className="py-2.5 px-4">{r.batchId ? <span className="font-mono text-xs bg-emerald-50 text-emerald-700 px-2 py-0.5 rounded-md">{r.batchId}</span> : <span className="text-xs text-muted-foreground">—</span>}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="px-4 py-3 border-t border-border flex items-center justify-between bg-emerald-50/50">
+            <p className="text-xs text-muted-foreground">{receipts.length} phiếu nhận hàng</p>
+            <div className="flex items-center gap-4">
+              <p className="text-xs font-semibold">Tổng KL: <span className="text-emerald-700">{fmtKg(receipts.reduce((s,r) => s+r.khoiLuong, 0))}</span></p>
+              <p className="text-xs font-semibold">Tổng tiền: <span className="text-emerald-700">{fmt(receipts.reduce((s,r) => s+r.thanhTien, 0))}</span></p>
+            </div>
+          </div>
+        </div>
+      )}
+
+
+      {/* ── Tổng kết Tab ── */}
+      {activeTab === "tong-ket" && (() => {
+        /* aggregate from receipts */
+        const byHo: Record<string, { maHo: string; tenHo: string; diaChi: string; kl: number; tien: number; soPhieu: number }> = {};
+        const byNgay: Record<string, { ngay: string; kl: number; tien: number; soPhieu: number }> = {};
+        const byVung: Record<string, { kl: number; tien: number }> = { "Nà Hồng": { kl:0, tien:0 }, "Nà Bay": { kl:0, tien:0 }, "Bản Chang": { kl:0, tien:0 } };
+        const byQuyCach: Record<string, { kl: number; tien: number }> = {};
+
+        for (const r of receipts) {
+          /* by Ho */
+          if (!byHo[r.maHo]) byHo[r.maHo] = { maHo: r.maHo, tenHo: r.tenHo, diaChi: r.diaChi, kl: 0, tien: 0, soPhieu: 0 };
+          byHo[r.maHo].kl += r.khoiLuong;
+          byHo[r.maHo].tien += r.thanhTien;
+          byHo[r.maHo].soPhieu += 1;
+          /* by Ngay */
+          if (!byNgay[r.ngay]) byNgay[r.ngay] = { ngay: r.ngay, kl: 0, tien: 0, soPhieu: 0 };
+          byNgay[r.ngay].kl += r.khoiLuong;
+          byNgay[r.ngay].tien += r.thanhTien;
+          byNgay[r.ngay].soPhieu += 1;
+          /* by Vung */
+          if (byVung[r.diaChi]) { byVung[r.diaChi].kl += r.khoiLuong; byVung[r.diaChi].tien += r.thanhTien; }
+          /* by QuyCach */
+          if (!byQuyCach[r.quyCach]) byQuyCach[r.quyCach] = { kl: 0, tien: 0 };
+          byQuyCach[r.quyCach].kl += r.khoiLuong;
+          byQuyCach[r.quyCach].tien += r.thanhTien;
+        }
+
+        const hoRows = Object.values(byHo).sort((a,b) => b.kl - a.kl);
+        const ngayRows = Object.values(byNgay).sort((a,b) => a.ngay.localeCompare(b.ngay));
+        const totalKL = receipts.reduce((s,r) => s + r.khoiLuong, 0);
+        const totalTien = receipts.reduce((s,r) => s + r.thanhTien, 0);
+
+        return (
+          <div className="space-y-5">
+            {/* KPI bar */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              {[
+                { label: "Tổng KL thu mua", value: fmtKg(totalKL), sub: `${receipts.length} phiếu`, color: "bg-emerald-50 text-emerald-700 border-emerald-200" },
+                { label: "Tổng chi phí", value: (totalTien/1e6).toFixed(2)+" tr đ", sub: "nguyên liệu tươi", color: "bg-blue-50 text-blue-700 border-blue-200" },
+                { label: "Số nông hộ", value: `${Object.keys(byHo).length} hộ`, sub: "đã giao nguyên liệu", color: "bg-violet-50 text-violet-700 border-violet-200" },
+                { label: "Ngày thu mua", value: `${ngayRows.length} ngày`, sub: ngayRows.length > 0 ? `${ngayRows[0].ngay} → ${ngayRows[ngayRows.length-1].ngay}` : "—", color: "bg-amber-50 text-amber-700 border-amber-200" },
+              ].map((k,i) => (
+                <div key={i} className={`rounded-xl border p-4 ${k.color}`}>
+                  <p className="text-xs font-medium opacity-75">{k.label}</p>
+                  <p className="text-xl font-bold mt-1">{k.value}</p>
+                  <p className="text-xs opacity-60 mt-0.5">{k.sub}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Tổng kết theo ngày */}
+              <div className="bg-white border border-border rounded-xl overflow-hidden">
+                <div className="px-5 py-3.5 border-b border-border bg-muted/20 flex items-center justify-between">
+                  <div>
+                    <h3 className="font-semibold text-sm">Tổng kết theo ngày</h3>
+                    <p className="text-xs text-muted-foreground mt-0.5">KL & chi phí từng ngày thu mua</p>
+                  </div>
+                </div>
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-border bg-muted/10">
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Ngày</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Số phiếu</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">KL (kg)</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Thành tiền</th>
+                  </tr></thead>
+                  <tbody className="divide-y divide-border/60">
+                    {ngayRows.map(row => (
+                      <tr key={row.ngay} className="hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-3 font-medium text-sm">{row.ngay}</td>
+                        <td className="px-4 py-3 text-right text-xs text-muted-foreground">{row.soPhieu}</td>
+                        <td className="px-4 py-3 text-right font-semibold text-emerald-700">{row.kl.toFixed(2)}</td>
+                        <td className="px-4 py-3 text-right font-semibold text-blue-700">{fmt(row.tien)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot><tr className="bg-muted/20 border-t border-border font-bold">
+                    <td className="px-4 py-2.5 text-sm text-muted-foreground">Tổng cộng</td>
+                    <td className="px-4 py-2.5 text-right text-xs">{receipts.length}</td>
+                    <td className="px-4 py-2.5 text-right text-emerald-700">{totalKL.toFixed(2)}</td>
+                    <td className="px-4 py-2.5 text-right text-blue-700">{fmt(totalTien)}</td>
+                  </tr></tfoot>
+                </table>
+              </div>
+
+              {/* Tổng kết theo vùng & quy cách */}
+              <div className="space-y-4">
+                <div className="bg-white border border-border rounded-xl overflow-hidden">
+                  <div className="px-5 py-3.5 border-b border-border bg-muted/20">
+                    <h3 className="font-semibold text-sm">Theo vùng thu mua</h3>
+                  </div>
+                  <table className="w-full text-sm">
+                    <thead><tr className="border-b border-border bg-muted/10">
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Vùng</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">KL (kg)</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Thành tiền</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Tỷ lệ</th>
+                    </tr></thead>
+                    <tbody className="divide-y divide-border/60">
+                      {Object.entries(byVung).filter(([,v]) => v.kl > 0).map(([vung, v]) => (
+                        <tr key={vung} className="hover:bg-muted/20">
+                          <td className="px-4 py-3"><span className={`inline-flex text-xs px-2 py-0.5 rounded-md font-medium ${AREA_COLORS[vung] ?? "bg-gray-100 text-gray-600"}`}>{vung}</span></td>
+                          <td className="px-4 py-3 text-right font-semibold text-emerald-700">{v.kl.toFixed(2)}</td>
+                          <td className="px-4 py-3 text-right font-semibold text-blue-700">{fmt(v.tien)}</td>
+                          <td className="px-4 py-3 text-right text-xs text-muted-foreground">{totalKL > 0 ? ((v.kl/totalKL)*100).toFixed(1) : 0}%</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
+                <div className="bg-white border border-border rounded-xl overflow-hidden">
+                  <div className="px-5 py-3.5 border-b border-border bg-muted/20">
+                    <h3 className="font-semibold text-sm">Theo quy cách thu hái</h3>
+                  </div>
+                  <table className="w-full text-sm">
+                    <thead><tr className="border-b border-border bg-muted/10">
+                      <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Quy cách</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">KL (kg)</th>
+                      <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Thành tiền</th>
+                    </tr></thead>
+                    <tbody className="divide-y divide-border/60">
+                      {Object.entries(byQuyCach).sort((a,b) => b[1].kl - a[1].kl).map(([qc, v]) => (
+                        <tr key={qc} className="hover:bg-muted/20">
+                          <td className="px-4 py-3"><span className={`inline-flex text-xs px-2.5 py-0.5 rounded-full border font-medium ${QUY_CACH_CFG[qc]?.color ?? "bg-gray-100 text-gray-600 border-gray-200"}`}>{qc}</span></td>
+                          <td className="px-4 py-3 text-right font-semibold text-emerald-700">{v.kl.toFixed(2)}</td>
+                          <td className="px-4 py-3 text-right font-semibold text-blue-700">{fmt(v.tien)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Tổng kết theo nông hộ */}
+            <div className="bg-white border border-border rounded-xl overflow-hidden">
+              <div className="px-5 py-3.5 border-b border-border bg-muted/20 flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-sm">Tổng kết theo nông hộ</h3>
+                  <p className="text-xs text-muted-foreground mt-0.5">Sắp xếp theo khối lượng giao giảm dần</p>
+                </div>
+                <span className="text-xs text-muted-foreground">{hoRows.length} hộ</span>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead><tr className="border-b border-border bg-muted/10">
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">STT</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Mã hộ</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Tên hộ</th>
+                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Vùng</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Số phiếu</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Tổng KL (kg)</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Tổng tiền (đ)</th>
+                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Tỷ lệ KL</th>
+                  </tr></thead>
+                  <tbody className="divide-y divide-border/60">
+                    {hoRows.map((row, i) => (
+                      <tr key={row.maHo} className="hover:bg-muted/20 transition-colors">
+                        <td className="px-4 py-2.5 text-xs text-muted-foreground">{i+1}</td>
+                        <td className="px-4 py-2.5 font-mono text-xs font-semibold text-primary">{row.maHo}</td>
+                        <td className="px-4 py-2.5 font-medium text-sm">{row.tenHo}</td>
+                        <td className="px-4 py-2.5"><span className={`inline-flex text-xs px-1.5 py-0.5 rounded-md font-medium ${AREA_COLORS[row.diaChi] ?? "bg-gray-100 text-gray-600"}`}>{row.diaChi}</span></td>
+                        <td className="px-4 py-2.5 text-right text-xs text-muted-foreground">{row.soPhieu}</td>
+                        <td className="px-4 py-2.5 text-right font-semibold text-emerald-700">{row.kl.toFixed(2)}</td>
+                        <td className="px-4 py-2.5 text-right font-semibold text-blue-700">{fmt(row.tien)}</td>
+                        <td className="px-4 py-2.5 text-right text-xs">
+                          <div className="flex items-center justify-end gap-2">
+                            <div className="h-1.5 w-20 bg-muted rounded-full overflow-hidden">
+                              <div className="h-full bg-emerald-500 rounded-full" style={{ width: `${totalKL > 0 ? (row.kl/totalKL)*100 : 0}%` }} />
+                            </div>
+                            <span className="text-muted-foreground w-9 text-right">{totalKL > 0 ? ((row.kl/totalKL)*100).toFixed(1) : 0}%</span>
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot><tr className="bg-emerald-50/60 border-t-2 border-emerald-200 font-bold text-sm">
+                    <td colSpan={4} className="px-4 py-3 text-muted-foreground">Tổng cộng</td>
+                    <td className="px-4 py-3 text-right text-xs">{receipts.length}</td>
+                    <td className="px-4 py-3 text-right text-emerald-700">{totalKL.toFixed(2)}</td>
+                    <td className="px-4 py-3 text-right text-blue-700">{fmt(totalTien)}</td>
+                    <td className="px-4 py-3 text-right text-muted-foreground text-xs">100%</td>
+                  </tr></tfoot>
+                </table>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
+      {/* ── PO Detail Drawer ── */}
+      {selectedPO && (
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div className="absolute inset-0 bg-black/30 backdrop-blur-sm" onClick={() => setSelectedPO(null)} />
+          <div className="relative bg-white w-full max-w-xl h-full overflow-y-auto shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border sticky top-0 bg-white z-10">
+              <div>
+                <span className="font-mono text-sm font-bold text-primary">{selectedPO.maPO}</span>
+                <p className="text-xs text-muted-foreground mt-0.5">Tạo bởi {selectedPO.nguoiTao} · {selectedPO.ngayTao}</p>
+              </div>
+              <button onClick={() => setSelectedPO(null)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4" /></button>
+            </div>
+
+            <div className="flex-1 px-5 py-4 space-y-5">
+              {/* Status stepper */}
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Luồng nghiệp vụ</p>
+                <div className="grid grid-cols-6 gap-0.5">
+                  {PO_FLOW.map((s, i) => {
+                    const sc = PO_STATUS_CFG[s];
+                    const idx = PO_FLOW.indexOf(selectedPO.trangThai);
+                    const isActive  = idx >= i;
+                    const isCurrent = selectedPO.trangThai === s;
+                    return (
+                      <button key={s} onClick={() => handleStatusChange(selectedPO.id, s)}
+                        className={`flex flex-col items-center gap-1 py-2 px-1 rounded-lg transition-all ${isCurrent ? "bg-primary/10 border border-primary/30" : isActive ? "bg-muted/40" : "opacity-40 hover:opacity-70"}`}>
+                        <sc.icon className={`w-3.5 h-3.5 ${isCurrent ? "text-primary" : isActive ? "text-foreground" : "text-muted-foreground"}`} />
+                        <span className={`text-[9px] font-medium text-center leading-tight ${isCurrent ? "text-primary" : "text-muted-foreground"}`}>{sc.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* QC */}
+              <div>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Kết quả kiểm tra chất lượng (QC)</p>
+                <div className="flex gap-2">
+                  {(["pending","pass","fail","reduce"] as QCResult[]).map(q => (
+                    <button key={q} onClick={() => handleQCChange(selectedPO.id, q)}
+                      className={`flex-1 py-1.5 text-xs font-medium rounded-lg border transition-all ${selectedPO.qcResult === q ? `${QC_CFG[q].color} border-current` : "border-border text-muted-foreground hover:bg-muted/40"}`}>
+                      {QC_CFG[q].label}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-2 flex items-center gap-2">
+                  <span className="text-xs text-muted-foreground">Độ ẩm / chất lượng:</span>
+                  <span className="text-xs font-semibold text-primary">{selectedPO.chatLuong}%</span>
+                  <span className="text-xs text-muted-foreground">· Quy cách: <strong>{selectedPO.quyCach}</strong></span>
+                </div>
+              </div>
+
+              {/* Farmer + Zone */}
+              <div className="bg-muted/30 rounded-xl p-4 space-y-2">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Nông hộ & Vùng trồng</p>
+                <div className="flex items-start gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 flex items-center justify-center shrink-0"><Users className="w-4 h-4 text-primary" /></div>
+                  <div>
+                    <p className="font-semibold">{selectedPO.tenHo} <span className="font-mono text-xs text-muted-foreground">({selectedPO.maHo})</span></p>
+                    <span className={`inline-flex text-xs px-1.5 py-0.5 rounded-full font-medium ${AREA_COLORS[selectedPO.diaChi] ?? "bg-gray-100 text-gray-600"}`}>{selectedPO.diaChi}</span>
+                    {selectedPO.sdt && <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Phone className="w-3 h-3" />{selectedPO.sdt}</p>}
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 pt-1">
+                  <div><p className="text-xs text-muted-foreground">Vùng trồng</p><p className="text-sm font-medium">{selectedPO.maVuon}</p></div>
+                  <div><p className="text-xs text-muted-foreground">Tên vườn</p><p className="text-sm font-medium">{selectedPO.tenVuon}</p></div>
+                  <div><p className="text-xs text-muted-foreground">Ngày đặt</p><p className="text-sm font-medium">{selectedPO.ngayTao}</p></div>
+                  <div><p className="text-xs text-muted-foreground">Ngày giao dự kiến</p><p className="text-sm font-medium">{selectedPO.ngayGiao || "—"}</p></div>
+                </div>
+              </div>
+
+              {/* Quantities + price */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-muted/20 rounded-xl p-3 text-center">
+                  <p className="text-xs text-muted-foreground mb-1">KL đặt</p>
+                  <p className="text-xl font-bold text-foreground">{selectedPO.khoiLuongDat}</p>
+                  <p className="text-xs text-muted-foreground">kg · {selectedPO.quyCach}</p>
+                </div>
+                <div className="bg-emerald-50 rounded-xl p-3 text-center">
+                  <p className="text-xs text-muted-foreground mb-1">KL thực nhận</p>
+                  <p className={`text-xl font-bold ${selectedPO.khoiLuongNhan > 0 ? "text-emerald-700" : "text-muted-foreground"}`}>{selectedPO.khoiLuongNhan > 0 ? selectedPO.khoiLuongNhan : "—"}</p>
+                  {selectedPO.khoiLuongNhan > 0 && <p className="text-xs text-muted-foreground">kg · {fmt(selectedPO.khoiLuongNhan * selectedPO.donGia)}</p>}
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between px-4 py-3 bg-muted/20 rounded-xl">
+                <span className="text-sm text-muted-foreground">Đơn giá</span>
+                <span className="text-lg font-bold text-primary">{fmt(selectedPO.donGia)}/kg</span>
+              </div>
+
+              {/* Batch */}
+              {selectedPO.batchId ? (
+                <div className="flex items-center gap-3 px-4 py-3 bg-emerald-50 border border-emerald-200 rounded-xl">
+                  <Package className="w-5 h-5 text-emerald-600 shrink-0" />
+                  <div>
+                    <p className="text-xs text-emerald-600 font-semibold">Batch nguyên liệu (gốc truy xuất)</p>
+                    <p className="font-mono text-sm font-bold text-emerald-800">{selectedPO.batchId}</p>
+                  </div>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 px-4 py-3 bg-amber-50 border border-amber-200 rounded-xl">
+                  <AlertCircle className="w-5 h-5 text-amber-500 shrink-0" />
+                  <p className="text-xs text-amber-700">Batch sẽ được tạo tự động khi chuyển sang bước <strong>Nhập kho</strong></p>
+                </div>
+              )}
+
+              {/* Trace chain snapshot */}
+              <div className="bg-gradient-to-br from-emerald-50 to-blue-50 border border-emerald-200 rounded-xl p-4">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Chuỗi truy xuất nguồn gốc (Snapshot)</p>
+                <div className="flex items-start gap-1.5 flex-wrap text-xs">
+                  {[
+                    { label:"Nông hộ", val:`${selectedPO.tenHo} (${selectedPO.maHo})`, color:"bg-emerald-100 border-emerald-300 text-emerald-800" },
+                    { label:"Vùng trồng", val:selectedPO.diaChi, color:"bg-blue-100 border-blue-300 text-blue-800" },
+                    { label:"Vườn cụ thể", val:`${selectedPO.maVuon}`, color:"bg-violet-100 border-violet-300 text-violet-800" },
+                    { label:"Batch RAW", val:selectedPO.batchId||"Chưa tạo", color:selectedPO.batchId?"bg-amber-100 border-amber-300 text-amber-800":"bg-gray-100 border-gray-300 text-gray-600" },
+                  ].map((step,si)=>(
+                    <div key={si} className="flex items-center gap-1">
+                      {si>0&&<ArrowRight className="w-3 h-3 text-muted-foreground shrink-0"/>}
+                      <div className={`border px-2.5 py-1.5 rounded-lg ${step.color}`}>
+                        <p className="font-semibold text-[10px] uppercase tracking-wide opacity-70">{step.label}</p>
+                        <p className="font-bold text-xs mt-0.5">{step.val}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-[10px] text-muted-foreground mt-2.5">✓ Thông tin vùng trồng đã được lưu snapshot tại thời điểm tạo đơn mua</p>
+              </div>
+
+              {selectedPO.ghiChu && (
+                <div className="px-4 py-3 bg-muted/20 rounded-xl">
+                  <p className="text-xs text-muted-foreground">Ghi chú</p>
+                  <p className="text-sm italic mt-0.5">{selectedPO.ghiChu}</p>
+                </div>
+              )}
+            </div>
+
+            <div className="px-5 pb-5 pt-3 border-t border-border flex gap-2 shrink-0">
+              <button className="flex-1 flex items-center justify-center gap-1.5 px-4 py-2.5 border border-border rounded-lg text-sm hover:bg-muted/50 transition-colors"><Printer className="w-3.5 h-3.5" /> In phiếu</button>
+              <button onClick={() => handleDelete(selectedPO.id)} className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-red-50 text-red-600 border border-red-200 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"><Trash2 className="w-3.5 h-3.5" /> Xóa</button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Create PO Modal ── */}
+      {showCreate && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => { setShowCreate(false); resetForm(); }} />
+          <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-[92vh]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+              <div className="flex items-center gap-2">
+                <ShoppingCart className="w-4 h-4 text-primary" />
+                <span className="font-semibold text-sm">Tạo đơn mua nguyên liệu</span>
+              </div>
+              <div className="flex items-center gap-2">
+                {/* step indicator */}
+                <div className="flex items-center gap-1">
+                  <span className={`w-2 h-2 rounded-full ${step === "chon-ho" ? "bg-primary" : "bg-primary/30"}`} />
+                  <span className={`w-2 h-2 rounded-full ${step === "chi-tiet" ? "bg-primary" : "bg-primary/30"}`} />
+                </div>
+                <button onClick={() => { setShowCreate(false); resetForm(); }} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60"><X className="w-4 h-4 text-muted-foreground" /></button>
+              </div>
+            </div>
+
+            {step === "chon-ho" ? (
+              /* ── Step 1: Chọn nông hộ ── */
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="p-4 border-b border-border shrink-0">
+                  <p className="text-xs font-semibold text-muted-foreground mb-2">Bước 1: Chọn nông hộ</p>
+                  <div className="flex gap-2">
+                    <div className="relative flex-1">
+                      <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+                      <input value={hoSearch} onChange={e => setHoSearch(e.target.value)} placeholder="Tìm tên, mã hộ, vùng..." className="w-full pl-9 pr-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/30" />
+                    </div>
+                    <button onClick={() => setQrMode(m => !m)}
+                      className={`flex items-center gap-1.5 px-3 py-2.5 text-sm font-medium rounded-lg border transition-all ${qrMode ? "bg-primary text-white border-primary" : "border-border text-muted-foreground hover:bg-muted/50"}`}>
+                      <QrCode className="w-4 h-4" /> QR
+                    </button>
+                  </div>
+                  {qrMode && (
+                    <div className="mt-3 border-2 border-dashed border-primary/30 rounded-xl p-4 text-center bg-primary/5">
+                      <QrCode className="w-8 h-8 text-primary/50 mx-auto mb-2" />
+                      <p className="text-xs text-primary/70 font-medium">Camera QR sẽ mở ở đây</p>
+                      <p className="text-xs text-muted-foreground mt-1">Hướng vào mã QR trên thẻ nông hộ để điền tự động</p>
+                    </div>
+                  )}
+                </div>
+                <div className="flex-1 overflow-y-auto divide-y divide-border">
+                  {filteredHo.map(h => (
+                    <button key={h.maHo} onClick={() => { setSelHo(h); const vs = ZONES[h.maHo]; setSelVuon(vs?.[0]?.maVuon ?? ""); }}
+                      className={`w-full flex items-center justify-between px-4 py-3 hover:bg-muted/30 transition-colors text-left ${selHo?.maHo === h.maHo ? "bg-primary/5 border-l-2 border-primary" : ""}`}>
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Users className="w-4 h-4 text-primary" /></div>
+                        <div>
+                          <p className="text-sm font-medium">{h.tenHo}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="font-mono text-xs text-muted-foreground">{h.maHo}</span>
+                            <span className={`inline-flex text-xs px-1.5 rounded-md font-medium ${AREA_COLORS[h.diaChi] ?? "bg-gray-100 text-gray-600"}`}>{h.diaChi}</span>
+                            <span className="text-xs text-muted-foreground">{h.dienTich} ha</span>
+                          </div>
+                        </div>
+                      </div>
+                      {selHo?.maHo === h.maHo && <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />}
+                    </button>
+                  ))}
+                </div>
+                <div className="p-4 border-t border-border shrink-0">
+                  <button onClick={() => selHo && setStep("chi-tiet")} disabled={!selHo}
+                    className="w-full py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
+                    Tiếp theo: Thông tin đơn <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* ── Step 2: Chi tiết đơn mua ── */
+              <div className="flex-1 flex flex-col overflow-hidden">
+                <div className="overflow-y-auto flex-1 px-5 py-4 space-y-4">
+                  {/* Selected farmer summary */}
+                  <div className="flex items-center gap-3 px-3 py-2.5 bg-primary/5 border border-primary/20 rounded-xl">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0"><Users className="w-4 h-4 text-primary" /></div>
+                    <div className="flex-1">
+                      <p className="text-sm font-semibold">{selHo?.tenHo} <span className="font-mono text-xs text-muted-foreground">({selHo?.maHo})</span></p>
+                      <p className="text-xs text-muted-foreground">{selHo?.diaChi} · {selHo?.dienTich} ha</p>
+                    </div>
+                    <button onClick={() => setStep("chon-ho")} className="text-xs text-primary hover:underline">Đổi</button>
+                  </div>
+
+                  {/* Zone selection */}
+                  {zonesOfSel.length > 0 && (
+                    <div>
+                      <label className="block text-xs font-semibold mb-1.5">Vùng trồng</label>
+                      <div className="grid grid-cols-2 gap-2">
+                        {zonesOfSel.map(z => (
+                          <button key={z.maVuon} onClick={() => setSelVuon(z.maVuon)}
+                            className={`px-3 py-2 text-xs font-medium rounded-lg border transition-all text-left ${selVuon === z.maVuon ? "bg-primary/10 border-primary text-primary" : "border-border text-muted-foreground hover:bg-muted/40"}`}>
+                            <p className="font-semibold">{z.maVuon}</p>
+                            <p>{z.tenVuon} · {z.dienTich} ha</p>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Dates */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div><label className="block text-xs font-semibold mb-1.5">Ngày tạo</label><input type="date" value={fDate} onChange={e => setFDate(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" /></div>
+                    <div><label className="block text-xs font-semibold mb-1.5">Ngày giao dự kiến</label><input type="date" value={fGiao} onChange={e => setFGiao(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" /></div>
+                  </div>
+
+                  {/* Quy cách */}
+                  <div>
+                    <label className="block text-xs font-semibold mb-1.5">Quy cách hái</label>
+                    <div className="grid grid-cols-2 gap-2 mb-2">
+                      {Object.entries(QUY_CACH_CFG).map(([q, cfg]) => (
+                        <button key={q} onClick={() => setFQuyCach(q)}
+                          className={`px-3 py-2.5 text-left rounded-xl border-2 transition-all ${fQuyCach === q ? "border-primary bg-primary/5" : "border-border hover:border-primary/30 hover:bg-muted/30"}`}>
+                          <p className="text-sm font-bold">{q}</p>
+                          <p className="text-[11px] text-muted-foreground mt-0.5">{cfg.loaiChe} · <span className="font-semibold text-primary">{cfg.priceNote}</span></p>
+                        </button>
+                      ))}
+                    </div>
+                    {fQuyCach && (
+                      <div className={`text-xs px-3 py-2 rounded-lg border ${QUY_CACH_CFG[fQuyCach]?.color ?? "bg-muted/20 border-border"}`}>
+                        <span className="font-semibold">{fQuyCach}</span> → Sản xuất <strong>{QUY_CACH_CFG[fQuyCach]?.loaiChe}</strong> · Giá: {QUY_CACH_CFG[fQuyCach]?.priceNote}
+                        {!QUY_CACH_CFG[fQuyCach]?.fixedPrice && <span className="ml-1 opacity-70">(tính theo % chất lượng bên dưới)</span>}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* KL + Chat luong */}
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-xs font-semibold mb-1.5">Khối lượng (kg) <span className="text-red-500">*</span></label>
+                      <input type="number" value={fKL} onChange={e => setFKL(e.target.value)} placeholder="0.00" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold mb-1.5">Chất lượng <span className="text-primary font-bold">({fCL}%)</span></label>
+                      <div className="flex items-center gap-2 mt-1">
+                        <button type="button" onClick={()=>setFCL(Math.max(70,fCL-1))} className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-muted/50 text-lg font-bold shrink-0 active:scale-95 transition-transform">−</button>
+                        <input type="number" min={70} max={100} value={fCL} onChange={e=>setFCL(Math.min(100,Math.max(70,Number(e.target.value)||70)))} className="flex-1 text-center px-2 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" />
+                        <button type="button" onClick={()=>setFCL(Math.min(100,fCL+1))} className="w-9 h-9 rounded-lg border border-border flex items-center justify-center hover:bg-muted/50 text-lg font-bold shrink-0 active:scale-95 transition-transform">+</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Price preview */}
+                  <div className="flex items-center justify-between px-4 py-3 bg-muted/20 rounded-xl">
+                    <div>
+                      <p className="text-xs text-muted-foreground">Đơn giá tính toán</p>
+                      <p className="text-lg font-bold text-primary">{fmt(fDonGia)}/kg</p>
+                    </div>
+                    {fKL && <div className="text-right">
+                      <p className="text-xs text-muted-foreground">Thành tiền</p>
+                      <p className="text-xl font-bold text-emerald-700">{fmt(fTotal)}</p>
+                    </div>}
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold mb-1.5">Ghi chú</label>
+                    <textarea value={fNote} onChange={e => setFNote(e.target.value)} rows={2} placeholder="Ghi chú đơn mua..." className="w-full px-3 py-2.5 text-sm border border-border rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-primary" />
+                  </div>
+                </div>
+
+                <div className="px-5 pb-5 pt-3 border-t border-border flex gap-2 shrink-0">
+                  <button onClick={() => setStep("chon-ho")} className="flex items-center justify-center gap-1.5 px-4 py-2.5 text-sm border border-border rounded-lg hover:bg-muted/50 transition-colors"><ArrowLeft className="w-3.5 h-3.5" /> Quay lại</button>
+                  <button onClick={handleCreate} disabled={!fKL || parseFloat(fKL) <= 0}
+                    className="flex-1 px-4 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-40 flex items-center justify-center gap-2">
+                    <Plus className="w-4 h-4" /> Tạo đơn mua
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </AppLayout>
+  );
+}

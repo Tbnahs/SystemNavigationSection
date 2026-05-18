@@ -1,0 +1,36 @@
+II. Chi tiết
+Giới thiệu luồng tổng quan và mockup
+Khảo sát nghiệp vụ & điều chỉnh giao diện
+Tạo hộ liên kết:
+Hiện tại: thu mua từ các Nông hộ (Bắc Kạn), hộ không trực tiếp tham gia khai báo, Doanh nghiệp khai báo Thu mua.
+Tương lai: các Nông hộ tỉnh khác có thể tham gia khai báo hoạt động canh tác, Thu hoạch → Vận chuyển đến Doanh nghiệp.
+Không có trồng xen canh theo mùa vụ, luôn chỉ trồng 1 Giống chè tại mỗi khu vực.
+Thu mua từ Nông hộ:
+Mỗi lô thu mua ⇔ 1 Nông hộ
+Chưa có quản lý Lệnh thu mua
+Mong muốn:
+Cấu hình được “Tiêu chí kiểm tra, đánh giá” - Lô thu mua
+Cấu hình Đánh giá - Đơn giá tương ứng:
+VD: 70-79: 27000; 80-89: 28000; …
+Cấu hình Quy cách - Đơn giá tương ứng:
+VD: 1 tôm: 27.000..
+Đơn mua:
+Thêm trường cho phép nhập để làm tròn giá tiền cho đơn mua.
+Thêm trường nhập “chất lượng” hoặc “mô tả” → phục vụ cho phân loại và sử dụng trong sản xuất.
+Thành tiền: mặc định tính theo đơn giá “Quy cách”, ưu tiên tính theo đơn giá “Đánh giá chất lượng” (nếu có).
+Lô thu mua sẽ dùng sản xuất luôn, không Lưu kho.
+Có thu mua vỏ quýt từ các Nông hộ - quy trình tương tự thu mua và sản xuất chè.
+Sản xuất/Chế biến:
+Không nhập liệu theo thời gian thực.
+1 lô thu mua từ Nông hộ → đem đi sản xuất thành lô Bán thành phẩm
+Không ghi nhận chi tiết các công đoạn: hong, vò, sao, sấy…khi Truy xuất chỉ ghi nhận chung là sự kiện “Sản xuất” (còn lại là thông tin mô tả trong sự kiện).
+Hiện tại: chưa có Lệnh sản xuất → mong muốn: sẽ có Lệnh sản xuất - gắn với Lô thu mua và Thành phẩm đầu ra (tương lai nhận “Lệnh sản xuất” từ bên Kinh doanh, hệ thống ưu tiên hiển thị những lô thu mua sẵn có chờ sản xuất).
+Đóng gói:
+Gộp các lô bán thành phẩm từ nhiều hộ, đóng bao - 5kg để nhập kho. 
+Hoặc mang tách lô 5kg ⇔ chè vụn cao cấp (thành chè túi lọc - có mã QR TXNG riêng lẻ) và đóng gói thành hộp chè các loại. 
+Có thêm role “QC” - kiểm soát chất lượng các lô thu mua/sản xuất/đóng gói.
+Có sử dụng các Lô bao bì - cần quản lý đánh mã lô, tính tồn kho.
+Xuất bán:
+Phần logistics (vận chuyển) hiện tại chưa triển khai và sẽ được xem xét bổ sung trong giai đoạn sau. 
+Hoạt động bán hàng hiện tại chủ yếu phục vụ thị trường trong nước, tuy nhiên trong tương lai (dự kiến từ năm 2028) có thể mở rộng sang xuất khẩu, do đó hệ thống cần có khả năng mở rộng để đáp ứng. 
+Tài chính - Kế toán: tích hợp với Bravo (giai đoạn sau).

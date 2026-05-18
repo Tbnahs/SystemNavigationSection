@@ -135,7 +135,7 @@ const AREA_COLORS: Record<string, string> = {
 /* ────────── Component ────────── */
 export default function PurchasePage() {
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<"po" | "receipt" | "farmers" | "quy-cach" | "tong-ket">("po");
+  const [activeTab, setActiveTab] = useState<"po" | "receipt" | "tong-ket">("po");
   const [search, setSearch]   = useState("");
   const [statusFilter, setStatusFilter] = useState<POStatus | "">("");
   const [diaChi, setDiaChi]   = useState("");
@@ -353,11 +353,9 @@ export default function PurchasePage() {
       {/* Tabs */}
       <div className="flex items-center gap-1 mb-4 border-b border-border overflow-x-auto">
         {[
-          { key: "po",        label: "Đơn mua (PO)",  count: poList.length },
-          { key: "receipt",   label: "Nhận hàng",      count: receipts.length },
-          { key: "farmers",   label: "Nông hộ",         count: FARMERS.length },
-          { key: "quy-cach",  label: "Quy cách & Giá", count: Object.keys(QUY_CACH_CFG).length },
-          { key: "tong-ket",  label: "Tổng kết",       count: 4 },
+          { key: "po",        label: "Đơn mua",   count: poList.length },
+          { key: "receipt",   label: "Nhận hàng", count: receipts.length },
+          { key: "tong-ket",  label: "Tổng kết",  count: 4 },
         ].map(tab => (
           <button key={tab.key} onClick={() => setActiveTab(tab.key as typeof activeTab)}
             className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}>
@@ -510,153 +508,6 @@ export default function PurchasePage() {
         </div>
       )}
 
-      {/* ── Nông hộ Tab ── */}
-      {activeTab === "farmers" && (
-        <div>
-          <div className="relative mb-4">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
-            <input value={farmerSearch} onChange={e => setFarmerSearch(e.target.value)} placeholder="Tìm tên hộ, mã hộ, vùng..." className="w-full pl-9 pr-3 py-2.5 text-sm border border-border rounded-xl focus:outline-none focus:ring-1 focus:ring-primary bg-white" />
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {filteredFarmers.map(f => {
-              const zones = ZONES[f.maHo] ?? [];
-              const farmerReceipts = receipts.filter(r => r.maHo === f.maHo);
-              const totalKLFarmer = farmerReceipts.reduce((s,r) => s+r.khoiLuong, 0);
-              return (
-                <div key={f.maHo} className="bg-white border border-border rounded-xl p-4 hover:border-primary/30 hover:shadow-sm transition-all">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                        <Users className="w-5 h-5 text-primary" strokeWidth={1.5} />
-                      </div>
-                      <div>
-                        <p className="font-semibold text-sm">{f.tenHo}</p>
-                        <span className="font-mono text-xs text-muted-foreground">{f.maHo}</span>
-                      </div>
-                    </div>
-                    <span className={`inline-flex text-xs px-2 py-0.5 rounded-full font-medium ${AREA_COLORS[f.diaChi] ?? "bg-gray-100 text-gray-600"}`}>{f.diaChi}</span>
-                  </div>
-                  <div className="space-y-1.5 text-xs text-muted-foreground">
-                    {f.sdt && <div className="flex items-center gap-1.5"><Phone className="w-3 h-3" />{f.sdt}</div>}
-                    <div className="flex items-center gap-1.5"><Leaf className="w-3 h-3" />{f.dienTich} ha · Shan Tuyết</div>
-                    <div className="flex items-center gap-1.5"><MapPin className="w-3 h-3" />{zones.length} vùng trồng · {zones.map(z => z.tenVuon).join(", ")}</div>
-                  </div>
-                  {totalKLFarmer > 0 && (
-                    <div className="mt-3 pt-3 border-t border-border/60 flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">Đã giao</span>
-                      <span className="text-xs font-semibold text-emerald-700">{fmtKg(totalKLFarmer)}</span>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-      )}
-
-      {/* ── Quy cách & Giá Tab ── */}
-      {activeTab === "quy-cach" && (
-        <div className="space-y-5">
-          {/* Bảng quy cách + đơn giá */}
-          <div className="bg-white border border-border rounded-xl overflow-hidden">
-            <div className="px-5 py-3.5 border-b border-border bg-muted/20">
-              <h3 className="font-semibold text-sm">Bảng quy cách thu hái & đơn giá</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">Ban hành theo quy định thu mua chè Shan Tuyết Bằng Phúc — HTX Hồng Hà</p>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-muted/10">
-                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">STT</th>
-                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Quy cách</th>
-                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Loại chè</th>
-                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Đơn giá (đ/kg)</th>
-                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Ghi chú</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60">
-                  {Object.entries(QUY_CACH_CFG).map(([q, cfg], i) => (
-                    <tr key={q} className="hover:bg-muted/20 transition-colors">
-                      <td className="px-4 py-3 text-muted-foreground text-xs">{i + 1}</td>
-                      <td className="px-4 py-3 font-bold">{q}</td>
-                      <td className="px-4 py-3">
-                        <span className={`inline-flex text-xs px-2.5 py-1 rounded-lg font-semibold border ${cfg.color}`}>{cfg.loaiChe}</span>
-                      </td>
-                      <td className="px-4 py-3 text-right font-semibold text-primary">{cfg.priceNote}</td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">
-                        {cfg.fixedPrice ? "Giá cố định" : "Tính theo % chất lượng"}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Bảng đơn giá theo % chất lượng */}
-          <div className="bg-white border border-border rounded-xl overflow-hidden">
-            <div className="px-5 py-3.5 border-b border-border bg-muted/20">
-              <h3 className="font-semibold text-sm">Bảng đơn giá theo % chất lượng</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">Áp dụng cho quy cách: <strong>1 tôm</strong> (Chè xanh) và <strong>1 tôm 2 lá</strong> (Bạch trà)</p>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border bg-muted/10">
-                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">STT</th>
-                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">% Đánh giá</th>
-                    <th className="text-right px-4 py-2.5 text-xs font-semibold text-muted-foreground">Đơn giá</th>
-                    <th className="text-left px-4 py-2.5 text-xs font-semibold text-muted-foreground">Xếp loại</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/60">
-                  {QUALITY_PRICE_TABLE.map((row, i) => (
-                    <tr key={i} className="hover:bg-muted/20 transition-colors">
-                      <td className="px-4 py-3 text-muted-foreground text-xs">{i + 1}</td>
-                      <td className="px-4 py-3 font-semibold">{row.label}</td>
-                      <td className="px-4 py-3 text-right font-bold text-emerald-700">{row.gia.toLocaleString("vi-VN")} đ/kg</td>
-                      <td className="px-4 py-3 text-xs text-muted-foreground">
-                        {i === 0 ? "Đạt cơ bản" : i === 1 ? "Khá" : i === 2 ? "Tốt" : "Xuất sắc"}
-                      </td>
-                    </tr>
-                  ))}
-                  <tr className="hover:bg-muted/20 transition-colors bg-violet-50/60">
-                    <td className="px-4 py-3 text-muted-foreground text-xs">5</td>
-                    <td className="px-4 py-3 font-semibold text-violet-800">Cây di sản</td>
-                    <td className="px-4 py-3 text-right font-bold text-violet-700">40,000 – 60,000 đ/kg</td>
-                    <td className="px-4 py-3 text-xs text-violet-600 font-medium">Đặc sản / Di sản</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* 3 tiêu chuẩn đánh giá từ quy cách */}
-          <div className="bg-white border border-border rounded-xl overflow-hidden">
-            <div className="px-5 py-3.5 border-b border-border bg-muted/20">
-              <h3 className="font-semibold text-sm">Tiêu chuẩn đánh giá chất lượng búp chè</h3>
-              <p className="text-xs text-muted-foreground mt-0.5">3 tiêu chí cốt lõi theo quy cách thu mua</p>
-            </div>
-            <div className="divide-y divide-border/60">
-              {[
-                { stt: "01", tieu: "Độ non, già của búp chè", moTa: "Búp phải non, đúng quy cách cam kết. Không hái già, không lẫn búp đen. Búp 1 tôm: chỉ lấy đỉnh búp cuộn. Tôm 2 lá: 2 lá non đầu tiên.", mau: "bg-emerald-500" },
-                { stt: "02", tieu: "Độ đồng đều khi thu hái",  moTa: "Búp chè đồng đều về kích cỡ và độ trưởng thành. Không lẫn quy cách khác. Tỷ lệ lẫn không được vượt quá 3% theo khối lượng.", mau: "bg-blue-500" },
-                { stt: "03", tieu: "Độ chuẩn chỉ khi thu hái", moTa: "Thu hái đúng kỹ thuật: ngắt sát cuống, không dập nát, không để bị oxy hoá trước khi giao. Vận chuyển trong giỏ thoáng, không nén chặt.", mau: "bg-amber-500" },
-              ].map(item => (
-                <div key={item.stt} className="flex items-start gap-4 px-5 py-4 hover:bg-muted/10 transition-colors">
-                  <div className={`w-8 h-8 rounded-lg ${item.mau} flex items-center justify-center shrink-0 mt-0.5`}>
-                    <span className="text-white text-xs font-bold">{item.stt}</span>
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold">{item.tieu}</p>
-                    <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{item.moTa}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── Tổng kết Tab ── */}
       {activeTab === "tong-ket" && (() => {

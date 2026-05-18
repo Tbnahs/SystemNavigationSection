@@ -1,0 +1,38 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+:root {
+  --background: 220 20% 96%;
+  --foreground: 220 13% 13%;
+  --border: 220 13% 88%;
+  --input: 220 13% 91%;
+  --ring: 142 71% 45%;
+
+  --card: 0 0% 100%;
+  --card-foreground: 220 13% 13%;
+
+  --popover: 0 0% 100%;
+  --popover-foreground: 220 13% 13%;
+
+  --primary: 142 71% 45%;
+  --primary-foreground: 0 0% 100%;
+
+  --secondary: 142 20% 95%;
+  --secondary-foreground: 142 71% 32%;
+
+  --muted: 220 13% 96%;
+  --muted-foreground: 220 9% 46%;
+
+  --accent: 142 20% 93%;
+  --accent-foreground: 142 71% 32%;
+
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 100%;
+
+  --radius: 0.625rem;
+}
+
+body, .erp-root {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+}

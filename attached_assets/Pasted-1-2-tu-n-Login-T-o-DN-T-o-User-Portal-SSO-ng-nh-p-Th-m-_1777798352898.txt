@@ -1,0 +1,41 @@
+1	2 tuần 	"Login + Tạo DN + Tạo User
+Portal SSO"	Đăng nhập																							
+			Thêm mới doanh nghiệp 			Dữ liệu Tỉnh/Thành phố, Xã/phường 																				
+			Xem danh sách Doanh nghiệp 																							
+			Tìm kiếm, lọc Doanh nghiệp 																							
+			Xem chi tiết Doanh nghiệp 																							
+			Cập nhật thông tin DN																							
+			Xóa Doanh nghiệp 																							
+			Phân quyền Doanh nghiệp 																							
+			Thêm mới User																							
+			Xem danh sách Doanh nghiệp 																							
+			Tìm kiếm, lọc User																							
+			Xem chi tiết User																							
+			Cập nhật thông tin User																							
+			Reset Mật khẩu mặc định																							
+			Xóa user																							
+			Phân quyền user																							
+			CRUD Đơn vị tính																							
+		Đồng bộ thông tin DN & User từ Portal SSO sang ERP	Đồng bộ thông tin DN từ Portal																							
+			Xem chi tiết doanh nghiệp 																							
+			Cập nhật thông tin DN																							
+			Đồng bộ thông tin User từ Portal 																							
+			Thêm mới User			Gửi request về Portal																				
+			Xem danh sách User																							
+			Tìm kiếm, lọc User																							
+			Xem chi tiết User																							
+			Cập nhật thông tin User																							
+			Reset Mật khẩu mặc định 																							
+			Xóa User																							
+			Phân quyền User																							
+		Tạo cơ sở & gán nhân viên cho Cơ sở	Thêm mới cơ sở			"- Hộ liên kết, Cơ sở sản xuất (thuê ngoài/nội bộ)
+- Gán nhân viên với cơ sở"																				
+			Import danh sách từ file Excel																							
+			Sinh mã QR Hộ liên kết																							
+			In QR Hộ liên kết																							
+			Xem danh sách cơ sở																							
+			Tìm kiếm, lọc Cơ sở 																							
+			Xem chi tiết cơ sở																							
+			Xuất file excel cơ sở																							
+			Cập nhật thông tin cơ sở																							
+			Xóa/Ngưng hoạt động cơ sở																							
