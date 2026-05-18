@@ -123,11 +123,6 @@ export default function TxngPage() {
 
           <SectionGroup title="Quản trị doanh nghiệp">
             <ShortcutCard
-              icon={Link2} label="Liên kết đối tác" desc="Quản lý đối tác trong chuỗi cung ứng"
-              href="/module/txng/lien-ket" color="bg-blue-50 text-blue-700 border-blue-200"
-              onClick={() => go("/module/txng/lien-ket")}
-            />
-            <ShortcutCard
               icon={Users} label="Quản lý nhân viên" desc="Nhân viên và phân quyền TXNG"
               href="/module/txng/nhan-vien" color="bg-blue-50 text-blue-700 border-blue-200"
               onClick={() => go("/module/txng/nhan-vien")}

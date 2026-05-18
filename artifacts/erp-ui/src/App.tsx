@@ -167,6 +167,18 @@ function Router() {
       <Route path="/module/txng">
         {() => <ProtectedRoute component={TxngPage} />}
       </Route>
+      <Route path="/module/txng/nhan-vien">
+        {() => <ProtectedRoute component={NhanVienPage} />}
+      </Route>
+      <Route path="/module/txng/co-so">
+        {() => <ProtectedRoute component={CoSoPage} />}
+      </Route>
+      <Route path="/module/txng/giong-che">
+        {() => <ProtectedRoute component={GiongChePage} />}
+      </Route>
+      <Route path="/module/txng/thuong-pham">
+        {() => <ProtectedRoute component={ThuongPhamPage} />}
+      </Route>
       <Route path="/module/txng/su-kien">
         {() => <ProtectedRoute component={TxngSuKienPage} />}
       </Route>

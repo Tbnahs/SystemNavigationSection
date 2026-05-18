@@ -48,7 +48,6 @@ const ERP_SUB_ITEMS: NavItem[] = [
 
 const TXNG_SUB_ITEMS: NavItem[] = [
   { type: "divider", label: "Quản trị doanh nghiệp" },
-  { id: "lien-ket",        icon: Link2,          label: "Liên kết đối tác" },
   { id: "nhan-vien",       icon: Users,          label: "Quản lý nhân viên" },
   { id: "co-so",           icon: Factory,        label: "Quản lý cơ sở" },
 
