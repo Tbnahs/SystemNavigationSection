@@ -48,15 +48,15 @@ const ERP_SUB_ITEMS: NavItem[] = [
 
 const TXNG_SUB_ITEMS: NavItem[] = [
   { type: "divider", label: "Quản trị doanh nghiệp" },
-  { id: "nhan-vien",       icon: Users,          label: "Quản lý nhân viên" },
-  { id: "co-so",           icon: Factory,        label: "Quản lý cơ sở" },
+  { id: "nhan-vien",       icon: Users,          label: "Nhân viên" },
+  { id: "co-so",           icon: Factory,        label: "Cơ sở" },
 
   { type: "divider", label: "Quản lý chứng chỉ" },
   { id: "chung-chi-dn",    icon: ShieldCheck,    label: "Chứng chỉ doanh nghiệp" },
   { id: "chung-chi-tp",    icon: Award,          label: "Chứng chỉ thương phẩm" },
 
   { type: "divider", label: "Quản lý thương phẩm" },
-  { id: "thuong-pham",     icon: Package,        label: "Quản lý thương phẩm" },
+  { id: "thuong-pham",     icon: Package,        label: "Thương phẩm" },
 
   { type: "divider", label: "Quản lý sự kiện trọng yếu" },
   { id: "su-kien",         icon: CalendarClock,  label: "Biểu mẫu sự kiện" },
