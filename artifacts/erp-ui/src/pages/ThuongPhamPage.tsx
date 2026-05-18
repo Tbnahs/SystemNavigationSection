@@ -3,10 +3,10 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
 import AppLayout from "@/components/AppLayout";
 import RichTextEditor from "@/components/RichTextEditor";
-import { Plus, Pencil, X, Loader2, Search, Package, Eye, Building2, Tag, Scale, DollarSign, Info, Calendar, Hash, ImageIcon, Barcode, Upload } from "lucide-react";
+import { Plus, Pencil, X, Loader2, Search, Package, Eye, Building2, Tag, Scale, DollarSign, Info, Calendar, Hash, ImageIcon, Barcode, Upload, Ruler, Globe, Award, Weight, Sparkles } from "lucide-react";
 import {
   fetchProducts, createProduct, updateProduct, deleteProduct,
-  fetchUnits, fetchEnterprises,
+  fetchUnits, fetchEnterprises, fetchTeaVarieties,
   type Product,
 } from "@/lib/api";
 
@@ -33,8 +33,26 @@ type PForm = {
   imageUrl: string;
   description: string;
   status: "active" | "inactive";
+  khoiLuong: string;
+  donViKhoiLuong: string;
+  chieuDai: string;
+  chieuRong: string;
+  chieuCao: string;
+  donViKichThuoc: string;
+  donViBan: string;
+  soLuongDonViCon: string;
+  donViConId: number | null;
+  thuongHieu: string;
+  xuatXu: string;
+  giongCheId: number | null;
 };
-const EMPTY_P: PForm = { enterpriseId: null, name: "", code: "", gtin: "", type: "ban_thanh_pham", unitId: null, price: "", imageUrl: "", description: "", status: "active" };
+const EMPTY_P: PForm = {
+  enterpriseId: null, name: "", code: "", gtin: "", type: "ban_thanh_pham", unitId: null,
+  price: "", imageUrl: "", description: "", status: "active",
+  khoiLuong: "", donViKhoiLuong: "kg", chieuDai: "", chieuRong: "", chieuCao: "", donViKichThuoc: "cm",
+  donViBan: "", soLuongDonViCon: "", donViConId: null,
+  thuongHieu: "", xuatXu: "", giongCheId: null,
+};
 
 function parseImages(raw: string | null | undefined): string[] {
   if (!raw) return [];
@@ -47,11 +65,14 @@ export default function ThuongPhamPage() {
   const isSuperAdmin = !user?.enterpriseId;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [drawerTab, setDrawerTab] = useState<1 | 2 | 3>(1);
   const [editItem, setEditItem] = useState<Product | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Product | null>(null);
   const [viewItem, setViewItem] = useState<Product | null>(null);
   const [form, setForm] = useState<PForm>(() => ({ ...EMPTY_P, enterpriseId: user?.enterpriseId ?? null }));
   const [imageUrls, setImageUrls] = useState<string[]>([]);
+  const [dacDiem, setDacDiem] = useState<string[]>([]);
+  const [anhChungChi, setAnhChungChi] = useState<string[]>([]);
   const [err, setErr] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
@@ -60,6 +81,7 @@ export default function ThuongPhamPage() {
   const listQ = useQuery({ queryKey: ["products"], queryFn: fetchProducts });
   const unitsQ = useQuery({ queryKey: ["units"], queryFn: fetchUnits });
   const dnQ = useQuery({ queryKey: ["enterprises"], queryFn: fetchEnterprises });
+  const varietiesQ = useQuery({ queryKey: ["tea-varieties"], queryFn: fetchTeaVarieties });
 
   function inv() { qc.invalidateQueries({ queryKey: ["products"] }); }
 
@@ -78,11 +100,26 @@ export default function ThuongPhamPage() {
     onSuccess: () => { inv(); setDeleteTarget(null); },
   });
 
-  function close_() { setDrawerOpen(false); setEditItem(null); setForm({ ...EMPTY_P, enterpriseId: user?.enterpriseId ?? null }); setImageUrls([]); setErr(null); }
+  function close_() {
+    setDrawerOpen(false); setEditItem(null); setDrawerTab(1);
+    setForm({ ...EMPTY_P, enterpriseId: user?.enterpriseId ?? null });
+    setImageUrls([]); setDacDiem([]); setAnhChungChi([]); setErr(null);
+  }
   function openEdit(p: Product) {
-    setEditItem(p);
-    setForm({ enterpriseId: p.enterpriseId, name: p.name, code: p.code, gtin: p.gtin ?? "", type: p.type, unitId: p.unitId, price: p.price, imageUrl: p.imageUrl ?? "", description: p.description, status: p.status });
+    setEditItem(p); setDrawerTab(1);
+    setForm({
+      enterpriseId: p.enterpriseId, name: p.name, code: p.code, gtin: p.gtin ?? "",
+      type: p.type, unitId: p.unitId, price: p.price, imageUrl: p.imageUrl ?? "",
+      description: p.description, status: p.status,
+      khoiLuong: p.khoiLuong ?? "", donViKhoiLuong: p.donViKhoiLuong ?? "kg",
+      chieuDai: p.chieuDai ?? "", chieuRong: p.chieuRong ?? "", chieuCao: p.chieuCao ?? "",
+      donViKichThuoc: p.donViKichThuoc ?? "cm",
+      donViBan: p.donViBan ?? "", soLuongDonViCon: p.soLuongDonViCon ?? "", donViConId: p.donViConId ?? null,
+      thuongHieu: p.thuongHieu ?? "", xuatXu: p.xuatXu ?? "", giongCheId: p.giongCheId ?? null,
+    });
     setImageUrls(parseImages(p.imageUrl));
+    try { setDacDiem(JSON.parse(p.dacDiem ?? "[]")); } catch { setDacDiem([]); }
+    try { setAnhChungChi(JSON.parse(p.anhChungChi ?? "[]")); } catch { setAnhChungChi([]); }
     setErr(null); setDrawerOpen(true);
   }
   function setF<K extends keyof PForm>(k: K, v: PForm[K]) { setForm(p => ({ ...p, [k]: v })); }
@@ -90,7 +127,12 @@ export default function ThuongPhamPage() {
   function handleSubmit() {
     setErr(null);
     if (!form.name.trim()) { setErr("Vui lòng nhập tên thương phẩm."); return; }
-    const payload = { ...form, imageUrl: imageUrls.length ? JSON.stringify(imageUrls) : "" };
+    const payload = {
+      ...form,
+      imageUrl: imageUrls.length ? JSON.stringify(imageUrls) : "",
+      dacDiem: dacDiem.filter(Boolean).length ? JSON.stringify(dacDiem.filter(Boolean)) : "",
+      anhChungChi: anhChungChi.length ? JSON.stringify(anhChungChi) : "",
+    };
     if (editItem) updateMu.mutate({ id: editItem.id, b: payload });
     else createMu.mutate(payload);
   }
@@ -329,90 +371,332 @@ export default function ThuongPhamPage() {
       {drawerOpen && (
         <>
           <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={close_} />
-          <aside className="fixed top-0 right-0 h-full w-full sm:w-[520px] bg-white shadow-2xl z-50 flex flex-col">
-            <div className="px-6 py-5 border-b border-border flex items-center justify-between">
-              <div className="text-[18px] font-semibold">{editItem ? "Sửa thương phẩm" : "Thêm thương phẩm"}</div>
+          <aside className="fixed top-0 right-0 h-full w-full sm:w-[560px] bg-white shadow-2xl z-50 flex flex-col">
+
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between shrink-0">
+              <div className="text-[17px] font-semibold tracking-tight">
+                {editItem ? "Sửa thương phẩm" : "THÊM MỚI THƯƠNG PHẨM"}
+              </div>
               <button onClick={close_} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
-            <div className="flex-1 overflow-auto px-6 py-5 space-y-4">
-              <div>
-                <label className="block text-[13px] font-medium mb-1.5">Tên thương phẩm <span className="text-rose-500">*</span></label>
-                <input value={form.name} onChange={e => setF("name", e.target.value)} placeholder="Chè Tân Cương 1 tôm 1 lá" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[13px] font-medium mb-1.5">Mã thương phẩm</label>
-                  <input value={form.code} onChange={e => setF("code", e.target.value)} placeholder="TP-001" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary font-mono" />
-                </div>
-                <div>
-                  <label className="block text-[13px] font-medium mb-1.5">Mã GTIN</label>
-                  <input value={form.gtin} onChange={e => setF("gtin", e.target.value)} placeholder="0123456789012" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary font-mono" />
-                </div>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-[13px] font-medium mb-1.5">Loại</label>
-                  <select value={form.type} onChange={e => setF("type", e.target.value as Product["type"])} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
-                    {TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-[13px] font-medium mb-1.5">Đơn vị tính</label>
-                  <select value={form.unitId ?? ""} onChange={e => setF("unitId", e.target.value ? Number(e.target.value) : null)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
-                    <option value="">-- Chọn đơn vị --</option>
-                    {units.map(u => <option key={u.id} value={u.id}>{u.name} ({u.abbreviation})</option>)}
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium mb-1.5">Đơn giá tham khảo</label>
-                <input value={form.price} onChange={e => setF("price", e.target.value)} placeholder="27,000 đ/kg" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium mb-1.5">
-                  Hình ảnh <span className="text-muted-foreground font-normal">(tối đa 5 ảnh)</span>
-                </label>
-                <label className={`flex flex-col items-center justify-center w-full h-20 border-2 border-dashed rounded-xl transition-colors ${imageUrls.length >= 5 ? "opacity-40 cursor-not-allowed border-border" : "border-border hover:border-primary hover:bg-primary/5 cursor-pointer"}`}>
-                  <Upload className="w-4 h-4 text-muted-foreground mb-1" />
-                  <span className="text-[12px] text-muted-foreground">{imageUrls.length >= 5 ? "Đã đủ 5 ảnh" : `Chọn ảnh từ máy (${imageUrls.length}/5)`}</span>
-                  <input type="file" accept="image/*" multiple disabled={imageUrls.length >= 5} className="hidden" onChange={handleFileChange} />
-                </label>
-                {imageUrls.length > 0 && (
-                  <div className="mt-2 grid grid-cols-5 gap-2">
-                    {imageUrls.map((url, i) => (
-                      <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-border bg-muted/30">
-                        <img src={url} alt={`ảnh ${i + 1}`} className="w-full h-full object-cover" />
-                        <button type="button" onClick={() => setImageUrls(imgs => imgs.filter((_, idx) => idx !== i))} className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                          <X className="w-3 h-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium mb-1.5">Trạng thái</label>
-                <select value={form.status} onChange={e => setF("status", e.target.value as "active" | "inactive")} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
-                  {STATUS_OPT.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-[13px] font-medium mb-1.5">Mô tả</label>
-                <RichTextEditor
-                  value={form.description}
-                  onChange={(val) => setF("description", val)}
-                  placeholder="Mô tả thêm…"
-                  minHeight={100}
-                />
-              </div>
-              {err && <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{err}</div>}
+
+            {/* Tab bar */}
+            <div className="flex border-b border-border shrink-0 bg-white">
+              {([
+                { id: 1, label: "1. Thông tin cơ bản" },
+                { id: 2, label: "2. Khối lượng & Đóng gói" },
+                { id: 3, label: "3. Thông tin quảng bá" },
+              ] as const).map(t => (
+                <button
+                  key={t.id}
+                  onClick={() => setDrawerTab(t.id)}
+                  className={`relative flex-1 py-3 text-[12.5px] font-medium transition-colors ${drawerTab === t.id ? "text-primary font-bold" : "text-muted-foreground hover:text-foreground"}`}
+                >
+                  {t.label}
+                  {drawerTab === t.id && <span className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-t" />}
+                </button>
+              ))}
             </div>
-            <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-2 bg-muted/40">
-              <button onClick={close_} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
-              <button disabled={isPending} onClick={handleSubmit} className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold shadow-sm hover:brightness-110 disabled:opacity-60 flex items-center gap-2">
-                {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                {editItem ? "Lưu thay đổi" : "Thêm"}
-              </button>
+
+            {/* Tab content */}
+            <div className="flex-1 overflow-y-auto">
+
+              {/* ── Tab 1: Thông tin cơ bản ── */}
+              {drawerTab === 1 && (
+                <div className="px-6 py-5 space-y-4">
+                  <div>
+                    <label className="block text-[13px] font-medium mb-1.5">Tên thương phẩm <span className="text-rose-500">*</span></label>
+                    <input value={form.name} onChange={e => setF("name", e.target.value)} placeholder="Nhập tên thương phẩm" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[13px] font-medium mb-1.5">Mã GTIN</label>
+                      <input value={form.gtin} onChange={e => setF("gtin", e.target.value)} placeholder="Nhập mã GTIN" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary font-mono" />
+                    </div>
+                    <div>
+                      <label className="block text-[13px] font-medium mb-1.5">Mã thương phẩm</label>
+                      <input value={form.code} onChange={e => setF("code", e.target.value)} placeholder="TP-001" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary font-mono" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[13px] font-medium mb-1.5">Loại sản phẩm</label>
+                      <select value={form.type} onChange={e => setF("type", e.target.value as Product["type"])} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
+                        {TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[13px] font-medium mb-1.5">Giống chè</label>
+                      <select value={form.giongCheId ?? ""} onChange={e => setF("giongCheId", e.target.value ? Number(e.target.value) : null)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
+                        <option value="">-- Chọn giống chè --</option>
+                        {(varietiesQ.data?.items ?? []).map(v => <option key={v.id} value={v.id}>{v.name}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-[13px] font-medium mb-1.5">Đơn vị tính</label>
+                      <select value={form.unitId ?? ""} onChange={e => setF("unitId", e.target.value ? Number(e.target.value) : null)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
+                        <option value="">-- Chọn đơn vị --</option>
+                        {units.map(u => <option key={u.id} value={u.id}>{u.name} ({u.abbreviation})</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-[13px] font-medium mb-1.5">Đơn giá tham khảo (VNĐ)</label>
+                      <input value={form.price} onChange={e => setF("price", e.target.value)} placeholder="VD: 270000" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-medium mb-1.5">Trạng thái</label>
+                    <div className="flex gap-2">
+                      {STATUS_OPT.map(o => (
+                        <button key={o.value} type="button" onClick={() => setF("status", o.value)}
+                          className={`flex-1 h-9 rounded-lg border text-[12.5px] font-medium transition-all ${form.status === o.value ? "border-primary text-primary bg-primary/8 font-semibold" : "border-border text-muted-foreground hover:bg-muted/40"}`}>
+                          {o.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-medium mb-1.5">
+                      Hình ảnh sản phẩm <span className="text-muted-foreground font-normal">(tối đa 5 ảnh)</span>
+                    </label>
+                    <label className={`flex flex-col items-center justify-center w-full h-20 border-2 border-dashed rounded-xl transition-colors ${imageUrls.length >= 5 ? "opacity-40 cursor-not-allowed border-border" : "border-border hover:border-primary hover:bg-primary/5 cursor-pointer"}`}>
+                      <Upload className="w-4 h-4 text-muted-foreground mb-1" />
+                      <span className="text-[12px] text-muted-foreground">{imageUrls.length >= 5 ? "Đã đủ 5 ảnh" : `Chọn ảnh từ máy (${imageUrls.length}/5)`}</span>
+                      <input type="file" accept="image/*" multiple disabled={imageUrls.length >= 5} className="hidden" onChange={handleFileChange} />
+                    </label>
+                    {imageUrls.length > 0 && (
+                      <div className="mt-2 grid grid-cols-5 gap-2">
+                        {imageUrls.map((url, i) => (
+                          <div key={i} className="relative group aspect-square rounded-lg overflow-hidden border border-border bg-muted/30">
+                            <img src={url} alt={`ảnh ${i + 1}`} className="w-full h-full object-cover" />
+                            <button type="button" onClick={() => setImageUrls(imgs => imgs.filter((_, idx) => idx !== i))} className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <X className="w-3 h-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <label className="block text-[13px] font-medium mb-1.5">Mô tả</label>
+                    <RichTextEditor value={form.description} onChange={(val) => setF("description", val)} placeholder="Mô tả thêm về thương phẩm…" minHeight={100} />
+                  </div>
+                </div>
+              )}
+
+              {/* ── Tab 2: Khối lượng & Đóng gói ── */}
+              {drawerTab === 2 && (
+                <div className="px-6 py-5 space-y-6">
+
+                  {/* Section: Khối lượng và kích thước */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="w-1 h-4 rounded bg-primary inline-block" />
+                      <h3 className="text-[14px] font-semibold text-primary">Khối lượng và kích thước</h3>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[13px] font-medium mb-1.5">Khối lượng</label>
+                          <input type="number" value={form.khoiLuong} onChange={e => setF("khoiLuong", e.target.value)} placeholder="Nhập giá trị số" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                        </div>
+                        <div>
+                          <label className="block text-[13px] font-medium mb-1.5">Đơn vị tính <span className="text-rose-500">*</span></label>
+                          <select value={form.donViKhoiLuong} onChange={e => setF("donViKhoiLuong", e.target.value)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
+                            <option value="g">Gram (g)</option>
+                            <option value="kg">Kilôgam (kg)</option>
+                            <option value="tan">Tấn (tấn)</option>
+                          </select>
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[13px] font-medium mb-1.5">Kích thước (Dài × Rộng × Cao)</label>
+                        <div className="grid grid-cols-4 gap-2">
+                          <div>
+                            <div className="text-[11px] text-muted-foreground mb-1">Dài</div>
+                            <input type="number" value={form.chieuDai} onChange={e => setF("chieuDai", e.target.value)} placeholder="0" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                          </div>
+                          <div>
+                            <div className="text-[11px] text-muted-foreground mb-1">Rộng</div>
+                            <input type="number" value={form.chieuRong} onChange={e => setF("chieuRong", e.target.value)} placeholder="0" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                          </div>
+                          <div>
+                            <div className="text-[11px] text-muted-foreground mb-1">Cao</div>
+                            <input type="number" value={form.chieuCao} onChange={e => setF("chieuCao", e.target.value)} placeholder="0" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                          </div>
+                          <div>
+                            <div className="text-[11px] text-muted-foreground mb-1">Đơn vị</div>
+                            <select value={form.donViKichThuoc} onChange={e => setF("donViKichThuoc", e.target.value)} className="w-full h-10 px-2 rounded-lg border border-border text-sm outline-none bg-white">
+                              <option value="mm">mm</option>
+                              <option value="cm">cm</option>
+                              <option value="m">m</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-border" />
+
+                  {/* Section: Thông tin đóng gói */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="w-1 h-4 rounded bg-primary inline-block" />
+                      <h3 className="text-[14px] font-semibold text-primary">Thông tin đóng gói</h3>
+                    </div>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-[13px] font-medium mb-1.5">Đơn vị bán</label>
+                        <input value={form.donViBan} onChange={e => setF("donViBan", e.target.value)} placeholder="Chọn đơn vị bán (Hộp, Thùng, Lốc, ...)" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                      </div>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[13px] font-medium mb-1.5">Số lượng đơn vị con</label>
+                          <input type="number" value={form.soLuongDonViCon} onChange={e => setF("soLuongDonViCon", e.target.value)} placeholder="VD: 24" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                        </div>
+                        <div>
+                          <label className="block text-[13px] font-medium mb-1.5">Đơn vị con</label>
+                          <select value={form.donViConId ?? ""} onChange={e => setF("donViConId", e.target.value ? Number(e.target.value) : null)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none bg-white">
+                            <option value="">-- Chọn đơn vị con --</option>
+                            {units.map(u => <option key={u.id} value={u.id}>{u.name} ({u.abbreviation})</option>)}
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* ── Tab 3: Thông tin quảng bá ── */}
+              {drawerTab === 3 && (
+                <div className="px-6 py-5 space-y-6">
+
+                  {/* Section: Thương hiệu & xuất xứ */}
+                  <div>
+                    <div className="flex items-center gap-2 mb-4">
+                      <span className="w-1 h-4 rounded bg-primary inline-block" />
+                      <h3 className="text-[14px] font-semibold text-primary">Thương hiệu và xuất xứ</h3>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-[13px] font-medium mb-1.5">Tên thương hiệu</label>
+                          <input value={form.thuongHieu} onChange={e => setF("thuongHieu", e.target.value)} placeholder="Chọn thương hiệu" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                        </div>
+                        <div>
+                          <label className="block text-[13px] font-medium mb-1.5">Xuất xứ</label>
+                          <input value={form.xuatXu} onChange={e => setF("xuatXu", e.target.value)} placeholder="Chọn quốc gia" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-[13px] font-medium mb-1.5">
+                          Hình ảnh chứng chỉ, chứng nhận
+                        </label>
+                        <label className={`flex flex-col items-center justify-center w-full h-20 border-2 border-dashed rounded-xl transition-colors ${anhChungChi.length >= 5 ? "opacity-40 cursor-not-allowed border-border" : "border-border hover:border-primary hover:bg-primary/5 cursor-pointer"}`}>
+                          <Award className="w-4 h-4 text-muted-foreground mb-1" />
+                          <span className="text-[12px] text-muted-foreground">Tải ảnh chứng chỉ</span>
+                          <span className="text-[11px] text-muted-foreground/60 mt-0.5">Hỗ trợ .jpg, .png (tối đa 5MB)</span>
+                          <input type="file" accept="image/*" multiple disabled={anhChungChi.length >= 5} className="hidden" onChange={async e => {
+                            const files = Array.from(e.target.files ?? []);
+                            const remaining = 5 - anhChungChi.length;
+                            const urls = await Promise.all(files.slice(0, remaining).map(f => new Promise<string>((res, rej) => {
+                              const r = new FileReader(); r.onload = () => res(r.result as string); r.onerror = rej; r.readAsDataURL(f);
+                            })));
+                            setAnhChungChi(prev => [...prev, ...urls]); e.target.value = "";
+                          }} />
+                        </label>
+                        {anhChungChi.length > 0 && (
+                          <div className="mt-2 grid grid-cols-4 gap-2">
+                            {anhChungChi.map((url, i) => (
+                              <div key={i} className="relative group aspect-[3/4] rounded-lg overflow-hidden border border-border bg-muted/20">
+                                <img src={url} alt={`chứng chỉ ${i + 1}`} className="w-full h-full object-cover" />
+                                <button type="button" onClick={() => setAnhChungChi(imgs => imgs.filter((_, idx) => idx !== i))} className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Divider */}
+                  <div className="border-t border-border" />
+
+                  {/* Section: Đặc điểm */}
+                  <div>
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <span className="w-1 h-4 rounded bg-primary inline-block" />
+                        <h3 className="text-[14px] font-semibold text-primary">Đặc điểm</h3>
+                        <span className="text-[11px] text-muted-foreground">({dacDiem.length}/10)</span>
+                      </div>
+                      {dacDiem.length < 10 && (
+                        <button type="button" onClick={() => setDacDiem(d => [...d, ""])}
+                          className="flex items-center gap-1 text-[12px] font-medium text-primary hover:bg-primary/5 px-2.5 py-1 rounded-lg border border-primary/30 transition-colors">
+                          <Plus className="w-3.5 h-3.5" /> Thêm đặc điểm
+                        </button>
+                      )}
+                    </div>
+                    {dacDiem.length === 0 ? (
+                      <div className="text-center py-8 text-[13px] text-muted-foreground">
+                        <Sparkles className="w-8 h-8 mx-auto mb-2 opacity-25" />
+                        <p>Chưa có đặc điểm nào.</p>
+                        <p className="text-[12px] mt-0.5">Nhấn "Thêm đặc điểm" để bắt đầu. Tối đa 10 đặc điểm.</p>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {dacDiem.map((dd, i) => (
+                          <div key={i} className="flex items-center gap-2">
+                            <span className="text-[11px] text-muted-foreground w-5 shrink-0 text-right">{i + 1}.</span>
+                            <input
+                              value={dd} onChange={e => setDacDiem(prev => prev.map((v, idx) => idx === i ? e.target.value : v))}
+                              placeholder="Nhập đặc điểm…"
+                              className="flex-1 h-9 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary"
+                            />
+                            <button type="button" onClick={() => setDacDiem(d => d.filter((_, idx) => idx !== i))}
+                              className="w-7 h-7 flex items-center justify-center rounded-lg text-muted-foreground hover:text-rose-500 hover:bg-rose-50 shrink-0">
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-border bg-muted/30 flex items-center justify-between shrink-0">
+              {err && <div className="text-[12px] text-rose-600 flex-1 mr-3">{err}</div>}
+              {!err && <div className="flex-1" />}
+              <div className="flex items-center gap-2">
+                {drawerTab > 1 && (
+                  <button type="button" onClick={() => setDrawerTab(t => (t - 1) as 1 | 2 | 3)}
+                    className="h-9 px-4 rounded-lg border border-border text-[13px] font-medium hover:bg-muted">
+                    ← Trước
+                  </button>
+                )}
+                {drawerTab < 3 && (
+                  <button type="button" onClick={() => setDrawerTab(t => (t + 1) as 1 | 2 | 3)}
+                    className="h-9 px-4 rounded-lg border border-border text-[13px] font-medium hover:bg-muted">
+                    Tiếp →
+                  </button>
+                )}
+                <button onClick={close_} className="h-9 px-4 rounded-lg border border-border text-[13px] font-medium hover:bg-muted">Hủy</button>
+                <button disabled={isPending} onClick={handleSubmit}
+                  className="h-9 px-5 rounded-lg bg-primary text-white text-[13px] font-semibold shadow-sm hover:brightness-110 disabled:opacity-60 flex items-center gap-2">
+                  {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                  {editItem ? "Lưu thay đổi" : "Lưu"}
+                </button>
+              </div>
             </div>
           </aside>
         </>
