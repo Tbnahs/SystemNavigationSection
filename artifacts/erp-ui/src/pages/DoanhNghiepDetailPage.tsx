@@ -4,8 +4,9 @@ import { useQuery } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   ArrowLeft, Pencil, MoreHorizontal, Search, MapPin, Phone, Mail,
-  Building2, Users, Package, Sprout, FileText, Download,
+  Building2, Users, Package, Sprout,
   CheckCircle2, AlertCircle, Clock, Globe, Hash, Calendar, LayoutGrid, Loader2,
+  Award, ShieldCheck, BadgeCheck, ExternalLink, Plus,
 } from "lucide-react";
 import { fetchEnterprise, type Employee } from "@/lib/api";
 
@@ -46,7 +47,7 @@ export default function DoanhNghiepDetailPage() {
   const params = useParams<{ id?: string }>();
   const id = Number(params.id);
   const [, setLocation] = useLocation();
-  const [tab, setTab] = useState<"overview" | "members" | "activity" | "documents">("overview");
+  const [tab, setTab] = useState<"overview" | "members" | "certs">("overview");
 
   const q = useQuery({
     queryKey: ["enterprise", id],
@@ -129,8 +130,7 @@ export default function DoanhNghiepDetailPage() {
             {[
               { k: "overview",  label: "Tổng quan" },
               { k: "members",   label: `Nhân viên (${members.length})` },
-              { k: "activity",  label: "Lịch sử thay đổi" },
-              { k: "documents", label: "Tài liệu" },
+              { k: "certs",     label: "Chứng nhận / Chứng chỉ" },
             ].map((t) => (
               <button
                 key={t.k}
@@ -292,34 +292,8 @@ export default function DoanhNghiepDetailPage() {
           </Card>
         )}
 
-        {tab === "activity" && (
-          <Card title="Lịch sử thay đổi">
-            <div className="space-y-0">
-              <div className="flex gap-3 py-3 border-b border-border">
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center shrink-0 ${TONES.blue}`}>
-                  <Building2 className="w-4 h-4" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="text-[13.5px]">
-                    <span className="font-medium text-foreground">Hệ thống</span>
-                    <span className="text-muted-foreground"> · Tạo doanh nghiệp</span>
-                  </div>
-                  <div className="text-[12.5px] text-muted-foreground mt-0.5">Doanh nghiệp được khởi tạo trên hệ thống</div>
-                </div>
-                <div className="text-[11.5px] text-muted-foreground shrink-0">{formatDate(dn.createdAt)}</div>
-              </div>
-              <div className="px-2 py-6 text-center text-[12.5px] text-muted-foreground">Lịch sử thay đổi chi tiết sẽ được bổ sung sau.</div>
-            </div>
-          </Card>
-        )}
-
-        {tab === "documents" && (
-          <Card title="Tài liệu" actionLabel="+ Tải lên">
-            <div className="text-[13px] text-muted-foreground py-8 text-center">
-              <FileText className="w-8 h-8 mx-auto mb-2 opacity-50" />
-              Chưa có tài liệu nào được tải lên cho doanh nghiệp này.
-            </div>
-          </Card>
+        {tab === "certs" && (
+          <CertsTab />
         )}
       </div>
     </AppLayout>
@@ -403,6 +377,171 @@ function Status({ icon: Icon, tone, label, sub }: { icon: React.ComponentType<{ 
         <div className="text-foreground">{label}</div>
         <div className="text-[12px] text-muted-foreground">{sub}</div>
       </div>
+    </div>
+  );
+}
+
+interface Cert {
+  id: string;
+  ten: string;
+  loai: "ocop" | "vietgap" | "organic" | "haccp" | "iso" | "khac";
+  soChungNhan: string;
+  capBoi: string;
+  ngayCap: string;
+  ngayHetHan: string;
+  phamVi: string;
+  trangThai: "con-han" | "sap-het-han" | "het-han";
+  ghiChu?: string;
+}
+
+const INIT_CERTS: Cert[] = [
+  { id:"c1", ten:"OCOP 4 sao", loai:"ocop", soChungNhan:"OCOP-BK-2022-014", capBoi:"UBND Tỉnh Bắc Kạn", ngayCap:"15/03/2022", ngayHetHan:"15/03/2025", phamVi:"Chè Shan Tuyết Bằng Phúc – Dạng búp khô", trangThai:"sap-het-han" },
+  { id:"c2", ten:"VietGAP Sản xuất chè", loai:"vietgap", soChungNhan:"VG-CHE-2023-0087", capBoi:"Trung tâm Chất lượng Nông lâm Thủy sản vùng 1", ngayCap:"10/06/2023", ngayHetHan:"10/06/2026", phamVi:"Vùng trồng Nà Hồng, Nà Bay, Bản Chang – 18,5 ha", trangThai:"con-han" },
+  { id:"c3", ten:"HACCP Chế biến chè", loai:"haccp", soChungNhan:"HACCP-2021-HTX-042", capBoi:"Cục An toàn thực phẩm – Bộ Y tế", ngayCap:"20/09/2021", ngayHetHan:"20/09/2024", phamVi:"Dây chuyền sao khô và đóng gói tại Nhà máy Bằng Phúc", trangThai:"het-han", ghiChu:"Cần gia hạn ngay" },
+];
+
+const CERT_CFG: Record<Cert["loai"], { label: string; bg: string; text: string; border: string }> = {
+  ocop:    { label:"OCOP",    bg:"bg-amber-50",   text:"text-amber-700",   border:"border-amber-200" },
+  vietgap: { label:"VietGAP", bg:"bg-emerald-50", text:"text-emerald-700", border:"border-emerald-200" },
+  organic: { label:"Organic", bg:"bg-green-50",   text:"text-green-700",   border:"border-green-200" },
+  haccp:   { label:"HACCP",   bg:"bg-blue-50",    text:"text-blue-700",    border:"border-blue-200" },
+  iso:     { label:"ISO",     bg:"bg-violet-50",  text:"text-violet-700",  border:"border-violet-200" },
+  khac:    { label:"Khác",    bg:"bg-slate-50",   text:"text-slate-600",   border:"border-slate-200" },
+};
+
+const STATUS_CERT: Record<Cert["trangThai"], { label: string; bg: string; text: string; dot: string }> = {
+  "con-han":      { label:"Còn hạn",     bg:"bg-emerald-50", text:"text-emerald-700", dot:"bg-emerald-500" },
+  "sap-het-han":  { label:"Sắp hết hạn", bg:"bg-amber-50",   text:"text-amber-700",   dot:"bg-amber-500" },
+  "het-han":      { label:"Hết hạn",     bg:"bg-red-50",     text:"text-red-600",     dot:"bg-red-500" },
+};
+
+function CertsTab() {
+  const [certs, setCerts] = useState<Cert[]>(INIT_CERTS);
+  const [showAdd, setShowAdd] = useState(false);
+  const [fTen, setFTen] = useState(""); const [fLoai, setFLoai] = useState<Cert["loai"]>("ocop");
+  const [fSo, setFSo] = useState(""); const [fCapBoi, setFCapBoi] = useState("");
+  const [fNgayCap, setFNgayCap] = useState(""); const [fNgayHH, setFNgayHH] = useState("");
+  const [fPhamVi, setFPhamVi] = useState(""); const [fGhiChu, setFGhiChu] = useState("");
+
+  const handleAdd = () => {
+    if (!fTen || !fSo) return;
+    const newC: Cert = { id: String(Date.now()), ten: fTen, loai: fLoai, soChungNhan: fSo, capBoi: fCapBoi, ngayCap: fNgayCap, ngayHetHan: fNgayHH, phamVi: fPhamVi, trangThai:"con-han", ghiChu: fGhiChu };
+    setCerts(prev => [...prev, newC]);
+    setShowAdd(false); setFTen(""); setFSo(""); setFCapBoi(""); setFNgayCap(""); setFNgayHH(""); setFPhamVi(""); setFGhiChu("");
+  };
+
+  const conHan = certs.filter(c => c.trangThai === "con-han").length;
+  const sapHH  = certs.filter(c => c.trangThai === "sap-het-han").length;
+  const hetHan = certs.filter(c => c.trangThai === "het-han").length;
+
+  return (
+    <div className="space-y-4">
+      {/* Summary */}
+      <div className="grid grid-cols-3 gap-3">
+        {[
+          { label:"Còn hiệu lực", value: conHan, bg:"bg-emerald-50", text:"text-emerald-700", icon: BadgeCheck },
+          { label:"Sắp hết hạn",  value: sapHH,  bg:"bg-amber-50",   text:"text-amber-700",   icon: Clock },
+          { label:"Đã hết hạn",   value: hetHan, bg:"bg-red-50",     text:"text-red-600",     icon: AlertCircle },
+        ].map(s => (
+          <div key={s.label} className="bg-white border border-border rounded-xl p-4 flex items-center gap-3">
+            <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${s.bg}`}>
+              <s.icon className={`w-5 h-5 ${s.text}`} />
+            </div>
+            <div><div className={`text-2xl font-bold ${s.text}`}>{s.value}</div><div className="text-[11.5px] text-muted-foreground">{s.label}</div></div>
+          </div>
+        ))}
+      </div>
+
+      {/* List */}
+      <div className="bg-white border border-border rounded-xl overflow-hidden">
+        <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
+          <div className="flex items-center gap-2">
+            <Award className="w-4 h-4 text-primary" />
+            <span className="text-[14px] font-semibold">Danh sách chứng nhận / chứng chỉ</span>
+          </div>
+          <button onClick={() => setShowAdd(true)} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-lg hover:bg-primary/90">
+            <Plus className="w-3.5 h-3.5" /> Thêm
+          </button>
+        </div>
+
+        {certs.length === 0 ? (
+          <div className="py-12 text-center text-[13px] text-muted-foreground">
+            <ShieldCheck className="w-9 h-9 mx-auto mb-3 opacity-30" />
+            Chưa có chứng nhận nào. Bấm "+ Thêm" để bổ sung.
+          </div>
+        ) : (
+          <div className="divide-y divide-border">
+            {certs.map(c => {
+              const lc  = CERT_CFG[c.loai];
+              const st  = STATUS_CERT[c.trangThai];
+              return (
+                <div key={c.id} className="px-5 py-4 flex items-start gap-4 hover:bg-muted/10 transition-colors">
+                  <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 border ${lc.bg} ${lc.border}`}>
+                    <Award className={`w-5 h-5 ${lc.text}`} />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="text-[14px] font-semibold text-foreground">{c.ten}</span>
+                      <span className={`text-[10.5px] px-1.5 py-0.5 rounded-full font-semibold border ${lc.bg} ${lc.text} ${lc.border}`}>{lc.label}</span>
+                      <span className={`inline-flex items-center gap-1 text-[10.5px] px-2 py-0.5 rounded-full font-medium ${st.bg} ${st.text}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />{st.label}
+                      </span>
+                    </div>
+                    <div className="mt-1.5 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-1">
+                      <div className="text-[12.5px] text-muted-foreground">Số: <span className="font-mono text-foreground">{c.soChungNhan}</span></div>
+                      <div className="text-[12.5px] text-muted-foreground">Cấp bởi: <span className="text-foreground">{c.capBoi}</span></div>
+                      <div className="text-[12.5px] text-muted-foreground">Ngày cấp: <span className="text-foreground">{c.ngayCap}</span></div>
+                      <div className="text-[12.5px] text-muted-foreground">Hết hạn: <span className={`font-medium ${c.trangThai === "het-han" ? "text-red-600" : c.trangThai === "sap-het-han" ? "text-amber-600" : "text-foreground"}`}>{c.ngayHetHan}</span></div>
+                    </div>
+                    {c.phamVi && <div className="mt-1 text-[12px] text-muted-foreground">Phạm vi: {c.phamVi}</div>}
+                    {c.ghiChu && (
+                      <div className="mt-1.5 inline-flex items-center gap-1 text-[11.5px] px-2 py-0.5 bg-red-50 text-red-600 rounded-full border border-red-200">
+                        <AlertCircle className="w-3 h-3" />{c.ghiChu}
+                      </div>
+                    )}
+                  </div>
+                  <button className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground shrink-0">
+                    <ExternalLink className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Add modal */}
+      {showAdd && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+          <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setShowAdd(false)} />
+          <div className="relative bg-white rounded-t-2xl sm:rounded-2xl shadow-2xl w-full max-w-lg flex flex-col max-h-[90vh]">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-border shrink-0">
+              <div className="flex items-center gap-2"><Award className="w-4 h-4 text-primary" /><span className="font-semibold text-sm">Thêm chứng nhận / chứng chỉ</span></div>
+              <button onClick={() => setShowAdd(false)} className="w-7 h-7 rounded-lg flex items-center justify-center hover:bg-muted/60 text-muted-foreground">✕</button>
+            </div>
+            <div className="overflow-y-auto flex-1 px-5 py-4 space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="col-span-2"><label className="block text-xs font-semibold mb-1.5">Tên chứng nhận <span className="text-red-500">*</span></label><input value={fTen} onChange={e=>setFTen(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" placeholder="VD: OCOP 4 sao, VietGAP…" /></div>
+                <div><label className="block text-xs font-semibold mb-1.5">Loại</label>
+                  <select value={fLoai} onChange={e=>setFLoai(e.target.value as Cert["loai"])} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary">
+                    {(Object.keys(CERT_CFG) as Cert["loai"][]).map(k=><option key={k} value={k}>{CERT_CFG[k].label}</option>)}
+                  </select>
+                </div>
+                <div><label className="block text-xs font-semibold mb-1.5">Số chứng nhận <span className="text-red-500">*</span></label><input value={fSo} onChange={e=>setFSo(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" /></div>
+                <div className="col-span-2"><label className="block text-xs font-semibold mb-1.5">Cơ quan cấp</label><input value={fCapBoi} onChange={e=>setFCapBoi(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" /></div>
+                <div><label className="block text-xs font-semibold mb-1.5">Ngày cấp</label><input value={fNgayCap} onChange={e=>setFNgayCap(e.target.value)} placeholder="DD/MM/YYYY" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" /></div>
+                <div><label className="block text-xs font-semibold mb-1.5">Ngày hết hạn</label><input value={fNgayHH} onChange={e=>setFNgayHH(e.target.value)} placeholder="DD/MM/YYYY" className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" /></div>
+                <div className="col-span-2"><label className="block text-xs font-semibold mb-1.5">Phạm vi áp dụng</label><textarea value={fPhamVi} onChange={e=>setFPhamVi(e.target.value)} rows={2} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg resize-none focus:outline-none focus:ring-1 focus:ring-primary" /></div>
+                <div className="col-span-2"><label className="block text-xs font-semibold mb-1.5">Ghi chú</label><input value={fGhiChu} onChange={e=>setFGhiChu(e.target.value)} className="w-full px-3 py-2.5 text-sm border border-border rounded-lg focus:outline-none focus:ring-1 focus:ring-primary" /></div>
+              </div>
+            </div>
+            <div className="px-5 pb-5 pt-3 border-t border-border flex gap-2 shrink-0">
+              <button onClick={() => setShowAdd(false)} className="flex-1 px-4 py-2.5 text-sm border border-border rounded-lg hover:bg-muted/50">Hủy</button>
+              <button onClick={handleAdd} disabled={!fTen || !fSo} className="flex-1 px-4 py-2.5 text-sm font-medium bg-primary text-white rounded-lg hover:bg-primary/90 disabled:opacity-40 flex items-center justify-center gap-1.5"><Plus className="w-4 h-4" />Thêm</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
