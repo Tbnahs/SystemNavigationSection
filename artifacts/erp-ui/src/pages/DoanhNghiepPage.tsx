@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import RichTextEditor from "@/components/RichTextEditor";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -711,14 +712,12 @@ export default function DoanhNghiepPage() {
                       <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
                       <span className="text-[13px] font-medium text-foreground/80">Câu chuyện thương hiệu</span>
                     </div>
-                    <textarea
+                    <RichTextEditor
                       value={form.cauChuyen}
-                      onChange={(e) => setF("cauChuyen", e.target.value)}
-                      rows={5}
+                      onChange={(val) => setF("cauChuyen", val)}
                       placeholder="Kể về lịch sử hình thành, vùng nguyên liệu, cam kết chất lượng của doanh nghiệp…"
-                      className="w-full px-3 py-2.5 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary focus:ring-2 focus:ring-primary/10 resize-none leading-relaxed"
+                      minHeight={140}
                     />
-                    <div className="text-[11.5px] text-muted-foreground mt-1">{form.cauChuyen.length} ký tự</div>
                   </div>
                 </div>
               )}
