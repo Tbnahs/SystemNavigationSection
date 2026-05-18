@@ -30,6 +30,7 @@ import CoSoPage from "@/pages/CoSoPage";
 import ThuongPhamPage from "@/pages/ThuongPhamPage";
 import DonThuMuaPage from "@/pages/DonThuMuaPage";
 import GiongChePage from "@/pages/GiongChePage";
+import TxngSuKienPage from "@/pages/TxngSuKienPage";
 import PortalPage from "@/pages/PortalPage";
 import HoSoPage from "@/pages/HoSoPage";
 import ModuleSelectPage from "@/pages/ModuleSelectPage";
@@ -159,6 +160,10 @@ function Router() {
       </Route>
       <Route path="/module/erp/co-so">
         {() => <ProtectedRoute component={CoSoPage} />}
+      </Route>
+
+      <Route path="/module/txng/su-kien">
+        {() => <ProtectedRoute component={TxngSuKienPage} />}
       </Route>
 
       {/* Generic sub-module and module fallbacks */}
