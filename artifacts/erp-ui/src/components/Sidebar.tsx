@@ -40,7 +40,6 @@ const ERP_SUB_ITEMS: NavItem[] = [
 
   { type: "divider", label: "Danh mục" },
   { id: "thuong-pham",        icon: Package,      label: "Thương phẩm" },
-  { id: "chung-chi-thuong-pham", icon: Award,     label: "Chứng chỉ thương phẩm" },
   { id: "quy-cach",           icon: BookOpen,     label: "Quy cách & Tiêu chuẩn" },
   { id: "giong-che",          icon: Sprout,       label: "Giống chè" },
   { id: "co-so",              icon: Factory,      label: "Cơ sở" },
