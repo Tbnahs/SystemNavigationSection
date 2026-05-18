@@ -91,6 +91,20 @@ export type Product = {
   updatedAt: string;
   unitName?: string | null;
   enterpriseName?: string | null;
+  khoiLuong?: string;
+  donViKhoiLuong?: string;
+  chieuDai?: string;
+  chieuRong?: string;
+  chieuCao?: string;
+  donViKichThuoc?: string;
+  donViBan?: string;
+  soLuongDonViCon?: string;
+  donViConId?: number | null;
+  thuongHieu?: string;
+  xuatXu?: string;
+  anhChungChi?: string;
+  dacDiem?: string;
+  giongCheId?: number | null;
 };
 
 export type Grade = {
