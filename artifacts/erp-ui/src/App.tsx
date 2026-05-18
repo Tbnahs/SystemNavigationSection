@@ -28,6 +28,7 @@ import NhanVienPage from "@/pages/NhanVienPage";
 import DonViTinhPage from "@/pages/DonViTinhPage";
 import CoSoPage from "@/pages/CoSoPage";
 import ThuongPhamPage from "@/pages/ThuongPhamPage";
+import ChungChiThuongPhamPage from "@/pages/ChungChiThuongPhamPage";
 import DonThuMuaPage from "@/pages/DonThuMuaPage";
 import GiongChePage from "@/pages/GiongChePage";
 import PortalPage from "@/pages/PortalPage";
@@ -150,6 +151,9 @@ function Router() {
       </Route>
       <Route path="/module/erp/thuong-pham">
         {() => <ProtectedRoute component={ThuongPhamPage} />}
+      </Route>
+      <Route path="/module/erp/chung-chi-thuong-pham">
+        {() => <ProtectedRoute component={ChungChiThuongPhamPage} />}
       </Route>
       <Route path="/module/erp/thu-mua">
         {() => <ProtectedRoute component={DonThuMuaPage} />}
