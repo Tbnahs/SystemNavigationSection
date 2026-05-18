@@ -157,6 +157,9 @@ function Router() {
       <Route path="/module/erp/giong-che">
         {() => <ProtectedRoute component={GiongChePage} />}
       </Route>
+      <Route path="/module/erp/co-so">
+        {() => <ProtectedRoute component={CoSoPage} />}
+      </Route>
 
       {/* Generic sub-module and module fallbacks */}
       <Route path="/module/:moduleId/:subId">
