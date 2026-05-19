@@ -8,6 +8,7 @@ import {
   MapPin, Sprout, FlaskConical, Scissors, CloudSun, ClipboardCheck,
   Building2, ShieldCheck, Scale, ShoppingBasket, LayoutGrid,
   Cpu, Wifi, Activity, Server, Globe,
+  CalendarClock, History, Tag, ClipboardList,
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -39,19 +40,39 @@ const ERP_SUB_ITEMS: NavItem[] = [
   { id: "reports",  icon: FileBarChart,   label: "Báo cáo" },
 
   { type: "divider", label: "Danh mục" },
-  { id: "thuong-pham", icon: Package,     label: "Thương phẩm" },
-  { id: "quy-cach",    icon: BookOpen,    label: "Quy cách & Tiêu chuẩn" },
-  { id: "giong-che",   icon: Sprout,      label: "Giống chè" },
-  { id: "co-so",       icon: Factory,     label: "Cơ sở" },
+  { id: "thuong-pham",        icon: Package,      label: "Thương phẩm" },
+  { id: "quy-cach",           icon: BookOpen,     label: "Quy cách & Tiêu chuẩn" },
+  { id: "giong-che",          icon: Sprout,       label: "Giống chè" },
+  { id: "co-so",              icon: Factory,      label: "Cơ sở" },
 ];
 
 const TXNG_SUB_ITEMS: NavItem[] = [
-  { id: "qrcode",        icon: QrCode,        label: "Mã QR" },
-  { id: "batch",         icon: Layers,        label: "Lô hàng" },
-  { id: "supplychain",   icon: Link2,         label: "Chuỗi cung ứng" },
-  { id: "certification", icon: Award,         label: "Chứng nhận" },
-  { id: "timeline",      icon: GitBranch,     label: "Lịch sử lô" },
-  { id: "audit",         icon: Search,        label: "Tra cứu / Kiểm toán" },
+  { type: "divider", label: "Quản trị doanh nghiệp" },
+  { id: "nhan-vien",       icon: Users,          label: "Nhân viên" },
+  { id: "co-so",           icon: Factory,        label: "Cơ sở" },
+
+  { type: "divider", label: "Quản lý chứng chỉ" },
+  { id: "chung-chi-dn",    icon: ShieldCheck,    label: "Chứng chỉ doanh nghiệp" },
+  { id: "chung-chi-tp",    icon: Award,          label: "Chứng chỉ thương phẩm" },
+
+  { type: "divider", label: "Quản lý thương phẩm" },
+  { id: "thuong-pham",     icon: Package,        label: "Thương phẩm" },
+
+  { type: "divider", label: "Quản lý sự kiện trọng yếu" },
+  { id: "su-kien",         icon: CalendarClock,  label: "Biểu mẫu sự kiện" },
+
+  { type: "divider", label: "Quản lý vùng nguyên liệu" },
+  { id: "giong-che",       icon: Sprout,         label: "Giống chè" },
+  { id: "bieu-mau-hd",     icon: ClipboardList,  label: "Biểu mẫu hoạt động" },
+  { id: "vung-nuoi-trong", icon: MapPin,         label: "Vùng nuôi trồng" },
+
+  { type: "divider", label: "Truy xuất" },
+  { id: "theo-lo",         icon: Search,         label: "Theo lô thương phẩm" },
+
+  { type: "divider", label: "Quản lý tem" },
+  { id: "tem",             icon: Tag,            label: "Quản lý tem" },
+  { id: "bao-cao-tem",     icon: FileBarChart,   label: "Báo cáo lượt quét tem" },
+  { id: "lich-su-tem",     icon: History,        label: "Lịch sử kích hoạt tem" },
 ];
 
 const VUNG_TRONG_SUB_ITEMS: NavItem[] = [

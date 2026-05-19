@@ -37,37 +37,12 @@ function roleClr(role: string) { return ROLE_CLR[role] ?? "bg-emerald-50 text-em
 
 const DEFAULT_ROLES = ["Admin", "Quản lý", "Nhân viên", "Kế toán"];
 
-/* ─── Permissions ───────────────────────────────────────────────── */
-const ALL_PERMS: { id: string; label: string; group: string }[] = [
-  { id: "erp.dn.xem",  label: "Xem nội dung doanh nghiệp",       group: "ERP" },
-  { id: "erp.dn.sua",  label: "Chỉnh sửa nội dung doanh nghiệp", group: "ERP" },
-  { id: "erp.bc.xem",  label: "Xem báo cáo ERP",                  group: "ERP" },
-  { id: "erp.bc.xuat", label: "Kết xuất dữ liệu",                 group: "ERP" },
-  { id: "txng.xem",    label: "Xem truy xuất nguồn gốc",          group: "TXNG" },
-  { id: "txng.tao",    label: "Tạo / Cập nhật lô hàng",           group: "TXNG" },
-  { id: "txng.xoa",    label: "Xóa lô hàng",                      group: "TXNG" },
-  { id: "txng.duyet",  label: "Phê duyệt lô hàng",                group: "TXNG" },
-  { id: "vt.xem",      label: "Xem vùng trồng",                   group: "Vùng Trồng" },
-  { id: "vt.sua",      label: "Thêm / Sửa vùng trồng",            group: "Vùng Trồng" },
-  { id: "vt.xoa",      label: "Xóa vùng trồng",                   group: "Vùng Trồng" },
-  { id: "vt.muavu",    label: "Quản lý mùa vụ",                   group: "Vùng Trồng" },
+/* ─── Module info ────────────────────────────────────────────────── */
+const MODULE_DEFS: { key: "ERP" | "TXNG" | "VT"; name: string; desc: string; color: "emerald" | "blue" | "amber" }[] = [
+  { key: "ERP",  name: "ERP",          desc: "Quản trị nguồn lực doanh nghiệp: thu mua, sản xuất, đóng gói, bán hàng.", color: "emerald" },
+  { key: "TXNG", name: "TXNG",         desc: "Truy xuất nguồn gốc sản phẩm theo từng lô, mã QR.",                       color: "blue"    },
+  { key: "VT",   name: "Vùng trồng",   desc: "Quản lý vùng nguyên liệu, hộ liên kết, bản đồ canh tác.",                 color: "amber"   },
 ];
-const ALL_IDS = ALL_PERMS.map(p => p.id);
-const ROLE_PRESET: Record<string, string[]> = {
-  "Admin":    ALL_IDS,
-  "Quản lý": ["erp.dn.xem","erp.dn.sua","erp.bc.xem","erp.bc.xuat","txng.xem","txng.tao","txng.duyet","vt.xem","vt.sua","vt.muavu"],
-  "Kế toán": ["erp.dn.xem","erp.bc.xem","erp.bc.xuat","txng.xem","vt.xem"],
-  "Nhân viên":["txng.xem","txng.tao","vt.xem","vt.muavu"],
-};
-function presetFor(role: string) { return ROLE_PRESET[role] ?? []; }
-
-const PERM_GROUPS = [...new Set(ALL_PERMS.map(p => p.group))];
-
-const MODULE_TO_GROUP: Record<string, string> = {
-  "ERP": "ERP",
-  "TXNG": "TXNG",
-  "VT": "Vùng Trồng",
-};
 
 /* ─── Form type ─────────────────────────────────────────────────── */
 type EForm = {
@@ -76,14 +51,14 @@ type EForm = {
   phone: string;
   enterpriseId: number | null;
   role: string;
-  permissions: string[];
+  modules: ("ERP" | "TXNG" | "VT")[];
   avatarUrl: string | null;
   facilityIds: number[];
   matKhau: string;
 };
 const EMPTY_E: EForm = {
   name: "", email: "", phone: "", enterpriseId: null,
-  role: "Nhân viên", permissions: presetFor("Nhân viên"), avatarUrl: null,
+  role: "Nhân viên", modules: [], avatarUrl: null,
   facilityIds: [], matKhau: "",
 };
 
@@ -229,164 +204,37 @@ function RoleCombobox({ value, onChange, roles, onAddRole }: {
   );
 }
 
-/* ─── PermissionMatrix ──────────────────────────────────────────── */
-const GROUP_META: Record<string, { icon: string; color: string; activeCls: string; badgeCls: string }> = {
-  "ERP":         { icon: "🏢", color: "text-blue-600",   activeCls: "border-blue-500 text-blue-700 bg-blue-50/60",   badgeCls: "bg-blue-100 text-blue-700" },
-  "TXNG":        { icon: "🔍", color: "text-violet-600", activeCls: "border-violet-500 text-violet-700 bg-violet-50/60", badgeCls: "bg-violet-100 text-violet-700" },
-  "Vùng Trồng":  { icon: "🌱", color: "text-emerald-600",activeCls: "border-emerald-500 text-emerald-700 bg-emerald-50/60", badgeCls: "bg-emerald-100 text-emerald-700" },
-};
-
-function PermissionMatrix({ permissions, onChange, role, activeGroups }: {
-  permissions: string[];
-  onChange: (p: string[]) => void;
-  role: string;
-  activeGroups: string[] | null;
+/* ─── ModuleToggle ───────────────────────────────────────────────── */
+function ModuleToggle({ name, desc, checked, onChange, color }: {
+  name: string; desc: string; checked: boolean; onChange: (v: boolean) => void; color: "emerald" | "blue" | "amber";
 }) {
-  const visibleGroups = activeGroups ? PERM_GROUPS.filter(g => activeGroups.includes(g)) : PERM_GROUPS;
-  const [activeTab, setActiveTab] = useState<string>(() => visibleGroups[0] ?? "");
-
-  const currentTab = visibleGroups.includes(activeTab) ? activeTab : (visibleGroups[0] ?? "");
-
-  const visiblePreset = presetFor(role).filter(id => {
-    const perm = ALL_PERMS.find(p => p.id === id);
-    return perm && (!activeGroups || activeGroups.includes(perm.group));
-  });
-  const isDefault = JSON.stringify([...permissions].sort()) === JSON.stringify([...visiblePreset].sort());
-
-  function toggle(id: string) {
-    onChange(permissions.includes(id) ? permissions.filter(p => p !== id) : [...permissions, id]);
-  }
-  function reset() { onChange(visiblePreset); }
-
-  if (activeGroups !== null && visibleGroups.length === 0) {
-    return (
-      <div className="rounded-xl border border-border bg-slate-50/60 p-4 text-center text-[13px] text-muted-foreground">
-        Doanh nghiệp này chưa đăng ký phân hệ nào.
-      </div>
-    );
-  }
-
-  const tabPerms = ALL_PERMS.filter(p => p.group === currentTab);
-  const tabChecked = tabPerms.filter(p => permissions.includes(p.id)).length;
-  const tabAllChecked = tabChecked === tabPerms.length;
-  const tabSomeChecked = tabChecked > 0 && !tabAllChecked;
-
-  function toggleTabGroup() {
-    const ids = tabPerms.map(p => p.id);
-    if (tabAllChecked) onChange(permissions.filter(id => !ids.includes(id)));
-    else onChange([...new Set([...permissions, ...ids])]);
-  }
-
-  const meta = GROUP_META[currentTab] ?? { icon: "•", color: "text-foreground", activeCls: "border-primary text-primary bg-primary/5", badgeCls: "bg-primary/10 text-primary" };
-
+  const tones = {
+    emerald: { bg: "bg-emerald-50", text: "text-emerald-700", icon: "🏭", border: checked ? "border-emerald-300 bg-emerald-50/30" : "border-border" },
+    blue:    { bg: "bg-blue-50",    text: "text-blue-700",    icon: "🔍", border: checked ? "border-blue-300 bg-blue-50/30"    : "border-border" },
+    amber:   { bg: "bg-amber-50",   text: "text-amber-700",   icon: "🌱", border: checked ? "border-amber-300 bg-amber-50/30"  : "border-border" },
+  }[color];
   return (
-    <div className="rounded-xl border border-border overflow-hidden bg-white">
-      {/* Header */}
-      <div className="px-4 py-3 border-b border-border flex items-center justify-between bg-white">
-        <div>
-          <div className="text-[13px] font-semibold">Phạm vi tài khoản</div>
-          <div className="text-[11.5px] text-muted-foreground mt-0.5">
-            Chọn chức năng được phép truy cập theo từng phân hệ
-          </div>
-        </div>
-        <div className="flex items-center gap-2">
-          {isDefault ? (
-            <span className="text-[11px] px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20 font-medium">
-              Mặc định theo vai trò
-            </span>
-          ) : (
-            <>
-              <span className="text-[11px] px-2 py-0.5 rounded-full bg-amber-50 text-amber-700 ring-1 ring-amber-600/20 font-medium">
-                Đã tùy chỉnh
-              </span>
-              <button
-                onClick={reset}
-                className="h-7 px-2.5 rounded-lg border border-border text-[11.5px] flex items-center gap-1 hover:bg-muted text-muted-foreground"
-              >
-                <RotateCcw className="w-3 h-3" /> Đặt lại
-              </button>
-            </>
-          )}
-        </div>
+    <div className={`border rounded-xl p-4 flex items-center gap-4 transition ${tones.border}`}>
+      <div className={`w-11 h-11 rounded-xl flex items-center justify-center text-xl ${tones.bg}`}>
+        {tones.icon}
       </div>
-
-      {/* Tab bar */}
-      <div className="flex border-b border-border bg-muted/30 overflow-x-auto">
-        {visibleGroups.map(group => {
-          const gPerms = ALL_PERMS.filter(p => p.group === group);
-          const gChecked = gPerms.filter(p => permissions.includes(p.id)).length;
-          const gMeta = GROUP_META[group] ?? { icon: "•", activeCls: "border-primary text-primary bg-white", badgeCls: "bg-primary/10 text-primary" };
-          const isActive = group === currentTab;
-          return (
-            <button
-              key={group}
-              onClick={() => setActiveTab(group)}
-              className={`relative flex items-center gap-2 px-4 py-3 text-[13px] font-medium border-b-2 transition-all whitespace-nowrap shrink-0 ${
-                isActive
-                  ? `${gMeta.activeCls} border-b-2`
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              }`}
-            >
-              <span>{gMeta.icon}</span>
-              <span>{group}</span>
-              <span className={`text-[10.5px] px-1.5 py-0.5 rounded-full font-semibold ${isActive ? gMeta.badgeCls : "bg-muted text-muted-foreground"}`}>
-                {gChecked}/{gPerms.length}
-              </span>
-            </button>
-          );
-        })}
+      <div className="flex-1 min-w-0">
+        <div className="font-semibold text-[14px] text-foreground">{name}</div>
+        <div className="text-[12.5px] text-muted-foreground leading-snug">{desc}</div>
       </div>
-
-      {/* Tab content */}
-      <div className="p-4">
-        {/* Select-all row */}
-        <button
-          onClick={toggleTabGroup}
-          className={`w-full flex items-center gap-2.5 px-3 py-2.5 rounded-lg mb-3 border transition-colors ${
-            tabAllChecked ? "bg-primary/5 border-primary/20" : tabSomeChecked ? "bg-primary/5 border-primary/10" : "border-border hover:bg-muted/50"
-          }`}
-        >
-          <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors ${
-            tabAllChecked ? "bg-primary border-primary" : tabSomeChecked ? "bg-primary/30 border-primary/50" : "border-border"
-          }`}>
-            {tabAllChecked && <Check className="w-2.5 h-2.5 text-white" />}
-            {tabSomeChecked && <div className="w-2 h-0.5 bg-primary rounded" />}
-          </div>
-          <span className="text-[12.5px] font-semibold text-foreground">
-            {tabAllChecked ? "Bỏ chọn tất cả" : "Chọn tất cả"} chức năng {meta.icon} {currentTab}
-          </span>
-          <span className="ml-auto text-[11.5px] text-muted-foreground">{tabChecked}/{tabPerms.length} đã chọn</span>
-        </button>
-
-        {/* Permission list */}
-        <div className="space-y-1">
-          {tabPerms.map(p => (
-            <label
-              key={p.id}
-              className={`flex items-center gap-3 px-3 py-2.5 rounded-lg cursor-pointer transition-colors ${
-                permissions.includes(p.id) ? "bg-emerald-50/60 hover:bg-emerald-50" : "hover:bg-muted/40"
-              }`}
-            >
-              <div
-                onClick={() => toggle(p.id)}
-                className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 transition-colors cursor-pointer ${
-                  permissions.includes(p.id) ? "bg-primary border-primary" : "border-border hover:border-primary/50"
-                }`}
-              >
-                {permissions.includes(p.id) && <Check className="w-2.5 h-2.5 text-white" />}
-              </div>
-              <span className="text-[13px] text-foreground/90">{p.label}</span>
-              {permissions.includes(p.id) && (
-                <span className="ml-auto w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center shrink-0">
-                  <svg viewBox="0 0 12 12" className="w-2.5 h-2.5 fill-none stroke-white stroke-2"><polyline points="1.5,6 4.5,9 10.5,3"/></svg>
-                </span>
-              )}
-            </label>
-          ))}
-        </div>
-      </div>
+      <button
+        type="button"
+        onClick={() => onChange(!checked)}
+        className={`relative w-11 h-6 rounded-full transition-colors ${checked ? "bg-primary" : "bg-muted"}`}
+      >
+        <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${checked ? "left-[22px]" : "left-0.5"}`} />
+      </button>
     </div>
   );
+}
+
+function toggleMod(arr: ("ERP" | "TXNG" | "VT")[], m: "ERP" | "TXNG" | "VT", on: boolean): ("ERP" | "TXNG" | "VT")[] {
+  return on ? Array.from(new Set([...arr, m])) : arr.filter(x => x !== m);
 }
 
 /* ─── Main Page ─────────────────────────────────────────────────── */
@@ -496,9 +344,10 @@ export default function NhanVienPage() {
       name: u.name, email: u.email, phone: u.phone,
       enterpriseId: u.enterpriseId,
       role: u.role,
-      permissions: presetFor(u.role),
+      modules: (u as Employee & { modules?: ("ERP" | "TXNG" | "VT")[] }).modules ?? [],
       avatarUrl: u.avatarUrl ?? null,
       facilityIds: [],
+      matKhau: "",
     });
     setSubmitErr(null);
     setDrawerOpen(true);
@@ -521,44 +370,18 @@ export default function NhanVienPage() {
 
   function setF<K extends keyof EForm>(k: K, v: EForm[K]) { setForm((p) => ({ ...p, [k]: v })); }
 
-  function getGroupsForDN(eid: number | null): string[] | null {
-    if (!eid) return null;
-    const dn = (dnQ.data?.items ?? []).find(d => d.id === eid);
-    if (!dn) return null;
-    return dn.modules.map(m => MODULE_TO_GROUP[m]).filter(Boolean);
-  }
-
-  function filterPermsToGroups(perms: string[], groups: string[] | null): string[] {
-    if (!groups) return perms;
-    return perms.filter(id => {
-      const p = ALL_PERMS.find(pp => pp.id === id);
-      return p && groups.includes(p.group);
-    });
-  }
-
   function setEnterprise(eid: number | null) {
-    const groups = getGroupsForDN(eid);
-    setForm(p => ({
-      ...p,
-      enterpriseId: eid,
-      permissions: filterPermsToGroups(p.permissions, groups),
-    }));
+    setForm(p => ({ ...p, enterpriseId: eid }));
   }
 
   function setRole(r: string) {
-    setForm(p => {
-      const groups = getGroupsForDN(p.enterpriseId);
-      const preset = filterPermsToGroups(presetFor(r), groups);
-      return { ...p, role: r, permissions: preset };
-    });
+    setForm(p => ({ ...p, role: r }));
   }
 
   const selectedDN = form.enterpriseId
     ? (dnQ.data?.items ?? []).find(d => d.id === form.enterpriseId) ?? null
     : null;
-  const activeGroups: string[] | null = selectedDN
-    ? selectedDN.modules.map(m => MODULE_TO_GROUP[m]).filter(Boolean)
-    : null;
+  const availableModules = selectedDN ? selectedDN.modules : (["ERP", "TXNG", "VT"] as ("ERP" | "TXNG" | "VT")[]);
 
   const isPending = createMu.isPending || updateMu.isPending;
 
@@ -934,13 +757,27 @@ export default function NhanVienPage() {
                 />
               </div>
 
-              {/* Permission matrix */}
-              <PermissionMatrix
-                permissions={form.permissions}
-                onChange={(p) => setF("permissions", p)}
-                role={form.role}
-                activeGroups={activeGroups}
-              />
+              {/* Module toggles */}
+              <div>
+                <label className="block text-[13px] font-medium text-foreground mb-2">Bật tắt phân hệ</label>
+                <div className="space-y-2">
+                  {MODULE_DEFS.filter(m => availableModules.includes(m.key)).map(m => (
+                    <ModuleToggle
+                      key={m.key}
+                      name={m.name}
+                      desc={m.desc}
+                      color={m.color}
+                      checked={form.modules.includes(m.key)}
+                      onChange={(v) => setF("modules", toggleMod(form.modules, m.key, v))}
+                    />
+                  ))}
+                  {availableModules.length === 0 && (
+                    <div className="rounded-xl border border-dashed border-border bg-muted/30 p-4 text-center text-[13px] text-muted-foreground">
+                      Doanh nghiệp này chưa đăng ký phân hệ nào.
+                    </div>
+                  )}
+                </div>
+              </div>
 
               {/* Password field */}
               <div>

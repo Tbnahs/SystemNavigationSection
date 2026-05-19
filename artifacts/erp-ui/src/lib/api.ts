@@ -169,6 +169,23 @@ export type TeaVariety = {
   updatedAt: string;
 };
 
+export type ProductCertificate = {
+  id: number;
+  enterpriseId: number | null;
+  productId: number | null;
+  loaiChungChi: string;
+  tenChungChi: string;
+  coQuanCap: string;
+  soChungChi: string;
+  ngayCap: string;
+  ngayHetHan: string;
+  imageUrl: string;
+  createdAt: string;
+  updatedAt: string;
+  productName?: string | null;
+  enterpriseName?: string | null;
+};
+
 export type PurchaseOrderItem = {
   id?: number;
   orderId?: number;
@@ -461,6 +478,8 @@ let teaVarieties: TeaVariety[] = [
   { id: 2, name: "Kim Tuyên",   code: "KT",   notes: "Giống nhập từ Đài Loan, năng suất cao, chất lượng tốt",          productId: 1, productName: "Chè Búp Tươi Quân Chu", createdAt: "2024-01-10T00:00:00.000Z", updatedAt: "2024-01-10T00:00:00.000Z" },
   { id: 3, name: "PH1",         code: "PH1",  notes: "Giống lai, búp to, thích hợp chế biến chè đen",                  productId: 1, productName: "Chè Búp Tươi Quân Chu", createdAt: "2024-02-01T00:00:00.000Z", updatedAt: "2024-02-01T00:00:00.000Z" },
 ];
+
+let productCertificates: ProductCertificate[] = [];
 
 // Employee ↔ Facility mapping
 let employeeFacilityMap: { employeeId: number; facilityId: number }[] = [
@@ -885,5 +904,56 @@ export const updateTeaVariety = (id: number, body: Partial<TeaVariety>) => {
 
 export const deleteTeaVariety = (id: number) => {
   teaVarieties = teaVarieties.filter((t) => t.id !== id);
+  return delay({ ok: true as const });
+};
+
+// ─── Product Certificates ───────────────────────────────────────────────────
+
+export const fetchProductCertificates = (enterpriseId?: number | null) => {
+  const items = enterpriseId != null
+    ? productCertificates.filter((c) => c.enterpriseId === enterpriseId)
+    : [...productCertificates];
+  return delay({ items });
+};
+
+export const createProductCertificate = (body: Partial<ProductCertificate>) => {
+  const prod = products.find((p) => p.id === body.productId);
+  const ent = enterprises.find((e) => e.id === body.enterpriseId);
+  const item: ProductCertificate = {
+    id: nextId(),
+    enterpriseId: body.enterpriseId ?? null,
+    productId: body.productId ?? null,
+    loaiChungChi: body.loaiChungChi ?? "",
+    tenChungChi: body.tenChungChi ?? "",
+    coQuanCap: body.coQuanCap ?? "",
+    soChungChi: body.soChungChi ?? "",
+    ngayCap: body.ngayCap ?? "",
+    ngayHetHan: body.ngayHetHan ?? "",
+    imageUrl: body.imageUrl ?? "",
+    createdAt: now(),
+    updatedAt: now(),
+    productName: prod?.name ?? null,
+    enterpriseName: ent?.tenHienThi ?? null,
+  };
+  productCertificates.push(item);
+  return delay({ item });
+};
+
+export const updateProductCertificate = (id: number, body: Partial<ProductCertificate>) => {
+  const idx = productCertificates.findIndex((c) => c.id === id);
+  if (idx < 0) throw new Error("Not found");
+  const prod = products.find((p) => p.id === (body.productId ?? productCertificates[idx].productId));
+  const ent = enterprises.find((e) => e.id === (body.enterpriseId ?? productCertificates[idx].enterpriseId));
+  productCertificates[idx] = {
+    ...productCertificates[idx], ...body,
+    updatedAt: now(),
+    productName: prod?.name ?? null,
+    enterpriseName: ent?.tenHienThi ?? null,
+  };
+  return delay({ item: productCertificates[idx] });
+};
+
+export const deleteProductCertificate = (id: number) => {
+  productCertificates = productCertificates.filter((c) => c.id !== id);
   return delay({ ok: true as const });
 };

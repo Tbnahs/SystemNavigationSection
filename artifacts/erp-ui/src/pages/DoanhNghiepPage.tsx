@@ -8,7 +8,7 @@ import {
   Search, Plus, Filter, Download, ChevronDown, X, Upload,
   Building2, Users, Package, Sprout, Leaf, Bell, KeyRound, Copy, CheckCheck,
   Pencil, Eye, EyeOff, MapPin, ArrowLeft, ArrowRight, LayoutGrid, Loader2,
-  Globe, Video, Image, BookOpen, Barcode, AtSign,
+  Globe, Video, Image, BookOpen, Barcode, AtSign, ShieldCheck, Trash2,
 } from "lucide-react";
 import {
   fetchEnterprises, fetchEnterpriseStats, createEnterprise,
@@ -70,6 +70,45 @@ const LOGO_COLORS = [
   "bg-teal-100 text-teal-700",
 ];
 
+type ChungChiItem = {
+  id: number;
+  loai: string;
+  ten: string;
+  coQuan: string;
+  soChungChi: string;
+  ngayCap: string;
+  ngayHetHan: string;
+  imageUrl: string;
+};
+
+const LOAI_CHUNG_CHI_OPTIONS = [
+  "VietGAP", "GlobalGAP", "Organic", "HACCP", "ISO 22000",
+  "FDA", "Halal", "OCOP", "Khác",
+];
+
+const EMPTY_CC: ChungChiItem = {
+  id: 0, loai: "VietGAP", ten: "", coQuan: "",
+  soChungChi: "", ngayCap: "", ngayHetHan: "", imageUrl: "",
+};
+
+function parseDNChungChis(dn: Enterprise): ChungChiItem[] {
+  const raw = dn.chungChiUrls;
+  if (!raw || raw.length === 0) return [];
+  if (raw.length === 1) {
+    try { return JSON.parse(raw[0]) as ChungChiItem[]; } catch {}
+  }
+  return raw.filter(Boolean).map((url, i) => ({
+    id: i + 1, loai: "Khác", ten: "", coQuan: "",
+    soChungChi: "", ngayCap: "", ngayHetHan: "", imageUrl: url,
+  }));
+}
+
+function fmtDateCC(s: string) {
+  if (!s) return "";
+  const [y, m, d] = s.split("-");
+  return `${d}/${m}/${y}`;
+}
+
 export default function DoanhNghiepPage() {
   const { user: currentUser } = useAuth();
   const isSuperAdmin = !currentUser?.enterpriseId;
@@ -83,6 +122,11 @@ export default function DoanhNghiepPage() {
   const [submitErr, setSubmitErr] = useState<string | null>(null);
   const [showPwdInDrawer, setShowPwdInDrawer] = useState(false);
   const [createdCreds, setCreatedCreds] = useState<{ email: string; password: string; name: string } | null>(null);
+  const [chungChis, setChungChis] = useState<ChungChiItem[]>([]);
+  const [showCCForm, setShowCCForm] = useState(false);
+  const [ccForm, setCcForm] = useState<ChungChiItem>(EMPTY_CC);
+  const [editCCIdx, setEditCCIdx] = useState<number | null>(null);
+  const ccFileRef = useRef<HTMLInputElement>(null);
 
   const qc = useQueryClient();
   const listQ = useQuery({ queryKey: ["enterprises"], queryFn: fetchEnterprises });
@@ -136,6 +180,10 @@ export default function DoanhNghiepPage() {
     setForm(EMPTY_FORM);
     setActiveTab("general" as const);
     setSubmitErr(null);
+    setChungChis([]);
+    setShowCCForm(false);
+    setCcForm(EMPTY_CC);
+    setEditCCIdx(null);
   }
 
   function openEdit(dn: Enterprise) {
@@ -150,8 +198,12 @@ export default function DoanhNghiepPage() {
       matKhau: "",
       gcp: dn.gcp ?? "", gln: dn.gln ?? "",
       website: dn.website ?? "", videoUrl: dn.videoUrl ?? "",
-      chungChiUrls: dn.chungChiUrls ?? [], cauChuyen: dn.cauChuyen ?? "",
+      chungChiUrls: [], cauChuyen: dn.cauChuyen ?? "",
     });
+    setChungChis(parseDNChungChis(dn));
+    setShowCCForm(false);
+    setCcForm(EMPTY_CC);
+    setEditCCIdx(null);
     setActiveTab("general");
     setSubmitErr(null);
     setDrawerOpen(true);
@@ -199,10 +251,11 @@ export default function DoanhNghiepPage() {
       setSubmitErr("Email doanh nghiệp là bắt buộc để tạo tài khoản đăng nhập.");
       return;
     }
+    const ccPayload = chungChis.length > 0 ? [JSON.stringify(chungChis)] : [];
     if (editItem) {
-      updateMu.mutate({ id: editItem.id, body: form });
+      updateMu.mutate({ id: editItem.id, body: { ...form, chungChiUrls: ccPayload } });
     } else {
-      createMu.mutate(form);
+      createMu.mutate({ ...form, chungChiUrls: ccPayload });
     }
   }
 
@@ -644,66 +697,197 @@ export default function DoanhNghiepPage() {
                   <div>
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-1.5">
-                        <Image className="w-3.5 h-3.5 text-muted-foreground" />
-                        <span className="text-[13px] font-medium text-foreground/80">Hình ảnh chứng chỉ / chứng nhận</span>
-                        <span className="text-[11px] text-muted-foreground ml-1">(tối đa 5 ảnh)</span>
+                        <ShieldCheck className="w-3.5 h-3.5 text-muted-foreground" />
+                        <span className="text-[13px] font-medium text-foreground/80">Chứng chỉ / Chứng nhận</span>
                       </div>
-                      {form.chungChiUrls.length < 5 && (
+                      {!showCCForm && (
                         <button
                           type="button"
-                          onClick={() => setF("chungChiUrls", [...form.chungChiUrls, ""])}
+                          onClick={() => { setCcForm({ ...EMPTY_CC, id: Date.now() }); setEditCCIdx(null); setShowCCForm(true); }}
                           className="text-[12px] text-primary font-medium flex items-center gap-1 hover:opacity-80"
                         >
-                          <Plus className="w-3.5 h-3.5" /> Thêm ảnh
+                          <Plus className="w-3.5 h-3.5" /> Thêm chứng chỉ
                         </button>
                       )}
                     </div>
 
-                    {form.chungChiUrls.length === 0 && (
+                    {/* Inline add/edit form */}
+                    {showCCForm && (
+                      <div className="rounded-xl border border-primary/30 bg-primary/5 p-4 mb-3">
+                        <div className="flex gap-4">
+                          {/* Left: image */}
+                          <div className="shrink-0">
+                            <div
+                              className="w-24 h-24 rounded-lg border-2 border-dashed border-border bg-white flex flex-col items-center justify-center cursor-pointer hover:border-primary/60 transition overflow-hidden relative"
+                              onClick={() => ccFileRef.current?.click()}
+                            >
+                              {ccForm.imageUrl ? (
+                                <img src={ccForm.imageUrl} alt="cert" className="w-full h-full object-cover" />
+                              ) : (
+                                <>
+                                  <Image className="w-5 h-5 text-muted-foreground mb-1" />
+                                  <span className="text-[10px] text-muted-foreground text-center leading-tight px-1">No image available</span>
+                                </>
+                              )}
+                            </div>
+                            <input
+                              ref={ccFileRef}
+                              type="file"
+                              accept="image/*"
+                              className="hidden"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0];
+                                if (!file) return;
+                                const reader = new FileReader();
+                                reader.onload = (ev) => setCcForm((p) => ({ ...p, imageUrl: (ev.target?.result as string) ?? "" }));
+                                reader.readAsDataURL(file);
+                                e.target.value = "";
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => ccFileRef.current?.click()}
+                              className="mt-1.5 w-24 h-7 rounded-lg bg-primary text-white text-[11px] font-medium hover:bg-primary/90 transition"
+                            >
+                              Tải ảnh
+                            </button>
+                          </div>
+                          {/* Right: fields */}
+                          <div className="flex-1 grid grid-cols-2 gap-x-3 gap-y-2.5">
+                            <div className="col-span-2">
+                              <label className="block text-[11px] text-muted-foreground mb-0.5">Loại chứng chỉ</label>
+                              <select
+                                value={ccForm.loai}
+                                onChange={(e) => setCcForm((p) => ({ ...p, loai: e.target.value }))}
+                                className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[13px] outline-none focus:border-primary"
+                              >
+                                {LOAI_CHUNG_CHI_OPTIONS.map((o) => <option key={o}>{o}</option>)}
+                              </select>
+                            </div>
+                            <div>
+                              <label className="block text-[11px] text-muted-foreground mb-0.5">Tên chứng chỉ</label>
+                              <input
+                                value={ccForm.ten}
+                                onChange={(e) => setCcForm((p) => ({ ...p, ten: e.target.value }))}
+                                placeholder="VD: VietGAP 2024"
+                                className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[13px] outline-none focus:border-primary"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] text-muted-foreground mb-0.5">Cơ quan cấp</label>
+                              <input
+                                value={ccForm.coQuan}
+                                onChange={(e) => setCcForm((p) => ({ ...p, coQuan: e.target.value }))}
+                                placeholder="VD: Bộ NN&PTNT"
+                                className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[13px] outline-none focus:border-primary"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] text-muted-foreground mb-0.5">Số chứng chỉ</label>
+                              <input
+                                value={ccForm.soChungChi}
+                                onChange={(e) => setCcForm((p) => ({ ...p, soChungChi: e.target.value }))}
+                                placeholder="VD: VG-2024-001"
+                                className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[13px] outline-none focus:border-primary"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] text-muted-foreground mb-0.5">Ngày cấp</label>
+                              <input
+                                type="date"
+                                value={ccForm.ngayCap}
+                                onChange={(e) => setCcForm((p) => ({ ...p, ngayCap: e.target.value }))}
+                                className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[13px] outline-none focus:border-primary"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[11px] text-muted-foreground mb-0.5">Ngày hết hạn</label>
+                              <input
+                                type="date"
+                                value={ccForm.ngayHetHan}
+                                onChange={(e) => setCcForm((p) => ({ ...p, ngayHetHan: e.target.value }))}
+                                className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[13px] outline-none focus:border-primary"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                        <div className="flex justify-end gap-2 mt-3">
+                          <button
+                            type="button"
+                            onClick={() => { setShowCCForm(false); setEditCCIdx(null); setCcForm(EMPTY_CC); }}
+                            className="h-8 px-4 rounded-lg border border-border bg-white text-[13px] font-medium hover:bg-muted/50 transition"
+                          >
+                            Hủy
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (editCCIdx !== null) {
+                                setChungChis((p) => p.map((c, i) => i === editCCIdx ? ccForm : c));
+                              } else {
+                                setChungChis((p) => [...p, { ...ccForm, id: Date.now() }]);
+                              }
+                              setShowCCForm(false);
+                              setEditCCIdx(null);
+                              setCcForm(EMPTY_CC);
+                            }}
+                            className="h-8 px-4 rounded-lg bg-primary text-white text-[13px] font-medium hover:bg-primary/90 transition"
+                          >
+                            {editCCIdx !== null ? "Cập nhật" : "Thêm"}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Certificate list */}
+                    {chungChis.length === 0 && !showCCForm && (
                       <div className="rounded-lg border border-dashed border-border bg-muted/30 p-4 text-center">
-                        <Image className="w-6 h-6 text-muted-foreground mx-auto mb-1.5" />
-                        <div className="text-[12.5px] text-muted-foreground">Chưa có hình ảnh. Nhấn "Thêm ảnh" để nhập URL.</div>
+                        <ShieldCheck className="w-6 h-6 text-muted-foreground mx-auto mb-1.5" />
+                        <div className="text-[12.5px] text-muted-foreground">Chưa có chứng chỉ. Nhấn "Thêm chứng chỉ" để bắt đầu.</div>
                       </div>
                     )}
 
                     <div className="space-y-2">
-                      {form.chungChiUrls.map((url, idx) => (
-                        <div key={idx} className="flex items-center gap-2">
-                          <div className="w-6 h-6 rounded flex items-center justify-center bg-muted text-[11px] text-muted-foreground font-mono shrink-0">{idx + 1}</div>
-                          <input
-                            value={url}
-                            onChange={(e) => {
-                              const next = [...form.chungChiUrls];
-                              next[idx] = e.target.value;
-                              setF("chungChiUrls", next);
-                            }}
-                            placeholder="https://... (URL hình ảnh chứng chỉ)"
-                            className="flex-1 h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
-                          />
-                          {url && (
-                            <a href={url} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-primary shrink-0">
-                              <Eye className="w-4 h-4" />
-                            </a>
-                          )}
-                          <button
-                            type="button"
-                            onClick={() => setF("chungChiUrls", form.chungChiUrls.filter((_, i) => i !== idx))}
-                            className="text-muted-foreground hover:text-rose-500 shrink-0"
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
+                      {chungChis.map((cc, idx) => (
+                        <div key={cc.id} className="flex items-start gap-3 rounded-xl border border-border bg-white p-3">
+                          <div className="w-14 h-14 rounded-lg border border-border bg-muted/30 shrink-0 overflow-hidden flex items-center justify-center">
+                            {cc.imageUrl ? (
+                              <img src={cc.imageUrl} alt={cc.ten} className="w-full h-full object-cover" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
+                            ) : (
+                              <ShieldCheck className="w-5 h-5 text-muted-foreground/50" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-0.5">
+                              <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-emerald-50 text-emerald-700 ring-1 ring-emerald-600/20">{cc.loai}</span>
+                              {cc.ten && <span className="text-[13px] font-medium truncate">{cc.ten}</span>}
+                            </div>
+                            <div className="grid grid-cols-2 gap-x-3 text-[11.5px] text-muted-foreground">
+                              {cc.coQuan && <span className="truncate">Cơ quan: {cc.coQuan}</span>}
+                              {cc.soChungChi && <span className="truncate">Số: {cc.soChungChi}</span>}
+                              {cc.ngayCap && <span>Ngày cấp: {fmtDateCC(cc.ngayCap)}</span>}
+                              {cc.ngayHetHan && <span>Hết hạn: {fmtDateCC(cc.ngayHetHan)}</span>}
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => { setCcForm(cc); setEditCCIdx(idx); setShowCCForm(true); }}
+                              className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted hover:text-primary transition"
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setChungChis((p) => p.filter((_, i) => i !== idx))}
+                              className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-rose-50 hover:text-rose-500 transition"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
-
-                    {/* Preview grid */}
-                    {form.chungChiUrls.filter(Boolean).length > 0 && (
-                      <div className="mt-3 flex flex-wrap gap-2">
-                        {form.chungChiUrls.filter(Boolean).map((url, i) => (
-                          <img key={i} src={url} alt={`Chứng chỉ ${i + 1}`} className="w-16 h-16 object-cover rounded-lg border border-border" onError={(e) => { (e.target as HTMLImageElement).style.display = "none"; }} />
-                        ))}
-                      </div>
-                    )}
                   </div>
 
                   {/* Câu chuyện thương hiệu */}
