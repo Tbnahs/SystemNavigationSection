@@ -635,6 +635,37 @@ export default function ThuongPhamPage() {
                       </div>
                       {/* ── Chứng chỉ, chứng nhận ── */}
                       <div>
+                        <div className="flex items-center justify-between mb-1.5">
+                          <label className="text-[13px] font-medium">
+                            Hình ảnh chứng chỉ, chứng nhận
+                          </label>
+                          <span className="text-[11.5px] text-muted-foreground">{anhChungChi.length}/5 ảnh</span>
+                        </div>
+                        <div className="grid grid-cols-5 gap-2">
+                          {anhChungChi.map((url, i) => (
+                            <div key={i} className="relative group aspect-[3/4] rounded-lg overflow-hidden border border-border bg-muted/20">
+                              <img src={url} alt={`chứng chỉ ${i + 1}`} className="w-full h-full object-cover" />
+                              <button type="button" onClick={() => setAnhChungChi(imgs => imgs.filter((_, idx) => idx !== i))} className="absolute top-0.5 right-0.5 w-5 h-5 rounded-full bg-black/60 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                          {anhChungChi.length < 5 && (
+                            <label className="aspect-[3/4] flex flex-col items-center justify-center border-2 border-dashed border-border rounded-lg cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors">
+                              <Award className="w-4 h-4 text-muted-foreground mb-1" />
+                              <span className="text-[10.5px] text-muted-foreground text-center leading-tight px-1">Tải ảnh</span>
+                              <input type="file" accept="image/*" multiple className="hidden" onChange={async e => {
+                                const files = Array.from(e.target.files ?? []);
+                                const remaining = 5 - anhChungChi.length;
+                                const urls = await Promise.all(files.slice(0, remaining).map(f => new Promise<string>((res, rej) => {
+                                  const r = new FileReader(); r.onload = () => res(r.result as string); r.onerror = rej; r.readAsDataURL(f);
+                                })));
+                                setAnhChungChi(prev => [...prev, ...urls]); e.target.value = "";
+                              }} />
+                            </label>
+                          )}
+                        </div>
+                        <p className="text-[11px] text-muted-foreground/60 mt-1.5">Hỗ trợ .jpg, .png · mỗi ảnh tối đa 5MB</p>
                         <div className="flex items-center justify-between mb-3">
                           <label className="block text-[13px] font-medium">
                             Chứng chỉ, chứng nhận

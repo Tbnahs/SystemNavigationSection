@@ -456,7 +456,7 @@ export default function NhanVienPage() {
                   <th className="px-3 py-3">Liên hệ</th>
                   <th className="px-3 py-3">Doanh nghiệp</th>
                   <th className="px-3 py-3">Cơ sở phụ trách</th>
-                  <th className="px-3 py-3">Vai trò</th>
+                  <th className="px-3 py-3">Phân hệ</th>
                   <th className="px-3 py-3">Trạng thái</th>
                   <th className="px-3 py-3">Hoạt động cuối</th>
                   <th className="px-3 py-3 w-16"></th>

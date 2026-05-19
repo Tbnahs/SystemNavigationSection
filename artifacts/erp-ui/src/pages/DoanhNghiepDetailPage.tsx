@@ -113,17 +113,6 @@ export default function DoanhNghiepDetailPage() {
                 <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Tham gia {formatDate(dn.createdAt)}</span>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button className="h-9 px-3 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted">
-                <Globe className="w-4 h-4" /> Truy cập trang TXNG
-              </button>
-              <button className="h-9 px-3 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted">
-                <Pencil className="w-4 h-4" /> Sửa hồ sơ
-              </button>
-              <button className="h-9 w-9 rounded-lg border border-border flex items-center justify-center hover:bg-muted text-muted-foreground">
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
-            </div>
           </div>
 
           <div className="flex gap-1 mt-5 -mb-5 border-b border-border overflow-x-auto">
@@ -245,7 +234,7 @@ export default function DoanhNghiepDetailPage() {
                 <thead>
                   <tr className="text-left text-[12px] uppercase tracking-wider text-muted-foreground">
                     <th className="px-3 py-2.5">Nhân viên</th>
-                    <th className="px-3 py-2.5">Vai trò</th>
+                    <th className="px-3 py-2.5">Phân hệ</th>
                     <th className="px-3 py-2.5">Liên hệ</th>
                     <th className="px-3 py-2.5">Trạng thái</th>
                     <th className="px-3 py-2.5">Hoạt động cuối</th>
