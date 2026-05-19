@@ -113,11 +113,6 @@ export default function DoanhNghiepDetailPage() {
                 <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5" /> Tham gia {formatDate(dn.createdAt)}</span>
               </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button className="h-9 w-9 rounded-lg border border-border flex items-center justify-center hover:bg-muted text-muted-foreground">
-                <MoreHorizontal className="w-4 h-4" />
-              </button>
-            </div>
           </div>
 
           <div className="flex gap-1 mt-5 -mb-5 border-b border-border overflow-x-auto">
