@@ -4,6 +4,7 @@ import AppLayout from "@/components/AppLayout";
 import {
   Plus, Pencil, X, Loader2, Search, Factory, QrCode, Printer,
   Building2, Home, MapPin, Phone, Users, Upload, Download, CheckCircle, ChevronDown,
+  Award, Trash2, HelpCircle, Maximize2,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
@@ -53,6 +54,26 @@ function printQR(facility: Facility) {
   win.document.close();
 }
 
+type CertItem = {
+  id: string;
+  ten: string;
+  loai: "ocop" | "vietgap" | "organic" | "iso" | "khac";
+  soChungChi: string;
+  ngayCap: string;
+  ngayHetHan: string;
+  capBoi: string;
+  imageUrl: string;
+};
+const CERT_LOAI_OPTIONS = [
+  { value: "ocop", label: "OCOP" },
+  { value: "vietgap", label: "VietGAP" },
+  { value: "organic", label: "Organic" },
+  { value: "iso", label: "ISO" },
+  { value: "khac", label: "Khác" },
+] as const;
+
+type BoPhanItem = { id: string; ma: string; ten: string; ghiChu: string };
+
 type FForm = {
   enterpriseId: number | null;
   name: string;
@@ -66,27 +87,49 @@ type FForm = {
   status: "active" | "inactive";
   notes: string;
   giong_che_ids: number[];
+  dienTich: string;
+  donViDienTich: string;
+  toaDo: string;
+  chungChi: CertItem[];
+  boPhan: BoPhanItem[];
 };
 const EMPTY_F: FForm = {
   enterpriseId: null, name: "", code: "", type: "ho_lien_ket",
   phone: "", tinh: "", xa: "", address: "", gln: "", status: "active", notes: "",
   giong_che_ids: [],
+  dienTich: "", donViDienTich: "Ha", toaDo: "",
+  chungChi: [], boPhan: [],
 };
+
+function parseCoords(s: string): { lat: number; lng: number } | null {
+  const m = s.match(/(-?\d+\.?\d*)[,\s]+(-?\d+\.?\d*)/);
+  if (!m) return null;
+  const lat = parseFloat(m[1]); const lng = parseFloat(m[2]);
+  if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) return { lat, lng };
+  return null;
+}
+
+function MapView({ toaDo }: { toaDo: string }) {
+  const coords = parseCoords(toaDo);
+  const lat = coords?.lat ?? 21.7285;
+  const lng = coords?.lng ?? 105.6683;
+  const src = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.04}%2C${lat - 0.025}%2C${lng + 0.04}%2C${lat + 0.025}&layer=mapnik${coords ? `&marker=${lat}%2C${lng}` : ""}`;
+  return (
+    <div className="rounded-xl overflow-hidden border border-border" style={{ height: 280 }}>
+      <iframe src={src} title="Bản đồ" className="w-full h-full" style={{ border: 0 }} loading="lazy" />
+    </div>
+  );
+}
 
 function ProvinceSelect({ value, onChange }: { value?: string; onChange?: (v: string) => void }) {
   return (
     <div>
-      <label className="block text-[13px] font-medium mb-1.5">Tỉnh / Thành phố</label>
+      <label className="block text-[13px] font-medium mb-1.5">Tỉnh / Thành phố <span className="text-rose-500">*</span></label>
       <div className="relative">
-        <select
-          value={value ?? ""}
-          onChange={(e) => onChange?.(e.target.value)}
-          className="w-full h-10 pl-3 pr-8 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary appearance-none cursor-pointer"
-        >
-          <option value="">-- Chọn tỉnh / thành phố --</option>
-          {PROVINCES_VN.map((p) => (
-            <option key={p} value={p}>{p}</option>
-          ))}
+        <select value={value ?? ""} onChange={(e) => onChange?.(e.target.value)}
+          className="w-full h-10 pl-3 pr-8 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary appearance-none cursor-pointer">
+          <option value="">Chọn Tỉnh/Thành phố</option>
+          {PROVINCES_VN.map((p) => <option key={p} value={p}>{p}</option>)}
         </select>
         <ChevronDown className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
       </div>
@@ -98,28 +141,20 @@ function CommuneSelect({ province, value, onChange }: { province?: string; value
   const options = province ? (COMMUNE_MAP[province] ?? []) : [];
   return (
     <div>
-      <label className="block text-[13px] font-medium mb-1.5">Xã / Phường</label>
+      <label className="block text-[13px] font-medium mb-1.5">Xã / Phường <span className="text-rose-500">*</span></label>
       {options.length > 0 ? (
         <div className="relative">
-          <select
-            value={value ?? ""}
-            onChange={(e) => onChange?.(e.target.value)}
-            className="w-full h-10 pl-3 pr-8 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary appearance-none cursor-pointer"
-          >
-            <option value="">-- Chọn xã / phường --</option>
-            {options.map((c) => (
-              <option key={c} value={c}>{c}</option>
-            ))}
+          <select value={value ?? ""} onChange={(e) => onChange?.(e.target.value)}
+            className="w-full h-10 pl-3 pr-8 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary appearance-none cursor-pointer">
+            <option value="">Chọn Xã/Phường</option>
+            {options.map((c) => <option key={c} value={c}>{c}</option>)}
           </select>
           <ChevronDown className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
         </div>
       ) : (
-        <input
-          value={value ?? ""}
-          onChange={(e) => onChange?.(e.target.value)}
+        <input value={value ?? ""} onChange={(e) => onChange?.(e.target.value)}
           placeholder="Nhập xã / phường / thị trấn"
-          className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary"
-        />
+          className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
       )}
     </div>
   );
@@ -137,8 +172,9 @@ export default function CoSoPage() {
   const [err, setErr] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<string>("all");
-  const [activeTab, setActiveTab] = useState<"info" | "employees">("info");
+  const [activeTab, setActiveTab] = useState<"info" | "location" | "certs" | "departments">("info");
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<number[]>([]);
+  const certImgRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const [importLoading, setImportLoading] = useState(false);
   const [importResult, setImportResult] = useState<{ ok: number; fail: number } | null>(null);
   const importRef = useRef<HTMLInputElement>(null);
@@ -154,11 +190,8 @@ export default function CoSoPage() {
   const createMu = useMutation({
     mutationFn: (b: FForm) => createFacility(b),
     onSuccess: async (data) => {
-      if (selectedEmployeeIds.length > 0) {
-        await assignFacilityEmployees(data.item.id, selectedEmployeeIds);
-      }
-      inv();
-      close_();
+      if (selectedEmployeeIds.length > 0) await assignFacilityEmployees(data.item.id, selectedEmployeeIds);
+      inv(); close_();
     },
     onError: (e: Error) => setErr(e.message),
   });
@@ -176,21 +209,17 @@ export default function CoSoPage() {
     onSuccess: () => inv(),
   });
 
-  function close_() { setDrawerOpen(false); setEditItem(null); setForm(EMPTY_F); setErr(null); setActiveTab("info"); setSelectedEmployeeIds([]); }
+  function close_() {
+    setDrawerOpen(false); setEditItem(null); setForm(EMPTY_F); setErr(null);
+    setActiveTab("info"); setSelectedEmployeeIds([]); certImgRefs.current = {};
+  }
 
   function exportExcel() {
     const rows = filtered.map(f => ({
-      "Tên cơ sở": f.name,
-      "Mã": f.code || `CS-${f.id}`,
-      "Loại": typeLabel(f.type),
-      "Doanh nghiệp": f.enterpriseName ?? "",
-      "GLN": f.gln,
-      "Số điện thoại": f.phone,
-      "Tỉnh / Thành phố": f.tinh,
-      "Xã / Phường": f.xa,
-      "Địa chỉ": f.address,
-      "Trạng thái": statusLabel(f.status),
-      "Ghi chú": f.notes,
+      "Tên cơ sở": f.name, "Mã": f.code || `CS-${f.id}`, "Loại": typeLabel(f.type),
+      "Doanh nghiệp": f.enterpriseName ?? "", "GLN": f.gln, "Số điện thoại": f.phone,
+      "Tỉnh / Thành phố": f.tinh, "Xã / Phường": f.xa, "Địa chỉ": f.address,
+      "Trạng thái": statusLabel(f.status), "Ghi chú": f.notes,
     }));
     const ws = XLSX.utils.json_to_sheet(rows);
     ws["!cols"] = [{ wch: 30 }, { wch: 12 }, { wch: 28 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 20 }, { wch: 25 }, { wch: 35 }, { wch: 18 }, { wch: 25 }];
@@ -212,11 +241,8 @@ export default function CoSoPage() {
   }
 
   async function handleImportFile(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    e.target.value = "";
-    setImportLoading(true);
-    setImportResult(null);
+    const file = e.target.files?.[0]; if (!file) return;
+    e.target.value = ""; setImportLoading(true); setImportResult(null);
     try {
       const buf = await file.arrayBuffer();
       const wb = XLSX.read(buf, { type: "array" });
@@ -236,8 +262,7 @@ export default function CoSoPage() {
         try {
           await createFacility({
             enterpriseId: isSuperAdmin ? null : (user?.enterpriseId ?? null), name,
-            code: (row["Mã"] || row["ma"] || "").trim(),
-            type,
+            code: (row["Mã"] || row["ma"] || "").trim(), type,
             phone: (row["Số điện thoại"] || row["sdt"] || "").trim(),
             tinh: (row["Tỉnh / Thành phố"] || row["tinh"] || "").trim(),
             xa: (row["Xã / Phường"] || row["xa"] || "").trim(),
@@ -249,13 +274,9 @@ export default function CoSoPage() {
           ok++;
         } catch { fail++; }
       }
-      inv();
-      setImportResult({ ok, fail });
-    } catch {
-      setImportResult({ ok: 0, fail: -1 });
-    } finally {
-      setImportLoading(false);
-    }
+      inv(); setImportResult({ ok, fail });
+    } catch { setImportResult({ ok: 0, fail: -1 }); }
+    finally { setImportLoading(false); }
   }
 
   function openEdit(f: Facility) {
@@ -265,11 +286,35 @@ export default function CoSoPage() {
       phone: f.phone, tinh: f.tinh ?? "", xa: f.xa ?? "", address: f.address,
       gln: f.gln ?? "", status: f.status, notes: f.notes,
       giong_che_ids: f.giong_che_ids ?? [],
+      dienTich: "", donViDienTich: "Ha", toaDo: "",
+      chungChi: [], boPhan: [],
     });
-    setErr(null);
-    setDrawerOpen(true);
+    setErr(null); setDrawerOpen(true);
   }
+
   function setF<K extends keyof FForm>(k: K, v: FForm[K]) { setForm(p => ({ ...p, [k]: v })); }
+
+  function addCert() {
+    setF("chungChi", [...form.chungChi, { id: Date.now().toString(), ten: "", loai: "ocop", soChungChi: "", ngayCap: "", ngayHetHan: "", capBoi: "", imageUrl: "" }]);
+  }
+  function updateCert(id: string, key: keyof CertItem, val: string) {
+    setF("chungChi", form.chungChi.map(c => c.id === id ? { ...c, [key]: val } : c));
+  }
+  function removeCert(id: string) { setF("chungChi", form.chungChi.filter(c => c.id !== id)); }
+  function handleCertImg(id: string, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]; if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => updateCert(id, "imageUrl", ev.target?.result as string);
+    reader.readAsDataURL(file); e.target.value = "";
+  }
+
+  function addBoPhan() {
+    setF("boPhan", [...form.boPhan, { id: Date.now().toString(), ma: "", ten: "", ghiChu: "" }]);
+  }
+  function updateBoPhan(id: string, key: keyof BoPhanItem, val: string) {
+    setF("boPhan", form.boPhan.map(b => b.id === id ? { ...b, [key]: val } : b));
+  }
+  function removeBoPhan(id: string) { setF("boPhan", form.boPhan.filter(b => b.id !== id)); }
 
   function handleSubmit() {
     setErr(null);
@@ -320,9 +365,7 @@ export default function CoSoPage() {
         {importResult && (
           <div className={`flex items-center gap-3 px-4 py-3 rounded-xl border text-[13px] ${importResult.fail === -1 ? "bg-rose-50 border-rose-200 text-rose-700" : "bg-emerald-50 border-emerald-200 text-emerald-800"}`}>
             <CheckCircle className="w-4 h-4 shrink-0" />
-            {importResult.fail === -1
-              ? "Lỗi đọc file. Vui lòng kiểm tra định dạng Excel."
-              : `Import xong: ${importResult.ok} thành công${importResult.fail > 0 ? `, ${importResult.fail} lỗi` : ""}.`}
+            {importResult.fail === -1 ? "Lỗi đọc file. Vui lòng kiểm tra định dạng Excel." : `Import xong: ${importResult.ok} thành công${importResult.fail > 0 ? `, ${importResult.fail} lỗi` : ""}.`}
             <button onClick={() => setImportResult(null)} className="ml-auto p-0.5 hover:opacity-70"><X className="w-3.5 h-3.5" /></button>
           </div>
         )}
@@ -331,52 +374,28 @@ export default function CoSoPage() {
         <div className="bg-white border border-border rounded-xl p-3 lg:p-4 flex items-center gap-2 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Tìm tên, mã, địa chỉ, tỉnh…"
-              className="w-full h-10 pl-9 pr-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
-            />
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tìm tên, mã, địa chỉ, tỉnh…"
+              className="w-full h-10 pl-9 pr-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary" />
           </div>
-          <select
-            value={typeFilter}
-            onChange={e => setTypeFilter(e.target.value)}
-            className="h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white"
-          >
+          <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)}
+            className="h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
             <option value="all">Tất cả loại</option>
             {TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
-          <button
-            onClick={exportExcel}
-            title="Xuất Excel"
-            className="h-10 px-3 rounded-lg border border-border text-sm font-medium flex items-center gap-2 hover:bg-muted"
-          >
+          <button onClick={exportExcel} className="h-10 px-3 rounded-lg border border-border text-sm font-medium flex items-center gap-2 hover:bg-muted">
             <Download className="w-4 h-4 text-muted-foreground" /> Xuất Excel
           </button>
-          <button
-            onClick={downloadTemplate}
-            title="Tải file mẫu import"
-            className="h-10 px-3 rounded-lg border border-border text-sm font-medium flex items-center gap-2 hover:bg-muted"
-          >
+          <button onClick={downloadTemplate} className="h-10 px-3 rounded-lg border border-border text-sm font-medium flex items-center gap-2 hover:bg-muted">
             <Download className="w-4 h-4 text-muted-foreground" /> File mẫu
           </button>
-          <button
-            onClick={() => importRef.current?.click()}
-            disabled={importLoading}
-            title="Import từ Excel"
-            className="h-10 px-3 rounded-lg border border-border text-sm font-medium flex items-center gap-2 hover:bg-muted disabled:opacity-60"
-          >
+          <button onClick={() => importRef.current?.click()} disabled={importLoading}
+            className="h-10 px-3 rounded-lg border border-border text-sm font-medium flex items-center gap-2 hover:bg-muted disabled:opacity-60">
             {importLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4 text-muted-foreground" />}
             Import Excel
           </button>
           <input ref={importRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImportFile} />
-          <button
-            onClick={() => {
-              setForm({ ...EMPTY_F, enterpriseId: isSuperAdmin ? null : (user?.enterpriseId ?? null) });
-              setDrawerOpen(true);
-            }}
-            className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 shadow-sm hover:brightness-110"
-          >
+          <button onClick={() => { setForm({ ...EMPTY_F, enterpriseId: isSuperAdmin ? null : (user?.enterpriseId ?? null) }); setDrawerOpen(true); }}
+            className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 shadow-sm hover:brightness-110">
             <Plus className="w-4 h-4" /> Thêm cơ sở
           </button>
         </div>
@@ -413,30 +432,19 @@ export default function CoSoPage() {
                       <div className="text-[11.5px] text-muted-foreground">Mã: {f.code || `CS-${f.id}`}</div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ring-1 ring-inset ${typeColor(f.type)}`}>
-                        {typeLabel(f.type)}
-                      </span>
+                      <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ring-1 ring-inset ${typeColor(f.type)}`}>{typeLabel(f.type)}</span>
                     </td>
                     <td className="px-4 py-3 text-[13px]">{f.enterpriseName ?? "—"}</td>
                     <td className="px-4 py-3">
                       {f.phone && <div className="flex items-center gap-1 text-[13px]"><Phone className="w-3.5 h-3.5 text-muted-foreground" />{f.phone}</div>}
-                      {(f.xa || f.tinh) && (
-                        <div className="flex items-center gap-1 text-[12px] text-muted-foreground mt-0.5">
-                          <MapPin className="w-3 h-3" />
-                          {[f.xa, f.tinh].filter(Boolean).join(", ")}
-                        </div>
-                      )}
+                      {(f.xa || f.tinh) && <div className="flex items-center gap-1 text-[12px] text-muted-foreground mt-0.5"><MapPin className="w-3 h-3" />{[f.xa, f.tinh].filter(Boolean).join(", ")}</div>}
                       {f.address && <div className="text-[12px] text-muted-foreground mt-0.5">{f.address}</div>}
                       {f.type === "ho_lien_ket" && f.giong_che_ids?.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1.5">
                           {f.giong_che_ids.map(id => {
                             const tv = teaVarieties.find((t: TeaVariety) => t.id === id);
                             if (!tv) return null;
-                            return (
-                              <span key={id} className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10.5px] font-medium ring-1 ring-emerald-200">
-                                {tv.name}
-                              </span>
-                            );
+                            return <span key={id} className="inline-flex items-center px-1.5 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[10.5px] font-medium ring-1 ring-emerald-200">{tv.name}</span>;
                           })}
                         </div>
                       )}
@@ -451,9 +459,7 @@ export default function CoSoPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
-                        {f.type === "ho_lien_ket" && (
-                          <button onClick={() => setQrTarget(f)} className="p-1.5 rounded hover:bg-muted" title="Xem QR"><QrCode className="w-4 h-4 text-muted-foreground" /></button>
-                        )}
+                        {f.type === "ho_lien_ket" && <button onClick={() => setQrTarget(f)} className="p-1.5 rounded hover:bg-muted" title="Xem QR"><QrCode className="w-4 h-4 text-muted-foreground" /></button>}
                         <button onClick={() => openEdit(f)} className="p-1.5 rounded hover:bg-muted" title="Sửa"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
                         <button onClick={() => setDeleteTarget(f)} className="p-1.5 rounded hover:bg-rose-50" title="Xóa"><X className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
                       </div>
@@ -478,18 +484,11 @@ export default function CoSoPage() {
               <button onClick={() => setQrTarget(null)} className="p-1.5 rounded hover:bg-muted"><X className="w-4 h-4" /></button>
             </div>
             <div className="flex justify-center mb-3">
-              <img
-                src={qrUrl(`CO-SO:${qrTarget.id}|${qrTarget.name}|${qrTarget.code || ""}`)}
-                alt="QR Code"
-                className="w-48 h-48"
-              />
+              <img src={qrUrl(`CO-SO:${qrTarget.id}|${qrTarget.name}|${qrTarget.code || ""}`)} alt="QR Code" className="w-48 h-48" />
             </div>
             <p className="text-[13px] text-muted-foreground mb-1">{qrTarget.name}</p>
             <p className="text-[12px] text-muted-foreground mb-4">Mã: {qrTarget.code || `CS-${qrTarget.id}`}</p>
-            <button
-              onClick={() => printQR(qrTarget)}
-              className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 mx-auto hover:brightness-110"
-            >
+            <button onClick={() => printQR(qrTarget)} className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 mx-auto hover:brightness-110">
               <Printer className="w-4 h-4" /> In QR
             </button>
           </div>
@@ -509,11 +508,8 @@ export default function CoSoPage() {
             </p>
             <div className="flex gap-3">
               <button onClick={() => setDeleteTarget(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">Hủy</button>
-              <button
-                disabled={deleteMu.isPending}
-                onClick={() => deleteMu.mutate(deleteTarget.id)}
-                className="flex-1 h-10 rounded-xl bg-rose-600 text-white font-semibold text-sm hover:bg-rose-700 disabled:opacity-60 flex items-center justify-center gap-2"
-              >
+              <button disabled={deleteMu.isPending} onClick={() => deleteMu.mutate(deleteTarget.id)}
+                className="flex-1 h-10 rounded-xl bg-rose-600 text-white font-semibold text-sm hover:bg-rose-700 disabled:opacity-60 flex items-center justify-center gap-2">
                 {deleteMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />} Xóa
               </button>
             </div>
@@ -521,229 +517,388 @@ export default function CoSoPage() {
         </div>
       )}
 
-      {/* Add/Edit Drawer */}
+      {/* 4-tab Modal */}
       {drawerOpen && (
-        <>
-          <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={close_} />
-          <aside className="fixed top-0 right-0 h-full w-full sm:w-[540px] bg-white shadow-2xl z-50 flex flex-col">
-            <div className="px-6 py-5 border-b border-border flex items-center justify-between">
-              <div>
-                <div className="text-[18px] font-semibold">{editItem ? "Sửa thông tin cơ sở" : "Thêm cơ sở mới"}</div>
-                <div className="text-[12.5px] text-muted-foreground">{editItem ? "Cập nhật thông tin cơ sở và nhân viên phụ trách." : "Điền thông tin cơ sở và chọn nhân viên phụ trách."}</div>
+        <div className="fixed inset-0 bg-slate-900/40 z-40 flex items-start justify-center overflow-auto py-6 px-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col" style={{ minHeight: 620 }}>
+
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-border flex items-center justify-between shrink-0">
+              <div className="text-[17px] font-semibold uppercase tracking-wide">
+                {editItem ? `Sửa: ${editItem.name}` : "Thêm mới cơ sở"}
               </div>
-              <button onClick={close_} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
+              <div className="flex items-center gap-1">
+                <button className="p-1.5 rounded hover:bg-muted text-muted-foreground"><Maximize2 className="w-4 h-4" /></button>
+                <button onClick={close_} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
+              </div>
             </div>
 
             {/* Tabs */}
-            <div className="flex border-b border-border px-6 gap-4">
-              {[
-                { key: "info" as const, label: "Thông tin cơ sở" },
-                { key: "employees" as const, label: "Nhân viên phụ trách" },
-              ].map(tab => (
-                <button
-                  key={tab.key}
-                  onClick={() => setActiveTab(tab.key)}
-                  className={`py-3 text-[13.5px] font-medium border-b-2 transition-colors ${activeTab === tab.key ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
-                >
+            <div className="flex border-b border-border shrink-0">
+              {([
+                { key: "info", label: "Thông tin cơ sở" },
+                { key: "location", label: "Diện tích & vị trí địa lý" },
+                { key: "certs", label: "Thông tin chứng chỉ" },
+                { key: "departments", label: "Bộ phận" },
+              ] as const).map(tab => (
+                <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+                  className={`flex-1 py-3.5 text-[13px] font-medium border-b-2 transition-colors ${activeTab === tab.key ? "border-primary text-primary bg-primary/5" : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"}`}>
                   {tab.label}
-                  {tab.key === "employees" && selectedEmployeeIds.length > 0 && (
-                    <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">{selectedEmployeeIds.length}</span>
+                  {tab.key === "certs" && form.chungChi.length > 0 && (
+                    <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">{form.chungChi.length}</span>
+                  )}
+                  {tab.key === "departments" && form.boPhan.length > 0 && (
+                    <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">{form.boPhan.length}</span>
                   )}
                 </button>
               ))}
             </div>
 
-            <div className="flex-1 overflow-auto px-6 py-5 space-y-4">
+            {/* Content */}
+            <div className="flex-1 overflow-auto px-6 py-5">
+
+              {/* TAB 1: Thông tin cơ sở */}
               {activeTab === "info" && (
-                <>
+                <div className="space-y-4 max-w-2xl">
                   <div>
                     <label className="block text-[13px] font-medium mb-1.5">Tên cơ sở <span className="text-rose-500">*</span></label>
-                    <input value={form.name} onChange={e => setF("name", e.target.value)} placeholder="Hộ ông Nguyễn Văn A" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                    <input value={form.name} onChange={e => setF("name", e.target.value)} placeholder="Hộ ông Nguyễn Văn A"
+                      className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
                   </div>
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-[13px] font-medium mb-1.5">Mã cơ sở</label>
-                      <input value={form.code} onChange={e => setF("code", e.target.value)} placeholder="CS-001" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                      <input value={form.code} onChange={e => setF("code", e.target.value)} placeholder="CS-001"
+                        className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
                     </div>
                     <div>
                       <label className="block text-[13px] font-medium mb-1.5">Loại cơ sở</label>
-                      <select value={form.type} onChange={e => { setF("type", e.target.value as Facility["type"]); if (e.target.value !== "ho_lien_ket") setF("giong_che_ids", []); }} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
+                      <select value={form.type} onChange={e => { setF("type", e.target.value as Facility["type"]); if (e.target.value !== "ho_lien_ket") setF("giong_che_ids", []); }}
+                        className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
                         {TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                       </select>
                     </div>
                   </div>
-
-                  {form.type === "ho_lien_ket" && (
+                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[13px] font-medium mb-1.5">
-                        Giống chè
-                        <span className="ml-1.5 text-[11px] text-muted-foreground font-normal">Chọn một hoặc nhiều giống</span>
-                      </label>
-                      {teaVarieties.length === 0 ? (
-                        <div className="px-3 py-2.5 rounded-lg border border-border bg-muted/40 text-[12.5px] text-muted-foreground">
-                          Chưa có giống chè nào. Thêm giống chè ở mục ERP → Giống chè trước.
-                        </div>
-                      ) : (
-                        <div className="border border-border rounded-lg divide-y divide-border max-h-48 overflow-y-auto">
-                          {teaVarieties.map((tv: TeaVariety) => {
-                            const checked = form.giong_che_ids.includes(tv.id);
-                            return (
-                              <label key={tv.id} className={`flex items-center gap-3 px-3 py-2.5 cursor-pointer hover:bg-muted/40 transition-colors ${checked ? "bg-emerald-50/60" : ""}`}>
-                                <input
-                                  type="checkbox"
-                                  className="accent-primary shrink-0"
-                                  checked={checked}
-                                  onChange={e => {
-                                    setF("giong_che_ids", e.target.checked
-                                      ? [...form.giong_che_ids, tv.id]
-                                      : form.giong_che_ids.filter(id => id !== tv.id));
-                                  }}
-                                />
-                                <div className="flex-1 min-w-0">
-                                  <div className="text-[13px] font-medium leading-snug">{tv.name}
-                                    {tv.code && <span className="ml-1.5 text-[11px] text-muted-foreground font-normal">({tv.code})</span>}
-                                  </div>
-                                  {tv.notes && <div className="text-[11.5px] text-muted-foreground truncate">{tv.notes}</div>}
-                                </div>
-                                {checked && <span className="w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center shrink-0"><svg viewBox="0 0 12 12" className="w-2.5 h-2.5 text-white fill-none stroke-white stroke-2"><polyline points="1.5,6 4.5,9 10.5,3"/></svg></span>}
-                              </label>
-                            );
-                          })}
-                        </div>
-                      )}
-                      {form.giong_che_ids.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mt-2">
-                          {form.giong_che_ids.map(id => {
-                            const tv = teaVarieties.find((t: TeaVariety) => t.id === id);
-                            if (!tv) return null;
-                            return (
-                              <span key={id} className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[11.5px] font-medium">
-                                {tv.name}
-                                <button onClick={() => setF("giong_che_ids", form.giong_che_ids.filter(i => i !== id))} className="hover:text-emerald-600 ml-0.5">
-                                  <X className="w-3 h-3" />
-                                </button>
-                              </span>
-                            );
-                          })}
-                        </div>
-                      )}
+                      <label className="block text-[13px] font-medium mb-1.5">Số điện thoại</label>
+                      <input value={form.phone} onChange={e => setF("phone", e.target.value)} placeholder="09xx xxx xxx"
+                        className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
                     </div>
-                  )}
+                    <div>
+                      <label className="block text-[13px] font-medium mb-1.5">Trạng thái</label>
+                      <select value={form.status} onChange={e => setF("status", e.target.value as "active" | "inactive")}
+                        className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
+                        {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                      </select>
+                    </div>
+                  </div>
                   {isSuperAdmin && (
                     <div>
                       <label className="block text-[13px] font-medium mb-1.5">Doanh nghiệp</label>
-                      <select value={form.enterpriseId ?? ""} onChange={e => setF("enterpriseId", e.target.value ? Number(e.target.value) : null)} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
+                      <select value={form.enterpriseId ?? ""} onChange={e => setF("enterpriseId", e.target.value ? Number(e.target.value) : null)}
+                        className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
                         <option value="">-- Chưa gắn doanh nghiệp --</option>
                         {enterprises.map(d => <option key={d.id} value={d.id}>{d.tenHienThi}</option>)}
                       </select>
                     </div>
                   )}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-[13px] font-medium mb-1.5">Số điện thoại</label>
-                      <input value={form.phone} onChange={e => setF("phone", e.target.value)} placeholder="09xx xxx xxx" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
-                    </div>
-                    <div>
-                      <label className="block text-[13px] font-medium mb-1.5">Trạng thái</label>
-                      <select value={form.status} onChange={e => setF("status", e.target.value as "active" | "inactive")} className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
-                        {STATUS_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-                      </select>
-                    </div>
+                  <div>
+                    <label className="block text-[13px] font-medium mb-1.5">
+                      GLN <span className="text-[11px] text-muted-foreground font-normal">(Global Location Number)</span>
+                    </label>
+                    <input value={form.gln} onChange={e => setF("gln", e.target.value)} placeholder="0000000000000 (13 chữ số)" maxLength={13}
+                      className="w-full h-10 px-3 rounded-lg border border-border text-sm font-mono outline-none focus:border-primary" />
+                    <div className="text-[11.5px] text-muted-foreground mt-1">Mã định danh địa điểm toàn cầu GS1.</div>
                   </div>
+                  {form.type === "ho_lien_ket" && (
+                    <div>
+                      <label className="block text-[13px] font-medium mb-1.5">Giống chè <span className="ml-1 text-[11px] text-muted-foreground font-normal">Chọn một hoặc nhiều giống</span></label>
+                      {teaVarieties.length === 0 ? (
+                        <div className="px-3 py-2.5 rounded-lg border border-border bg-muted/40 text-[12.5px] text-muted-foreground">Chưa có giống chè nào.</div>
+                      ) : (
+                        <div className="border border-border rounded-lg divide-y divide-border max-h-40 overflow-y-auto">
+                          {teaVarieties.map((tv: TeaVariety) => {
+                            const checked = form.giong_che_ids.includes(tv.id);
+                            return (
+                              <label key={tv.id} className={`flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-muted/40 ${checked ? "bg-emerald-50/60" : ""}`}>
+                                <input type="checkbox" className="accent-primary shrink-0" checked={checked}
+                                  onChange={e => setF("giong_che_ids", e.target.checked ? [...form.giong_che_ids, tv.id] : form.giong_che_ids.filter(id => id !== tv.id))} />
+                                <span className="text-[13px] font-medium">{tv.name}{tv.code && <span className="ml-1.5 text-[11px] text-muted-foreground">({tv.code})</span>}</span>
+                                {checked && <span className="ml-auto w-4 h-4 rounded-full bg-emerald-500 flex items-center justify-center"><svg viewBox="0 0 12 12" className="w-2.5 h-2.5 fill-none stroke-white stroke-2"><polyline points="1.5,6 4.5,9 10.5,3" /></svg></span>}
+                              </label>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  <div>
+                    <label className="block text-[13px] font-medium mb-1.5">Ghi chú</label>
+                    <textarea value={form.notes} onChange={e => setF("notes", e.target.value)} rows={2} placeholder="Ghi chú thêm…"
+                      className="w-full px-3 py-2.5 rounded-lg border border-border text-sm outline-none focus:border-primary resize-none" />
+                  </div>
+                </div>
+              )}
+
+              {/* TAB 2: Diện tích & vị trí địa lý */}
+              {activeTab === "location" && (
+                <div className="space-y-5">
                   <div className="grid grid-cols-2 gap-4">
                     <ProvinceSelect value={form.tinh} onChange={(v) => { setF("tinh", v); setF("xa", ""); }} />
                     <CommuneSelect province={form.tinh} value={form.xa} onChange={(v) => setF("xa", v)} />
                   </div>
                   <div>
-                    <label className="block text-[13px] font-medium mb-1.5">Địa chỉ chi tiết</label>
-                    <input value={form.address} onChange={e => setF("address", e.target.value)} placeholder="Số nhà, đường, thôn xóm…" className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                    <label className="block text-[13px] font-medium mb-1.5">Địa chỉ chi tiết <span className="text-rose-500">*</span></label>
+                    <input value={form.address} onChange={e => setF("address", e.target.value)} placeholder="Số nhà, đường, thôn xóm…"
+                      className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
                   </div>
+
+                  {/* Diện tích + Đơn vị */}
                   <div>
-                    <label className="block text-[13px] font-medium mb-1.5">
-                      GLN <span className="text-[11px] text-muted-foreground font-normal">(Global Location Number)</span>
+                    <label className="block text-[13px] font-medium mb-1.5">Diện tích</label>
+                    <div className="flex gap-3">
+                      <input value={form.dienTich} onChange={e => setF("dienTich", e.target.value)} placeholder="VD: 20" type="number" min="0" step="any"
+                        className="flex-1 h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                      <div className="relative w-44">
+                        <select value={form.donViDienTich} onChange={e => setF("donViDienTich", e.target.value)}
+                          className="w-full h-10 pl-3 pr-8 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white appearance-none">
+                          {["Ha", "m²", "sào", "mẫu", "km²"].map(u => <option key={u} value={u}>{u}</option>)}
+                        </select>
+                        <ChevronDown className="w-4 h-4 absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                      </div>
+                    </div>
+                    {form.dienTich && <div className="text-[11.5px] text-muted-foreground mt-1">= {form.dienTich} {form.donViDienTich}</div>}
+                  </div>
+
+                  {/* Tọa độ */}
+                  <div>
+                    <label className="block text-[13px] font-medium mb-1.5 flex items-center gap-1.5">
+                      Tọa độ
+                      <span title="Nhập theo định dạng: vĩ độ, kinh độ (VD: 21.7285, 105.6683)"><HelpCircle className="w-3.5 h-3.5 text-muted-foreground cursor-help" /></span>
                     </label>
-                    <input
-                      value={form.gln}
-                      onChange={e => setF("gln", e.target.value)}
-                      placeholder="0000000000000 (13 chữ số)"
-                      maxLength={13}
-                      className="w-full h-10 px-3 rounded-lg border border-border text-sm font-mono outline-none focus:border-primary"
-                    />
-                    <div className="text-[11.5px] text-muted-foreground mt-1">Mã định danh địa điểm toàn cầu GS1 (dùng trong truy xuất chuỗi cung ứng).</div>
+                    <textarea value={form.toaDo} onChange={e => setF("toaDo", e.target.value)} rows={3}
+                      placeholder={"Nhập tọa độ GPS:\nVĩ độ, Kinh độ (VD: 21.7285, 105.6683)"}
+                      className="w-full px-3 py-2.5 rounded-lg border border-border text-sm font-mono outline-none focus:border-primary resize-none" />
+                    {form.toaDo && !parseCoords(form.toaDo) && (
+                      <div className="text-[11.5px] text-amber-600 mt-1">Định dạng chưa nhận ra. Thử: 21.7285, 105.6683</div>
+                    )}
+                    {parseCoords(form.toaDo) && (
+                      <button type="button" onClick={() => setF("toaDo", "")} className="text-[12px] text-primary mt-1 hover:underline">
+                        Đặt lại bản đồ
+                      </button>
+                    )}
                   </div>
+
+                  {/* Map */}
                   <div>
-                    <label className="block text-[13px] font-medium mb-1.5">Ghi chú</label>
-                    <textarea value={form.notes} onChange={e => setF("notes", e.target.value)} rows={2} placeholder="Ghi chú thêm…" className="w-full px-3 py-2.5 rounded-lg border border-border text-sm outline-none focus:border-primary resize-none" />
+                    <label className="block text-[13px] font-medium mb-2">Bản đồ</label>
+                    <MapView toaDo={form.toaDo} />
+                    {!parseCoords(form.toaDo) && (
+                      <div className="text-[11.5px] text-muted-foreground mt-1.5">Nhập tọa độ ở trên để định vị cơ sở trên bản đồ.</div>
+                    )}
                   </div>
-                </>
+                </div>
               )}
 
-              {activeTab === "employees" && (
-                <div className="space-y-3">
-                  {!editItem && (
-                    <div className="px-3 py-2.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-[12.5px]">
-                      Chọn nhân viên phụ trách ngay khi tạo cơ sở. Phân công sẽ được lưu cùng lúc với thông tin cơ sở.
+              {/* TAB 3: Thông tin chứng chỉ */}
+              {activeTab === "certs" && (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Award className="w-4 h-4 text-primary" />
+                      <span className="text-[14px] font-semibold">Chứng nhận / Chứng chỉ</span>
+                      <span className="text-[12px] text-muted-foreground">({form.chungChi.length} chứng chỉ)</span>
                     </div>
-                  )}
-                  <p className="text-[13px] text-muted-foreground">Chọn nhân viên phụ trách cơ sở này:</p>
-                  {relevantEmployees.length === 0 ? (
-                    <div className="py-8 text-center text-[13px] text-muted-foreground">
-                      <Users className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                      Chưa có nhân viên nào. Thêm nhân viên ở mục Người dùng trước.
+                    <button onClick={addCert} className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-lg hover:bg-primary/90">
+                      <Plus className="w-3.5 h-3.5" /> Thêm chứng chỉ
+                    </button>
+                  </div>
+                  {form.chungChi.length === 0 ? (
+                    <div className="py-16 text-center text-[13px] text-muted-foreground border border-dashed border-border rounded-xl">
+                      <Award className="w-8 h-8 mx-auto mb-2 opacity-25" />
+                      Chưa có chứng chỉ. Nhấn "+ Thêm chứng chỉ" để bắt đầu.
                     </div>
                   ) : (
-                    <div className="space-y-2 max-h-96 overflow-y-auto">
-                      {relevantEmployees.map(emp => (
-                        <label key={emp.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border hover:bg-muted/40 cursor-pointer">
-                          <input
-                            type="checkbox"
-                            className="accent-primary"
-                            checked={selectedEmployeeIds.includes(emp.id)}
-                            onChange={e => {
-                              if (e.target.checked) setSelectedEmployeeIds(p => [...p, emp.id]);
-                              else setSelectedEmployeeIds(p => p.filter(id => id !== emp.id));
-                            }}
-                          />
-                          <div className={`w-8 h-8 rounded-full text-white text-[11px] font-semibold flex items-center justify-center shrink-0 ${emp.avatarColor}`}>
-                            {emp.name.slice(-2).toUpperCase()}
+                    <div className="space-y-4">
+                      {form.chungChi.map((c, idx) => (
+                        <div key={c.id} className="border border-border rounded-xl p-4 space-y-3">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wide">Chứng chỉ #{idx + 1}</span>
+                            <button onClick={() => removeCert(c.id)} className="p-1 rounded hover:bg-rose-50 text-muted-foreground hover:text-rose-600">
+                              <Trash2 className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className="block text-[12px] font-medium mb-1">Tên chứng chỉ <span className="text-rose-500">*</span></label>
+                              <input value={c.ten} onChange={e => updateCert(c.id, "ten", e.target.value)} placeholder="OCOP 4 sao 2024"
+                                className="w-full h-9 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                            </div>
+                            <div>
+                              <label className="block text-[12px] font-medium mb-1">Loại</label>
+                              <select value={c.loai} onChange={e => updateCert(c.id, "loai", e.target.value)}
+                                className="w-full h-9 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
+                                {CERT_LOAI_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
+                              </select>
+                            </div>
+                          </div>
+                          <div className="grid grid-cols-3 gap-3">
+                            <div>
+                              <label className="block text-[12px] font-medium mb-1">Số chứng chỉ</label>
+                              <input value={c.soChungChi} onChange={e => updateCert(c.id, "soChungChi", e.target.value)} placeholder="CC-001"
+                                className="w-full h-9 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                            </div>
+                            <div>
+                              <label className="block text-[12px] font-medium mb-1">Ngày cấp</label>
+                              <input type="date" value={c.ngayCap} onChange={e => updateCert(c.id, "ngayCap", e.target.value)}
+                                className="w-full h-9 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                            </div>
+                            <div>
+                              <label className="block text-[12px] font-medium mb-1">Ngày hết hạn</label>
+                              <input type="date" value={c.ngayHetHan} onChange={e => updateCert(c.id, "ngayHetHan", e.target.value)}
+                                className="w-full h-9 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+                            </div>
                           </div>
                           <div>
-                            <div className="text-[13px] font-medium">{emp.name}</div>
-                            <div className="text-[11.5px] text-muted-foreground">{emp.role}</div>
+                            <label className="block text-[12px] font-medium mb-1">Cấp bởi</label>
+                            <input value={c.capBoi} onChange={e => updateCert(c.id, "capBoi", e.target.value)} placeholder="Bộ Nông nghiệp & PTNT, UBND tỉnh…"
+                              className="w-full h-9 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
                           </div>
-                        </label>
+                          <div>
+                            <label className="block text-[12px] font-medium mb-1.5">Ảnh chứng chỉ</label>
+                            {c.imageUrl ? (
+                              <div className="relative w-28 h-36 group">
+                                <img src={c.imageUrl} alt={c.ten} className="w-full h-full object-cover rounded-lg border border-border" />
+                                <button onClick={() => updateCert(c.id, "imageUrl", "")}
+                                  className="absolute top-1 right-1 w-5 h-5 rounded-full bg-white shadow flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                                  <X className="w-3 h-3 text-rose-500" />
+                                </button>
+                              </div>
+                            ) : (
+                              <button type="button" onClick={() => certImgRefs.current[c.id]?.click()}
+                                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-border text-[12px] text-muted-foreground hover:border-primary hover:text-primary transition-colors">
+                                <Upload className="w-3.5 h-3.5" /> Tải lên ảnh chứng chỉ
+                              </button>
+                            )}
+                            <input type="file" accept="image/*" className="hidden"
+                              ref={el => { certImgRefs.current[c.id] = el; }}
+                              onChange={e => handleCertImg(c.id, e)} />
+                          </div>
+                        </div>
                       ))}
                     </div>
-                  )}
-                  {editItem && (
-                    <button
-                      onClick={() => assignMu.mutate({ id: editItem.id, ids: selectedEmployeeIds })}
-                      disabled={assignMu.isPending}
-                      className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 hover:brightness-110 disabled:opacity-60"
-                    >
-                      {assignMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                      <Users className="w-4 h-4" /> Lưu phân công
-                    </button>
                   )}
                 </div>
               )}
 
-              {err && <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{err}</div>}
+              {/* TAB 4: Bộ phận */}
+              {activeTab === "departments" && (
+                <div className="space-y-4">
+                  <div>
+                    <button onClick={addBoPhan} className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium border border-primary text-primary rounded-lg hover:bg-primary/5">
+                      <Plus className="w-3.5 h-3.5" /> Thêm bộ phận
+                    </button>
+                  </div>
+                  {form.boPhan.length === 0 ? (
+                    <div className="py-16 text-center text-[13px] text-muted-foreground border border-dashed border-border rounded-xl">
+                      <Users className="w-8 h-8 mx-auto mb-2 opacity-25" />
+                      Chưa có bộ phận nào. Nhấn "+ Thêm bộ phận" để bắt đầu.
+                    </div>
+                  ) : (
+                    <div className="border border-border rounded-xl overflow-hidden">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="text-left text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/40 border-b border-border">
+                            <th className="px-4 py-3 w-12 text-center">STT</th>
+                            <th className="px-4 py-3 w-40">Mã bộ phận</th>
+                            <th className="px-4 py-3">Tên bộ phận</th>
+                            <th className="px-4 py-3">Ghi chú</th>
+                            <th className="px-4 py-3 w-20 text-center">Hành động</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {form.boPhan.map((b, idx) => (
+                            <tr key={b.id} className="border-t border-border hover:bg-muted/20">
+                              <td className="px-4 py-2.5 text-[13px] text-muted-foreground text-center">{idx + 1}</td>
+                              <td className="px-4 py-2.5">
+                                <input value={b.ma} onChange={e => updateBoPhan(b.id, "ma", e.target.value)} placeholder="BP-001"
+                                  className="w-full h-8 px-2 rounded border border-border text-sm outline-none focus:border-primary bg-white" />
+                              </td>
+                              <td className="px-4 py-2.5">
+                                <input value={b.ten} onChange={e => updateBoPhan(b.id, "ten", e.target.value)} placeholder="Tên bộ phận…"
+                                  className="w-full h-8 px-2 rounded border border-border text-sm outline-none focus:border-primary bg-white" />
+                              </td>
+                              <td className="px-4 py-2.5">
+                                <input value={b.ghiChu} onChange={e => updateBoPhan(b.id, "ghiChu", e.target.value)} placeholder="Ghi chú…"
+                                  className="w-full h-8 px-2 rounded border border-border text-sm outline-none focus:border-primary bg-white" />
+                              </td>
+                              <td className="px-4 py-2.5 text-center">
+                                <button onClick={() => removeBoPhan(b.id)} className="p-1.5 rounded hover:bg-rose-50 text-muted-foreground hover:text-rose-600">
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                  {/* Nhân viên phụ trách trong tab Bộ phận */}
+                  <div className="mt-6 pt-5 border-t border-border">
+                    <div className="flex items-center gap-2 mb-3">
+                      <Users className="w-4 h-4 text-primary" />
+                      <span className="text-[14px] font-semibold">Nhân viên phụ trách</span>
+                    </div>
+                    {relevantEmployees.length === 0 ? (
+                      <div className="py-6 text-center text-[13px] text-muted-foreground border border-dashed border-border rounded-xl">
+                        <Users className="w-7 h-7 mx-auto mb-2 opacity-25" />
+                        Chưa có nhân viên nào.
+                      </div>
+                    ) : (
+                      <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto">
+                        {relevantEmployees.map(emp => (
+                          <label key={emp.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border hover:bg-muted/40 cursor-pointer">
+                            <input type="checkbox" className="accent-primary" checked={selectedEmployeeIds.includes(emp.id)}
+                              onChange={e => { if (e.target.checked) setSelectedEmployeeIds(p => [...p, emp.id]); else setSelectedEmployeeIds(p => p.filter(id => id !== emp.id)); }} />
+                            <div className={`w-7 h-7 rounded-full text-white text-[10px] font-semibold flex items-center justify-center shrink-0 ${emp.avatarColor}`}>
+                              {emp.name.slice(-2).toUpperCase()}
+                            </div>
+                            <div className="min-w-0">
+                              <div className="text-[12.5px] font-medium truncate">{emp.name}</div>
+                              <div className="text-[11px] text-muted-foreground truncate">{emp.role}</div>
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                    )}
+                    {editItem && selectedEmployeeIds.length > 0 && (
+                      <button onClick={() => assignMu.mutate({ id: editItem.id, ids: selectedEmployeeIds })} disabled={assignMu.isPending}
+                        className="mt-3 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 hover:brightness-110 disabled:opacity-60">
+                        {assignMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                        <Users className="w-4 h-4" /> Lưu phân công
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {err && <div className="mt-4 px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{err}</div>}
             </div>
 
-            <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-2 bg-muted/40">
-              <button onClick={close_} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
-              <button
-                disabled={isPending}
-                onClick={handleSubmit}
-                className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold shadow-sm hover:brightness-110 disabled:opacity-60 flex items-center gap-2"
-              >
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-border flex items-center justify-end gap-2 bg-muted/30 shrink-0 rounded-b-2xl">
+              <button onClick={close_} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted flex items-center gap-2">
+                <X className="w-4 h-4" /> Hủy
+              </button>
+              <button disabled={isPending} onClick={handleSubmit}
+                className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold shadow-sm hover:brightness-110 disabled:opacity-60 flex items-center gap-2">
                 {isPending && <Loader2 className="w-4 h-4 animate-spin" />}
                 {editItem ? "Lưu thay đổi" : "Thêm cơ sở"}
               </button>
             </div>
-          </aside>
-        </>
+          </div>
+        </div>
       )}
     </AppLayout>
   );
