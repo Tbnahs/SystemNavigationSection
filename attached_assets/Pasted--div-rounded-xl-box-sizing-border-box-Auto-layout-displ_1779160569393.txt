@@ -1,0 +1,1574 @@
+/* div.rounded-xl */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 15.8px;
+gap: 12px;
+
+position: absolute;
+width: 900px;
+height: 310px;
+left: 10969px;
+top: 10551px;
+
+/* 892790dc-34a1-4d4e-846b-10f16d653c36-00-2d2lieazusch2.pike.replit.dev/Mountain Meadow 5% */
+background: rgba(33, 196, 93, 0.05);
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mountain Meadow 30% */
+border: 1px solid rgba(33, 196, 93, 0.3);
+border-radius: 14px;
+
+
+/* div.flex */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+gap: 16px;
+
+width: 866.4px;
+height: 232px;
+min-height: 232px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* div.shrink-0 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 6px;
+
+width: 96px;
+height: 232px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* div.w-24 */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 0.6px;
+
+width: 96px;
+height: 96px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/White */
+background: #FFFFFF;
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mischka */
+border: 1px dashed #DCDFE4;
+border-radius: 10px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* svg.lucide:margin */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px 0px 4px;
+
+width: 20px;
+height: 24px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* svg.lucide */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 0px;
+
+width: 20px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Component 1 */
+
+width: 20px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* Vector */
+
+position: absolute;
+left: 12.5%;
+right: 12.5%;
+top: 12.5%;
+bottom: 12.5%;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Boulder */
+border: 1.66667px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 29.17%;
+right: 54.16%;
+top: 29.17%;
+bottom: 54.17%;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Boulder */
+border: 1.66667px solid #6B7280;
+
+
+/* Vector */
+
+position: absolute;
+left: 25%;
+right: 12.5%;
+top: 47.2%;
+bottom: 12.5%;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Boulder */
+border: 1.66667px solid #6B7280;
+
+
+/* span.text-muted-foreground */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: center;
+padding: 0px 23.85px 0px 23.84px;
+
+width: 92.69px;
+height: 25px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* No image available */
+
+width: 45px;
+height: 25px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 10px;
+line-height: 12px;
+/* or 125% */
+display: flex;
+align-items: center;
+text-align: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Boulder */
+color: #6B7280;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* button.w-24 */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 0px;
+
+width: 96px;
+height: 28px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mountain Meadow */
+background: #21C45D;
+border-radius: 10px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Tải ảnh */
+
+width: 38px;
+height: 17px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Medium */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 11px;
+line-height: 16px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+text-align: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/White */
+color: #FFFFFF;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* div.flex-1 */
+
+width: 754.4px;
+height: 232px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 1;
+
+
+/* div.col-span-2 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 2px;
+
+position: absolute;
+left: 0px;
+right: 0px;
+top: 0px;
+bottom: 181.5px;
+
+
+
+/* label.block */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 754.4px;
+height: 17px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Loại chứng chỉ */
+
+width: 754.4px;
+height: 17px;
+
+/* 48a11cc9-49ba-4a8c-b301-b4fdf6f16a10-00-2emnxs16r1hz5.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 16px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Boulder */
+color: #6B7280;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* select.w-full */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+padding: 0px 23.8px 0px 11.8px;
+
+width: 754.4px;
+height: 32px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/White */
+background: #FFFFFF;
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mischka */
+border: 1px solid #DCDFE4;
+border-radius: 10px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* div */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0.8px 0px;
+
+width: 716.8px;
+height: 17.6px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* VietGAP */
+
+width: 716.8px;
+height: 16px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 16px;
+/* identical to box height, or 123% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* div */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 2px;
+
+position: absolute;
+left: 0px;
+right: 383.2px;
+top: 60.5px;
+bottom: 121px;
+
+
+
+/* label.block */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 371.2px;
+height: 17px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Tên chứng chỉ */
+
+width: 371.2px;
+height: 17px;
+
+/* 48a11cc9-49ba-4a8c-b301-b4fdf6f16a10-00-2emnxs16r1hz5.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 16px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Boulder */
+color: #6B7280;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* input.w-full */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: flex-start;
+padding: 7px 7.8px;
+
+width: 371.2px;
+height: 32px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/White */
+background: #FFFFFF;
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mischka */
+border: 1px solid #DCDFE4;
+border-radius: 10px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* div#placeholder */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 353.6px;
+height: 16px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* VD: VietGAP 2024 */
+
+width: 353.6px;
+height: 16px;
+
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 16px;
+/* identical to box height */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark 50% */
+color: rgba(29, 32, 37, 0.5);
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* div */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 2px;
+
+position: absolute;
+left: 383.2px;
+right: 0px;
+top: 60.5px;
+bottom: 121px;
+
+
+
+/* label.block */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 371.2px;
+height: 17px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Cơ quan cấp */
+
+width: 371.2px;
+height: 17px;
+
+/* 48a11cc9-49ba-4a8c-b301-b4fdf6f16a10-00-2emnxs16r1hz5.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 16px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Boulder */
+color: #6B7280;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* input.w-full */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: flex-start;
+padding: 7px 7.8px;
+
+width: 371.2px;
+height: 32px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/White */
+background: #FFFFFF;
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mischka */
+border: 1px solid #DCDFE4;
+border-radius: 10px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* div#placeholder */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 353.6px;
+height: 16px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* VD: Bộ NN&PTNT */
+
+width: 353.6px;
+height: 16px;
+
+/* 892790dc-34a1-4d4e-846b-10f16d653c36-00-2d2lieazusch2.pike.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 16px;
+/* identical to box height */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark 50% */
+color: rgba(29, 32, 37, 0.5);
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* div */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 2px;
+
+position: absolute;
+left: 0px;
+right: 383.2px;
+top: 121px;
+bottom: 60.5px;
+
+
+
+/* label.block */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 371.2px;
+height: 17px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Số chứng chỉ */
+
+width: 371.2px;
+height: 17px;
+
+/* 48a11cc9-49ba-4a8c-b301-b4fdf6f16a10-00-2emnxs16r1hz5.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 16px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Boulder */
+color: #6B7280;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* input.w-full */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: flex-start;
+padding: 7px 7.8px;
+
+width: 371.2px;
+height: 32px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/White */
+background: #FFFFFF;
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mischka */
+border: 1px solid #DCDFE4;
+border-radius: 10px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* div#placeholder */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 353.6px;
+height: 16px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* VD: VG-2024-001 */
+
+width: 353.6px;
+height: 16px;
+
+/* 892790dc-34a1-4d4e-846b-10f16d653c36-00-2d2lieazusch2.pike.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 16px;
+/* identical to box height */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark 50% */
+color: rgba(29, 32, 37, 0.5);
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* div */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 2px;
+
+position: absolute;
+left: 383.2px;
+right: 0px;
+top: 121px;
+bottom: 60.5px;
+
+
+
+/* label.block */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 371.2px;
+height: 17px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Ngày cấp */
+
+width: 371.2px;
+height: 17px;
+
+/* 48a11cc9-49ba-4a8c-b301-b4fdf6f16a10-00-2emnxs16r1hz5.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 16px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Boulder */
+color: #6B7280;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* input.w-full */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: flex-start;
+padding: 4.85px 7.8px 5.25px;
+
+width: 371.2px;
+height: 32px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/White */
+background: #FFFFFF;
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mischka */
+border: 1px solid #DCDFE4;
+border-radius: 10px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* div */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+
+width: 353.6px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* div#date-time-edit */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+
+width: 336.6px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* div */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px 1px;
+gap: 1px;
+
+width: 85px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Ngày → dd */
+
+width: 17px;
+height: 20px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* / */
+
+width: 5px;
+height: 20px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Tháng → mm */
+
+width: 23px;
+height: 20px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* / */
+
+width: 5px;
+height: 20px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 3;
+flex-grow: 0;
+
+
+/* Năm → yyyy */
+
+width: 29px;
+height: 20px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 4;
+flex-grow: 0;
+
+
+/* div menu#picker */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 2px;
+
+width: 17px;
+height: 17px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Component 1 */
+
+width: 13px;
+height: 12.19px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 10.94%;
+right: 10.94%;
+top: 4.17%;
+bottom: 4.17%;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Black */
+background: #000000;
+
+
+/* Vector */
+
+position: absolute;
+left: 3.12%;
+right: 3.12%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* div */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+gap: 2px;
+
+position: absolute;
+left: 0px;
+right: 383.2px;
+top: 181.5px;
+bottom: 0px;
+
+
+
+/* label.block */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 0px;
+
+width: 371.2px;
+height: 17px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Ngày hết hạn */
+
+width: 371.2px;
+height: 17px;
+
+/* 48a11cc9-49ba-4a8c-b301-b4fdf6f16a10-00-2emnxs16r1hz5.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 11px;
+line-height: 16px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Boulder */
+color: #6B7280;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* input.w-full */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: center;
+align-items: flex-start;
+padding: 4.85px 7.8px 5.25px;
+
+width: 371.2px;
+height: 32px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/White */
+background: #FFFFFF;
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mischka */
+border: 1px solid #DCDFE4;
+border-radius: 10px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* div */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: center;
+padding: 0px;
+
+width: 353.6px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* div#date-time-edit */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px;
+
+width: 336.6px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 1;
+
+
+/* div */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+align-items: flex-start;
+padding: 0px 1px;
+gap: 1px;
+
+width: 85px;
+height: 20px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* Ngày → dd */
+
+width: 17px;
+height: 20px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* / */
+
+width: 5px;
+height: 20px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Tháng → mm */
+
+width: 23px;
+height: 20px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 2;
+flex-grow: 0;
+
+
+/* / */
+
+width: 5px;
+height: 20px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 3;
+flex-grow: 0;
+
+
+/* Năm → yyyy */
+
+width: 29px;
+height: 20px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Regular */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 400;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 4;
+flex-grow: 0;
+
+
+/* div menu#picker */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+align-items: flex-start;
+padding: 2px;
+
+width: 17px;
+height: 17px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Component 1 */
+
+width: 13px;
+height: 12.19px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Vector */
+
+position: absolute;
+left: 10.94%;
+right: 10.94%;
+top: 4.17%;
+bottom: 4.17%;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Black */
+background: #000000;
+
+
+/* Vector */
+
+position: absolute;
+left: 3.12%;
+right: 3.12%;
+top: 0%;
+bottom: 0%;
+
+
+
+/* div.flex */
+
+/* Auto layout */
+display: flex;
+flex-direction: row;
+justify-content: flex-end;
+align-items: flex-start;
+padding: 0px;
+gap: 8px;
+
+width: 866.4px;
+height: 32px;
+
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+align-self: stretch;
+flex-grow: 0;
+
+
+/* button.h-8 */
+
+box-sizing: border-box;
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 0px 15.8px;
+
+width: 58.6px;
+height: 32px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/White */
+background: #FFFFFF;
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mischka */
+border: 1px solid #DCDFE4;
+border-radius: 10px;
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* Hủy */
+
+width: 25px;
+height: 20px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Medium */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+text-align: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Shark */
+color: #1D2025;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
+
+
+/* button.h-8 */
+
+/* Auto layout */
+display: flex;
+flex-direction: column;
+justify-content: center;
+align-items: center;
+padding: 0px 16px;
+
+width: 68px;
+height: 32px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Mountain Meadow */
+background: #21C45D;
+border-radius: 10px;
+
+/* Inside auto layout */
+flex: none;
+order: 1;
+flex-grow: 0;
+
+
+/* Thêm */
+
+width: 36px;
+height: 20px;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/Inter/Medium */
+font-family: 'Inter';
+font-style: normal;
+font-weight: 500;
+font-size: 13px;
+line-height: 20px;
+/* identical to box height, or 150% */
+display: flex;
+align-items: center;
+text-align: center;
+
+/* 359bbeb2-9748-4626-b97f-2e405244898b-00-2cm7ho1km84mz.sisko.replit.dev/White */
+color: #FFFFFF;
+
+
+/* Inside auto layout */
+flex: none;
+order: 0;
+flex-grow: 0;
