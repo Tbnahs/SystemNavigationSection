@@ -245,7 +245,7 @@ export default function DoanhNghiepDetailPage() {
                 <thead>
                   <tr className="text-left text-[12px] uppercase tracking-wider text-muted-foreground">
                     <th className="px-3 py-2.5">Nhân viên</th>
-                    <th className="px-3 py-2.5">Vai trò</th>
+                    <th className="px-3 py-2.5">Phân hệ</th>
                     <th className="px-3 py-2.5">Liên hệ</th>
                     <th className="px-3 py-2.5">Trạng thái</th>
                     <th className="px-3 py-2.5">Hoạt động cuối</th>
