@@ -115,9 +115,6 @@ export default function DoanhNghiepDetailPage() {
             </div>
             <div className="flex items-center gap-2">
               <button className="h-9 px-3 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted">
-                <Globe className="w-4 h-4" /> Truy cập trang TXNG
-              </button>
-              <button className="h-9 px-3 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted">
                 <Pencil className="w-4 h-4" /> Sửa hồ sơ
               </button>
               <button className="h-9 w-9 rounded-lg border border-border flex items-center justify-center hover:bg-muted text-muted-foreground">
