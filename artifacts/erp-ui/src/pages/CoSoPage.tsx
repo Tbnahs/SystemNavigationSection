@@ -514,10 +514,10 @@ export default function CoSoPage() {
         </div>
       )}
 
-      {/* 4-tab Modal */}
+      {/* 4-tab Drawer (right panel) */}
       {drawerOpen && (
-        <div className="fixed inset-0 bg-slate-900/40 z-40 flex items-start justify-center overflow-auto py-6 px-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-5xl flex flex-col" style={{ minHeight: 620 }}>
+        <div className="fixed inset-0 bg-slate-900/40 z-40 flex justify-end">
+          <div className="bg-white shadow-2xl w-full max-w-2xl flex flex-col h-full overflow-y-auto">
 
             {/* Header */}
             <div className="px-6 py-4 border-b border-border flex items-center justify-between shrink-0">
