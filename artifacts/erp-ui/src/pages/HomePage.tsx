@@ -18,13 +18,18 @@ import {
 import {
   fetchEnterpriseStats, fetchEmployeeStats, fetchFacilities, fetchUnits,
 } from "@/lib/api";
+import { TranslationKey } from "@/i18n/translations";
 
 /* ── Constants ───────────────────────────────────────────── */
-const ALL_SYSTEMS = [
-  { id: "portal",     icon: Globe,    label: "Portal",              desc: "Quản lý tài khoản và phân quyền truy cập",          href: "/portal",          count: "4",  gradient: "from-violet-500 to-purple-600", badge: "bg-violet-100 text-violet-700" },
-  { id: "erp",        icon: BarChart3, label: "ERP",                desc: "Thu mua, sản xuất, đóng gói, bán hàng",             href: "/module/erp",      count: "13", gradient: "from-emerald-500 to-green-600", badge: "bg-emerald-100 text-emerald-700" },
-  { id: "txng",       icon: ScanLine,  label: "Truy xuất nguồn gốc",desc: "QR code, chuỗi cung ứng, chứng nhận",               href: "/module/txng",     count: "6",  gradient: "from-blue-500 to-cyan-600",     badge: "bg-blue-100 text-blue-700" },
-  { id: "vung_trong", icon: Leaf,      label: "Vùng trồng & IoT",   desc: "Quản lý vùng nguyên liệu, cây trồng và thiết bị IoT",href: "/module/vung-trong",count:"10", gradient: "from-amber-500 to-orange-500",  badge: "bg-amber-100 text-amber-700" },
+
+const ALL_SYSTEMS: {
+  id: string; icon: React.ElementType; labelKey?: TranslationKey; label: string;
+  descKey: TranslationKey; href: string; count: string; gradient: string; badge: string;
+}[] = [
+  { id: "portal",     icon: Globe,    label: "Portal",        descKey: "home.system.portal.desc",      href: "/portal",           count: "4",  gradient: "from-violet-500 to-purple-600", badge: "bg-violet-100 text-violet-700" },
+  { id: "erp",        icon: BarChart3, label: "ERP",          descKey: "home.system.erp.desc",         href: "/module/erp",       count: "13", gradient: "from-emerald-500 to-green-600", badge: "bg-emerald-100 text-emerald-700" },
+  { id: "txng",       icon: ScanLine, labelKey: "nav.module.txng",  label: "Truy xuất nguồn gốc",    descKey: "home.system.txng.desc",    href: "/module/txng",      count: "6",  gradient: "from-blue-500 to-cyan-600",     badge: "bg-blue-100 text-blue-700" },
+  { id: "vung_trong", icon: Leaf,     labelKey: "nav.module.vung-trong", label: "Vùng trồng & IoT",  descKey: "home.system.vung-trong.desc", href: "/module/vung-trong", count: "10", gradient: "from-amber-500 to-orange-500",  badge: "bg-amber-100 text-amber-700" },
 ];
 
 const ERP_ACTIVITIES = [
@@ -363,8 +368,8 @@ export default function HomePage() {
                     {sys.count} chức năng
                   </span>
                 </div>
-                <h3 className="font-semibold text-foreground text-sm mb-1">{sys.label}</h3>
-                <p className="text-xs text-muted-foreground mb-4">{sys.desc}</p>
+                <h3 className="font-semibold text-foreground text-sm mb-1">{sys.labelKey ? t(sys.labelKey) : sys.label}</h3>
+                <p className="text-xs text-muted-foreground mb-4">{t(sys.descKey)}</p>
                 <div className="flex items-center gap-1 text-primary text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                   Vào hệ thống <ArrowRight className="w-3 h-3" />
                 </div>

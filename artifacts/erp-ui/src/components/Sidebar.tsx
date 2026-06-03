@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { TranslationKey } from "@/i18n/translations";
 import logoImg from "@assets/Logo ESG.png";
 
 interface SidebarProps {
@@ -20,83 +21,126 @@ interface SidebarProps {
 }
 
 type NavItem =
-  | { type?: "item"; id: string; icon: React.ElementType; label: string }
-  | { type: "divider"; label: string };
+  | { type?: "item"; id: string; icon: React.ElementType; labelKey: TranslationKey }
+  | { type: "divider"; labelKey: TranslationKey };
 
 const ERP_SUB_ITEMS: NavItem[] = [
-  { type: "divider", label: "Thu mua" },
-  { id: "thu-mua",  icon: ShoppingBasket, label: "Đơn thu mua" },
+  { type: "divider", labelKey: "nav.div.thu-mua" },
+  { id: "thu-mua",     icon: ShoppingBasket, labelKey: "submodule.erp.thu-mua" },
 
-  { type: "divider", label: "Sản xuất" },
-  { id: "production", icon: Factory,      label: "Lệnh sản xuất" },
+  { type: "divider", labelKey: "nav.div.san-xuat" },
+  { id: "production",  icon: Factory,        labelKey: "submodule.erp.production" },
 
-  { type: "divider", label: "Đóng gói" },
-  { id: "packaging",  icon: Package,      label: "Lô đóng gói" },
+  { type: "divider", labelKey: "nav.div.dong-goi" },
+  { id: "packaging",   icon: Package,        labelKey: "submodule.erp.packaging" },
 
-  { type: "divider", label: "Bán hàng" },
-  { id: "sales",    icon: ShoppingCart,   label: "Đơn hàng" },
+  { type: "divider", labelKey: "nav.div.ban-hang" },
+  { id: "sales",       icon: ShoppingCart,   labelKey: "submodule.erp.sales" },
 
-  { type: "divider", label: "Báo cáo" },
-  { id: "reports",  icon: FileBarChart,   label: "Báo cáo" },
+  { type: "divider", labelKey: "nav.div.bao-cao" },
+  { id: "reports",     icon: FileBarChart,   labelKey: "submodule.erp.reports" },
 
-  { type: "divider", label: "Danh mục" },
-  { id: "thuong-pham",        icon: Package,      label: "Thương phẩm" },
-  { id: "quy-cach",           icon: BookOpen,     label: "Quy cách & Tiêu chuẩn" },
-  { id: "giong-che",          icon: Sprout,       label: "Giống chè" },
-  { id: "co-so",              icon: Factory,      label: "Cơ sở" },
+  { type: "divider", labelKey: "nav.div.danh-muc" },
+  { id: "thuong-pham", icon: Package,        labelKey: "submodule.erp.thuong-pham" },
+  { id: "quy-cach",    icon: BookOpen,       labelKey: "submodule.erp.quy-cach" },
+  { id: "giong-che",   icon: Sprout,         labelKey: "submodule.erp.giong-che" },
+  { id: "co-so",       icon: Factory,        labelKey: "submodule.erp.co-so" },
 ];
 
 const TXNG_SUB_ITEMS: NavItem[] = [
-  { type: "divider", label: "Quản trị doanh nghiệp" },
-  { id: "nhan-vien",       icon: Users,          label: "Nhân viên" },
-  { id: "co-so",           icon: Factory,        label: "Cơ sở" },
+  { type: "divider", labelKey: "nav.div.quan-tri-dn" },
+  { id: "nhan-vien",       icon: Users,       labelKey: "nav.txng.staff" },
+  { id: "co-so",           icon: Factory,     labelKey: "nav.portal.co-so" },
 
-  { type: "divider", label: "Quản lý chứng chỉ" },
-  { id: "chung-chi-dn",    icon: ShieldCheck,    label: "Chứng chỉ doanh nghiệp" },
-  { id: "chung-chi-tp",    icon: Award,          label: "Chứng chỉ thương phẩm" },
+  { type: "divider", labelKey: "nav.div.chung-chi" },
+  { id: "chung-chi-dn",    icon: ShieldCheck, labelKey: "nav.txng.chung-chi-dn" },
+  { id: "chung-chi-tp",    icon: Award,       labelKey: "nav.txng.chung-chi-tp" },
 
-  { type: "divider", label: "Quản lý thương phẩm" },
-  { id: "thuong-pham",     icon: Package,        label: "Thương phẩm" },
+  { type: "divider", labelKey: "nav.div.quan-ly-tp" },
+  { id: "thuong-pham",     icon: Package,     labelKey: "submodule.erp.thuong-pham" },
 
-  { type: "divider", label: "Quản lý sự kiện trọng yếu" },
-  { id: "su-kien",         icon: CalendarClock,  label: "Biểu mẫu sự kiện" },
+  { type: "divider", labelKey: "nav.div.su-kien" },
+  { id: "su-kien",         icon: CalendarClock, labelKey: "nav.txng.su-kien" },
 
-  { type: "divider", label: "Quản lý vùng nguyên liệu" },
-  { id: "giong-che",       icon: Sprout,         label: "Giống chè" },
-  { id: "bieu-mau-hd",     icon: ClipboardList,  label: "Biểu mẫu hoạt động" },
-  { id: "vung-nuoi-trong", icon: MapPin,         label: "Vùng nuôi trồng" },
+  { type: "divider", labelKey: "nav.div.vung-nl" },
+  { id: "giong-che",       icon: Sprout,      labelKey: "submodule.erp.giong-che" },
+  { id: "bieu-mau-hd",     icon: ClipboardList, labelKey: "nav.txng.bieu-mau-hd" },
+  { id: "vung-nuoi-trong", icon: MapPin,      labelKey: "nav.txng.vung-nuoi-trong" },
 
-  { type: "divider", label: "Truy xuất" },
-  { id: "theo-lo",         icon: Search,         label: "Theo lô thương phẩm" },
+  { type: "divider", labelKey: "nav.div.truy-xuat" },
+  { id: "theo-lo",         icon: Search,      labelKey: "nav.txng.theo-lo" },
 
-  { type: "divider", label: "Quản lý tem" },
-  { id: "tem",             icon: Tag,            label: "Quản lý tem" },
-  { id: "bao-cao-tem",     icon: FileBarChart,   label: "Báo cáo lượt quét tem" },
-  { id: "lich-su-tem",     icon: History,        label: "Lịch sử kích hoạt tem" },
+  { type: "divider", labelKey: "nav.div.quan-ly-tem" },
+  { id: "tem",             icon: Tag,         labelKey: "nav.txng.tem" },
+  { id: "bao-cao-tem",     icon: FileBarChart,labelKey: "nav.txng.bao-cao-tem" },
+  { id: "lich-su-tem",     icon: History,     labelKey: "nav.txng.lich-su-tem" },
 ];
 
 const VUNG_TRONG_SUB_ITEMS: NavItem[] = [
-  { id: "zones",      icon: MapPin,         label: "Vùng trồng" },
-  { id: "crops",      icon: Sprout,         label: "Cây trồng" },
-  { id: "pesticides", icon: FlaskConical,   label: "Thuốc BVTV" },
-  { id: "harvest",    icon: Scissors,       label: "Thu hoạch" },
-  { id: "weather",    icon: CloudSun,       label: "Thời tiết" },
-  { id: "inspection", icon: ClipboardCheck, label: "Kiểm định" },
-  { type: "divider",  label: "Thiết bị IoT" },
-  { id: "iot/devices",  icon: Server,   label: "Thiết bị" },
-  { id: "iot/sensors",  icon: Activity, label: "Cảm biến" },
-  { id: "iot/connect",  icon: Wifi,     label: "Kết nối" },
-  { id: "iot/monitor",  icon: Cpu,      label: "Giám sát" },
+  { id: "zones",       icon: MapPin,         labelKey: "nav.vt.zones" },
+  { id: "crops",       icon: Sprout,         labelKey: "nav.vt.crops" },
+  { id: "pesticides",  icon: FlaskConical,   labelKey: "nav.vt.pesticides" },
+  { id: "harvest",     icon: Scissors,       labelKey: "nav.vt.harvest" },
+  { id: "weather",     icon: CloudSun,       labelKey: "nav.vt.weather" },
+  { id: "inspection",  icon: ClipboardCheck, labelKey: "nav.vt.inspection" },
+  { type: "divider",   labelKey: "nav.div.thiet-bi-iot" },
+  { id: "iot/devices", icon: Server,         labelKey: "nav.iot.devices" },
+  { id: "iot/sensors", icon: Activity,       labelKey: "submodule.iot.sensors" },
+  { id: "iot/connect", icon: Wifi,           labelKey: "nav.iot.connect" },
+  { id: "iot/monitor", icon: Cpu,            labelKey: "nav.iot.monitor" },
 ];
 
 const PORTAL_SUB_ITEMS: NavItem[] = [
-  { id: "",             icon: LayoutGrid, label: "Tổng quan" },
-  { type: "divider", label: "Tài khoản" },
-  { id: "doanh-nghiep", icon: Building2,  label: "Doanh nghiệp" },
-  { id: "nguoi-dung",   icon: Users,      label: "Người dùng" },
-  { type: "divider", label: "Danh mục" },
-  { id: "don-vi-tinh",  icon: Scale,      label: "Đơn vị tính" },
-  { id: "co-so",        icon: Factory,    label: "Cơ sở" },
+  { id: "",             icon: LayoutGrid, labelKey: "nav.portal.overview" },
+  { type: "divider",    labelKey: "nav.div.quan-tri-dn" },
+  { id: "doanh-nghiep", icon: Building2,  labelKey: "nav.portal.enterprise" },
+  { id: "nguoi-dung",   icon: Users,      labelKey: "nav.portal.users" },
+  { type: "divider",    labelKey: "nav.div.danh-muc" },
+  { id: "don-vi-tinh",  icon: Scale,      labelKey: "nav.portal.units" },
+  { id: "co-so",        icon: Factory,    labelKey: "nav.portal.co-so" },
+];
+
+const MODULE_CONFIG = [
+  {
+    key: "portal",
+    href: "/portal",
+    subBase: "/portal",
+    icon: Globe,
+    labelKey: "nav.erp" as TranslationKey,
+    subItems: PORTAL_SUB_ITEMS,
+    color: "text-violet-700 bg-violet-50",
+    pathPrefix: "/portal",
+  },
+  {
+    key: "erp",
+    href: "/module/erp",
+    subBase: "/module/erp",
+    icon: BarChart3,
+    labelKey: "nav.erp" as TranslationKey,
+    subItems: ERP_SUB_ITEMS,
+    color: "text-primary bg-primary/10",
+    pathPrefix: "/module/erp",
+  },
+  {
+    key: "txng",
+    href: "/module/txng",
+    subBase: "/module/txng",
+    icon: ScanLine,
+    labelKey: "nav.module.txng" as TranslationKey,
+    subItems: TXNG_SUB_ITEMS,
+    color: "text-blue-700 bg-blue-50",
+    pathPrefix: "/module/txng",
+  },
+  {
+    key: "vung_trong",
+    href: "/module/vung-trong",
+    subBase: "/module/vung-trong",
+    icon: Leaf,
+    labelKey: "nav.module.vung-trong" as TranslationKey,
+    subItems: VUNG_TRONG_SUB_ITEMS,
+    color: "text-amber-700 bg-amber-50",
+    pathPrefix: "/module/vung-trong",
+  },
 ];
 
 function ExpandableNavItem({
@@ -110,6 +154,7 @@ function ExpandableNavItem({
   subBase?: string;
   color?: string;
 }) {
+  const { t } = useLanguage();
   const subBase = subBaseProp ?? href;
   const activeColor = color ?? "text-primary bg-primary/10";
   const iconActive = color ? color.split(" ")[0] : "text-primary";
@@ -127,7 +172,7 @@ function ExpandableNavItem({
         <button
           onClick={onToggle}
           className="px-2 py-2.5 rounded-r-xl hover:bg-black/5 transition-colors shrink-0"
-          title={expanded ? "Thu gọn" : "Mở rộng"}
+          title={expanded ? t("submodule.back") : "Mở rộng"}
         >
           <ChevronDown
             className={`w-3.5 h-3.5 transition-transform duration-200 ${expanded ? "rotate-180" : ""} ${isActive ? iconActive : "text-muted-foreground"}`}
@@ -142,7 +187,7 @@ function ExpandableNavItem({
             if (item.type === "divider") {
               return (
                 <p key={`div-${idx}`} className="px-2 pt-3 pb-0.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60 select-none">
-                  {item.label}
+                  {t(item.labelKey)}
                 </p>
               );
             }
@@ -159,7 +204,7 @@ function ExpandableNavItem({
                 }`}
               >
                 <SubIcon className={`w-3.5 h-3.5 shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`} strokeWidth={1.5} />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             );
           })}
@@ -168,53 +213,6 @@ function ExpandableNavItem({
     </div>
   );
 }
-
-const MODULE_CONFIG = [
-  {
-    key: "portal",
-    href: "/portal",
-    subBase: "/portal",
-    icon: Globe,
-    label: "Portal",
-    subItems: PORTAL_SUB_ITEMS,
-    color: "text-violet-700 bg-violet-50",
-    iconColor: "text-violet-700",
-    pathPrefix: "/portal",
-  },
-  {
-    key: "erp",
-    href: "/module/erp",
-    subBase: "/module/erp",
-    icon: BarChart3,
-    label: "ERP",
-    subItems: ERP_SUB_ITEMS,
-    color: "text-primary bg-primary/10",
-    iconColor: "text-primary",
-    pathPrefix: "/module/erp",
-  },
-  {
-    key: "txng",
-    href: "/module/txng",
-    subBase: "/module/txng",
-    icon: ScanLine,
-    label: "Truy xuất nguồn gốc",
-    subItems: TXNG_SUB_ITEMS,
-    color: "text-blue-700 bg-blue-50",
-    iconColor: "text-blue-700",
-    pathPrefix: "/module/txng",
-  },
-  {
-    key: "vung_trong",
-    href: "/module/vung-trong",
-    subBase: "/module/vung-trong",
-    icon: Leaf,
-    label: "Vùng trồng",
-    subItems: VUNG_TRONG_SUB_ITEMS,
-    color: "text-amber-700 bg-amber-50",
-    iconColor: "text-amber-700",
-    pathPrefix: "/module/vung-trong",
-  },
-];
 
 export default function Sidebar({ open, onClose }: SidebarProps) {
   const { t } = useLanguage();
@@ -231,10 +229,10 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   const visibleModules = MODULE_CONFIG.map(m => {
     if (m.key === "portal") return {
       ...m,
-      label: isSuperAdmin ? "Portal" : "Quản trị hệ thống",
+      label: isSuperAdmin ? "Portal" : t("nav.module.portal.admin"),
       subItems: portalSubItems,
     };
-    return m;
+    return { ...m, label: m.key === "erp" ? "ERP" : t(m.labelKey) };
   }).filter(m => {
     if (m.key === "vung_trong") return userModules.includes("vung_trong") || userModules.includes("iot");
     return userModules.includes(m.key);
@@ -303,7 +301,7 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
         <div className="px-4 py-4 border-t border-border">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-xs text-muted-foreground">Hệ thống hoạt động bình thường</span>
+            <span className="text-xs text-muted-foreground">{t("nav.system.status")}</span>
           </div>
         </div>
       </aside>

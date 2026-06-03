@@ -107,7 +107,53 @@ export type TranslationKey =
   | "nav.farming"
   | "nav.iot"
   | "nav.reports"
-  | "nav.settings";
+  | "nav.settings"
+  | "nav.module.txng"
+  | "nav.module.vung-trong"
+  | "nav.module.portal.admin"
+  | "nav.system.status"
+  | "nav.portal.overview"
+  | "nav.portal.enterprise"
+  | "nav.portal.users"
+  | "nav.portal.units"
+  | "nav.portal.co-so"
+  | "nav.div.thu-mua"
+  | "nav.div.san-xuat"
+  | "nav.div.dong-goi"
+  | "nav.div.ban-hang"
+  | "nav.div.bao-cao"
+  | "nav.div.danh-muc"
+  | "nav.div.quan-tri-dn"
+  | "nav.div.chung-chi"
+  | "nav.div.quan-ly-tp"
+  | "nav.div.su-kien"
+  | "nav.div.vung-nl"
+  | "nav.div.truy-xuat"
+  | "nav.div.quan-ly-tem"
+  | "nav.div.thiet-bi-iot"
+  | "nav.txng.staff"
+  | "nav.txng.chung-chi-dn"
+  | "nav.txng.chung-chi-tp"
+  | "nav.txng.su-kien"
+  | "nav.txng.bieu-mau-hd"
+  | "nav.txng.vung-nuoi-trong"
+  | "nav.txng.theo-lo"
+  | "nav.txng.tem"
+  | "nav.txng.bao-cao-tem"
+  | "nav.txng.lich-su-tem"
+  | "nav.vt.zones"
+  | "nav.vt.crops"
+  | "nav.vt.pesticides"
+  | "nav.vt.harvest"
+  | "nav.vt.weather"
+  | "nav.vt.inspection"
+  | "nav.iot.devices"
+  | "nav.iot.connect"
+  | "nav.iot.monitor"
+  | "home.system.portal.desc"
+  | "home.system.erp.desc"
+  | "home.system.txng.desc"
+  | "home.system.vung-trong.desc";
 
 type Translations = Record<TranslationKey, string>;
 
@@ -219,6 +265,52 @@ const vi: Translations = {
   "nav.iot": "IoT & IOC",
   "nav.reports": "Báo cáo",
   "nav.settings": "Cài đặt",
+  "nav.module.txng": "Truy xuất nguồn gốc",
+  "nav.module.vung-trong": "Vùng trồng",
+  "nav.module.portal.admin": "Quản trị hệ thống",
+  "nav.system.status": "Hệ thống hoạt động bình thường",
+  "nav.portal.overview": "Tổng quan",
+  "nav.portal.enterprise": "Doanh nghiệp",
+  "nav.portal.users": "Người dùng",
+  "nav.portal.units": "Đơn vị tính",
+  "nav.portal.co-so": "Cơ sở",
+  "nav.div.thu-mua": "Thu mua",
+  "nav.div.san-xuat": "Sản xuất",
+  "nav.div.dong-goi": "Đóng gói",
+  "nav.div.ban-hang": "Bán hàng",
+  "nav.div.bao-cao": "Báo cáo",
+  "nav.div.danh-muc": "Danh mục",
+  "nav.div.quan-tri-dn": "Quản trị doanh nghiệp",
+  "nav.div.chung-chi": "Quản lý chứng chỉ",
+  "nav.div.quan-ly-tp": "Quản lý thương phẩm",
+  "nav.div.su-kien": "Quản lý sự kiện trọng yếu",
+  "nav.div.vung-nl": "Quản lý vùng nguyên liệu",
+  "nav.div.truy-xuat": "Truy xuất",
+  "nav.div.quan-ly-tem": "Quản lý tem",
+  "nav.div.thiet-bi-iot": "Thiết bị IoT",
+  "nav.txng.staff": "Nhân viên",
+  "nav.txng.chung-chi-dn": "Chứng chỉ doanh nghiệp",
+  "nav.txng.chung-chi-tp": "Chứng chỉ thương phẩm",
+  "nav.txng.su-kien": "Biểu mẫu sự kiện",
+  "nav.txng.bieu-mau-hd": "Biểu mẫu hoạt động",
+  "nav.txng.vung-nuoi-trong": "Vùng nuôi trồng",
+  "nav.txng.theo-lo": "Theo lô thương phẩm",
+  "nav.txng.tem": "Quản lý tem",
+  "nav.txng.bao-cao-tem": "Báo cáo lượt quét tem",
+  "nav.txng.lich-su-tem": "Lịch sử kích hoạt tem",
+  "nav.vt.zones": "Vùng trồng",
+  "nav.vt.crops": "Cây trồng",
+  "nav.vt.pesticides": "Thuốc BVTV",
+  "nav.vt.harvest": "Thu hoạch",
+  "nav.vt.weather": "Thời tiết",
+  "nav.vt.inspection": "Kiểm định",
+  "nav.iot.devices": "Thiết bị",
+  "nav.iot.connect": "Kết nối",
+  "nav.iot.monitor": "Giám sát",
+  "home.system.portal.desc": "Quản lý tài khoản và phân quyền truy cập",
+  "home.system.erp.desc": "Thu mua, sản xuất, đóng gói, bán hàng",
+  "home.system.txng.desc": "QR code, chuỗi cung ứng, chứng nhận",
+  "home.system.vung-trong.desc": "Quản lý vùng nguyên liệu, cây trồng và thiết bị IoT",
 };
 
 const en: Translations = {
@@ -321,6 +413,60 @@ const en: Translations = {
   "nav.iot": "IoT & IOC",
   "nav.reports": "Reports",
   "nav.settings": "Settings",
+  "submodule.erp.thu-mua": "Purchase Orders",
+  "submodule.erp.thu-mua.desc": "Manage raw material purchase orders",
+  "submodule.erp.thuong-pham": "Products",
+  "submodule.erp.thuong-pham.desc": "Tea product catalogue",
+  "submodule.erp.giong-che": "Tea Varieties",
+  "submodule.erp.giong-che.desc": "Tea cultivation varieties",
+  "submodule.erp.co-so": "Facilities",
+  "submodule.erp.co-so.desc": "Manage facilities and linked households",
+  "nav.module.txng": "Traceability",
+  "nav.module.vung-trong": "Farming Zones",
+  "nav.module.portal.admin": "System Admin",
+  "nav.system.status": "System operating normally",
+  "nav.portal.overview": "Overview",
+  "nav.portal.enterprise": "Enterprises",
+  "nav.portal.users": "Users",
+  "nav.portal.units": "Units of Measure",
+  "nav.portal.co-so": "Facilities",
+  "nav.div.thu-mua": "Procurement",
+  "nav.div.san-xuat": "Production",
+  "nav.div.dong-goi": "Packaging",
+  "nav.div.ban-hang": "Sales",
+  "nav.div.bao-cao": "Reports",
+  "nav.div.danh-muc": "Catalogue",
+  "nav.div.quan-tri-dn": "Enterprise Admin",
+  "nav.div.chung-chi": "Certificates",
+  "nav.div.quan-ly-tp": "Products",
+  "nav.div.su-kien": "Key Events",
+  "nav.div.vung-nl": "Raw Material Zones",
+  "nav.div.truy-xuat": "Traceability",
+  "nav.div.quan-ly-tem": "Label Management",
+  "nav.div.thiet-bi-iot": "IoT Devices",
+  "nav.txng.staff": "Staff",
+  "nav.txng.chung-chi-dn": "Enterprise Certs",
+  "nav.txng.chung-chi-tp": "Product Certs",
+  "nav.txng.su-kien": "Event Forms",
+  "nav.txng.bieu-mau-hd": "Activity Forms",
+  "nav.txng.vung-nuoi-trong": "Growing Zones",
+  "nav.txng.theo-lo": "By Product Lot",
+  "nav.txng.tem": "Label Management",
+  "nav.txng.bao-cao-tem": "Label Scan Reports",
+  "nav.txng.lich-su-tem": "Label Activation History",
+  "nav.vt.zones": "Growing Zones",
+  "nav.vt.crops": "Crops",
+  "nav.vt.pesticides": "Pesticides",
+  "nav.vt.harvest": "Harvest",
+  "nav.vt.weather": "Weather",
+  "nav.vt.inspection": "Inspection",
+  "nav.iot.devices": "Devices",
+  "nav.iot.connect": "Connection",
+  "nav.iot.monitor": "Monitoring",
+  "home.system.portal.desc": "Account management and access control",
+  "home.system.erp.desc": "Procurement, production, packaging, sales",
+  "home.system.txng.desc": "QR codes, supply chain, certification",
+  "home.system.vung-trong.desc": "Manage raw material zones, crops and IoT devices",
 };
 
 const ko: Translations = {
@@ -423,6 +569,60 @@ const ko: Translations = {
   "nav.iot": "IoT & IOC",
   "nav.reports": "보고서",
   "nav.settings": "설정",
+  "submodule.erp.thu-mua": "구매 주문",
+  "submodule.erp.thu-mua.desc": "원자재 구매 주문 관리",
+  "submodule.erp.thuong-pham": "제품",
+  "submodule.erp.thuong-pham.desc": "차 제품 카탈로그",
+  "submodule.erp.giong-che": "차 품종",
+  "submodule.erp.giong-che.desc": "차 재배 품종",
+  "submodule.erp.co-so": "시설",
+  "submodule.erp.co-so.desc": "시설 및 연계 농가 관리",
+  "nav.module.txng": "원산지 추적",
+  "nav.module.vung-trong": "농업 구역",
+  "nav.module.portal.admin": "시스템 관리",
+  "nav.system.status": "시스템 정상 운영 중",
+  "nav.portal.overview": "개요",
+  "nav.portal.enterprise": "기업",
+  "nav.portal.users": "사용자",
+  "nav.portal.units": "단위",
+  "nav.portal.co-so": "시설",
+  "nav.div.thu-mua": "구매",
+  "nav.div.san-xuat": "생산",
+  "nav.div.dong-goi": "포장",
+  "nav.div.ban-hang": "판매",
+  "nav.div.bao-cao": "보고서",
+  "nav.div.danh-muc": "카탈로그",
+  "nav.div.quan-tri-dn": "기업 관리",
+  "nav.div.chung-chi": "인증서",
+  "nav.div.quan-ly-tp": "제품",
+  "nav.div.su-kien": "주요 이벤트",
+  "nav.div.vung-nl": "원자재 구역",
+  "nav.div.truy-xuat": "추적",
+  "nav.div.quan-ly-tem": "라벨 관리",
+  "nav.div.thiet-bi-iot": "IoT 장치",
+  "nav.txng.staff": "직원",
+  "nav.txng.chung-chi-dn": "기업 인증서",
+  "nav.txng.chung-chi-tp": "제품 인증서",
+  "nav.txng.su-kien": "이벤트 양식",
+  "nav.txng.bieu-mau-hd": "활동 양식",
+  "nav.txng.vung-nuoi-trong": "재배 구역",
+  "nav.txng.theo-lo": "로트별 추적",
+  "nav.txng.tem": "라벨 관리",
+  "nav.txng.bao-cao-tem": "라벨 스캔 보고서",
+  "nav.txng.lich-su-tem": "라벨 활성화 이력",
+  "nav.vt.zones": "재배 구역",
+  "nav.vt.crops": "작물",
+  "nav.vt.pesticides": "농약",
+  "nav.vt.harvest": "수확",
+  "nav.vt.weather": "날씨",
+  "nav.vt.inspection": "검사",
+  "nav.iot.devices": "장치",
+  "nav.iot.connect": "연결",
+  "nav.iot.monitor": "모니터링",
+  "home.system.portal.desc": "계정 관리 및 접근 제어",
+  "home.system.erp.desc": "구매, 생산, 포장, 판매",
+  "home.system.txng.desc": "QR 코드, 공급망, 인증",
+  "home.system.vung-trong.desc": "원자재 구역, 작물 및 IoT 장치 관리",
 };
 
 const ja: Translations = {
@@ -525,6 +725,60 @@ const ja: Translations = {
   "nav.iot": "IoT & IOC",
   "nav.reports": "レポート",
   "nav.settings": "設定",
+  "submodule.erp.thu-mua": "購買注文",
+  "submodule.erp.thu-mua.desc": "原材料購買注文の管理",
+  "submodule.erp.thuong-pham": "製品",
+  "submodule.erp.thuong-pham.desc": "茶製品カタログ",
+  "submodule.erp.giong-che": "茶品種",
+  "submodule.erp.giong-che.desc": "茶栽培品種",
+  "submodule.erp.co-so": "施設",
+  "submodule.erp.co-so.desc": "施設と連携農家の管理",
+  "nav.module.txng": "トレーサビリティ",
+  "nav.module.vung-trong": "農業ゾーン",
+  "nav.module.portal.admin": "システム管理",
+  "nav.system.status": "システム正常稼働中",
+  "nav.portal.overview": "概要",
+  "nav.portal.enterprise": "企業",
+  "nav.portal.users": "ユーザー",
+  "nav.portal.units": "単位",
+  "nav.portal.co-so": "施設",
+  "nav.div.thu-mua": "調達",
+  "nav.div.san-xuat": "生産",
+  "nav.div.dong-goi": "梱包",
+  "nav.div.ban-hang": "販売",
+  "nav.div.bao-cao": "レポート",
+  "nav.div.danh-muc": "カタログ",
+  "nav.div.quan-tri-dn": "企業管理",
+  "nav.div.chung-chi": "証明書",
+  "nav.div.quan-ly-tp": "製品",
+  "nav.div.su-kien": "重要イベント",
+  "nav.div.vung-nl": "原材料ゾーン",
+  "nav.div.truy-xuat": "トレーサビリティ",
+  "nav.div.quan-ly-tem": "ラベル管理",
+  "nav.div.thiet-bi-iot": "IoTデバイス",
+  "nav.txng.staff": "スタッフ",
+  "nav.txng.chung-chi-dn": "企業証明書",
+  "nav.txng.chung-chi-tp": "製品証明書",
+  "nav.txng.su-kien": "イベントフォーム",
+  "nav.txng.bieu-mau-hd": "活動フォーム",
+  "nav.txng.vung-nuoi-trong": "栽培ゾーン",
+  "nav.txng.theo-lo": "ロット別追跡",
+  "nav.txng.tem": "ラベル管理",
+  "nav.txng.bao-cao-tem": "ラベルスキャンレポート",
+  "nav.txng.lich-su-tem": "ラベル有効化履歴",
+  "nav.vt.zones": "栽培ゾーン",
+  "nav.vt.crops": "作物",
+  "nav.vt.pesticides": "農薬",
+  "nav.vt.harvest": "収穫",
+  "nav.vt.weather": "天気",
+  "nav.vt.inspection": "検査",
+  "nav.iot.devices": "デバイス",
+  "nav.iot.connect": "接続",
+  "nav.iot.monitor": "モニタリング",
+  "home.system.portal.desc": "アカウント管理とアクセス制御",
+  "home.system.erp.desc": "調達、生産、梱包、販売",
+  "home.system.txng.desc": "QRコード、サプライチェーン、認証",
+  "home.system.vung-trong.desc": "原材料ゾーン、作物およびIoTデバイスの管理",
 };
 
 export const translations: Record<Language, Translations> = { vi, en, ko, ja };

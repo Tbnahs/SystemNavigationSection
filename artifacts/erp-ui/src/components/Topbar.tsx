@@ -7,65 +7,65 @@ import { Bell, Search, ChevronDown, Globe, User, Settings, LogOut, Menu, X, Buil
 } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Language, languageLabels } from "@/i18n/translations";
+import { Language, TranslationKey, languageLabels } from "@/i18n/translations";
 
-interface SearchItem {
-  label: string;
+interface SearchItemDef {
+  labelKey: TranslationKey;
   href: string;
-  module: string;
+  moduleKey: string;
   moduleColor: string;
   icon: React.ElementType;
 }
 
-const ALL_SEARCH_ITEMS: SearchItem[] = [
+const ALL_SEARCH_DEFS: SearchItemDef[] = [
   // Portal
-  { label: "Tổng quan",          href: "/portal",                   module: "Portal",  moduleColor: "text-violet-600", icon: LayoutGrid },
-  { label: "Doanh nghiệp",       href: "/portal/doanh-nghiep",      module: "Portal",  moduleColor: "text-violet-600", icon: Building2 },
-  { label: "Người dùng",         href: "/portal/nguoi-dung",        module: "Portal",  moduleColor: "text-violet-600", icon: Users },
-  { label: "Đơn vị tính",        href: "/portal/don-vi-tinh",       module: "Portal",  moduleColor: "text-violet-600", icon: Scale },
-  { label: "Cơ sở (Portal)",     href: "/portal/co-so",             module: "Portal",  moduleColor: "text-violet-600", icon: Factory },
+  { labelKey: "nav.portal.overview",    href: "/portal",                        moduleKey: "Portal", moduleColor: "text-violet-600", icon: LayoutGrid },
+  { labelKey: "nav.portal.enterprise",  href: "/portal/doanh-nghiep",           moduleKey: "Portal", moduleColor: "text-violet-600", icon: Building2 },
+  { labelKey: "nav.portal.users",       href: "/portal/nguoi-dung",             moduleKey: "Portal", moduleColor: "text-violet-600", icon: Users },
+  { labelKey: "nav.portal.units",       href: "/portal/don-vi-tinh",            moduleKey: "Portal", moduleColor: "text-violet-600", icon: Scale },
+  { labelKey: "nav.portal.co-so",       href: "/portal/co-so",                  moduleKey: "Portal", moduleColor: "text-violet-600", icon: Factory },
   // ERP
-  { label: "Đơn thu mua",        href: "/module/erp/thu-mua",       module: "ERP",     moduleColor: "text-emerald-600", icon: ShoppingBasket },
-  { label: "Lệnh sản xuất",      href: "/module/erp/production",    module: "ERP",     moduleColor: "text-emerald-600", icon: Factory },
-  { label: "Lô đóng gói",        href: "/module/erp/packaging",     module: "ERP",     moduleColor: "text-emerald-600", icon: Package },
-  { label: "Đơn hàng",           href: "/module/erp/sales",         module: "ERP",     moduleColor: "text-emerald-600", icon: ShoppingCart },
-  { label: "Báo cáo",            href: "/module/erp/reports",       module: "ERP",     moduleColor: "text-emerald-600", icon: FileBarChart },
-  { label: "Thương phẩm",        href: "/module/erp/thuong-pham",   module: "ERP",     moduleColor: "text-emerald-600", icon: Package },
-  { label: "Quy cách & Tiêu chuẩn", href: "/module/erp/quy-cach", module: "ERP",     moduleColor: "text-emerald-600", icon: BookOpen },
-  { label: "Giống chè",          href: "/module/erp/giong-che",     module: "ERP",     moduleColor: "text-emerald-600", icon: Sprout },
-  { label: "Cơ sở (ERP)",        href: "/module/erp/co-so",         module: "ERP",     moduleColor: "text-emerald-600", icon: Factory },
+  { labelKey: "submodule.erp.thu-mua",    href: "/module/erp/thu-mua",          moduleKey: "ERP",    moduleColor: "text-emerald-600", icon: ShoppingBasket },
+  { labelKey: "submodule.erp.production", href: "/module/erp/production",       moduleKey: "ERP",    moduleColor: "text-emerald-600", icon: Factory },
+  { labelKey: "submodule.erp.packaging",  href: "/module/erp/packaging",        moduleKey: "ERP",    moduleColor: "text-emerald-600", icon: Package },
+  { labelKey: "submodule.erp.sales",      href: "/module/erp/sales",            moduleKey: "ERP",    moduleColor: "text-emerald-600", icon: ShoppingCart },
+  { labelKey: "submodule.erp.reports",    href: "/module/erp/reports",          moduleKey: "ERP",    moduleColor: "text-emerald-600", icon: FileBarChart },
+  { labelKey: "submodule.erp.thuong-pham",href: "/module/erp/thuong-pham",      moduleKey: "ERP",    moduleColor: "text-emerald-600", icon: Package },
+  { labelKey: "submodule.erp.quy-cach",   href: "/module/erp/quy-cach",        moduleKey: "ERP",    moduleColor: "text-emerald-600", icon: BookOpen },
+  { labelKey: "submodule.erp.giong-che",  href: "/module/erp/giong-che",        moduleKey: "ERP",    moduleColor: "text-emerald-600", icon: Sprout },
+  { labelKey: "submodule.erp.co-so",      href: "/module/erp/co-so",            moduleKey: "ERP",    moduleColor: "text-emerald-600", icon: Factory },
   // TXNG
-  { label: "Nhân viên",          href: "/module/txng/nhan-vien",    module: "TXNG",    moduleColor: "text-blue-600", icon: Users },
-  { label: "Cơ sở (TXNG)",       href: "/module/txng/co-so",        module: "TXNG",    moduleColor: "text-blue-600", icon: Factory },
-  { label: "Chứng chỉ doanh nghiệp", href: "/module/txng/chung-chi-dn", module: "TXNG", moduleColor: "text-blue-600", icon: ShieldCheck },
-  { label: "Chứng chỉ thương phẩm",  href: "/module/txng/chung-chi-tp", module: "TXNG", moduleColor: "text-blue-600", icon: Award },
-  { label: "Thương phẩm (TXNG)", href: "/module/txng/thuong-pham",  module: "TXNG",    moduleColor: "text-blue-600", icon: Package },
-  { label: "Biểu mẫu sự kiện",   href: "/module/txng/su-kien",      module: "TXNG",    moduleColor: "text-blue-600", icon: CalendarClock },
-  { label: "Giống chè (TXNG)",   href: "/module/txng/giong-che",    module: "TXNG",    moduleColor: "text-blue-600", icon: Sprout },
-  { label: "Biểu mẫu hoạt động", href: "/module/txng/bieu-mau-hd",  module: "TXNG",   moduleColor: "text-blue-600", icon: ClipboardList },
-  { label: "Vùng nuôi trồng",    href: "/module/txng/vung-nuoi-trong", module: "TXNG", moduleColor: "text-blue-600", icon: MapPin },
-  { label: "Theo lô thương phẩm", href: "/module/txng/theo-lo",     module: "TXNG",    moduleColor: "text-blue-600", icon: Search },
-  { label: "Quản lý tem",        href: "/module/txng/tem",          module: "TXNG",    moduleColor: "text-blue-600", icon: Tag },
-  { label: "Báo cáo lượt quét tem", href: "/module/txng/bao-cao-tem", module: "TXNG", moduleColor: "text-blue-600", icon: FileBarChart },
-  { label: "Lịch sử kích hoạt tem", href: "/module/txng/lich-su-tem", module: "TXNG", moduleColor: "text-blue-600", icon: History },
+  { labelKey: "nav.txng.staff",           href: "/module/txng/nhan-vien",       moduleKey: "TXNG",   moduleColor: "text-blue-600", icon: Users },
+  { labelKey: "nav.portal.co-so",         href: "/module/txng/co-so",           moduleKey: "TXNG",   moduleColor: "text-blue-600", icon: Factory },
+  { labelKey: "nav.txng.chung-chi-dn",    href: "/module/txng/chung-chi-dn",    moduleKey: "TXNG",   moduleColor: "text-blue-600", icon: ShieldCheck },
+  { labelKey: "nav.txng.chung-chi-tp",    href: "/module/txng/chung-chi-tp",    moduleKey: "TXNG",   moduleColor: "text-blue-600", icon: Award },
+  { labelKey: "submodule.erp.thuong-pham",href: "/module/txng/thuong-pham",     moduleKey: "TXNG",   moduleColor: "text-blue-600", icon: Package },
+  { labelKey: "nav.txng.su-kien",         href: "/module/txng/su-kien",         moduleKey: "TXNG",   moduleColor: "text-blue-600", icon: CalendarClock },
+  { labelKey: "submodule.erp.giong-che",  href: "/module/txng/giong-che",       moduleKey: "TXNG",   moduleColor: "text-blue-600", icon: Sprout },
+  { labelKey: "nav.txng.bieu-mau-hd",     href: "/module/txng/bieu-mau-hd",    moduleKey: "TXNG",   moduleColor: "text-blue-600", icon: ClipboardList },
+  { labelKey: "nav.txng.vung-nuoi-trong", href: "/module/txng/vung-nuoi-trong", moduleKey: "TXNG",   moduleColor: "text-blue-600", icon: MapPin },
+  { labelKey: "nav.txng.theo-lo",         href: "/module/txng/theo-lo",         moduleKey: "TXNG",   moduleColor: "text-blue-600", icon: Search },
+  { labelKey: "nav.txng.tem",             href: "/module/txng/tem",             moduleKey: "TXNG",   moduleColor: "text-blue-600", icon: Tag },
+  { labelKey: "nav.txng.bao-cao-tem",     href: "/module/txng/bao-cao-tem",     moduleKey: "TXNG",   moduleColor: "text-blue-600", icon: FileBarChart },
+  { labelKey: "nav.txng.lich-su-tem",     href: "/module/txng/lich-su-tem",     moduleKey: "TXNG",   moduleColor: "text-blue-600", icon: History },
   // Vùng trồng
-  { label: "Vùng trồng",         href: "/module/vung-trong/zones",      module: "Vùng trồng", moduleColor: "text-amber-600", icon: MapPin },
-  { label: "Cây trồng",          href: "/module/vung-trong/crops",      module: "Vùng trồng", moduleColor: "text-amber-600", icon: Sprout },
-  { label: "Thuốc BVTV",         href: "/module/vung-trong/pesticides", module: "Vùng trồng", moduleColor: "text-amber-600", icon: FlaskConical },
-  { label: "Thu hoạch",          href: "/module/vung-trong/harvest",    module: "Vùng trồng", moduleColor: "text-amber-600", icon: Scissors },
-  { label: "Thời tiết",          href: "/module/vung-trong/weather",    module: "Vùng trồng", moduleColor: "text-amber-600", icon: CloudSun },
-  { label: "Kiểm định",          href: "/module/vung-trong/inspection", module: "Vùng trồng", moduleColor: "text-amber-600", icon: ClipboardCheck },
-  { label: "Thiết bị IoT",       href: "/module/vung-trong/iot/devices", module: "IoT",       moduleColor: "text-amber-600", icon: Server },
-  { label: "Cảm biến IoT",       href: "/module/vung-trong/iot/sensors", module: "IoT",       moduleColor: "text-amber-600", icon: Activity },
-  { label: "Kết nối IoT",        href: "/module/vung-trong/iot/connect", module: "IoT",       moduleColor: "text-amber-600", icon: Wifi },
-  { label: "Giám sát IoT",       href: "/module/vung-trong/iot/monitor", module: "IoT",       moduleColor: "text-amber-600", icon: Cpu },
+  { labelKey: "nav.vt.zones",       href: "/module/vung-trong/zones",           moduleKey: "nav.module.vung-trong", moduleColor: "text-amber-600", icon: MapPin },
+  { labelKey: "nav.vt.crops",       href: "/module/vung-trong/crops",           moduleKey: "nav.module.vung-trong", moduleColor: "text-amber-600", icon: Sprout },
+  { labelKey: "nav.vt.pesticides",  href: "/module/vung-trong/pesticides",      moduleKey: "nav.module.vung-trong", moduleColor: "text-amber-600", icon: FlaskConical },
+  { labelKey: "nav.vt.harvest",     href: "/module/vung-trong/harvest",         moduleKey: "nav.module.vung-trong", moduleColor: "text-amber-600", icon: Scissors },
+  { labelKey: "nav.vt.weather",     href: "/module/vung-trong/weather",         moduleKey: "nav.module.vung-trong", moduleColor: "text-amber-600", icon: CloudSun },
+  { labelKey: "nav.vt.inspection",  href: "/module/vung-trong/inspection",      moduleKey: "nav.module.vung-trong", moduleColor: "text-amber-600", icon: ClipboardCheck },
+  { labelKey: "nav.iot.devices",    href: "/module/vung-trong/iot/devices",     moduleKey: "nav.iot", moduleColor: "text-amber-600", icon: Server },
+  { labelKey: "submodule.iot.sensors", href: "/module/vung-trong/iot/sensors",  moduleKey: "nav.iot", moduleColor: "text-amber-600", icon: Activity },
+  { labelKey: "nav.iot.connect",    href: "/module/vung-trong/iot/connect",     moduleKey: "nav.iot", moduleColor: "text-amber-600", icon: Wifi },
+  { labelKey: "nav.iot.monitor",    href: "/module/vung-trong/iot/monitor",     moduleKey: "nav.iot", moduleColor: "text-amber-600", icon: Cpu },
 ];
 
 const MODULE_LIST = [
-  { id: "portal",     icon: Globe,     label: "Portal",              labelShort: "Portal",   href: "/portal",           color: "text-violet-600", bg: "bg-violet-50" },
-  { id: "erp",        icon: BarChart3, label: "ERP",                 labelShort: "ERP",      href: "/module/erp",        color: "text-emerald-600", bg: "bg-emerald-50" },
-  { id: "txng",       icon: ScanLine,  label: "Truy xuất nguồn gốc", labelShort: "TXNG",     href: "/module/txng",       color: "text-blue-600",   bg: "bg-blue-50" },
-  { id: "vung_trong", icon: Leaf,      label: "Vùng trồng & IoT",    labelShort: "Vùng trồng", href: "/module/vung-trong", color: "text-amber-600",  bg: "bg-amber-50" },
+  { id: "portal",     icon: Globe,     labelKey: null as TranslationKey | null, label: "Portal",   labelShort: "Portal",     href: "/portal",            color: "text-violet-600",  bg: "bg-violet-50" },
+  { id: "erp",        icon: BarChart3, labelKey: null,                          label: "ERP",      labelShort: "ERP",        href: "/module/erp",        color: "text-emerald-600", bg: "bg-emerald-50" },
+  { id: "txng",       icon: ScanLine,  labelKey: "nav.module.txng" as TranslationKey, label: "Truy xuất nguồn gốc", labelShort: "TXNG", href: "/module/txng",  color: "text-blue-600",    bg: "bg-blue-50" },
+  { id: "vung_trong", icon: Leaf,      labelKey: "nav.module.vung-trong" as TranslationKey, label: "Vùng trồng & IoT", labelShort: "Vùng trồng", href: "/module/vung-trong", color: "text-amber-600", bg: "bg-amber-50" },
 ];
 
 interface TopbarProps {
@@ -103,8 +103,16 @@ export default function Topbar({ onMenuToggle, menuOpen }: TopbarProps) {
     location === m.href || location.startsWith(m.href + "/")
   );
 
+  const translatedSearchItems = ALL_SEARCH_DEFS.map(def => ({
+    ...def,
+    label: t(def.labelKey),
+    module: (def.moduleKey === "nav.module.txng" || def.moduleKey === "nav.module.vung-trong" || def.moduleKey === "nav.iot")
+      ? t(def.moduleKey as TranslationKey)
+      : def.moduleKey,
+  }));
+
   const searchResults = searchQuery.trim().length > 0
-    ? ALL_SEARCH_ITEMS.filter(item =>
+    ? translatedSearchItems.filter(item =>
         item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.module.toLowerCase().includes(searchQuery.toLowerCase())
       ).slice(0, 8)
@@ -204,12 +212,14 @@ export default function Topbar({ onMenuToggle, menuOpen }: TopbarProps) {
               <div className={`w-5 h-5 rounded-md ${activeModule.bg} flex items-center justify-center shrink-0`}>
                 <activeModule.icon className={`w-3 h-3 ${activeModule.color}`} strokeWidth={2} />
               </div>
-              <span className="font-medium text-foreground hidden sm:inline max-w-[120px] truncate">{activeModule.labelShort}</span>
+              <span className="font-medium text-foreground hidden sm:inline max-w-[120px] truncate">
+                {activeModule.labelKey ? t(activeModule.labelKey) : activeModule.label}
+              </span>
             </>
           ) : (
             <>
               <LayoutGrid className="w-4 h-4 text-muted-foreground" />
-              <span className="text-muted-foreground hidden sm:inline">Chọn phân hệ</span>
+              <span className="text-muted-foreground hidden sm:inline">{t("home.modules")}</span>
             </>
           )}
           <ChevronDown className={`w-3.5 h-3.5 text-muted-foreground transition-transform duration-150 ${showModules ? "rotate-180" : ""}`} />
@@ -233,7 +243,7 @@ export default function Topbar({ onMenuToggle, menuOpen }: TopbarProps) {
                     <div className={`w-7 h-7 rounded-lg ${m.bg} flex items-center justify-center shrink-0`}>
                       <Icon className={`w-3.5 h-3.5 ${m.color}`} strokeWidth={2} />
                     </div>
-                    <span className="flex-1 text-left">{m.label}</span>
+                    <span className="flex-1 text-left">{m.labelKey ? t(m.labelKey) : m.label}</span>
                     {isActive && <div className="w-1.5 h-1.5 rounded-full bg-primary shrink-0" />}
                   </button>
                 );
