@@ -149,18 +149,16 @@ export default function CoSoDetailPage() {
 
         {/* Hero card */}
         <div className="bg-white border border-border rounded-2xl overflow-hidden">
-          {/* Top gradient banner */}
-          <div className="h-20 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-400 relative">
-            <div className="absolute inset-0 opacity-20" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23fff' fill-opacity='1' fill-rule='evenodd'%3E%3Ccircle cx='20' cy='20' r='1'/%3E%3C/g%3E%3C/svg%3E\")" }} />
-          </div>
+          {/* Top accent line */}
+          <div className="h-1 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-400" />
 
-          <div className="px-6 pb-6">
-            {/* Avatar + actions row */}
-            <div className="flex items-end justify-between -mt-8 mb-4">
-              <div className="w-16 h-16 rounded-2xl border-4 border-white bg-emerald-100 flex items-center justify-center shadow-sm">
-                <TypeIcon className="w-7 h-7 text-emerald-600" />
+          <div className="px-6 py-5">
+            {/* Icon + actions row */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center">
+                <TypeIcon className="w-5 h-5 text-emerald-600" />
               </div>
-              <div className="flex items-center gap-2 mt-8">
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() => setLocation(`/portal/co-so?edit=${f.id}`)}
                   className="h-9 px-4 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted">
