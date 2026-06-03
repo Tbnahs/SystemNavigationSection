@@ -201,60 +201,42 @@ export default function QuyCachPage() {
           {gQ.isLoading && <div className="py-8 text-center"><Loader2 className="w-5 h-5 animate-spin inline text-muted-foreground" /></div>}
           {grades.length === 0 && !gQ.isLoading && <div className="py-8 text-center text-muted-foreground text-[13px] bg-white border border-border rounded-xl">Chưa có quy cách nào.</div>}
           {grades.length > 0 && (
-            <div className="bg-white border border-border rounded-xl overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/40">
-                    <th className="px-4 py-3">Tên quy cách</th>
-                    <th className="px-4 py-3">Thương phẩm</th>
-                    <th className="px-4 py-3">Bảng giá</th>
-                    <th className="px-4 py-3">Ghi chú</th>
-                    <th className="px-4 py-3 w-20"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {grades.map(g => {
-                    const priceList = parsePrices(g.prices);
-                    return (
-                      <tr key={g.id} className="border-t border-border hover:bg-emerald-50/20">
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-2.5">
-                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${dotColor(g.colorKey)}`} />
-                            <span className="font-semibold text-[14px] text-foreground">{g.name}</span>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          {g.loaiChe
-                            ? <span className={`inline-flex px-2 py-0.5 rounded-full border text-[11.5px] font-medium ${colorBadge(g.colorKey)}`}>{g.loaiChe}</span>
-                            : <span className="text-muted-foreground">—</span>
-                          }
-                        </td>
-                        <td className="px-4 py-3">
-                          {priceList.length > 0
-                            ? <div className="space-y-0.5">
-                                {priceList.map((e, i) => (
-                                  <div key={i} className="text-[12px] font-medium text-emerald-700">
-                                    {e.label ? `${e.label}: ` : ""}{e.value}
-                                  </div>
-                                ))}
-                              </div>
-                            : g.price
-                              ? <span className="text-[13px] font-medium text-emerald-700">{g.price}</span>
-                              : <span className="text-muted-foreground">—</span>
-                          }
-                        </td>
-                        <td className="px-4 py-3 text-[13px] text-muted-foreground">{g.ghiChu || "—"}</td>
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-1">
-                            <button onClick={() => { setGE(g); setGF({ name: g.name, price: g.price, prices: parsePrices(g.prices), loaiChe: g.loaiChe, ghiChu: g.ghiChu, colorKey: g.colorKey }); setGD(true); }} className="p-1.5 rounded hover:bg-muted"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
-                            <button onClick={() => setGDel(g)} className="p-1.5 rounded hover:bg-rose-50"><Trash2 className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
+            <div className="grid gap-2">
+              {grades.map(g => {
+                const priceList = parsePrices(g.prices);
+                return (
+                  <div key={g.id} className={`rounded-xl p-4 flex items-center gap-3 border ${colorRow(g.colorKey)}`}>
+                    <div className={`w-2 rounded-full self-stretch flex-shrink-0 ${dotColor(g.colorKey)}`} style={{ minHeight: 40 }} />
+                    <div className="flex-1 min-w-0">
+                      <div className="font-semibold text-[14px]">{g.name}</div>
+                      <div className="flex items-center gap-2 mt-1.5 flex-wrap">
+                        {g.loaiChe && (
+                          <span className={`inline-flex px-2 py-0.5 rounded-full border text-[11px] font-medium ${colorBadge(g.colorKey)}`}>
+                            {g.loaiChe}
+                          </span>
+                        )}
+                        {priceList.length > 0
+                          ? priceList.map((e, i) => (
+                              <span key={i} className={`inline-flex px-2 py-0.5 text-[11.5px] font-medium rounded border bg-white/60 ${colorBadge(g.colorKey)}`}>
+                                {e.label ? `${e.label}: ` : ""}{e.value}
+                              </span>
+                            ))
+                          : g.price
+                            ? <span className={`inline-flex px-2 py-0.5 text-[11.5px] font-medium rounded border bg-white/60 ${colorBadge(g.colorKey)}`}>{g.price}</span>
+                            : null
+                        }
+                        {g.ghiChu && (
+                          <span className="text-[12px] opacity-70">{g.ghiChu}</span>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button onClick={() => { setGE(g); setGF({ name: g.name, price: g.price, prices: parsePrices(g.prices), loaiChe: g.loaiChe, ghiChu: g.ghiChu, colorKey: g.colorKey }); setGD(true); }} className="p-1.5 rounded hover:bg-white/50"><Pencil className="w-4 h-4 opacity-60" /></button>
+                      <button onClick={() => setGDel(g)} className="p-1.5 rounded hover:bg-rose-50"><Trash2 className="w-4 h-4 opacity-60 hover:text-rose-600 hover:opacity-100" /></button>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
