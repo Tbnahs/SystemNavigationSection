@@ -1,9 +1,65 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useLocation } from "wouter";
-import { Bell, Search, ChevronDown, Globe, User, Settings, LogOut, Menu, X, Building2, LayoutGrid, BarChart3, ScanLine, Leaf } from "lucide-react";
+import { Bell, Search, ChevronDown, Globe, User, Settings, LogOut, Menu, X, Building2, LayoutGrid, BarChart3, ScanLine, Leaf,
+  ShoppingBasket, Factory, Package, ShoppingCart, FileBarChart, BookOpen, Sprout, Scale, Users,
+  QrCode, Link2, Award, MapPin, FlaskConical, Scissors, CloudSun, ClipboardCheck,
+  CalendarClock, History, Tag, ClipboardList, ShieldCheck, Cpu, Wifi, Activity, Server,
+} from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Language, languageLabels } from "@/i18n/translations";
+
+interface SearchItem {
+  label: string;
+  href: string;
+  module: string;
+  moduleColor: string;
+  icon: React.ElementType;
+}
+
+const ALL_SEARCH_ITEMS: SearchItem[] = [
+  // Portal
+  { label: "Tổng quan",          href: "/portal",                   module: "Portal",  moduleColor: "text-violet-600", icon: LayoutGrid },
+  { label: "Doanh nghiệp",       href: "/portal/doanh-nghiep",      module: "Portal",  moduleColor: "text-violet-600", icon: Building2 },
+  { label: "Người dùng",         href: "/portal/nguoi-dung",        module: "Portal",  moduleColor: "text-violet-600", icon: Users },
+  { label: "Đơn vị tính",        href: "/portal/don-vi-tinh",       module: "Portal",  moduleColor: "text-violet-600", icon: Scale },
+  { label: "Cơ sở (Portal)",     href: "/portal/co-so",             module: "Portal",  moduleColor: "text-violet-600", icon: Factory },
+  // ERP
+  { label: "Đơn thu mua",        href: "/module/erp/thu-mua",       module: "ERP",     moduleColor: "text-emerald-600", icon: ShoppingBasket },
+  { label: "Lệnh sản xuất",      href: "/module/erp/production",    module: "ERP",     moduleColor: "text-emerald-600", icon: Factory },
+  { label: "Lô đóng gói",        href: "/module/erp/packaging",     module: "ERP",     moduleColor: "text-emerald-600", icon: Package },
+  { label: "Đơn hàng",           href: "/module/erp/sales",         module: "ERP",     moduleColor: "text-emerald-600", icon: ShoppingCart },
+  { label: "Báo cáo",            href: "/module/erp/reports",       module: "ERP",     moduleColor: "text-emerald-600", icon: FileBarChart },
+  { label: "Thương phẩm",        href: "/module/erp/thuong-pham",   module: "ERP",     moduleColor: "text-emerald-600", icon: Package },
+  { label: "Quy cách & Tiêu chuẩn", href: "/module/erp/quy-cach", module: "ERP",     moduleColor: "text-emerald-600", icon: BookOpen },
+  { label: "Giống chè",          href: "/module/erp/giong-che",     module: "ERP",     moduleColor: "text-emerald-600", icon: Sprout },
+  { label: "Cơ sở (ERP)",        href: "/module/erp/co-so",         module: "ERP",     moduleColor: "text-emerald-600", icon: Factory },
+  // TXNG
+  { label: "Nhân viên",          href: "/module/txng/nhan-vien",    module: "TXNG",    moduleColor: "text-blue-600", icon: Users },
+  { label: "Cơ sở (TXNG)",       href: "/module/txng/co-so",        module: "TXNG",    moduleColor: "text-blue-600", icon: Factory },
+  { label: "Chứng chỉ doanh nghiệp", href: "/module/txng/chung-chi-dn", module: "TXNG", moduleColor: "text-blue-600", icon: ShieldCheck },
+  { label: "Chứng chỉ thương phẩm",  href: "/module/txng/chung-chi-tp", module: "TXNG", moduleColor: "text-blue-600", icon: Award },
+  { label: "Thương phẩm (TXNG)", href: "/module/txng/thuong-pham",  module: "TXNG",    moduleColor: "text-blue-600", icon: Package },
+  { label: "Biểu mẫu sự kiện",   href: "/module/txng/su-kien",      module: "TXNG",    moduleColor: "text-blue-600", icon: CalendarClock },
+  { label: "Giống chè (TXNG)",   href: "/module/txng/giong-che",    module: "TXNG",    moduleColor: "text-blue-600", icon: Sprout },
+  { label: "Biểu mẫu hoạt động", href: "/module/txng/bieu-mau-hd",  module: "TXNG",   moduleColor: "text-blue-600", icon: ClipboardList },
+  { label: "Vùng nuôi trồng",    href: "/module/txng/vung-nuoi-trong", module: "TXNG", moduleColor: "text-blue-600", icon: MapPin },
+  { label: "Theo lô thương phẩm", href: "/module/txng/theo-lo",     module: "TXNG",    moduleColor: "text-blue-600", icon: Search },
+  { label: "Quản lý tem",        href: "/module/txng/tem",          module: "TXNG",    moduleColor: "text-blue-600", icon: Tag },
+  { label: "Báo cáo lượt quét tem", href: "/module/txng/bao-cao-tem", module: "TXNG", moduleColor: "text-blue-600", icon: FileBarChart },
+  { label: "Lịch sử kích hoạt tem", href: "/module/txng/lich-su-tem", module: "TXNG", moduleColor: "text-blue-600", icon: History },
+  // Vùng trồng
+  { label: "Vùng trồng",         href: "/module/vung-trong/zones",      module: "Vùng trồng", moduleColor: "text-amber-600", icon: MapPin },
+  { label: "Cây trồng",          href: "/module/vung-trong/crops",      module: "Vùng trồng", moduleColor: "text-amber-600", icon: Sprout },
+  { label: "Thuốc BVTV",         href: "/module/vung-trong/pesticides", module: "Vùng trồng", moduleColor: "text-amber-600", icon: FlaskConical },
+  { label: "Thu hoạch",          href: "/module/vung-trong/harvest",    module: "Vùng trồng", moduleColor: "text-amber-600", icon: Scissors },
+  { label: "Thời tiết",          href: "/module/vung-trong/weather",    module: "Vùng trồng", moduleColor: "text-amber-600", icon: CloudSun },
+  { label: "Kiểm định",          href: "/module/vung-trong/inspection", module: "Vùng trồng", moduleColor: "text-amber-600", icon: ClipboardCheck },
+  { label: "Thiết bị IoT",       href: "/module/vung-trong/iot/devices", module: "IoT",       moduleColor: "text-amber-600", icon: Server },
+  { label: "Cảm biến IoT",       href: "/module/vung-trong/iot/sensors", module: "IoT",       moduleColor: "text-amber-600", icon: Activity },
+  { label: "Kết nối IoT",        href: "/module/vung-trong/iot/connect", module: "IoT",       moduleColor: "text-amber-600", icon: Wifi },
+  { label: "Giám sát IoT",       href: "/module/vung-trong/iot/monitor", module: "IoT",       moduleColor: "text-amber-600", icon: Cpu },
+];
 
 const MODULE_LIST = [
   { id: "portal",     icon: Globe,     label: "Portal",              labelShort: "Portal",   href: "/portal",           color: "text-violet-600", bg: "bg-violet-50" },
@@ -28,6 +84,9 @@ export default function Topbar({ onMenuToggle, menuOpen }: TopbarProps) {
   const [showProfile, setShowProfile] = useState(false);
   const [showLang, setShowLang] = useState(false);
   const [showModules, setShowModules] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [showSearch, setShowSearch] = useState(false);
+  const searchRef = useRef<HTMLDivElement>(null);
   const { user, logout } = useAuth();
   const { t, language, setLanguage } = useLanguage();
   const [location, setLocation] = useLocation();
@@ -43,6 +102,30 @@ export default function Topbar({ onMenuToggle, menuOpen }: TopbarProps) {
   const activeModule = MODULE_LIST.find((m) =>
     location === m.href || location.startsWith(m.href + "/")
   );
+
+  const searchResults = searchQuery.trim().length > 0
+    ? ALL_SEARCH_ITEMS.filter(item =>
+        item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.module.toLowerCase().includes(searchQuery.toLowerCase())
+      ).slice(0, 8)
+    : [];
+
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
+        setShowSearch(false);
+        setSearchQuery("");
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  const handleSearchSelect = (href: string) => {
+    setLocation(href);
+    setShowSearch(false);
+    setSearchQuery("");
+  };
 
   const handleLogout = () => {
     logout();
@@ -69,15 +152,41 @@ export default function Topbar({ onMenuToggle, menuOpen }: TopbarProps) {
       </div>
 
       {/* Search */}
-      <div className="hidden md:flex flex-1 max-w-md">
+      <div className="hidden md:flex flex-1 max-w-md" ref={searchRef}>
         <div className="relative w-full">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
           <input
             data-testid="input-search"
-            type="search"
+            type="text"
+            value={searchQuery}
+            onChange={e => { setSearchQuery(e.target.value); setShowSearch(true); }}
+            onFocus={() => setShowSearch(true)}
             placeholder={t("topbar.search")}
             className="w-full pl-9 pr-4 py-2 text-sm rounded-xl bg-muted border-0 focus:outline-none focus:ring-2 focus:ring-ring text-foreground placeholder:text-muted-foreground"
           />
+          {showSearch && searchResults.length > 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-xl shadow-lg z-50 overflow-hidden">
+              {searchResults.map((item, i) => {
+                const Icon = item.icon;
+                return (
+                  <button
+                    key={i}
+                    onMouseDown={() => handleSearchSelect(item.href)}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-accent transition-colors text-left"
+                  >
+                    <Icon className="w-4 h-4 text-muted-foreground shrink-0" strokeWidth={1.5} />
+                    <span className="flex-1 text-sm text-foreground truncate">{item.label}</span>
+                    <span className={`text-[11px] font-medium shrink-0 ${item.moduleColor}`}>{item.module}</span>
+                  </button>
+                );
+              })}
+            </div>
+          )}
+          {showSearch && searchQuery.trim().length > 0 && searchResults.length === 0 && (
+            <div className="absolute top-full left-0 right-0 mt-1.5 bg-card border border-border rounded-xl shadow-lg z-50 px-4 py-3 text-sm text-muted-foreground">
+              Không tìm thấy kết quả cho "<span className="font-medium text-foreground">{searchQuery}</span>"
+            </div>
+          )}
         </div>
       </div>
 
