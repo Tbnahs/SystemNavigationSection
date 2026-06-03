@@ -61,6 +61,14 @@ export type TranslationKey =
   | "submodule.erp.reports.desc"
   | "submodule.erp.settings"
   | "submodule.erp.settings.desc"
+  | "submodule.erp.thu-mua"
+  | "submodule.erp.thu-mua.desc"
+  | "submodule.erp.thuong-pham"
+  | "submodule.erp.thuong-pham.desc"
+  | "submodule.erp.giong-che"
+  | "submodule.erp.giong-che.desc"
+  | "submodule.erp.co-so"
+  | "submodule.erp.co-so.desc"
   | "submodule.txng.qrcode"
   | "submodule.txng.qrcode.desc"
   | "submodule.txng.supplychain"
@@ -162,6 +170,14 @@ const vi: Translations = {
   "submodule.erp.reports.desc": "Thống kê và phân tích",
   "submodule.erp.settings": "Cài đặt",
   "submodule.erp.settings.desc": "Cấu hình hệ thống",
+  "submodule.erp.thu-mua": "Đơn thu mua",
+  "submodule.erp.thu-mua.desc": "Quản lý phiếu thu mua nguyên liệu",
+  "submodule.erp.thuong-pham": "Thương phẩm",
+  "submodule.erp.thuong-pham.desc": "Danh mục sản phẩm chè thương phẩm",
+  "submodule.erp.giong-che": "Giống chè",
+  "submodule.erp.giong-che.desc": "Danh mục giống chè canh tác",
+  "submodule.erp.co-so": "Cơ sở",
+  "submodule.erp.co-so.desc": "Quản lý cơ sở và hộ liên kết",
   "submodule.txng.qrcode": "Mã QR",
   "submodule.txng.qrcode.desc": "Tạo và quản lý mã QR",
   "submodule.txng.supplychain": "Chuỗi cung ứng",
