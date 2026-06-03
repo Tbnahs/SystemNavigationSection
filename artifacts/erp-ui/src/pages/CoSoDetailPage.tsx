@@ -484,44 +484,19 @@ export default function CoSoDetailPage() {
                             </div>
                           </div>
 
-                          <div className="mt-3 pt-3 border-t border-border">
-                            <div className="text-[11px] text-muted-foreground mb-2 flex items-center gap-1">
-                              <ImageIcon className="w-3 h-3" /> Ảnh chứng chỉ
-                            </div>
-                            {c.imageUrl ? (
-                              <div className="relative w-28 h-36 group">
-                                <img src={c.imageUrl} alt={c.ten}
-                                  className="w-full h-full object-cover rounded-xl border border-border shadow-sm cursor-pointer"
-                                  onClick={() => window.open(c.imageUrl, "_blank")} />
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-xl transition-colors" />
-                                <button onClick={() => removeCertImg(c.id)}
-                                  className="absolute top-1 right-1 w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-50">
-                                  <X className="w-3.5 h-3.5 text-rose-500" />
-                                </button>
-                                <button onClick={() => certImgRefs.current[c.id]?.click()}
-                                  className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-emerald-50"
-                                  title="Đổi ảnh">
-                                  <Upload className="w-3 h-3 text-emerald-600" />
-                                </button>
+                          {c.imageUrl && (
+                            <div className="mt-3 pt-3 border-t border-border">
+                              <div className="text-[11px] text-muted-foreground mb-2 flex items-center gap-1">
+                                <ImageIcon className="w-3 h-3" /> Ảnh chứng chỉ
                               </div>
-                            ) : (
-                              <button type="button" onClick={() => certImgRefs.current[c.id]?.click()}
-                                disabled={updateCertImg.isPending}
-                                className="flex flex-col items-center justify-center gap-2 w-28 h-36 rounded-xl border-2 border-dashed border-border hover:border-emerald-400 hover:bg-emerald-50/40 text-muted-foreground hover:text-emerald-600 transition-colors disabled:opacity-50">
-                                {updateCertImg.isPending ? (
-                                  <Loader2 className="w-5 h-5 animate-spin" />
-                                ) : (
-                                  <>
-                                    <Upload className="w-5 h-5" />
-                                    <span className="text-[11px] font-medium text-center leading-tight px-1">Tải lên ảnh</span>
-                                  </>
-                                )}
-                              </button>
-                            )}
-                            <input type="file" accept="image/*" className="hidden"
-                              ref={el => { certImgRefs.current[c.id] = el; }}
-                              onChange={e => handleCertImg(c.id, e)} />
-                          </div>
+                              <img
+                                src={c.imageUrl}
+                                alt={c.ten}
+                                className="w-28 h-36 object-cover rounded-xl border border-border shadow-sm cursor-pointer"
+                                onClick={() => window.open(c.imageUrl, "_blank")}
+                              />
+                            </div>
+                          )}
                         </div>
                       );
                     })}
