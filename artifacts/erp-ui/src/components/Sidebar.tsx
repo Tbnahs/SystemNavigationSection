@@ -3,7 +3,7 @@ import { useLocation, Link } from "wouter";
 import {
   Home, BarChart3, Leaf, ScanLine, Settings,
   ShoppingCart, Package, Users, Factory,
-  FileBarChart, BookOpen, ChevronDown,
+  FileBarChart, BookOpen, ChevronDown, ChevronLeft, ChevronRight,
   QrCode, Link2, Award, Layers, GitBranch, Search,
   MapPin, Sprout, FlaskConical, Scissors, CloudSun, ClipboardCheck,
   Building2, ShieldCheck, Scale, ShoppingBasket, LayoutGrid,
@@ -18,6 +18,8 @@ import logoImg from "@assets/Logo ESG.png";
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
+  collapsed?: boolean;
+  onCollapse?: () => void;
 }
 
 type NavItem =
@@ -214,7 +216,7 @@ function ExpandableNavItem({
   );
 }
 
-export default function Sidebar({ open, onClose }: SidebarProps) {
+export default function Sidebar({ open, onClose, collapsed = false, onCollapse }: SidebarProps) {
   const { t } = useLanguage();
   const { user } = useAuth();
   const [location] = useLocation();
@@ -251,13 +253,18 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
   const isActive = (href: string) =>
     location === href || location.startsWith(href + "/");
 
+  const desktopVisible = !collapsed;
+
   return (
     <>
       {open && (
         <div className="fixed inset-0 bg-black/30 z-20 lg:hidden" onClick={onClose} />
       )}
 
-      <aside className={`fixed left-0 top-16 bottom-0 w-60 bg-white border-r border-border z-20 flex flex-col transition-transform duration-200 lg:translate-x-0 ${open ? "translate-x-0" : "-translate-x-full"}`}>
+      <aside className={`fixed left-0 top-16 bottom-0 w-60 bg-white border-r border-border z-20 flex flex-col transition-transform duration-200
+        ${open ? "translate-x-0" : "-translate-x-full"}
+        ${desktopVisible ? "lg:translate-x-0" : "lg:-translate-x-full"}
+      `}>
         <div className="px-4 py-5 border-b border-border">
           <div className="flex items-center gap-3">
             <img src={logoImg} alt="ESG VALLEY logo" className="w-9 h-9 object-contain" />
@@ -298,13 +305,32 @@ export default function Sidebar({ open, onClose }: SidebarProps) {
           ))}
         </nav>
 
-        <div className="px-4 py-4 border-t border-border">
+        <div className="px-4 py-3 border-t border-border flex items-center justify-between">
           <div className="flex items-center gap-2">
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
             <span className="text-xs text-muted-foreground">{t("nav.system.status")}</span>
           </div>
+          {onCollapse && (
+            <button
+              onClick={onCollapse}
+              title="Thu gọn menu"
+              className="hidden lg:flex items-center justify-center w-6 h-6 rounded-md hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          )}
         </div>
       </aside>
+
+      {collapsed && onCollapse && (
+        <button
+          onClick={onCollapse}
+          title="Mở rộng menu"
+          className="hidden lg:flex fixed left-0 top-1/2 -translate-y-1/2 z-20 items-center justify-center w-5 h-10 bg-white border border-l-0 border-border rounded-r-lg shadow-sm hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ChevronRight className="w-3.5 h-3.5" />
+        </button>
+      )}
     </>
   );
 }
