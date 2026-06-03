@@ -159,11 +159,6 @@ export default function CoSoDetailPage() {
                 <TypeIcon className="w-5 h-5 text-emerald-600" />
               </div>
               <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setLocation(`/portal/co-so?edit=${f.id}`)}
-                  className="h-9 px-4 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted">
-                  <Pencil className="w-3.5 h-3.5" /> Chỉnh sửa
-                </button>
                 {f.type === "ho_lien_ket" && (
                   <button onClick={() => setShowQrModal(true)}
                     className="h-9 px-4 rounded-lg bg-emerald-600 text-white text-[13px] font-medium flex items-center gap-2 hover:bg-emerald-700">
@@ -367,15 +362,9 @@ export default function CoSoDetailPage() {
             {/* Tab: Nhân viên */}
             {tab === "employees" && (
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <h3 className="text-[15px] font-semibold">Nhân viên được giao</h3>
-                    <p className="text-[13px] text-muted-foreground mt-0.5">{assignedEmployees.length} nhân viên phụ trách cơ sở này</p>
-                  </div>
-                  <button onClick={() => setLocation(`/portal/co-so?edit=${f.id}&tab=employees`)}
-                    className="h-9 px-4 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted">
-                    <Pencil className="w-3.5 h-3.5" /> Cập nhật
-                  </button>
+                <div>
+                  <h3 className="text-[15px] font-semibold">Nhân viên được giao</h3>
+                  <p className="text-[13px] text-muted-foreground mt-0.5">{assignedEmployees.length} nhân viên phụ trách cơ sở này</p>
                 </div>
 
                 {assignedEmployees.length === 0 ? (
