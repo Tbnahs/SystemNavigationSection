@@ -366,16 +366,6 @@ export default function CoSoDetailPage() {
                     </section>
                   )}
 
-                  {(f.dienTich) && (
-                    <section>
-                      <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Diện tích</h3>
-                      <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-50 border border-amber-100">
-                        <Leaf className="w-5 h-5 text-amber-600 shrink-0" />
-                        <div className="text-[15px] font-semibold text-amber-900">{f.dienTich} <span className="text-[13px] font-normal text-amber-700">{f.donViDienTich}</span></div>
-                      </div>
-                    </section>
-                  )}
-
                   {boPhan.length > 0 && (
                     <section>
                       <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Bộ phận ({boPhan.length})</h3>
