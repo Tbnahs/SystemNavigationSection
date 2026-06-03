@@ -214,8 +214,8 @@ export default function CoSoDetailPage() {
               </span>
               {f.type === "ho_lien_ket" && (
                 <button onClick={() => setShowQrModal(true)}
-                  className="h-9 px-4 rounded-lg bg-emerald-600 text-white text-[13px] font-medium flex items-center gap-2 hover:bg-emerald-700">
-                  <QrCode className="w-3.5 h-3.5" /> Xem QR
+                  className="p-1.5 rounded hover:bg-muted" title="Xem QR">
+                  <QrCode className="w-4 h-4 text-muted-foreground" />
                 </button>
               )}
             </div>

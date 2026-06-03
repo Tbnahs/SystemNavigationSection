@@ -489,9 +489,9 @@ export default function DonThuMuaPage() {
                               setQrLoading(false);
                             }
                           }}
-                          className="p-1.5 rounded hover:bg-blue-50" title="Xem QR"
+                          className="p-1.5 rounded hover:bg-muted" title="Xem QR"
                         >
-                          {qrLoading ? <Loader2 className="w-4 h-4 text-blue-400 animate-spin" /> : <QrCode className="w-4 h-4 text-blue-500" />}
+                          {qrLoading ? <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" /> : <QrCode className="w-4 h-4 text-muted-foreground" />}
                         </button>
                         <button onClick={() => openEdit(o)} className="p-1.5 rounded hover:bg-muted" title="Sửa"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
                         <button onClick={() => setDeleteTarget(o)} className="p-1.5 rounded hover:bg-rose-50" title="Xóa"><X className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
