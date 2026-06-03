@@ -190,7 +190,7 @@ export default function PackagingPage() {
                     <td className="py-3 px-4 text-xs text-muted-foreground">{bbLabel}</td>
                     <td className="py-3 px-4 font-medium text-sm">{lo.klDG}</td>
                     <td className="py-3 px-4 text-sm font-semibold">{lo.soSP}</td>
-                    <td className="py-3 px-4">{lo.qrCode?<button onClick={e=>{e.stopPropagation();setShowQR(lo.qrCode);}} className="flex items-center gap-1 text-xs text-primary hover:underline"><QrCode className="w-3 h-3"/>Xem QR</button>:<span className="text-xs text-muted-foreground">—</span>}</td>
+                    <td className="py-3 px-4">{lo.qrCode?<button onClick={e=>{e.stopPropagation();setShowQR(lo.qrCode);}} className="p-1.5 rounded hover:bg-muted" title="Xem QR"><QrCode className="w-4 h-4 text-muted-foreground"/></button>:<span className="text-xs text-muted-foreground">—</span>}</td>
                     <td className="py-3 px-4"><span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-medium ${tc.color}`}><Ic className="w-3 h-3"/>{tc.label}</span></td>
                     <td className="py-3 px-4" onClick={e=>e.stopPropagation()}>
                       <div className="flex items-center justify-end gap-0.5">
