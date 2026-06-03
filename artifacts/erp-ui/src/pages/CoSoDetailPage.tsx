@@ -99,6 +99,7 @@ export default function CoSoDetailPage() {
   const [tab, setTab] = useState<"overview" | "location" | "certs" | "employees" | "qr">("overview");
   const [showQrModal, setShowQrModal] = useState(false);
   const [selectedEmp, setSelectedEmp] = useState<Employee | null>(null);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const certImgRefs = useRef<Record<string, HTMLInputElement | null>>({});
   const qc = useQueryClient();
 
@@ -477,8 +478,8 @@ export default function CoSoDetailPage() {
                               <img
                                 src={c.imageUrl}
                                 alt={c.ten}
-                                className="w-28 h-36 object-cover rounded-xl border border-border shadow-sm cursor-pointer"
-                                onClick={() => window.open(c.imageUrl, "_blank")}
+                                className="w-28 h-36 object-cover rounded-xl border border-border shadow-sm cursor-pointer hover:opacity-90 transition-opacity"
+                                onClick={() => setLightboxUrl(c.imageUrl)}
                               />
                             </div>
                           )}
@@ -564,6 +565,19 @@ export default function CoSoDetailPage() {
       {/* Employee Detail Panel */}
       {selectedEmp && (
         <EmployeeDetailPanel emp={selectedEmp} onClose={() => setSelectedEmp(null)} />
+      )}
+
+      {/* Lightbox */}
+      {lightboxUrl && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4" onClick={() => setLightboxUrl(null)}>
+          <div className="relative max-w-2xl w-full" onClick={e => e.stopPropagation()}>
+            <button onClick={() => setLightboxUrl(null)}
+              className="absolute -top-10 right-0 text-white/80 hover:text-white flex items-center gap-1.5 text-[13px]">
+              <X className="w-5 h-5" /> Đóng
+            </button>
+            <img src={lightboxUrl} alt="Ảnh chứng chỉ" className="w-full max-h-[80vh] object-contain rounded-xl shadow-2xl" />
+          </div>
+        </div>
       )}
 
       {/* QR Modal */}
