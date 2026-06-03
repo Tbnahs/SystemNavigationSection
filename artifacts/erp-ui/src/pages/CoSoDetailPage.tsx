@@ -5,9 +5,10 @@ import AppLayout from "@/components/AppLayout";
 import {
   ArrowLeft, MapPin, Phone, Building2, Home, Factory,
   Users, QrCode, Printer, Award, Loader2, Globe, Hash,
-  Leaf, Info, Map, LayoutGrid, CheckCircle2, AlertCircle, Calendar, BadgeCheck,
+  Leaf, Info, Map, CheckCircle2, AlertCircle, Calendar, BadgeCheck,
+  ChevronRight, X, Mail, Clock, ShieldCheck,
 } from "lucide-react";
-import { fetchFacility, fetchTeaVarieties, type Facility, type Employee } from "@/lib/api";
+import { fetchFacility, fetchTeaVarieties, fetchEmployeeFacilities, fetchFacilities, type Facility, type Employee } from "@/lib/api";
 
 const TYPE_OPTIONS: { value: Facility["type"]; label: string; color: string; Icon: typeof Home }[] = [
   { value: "ho_lien_ket", label: "Hộ liên kết", color: "bg-emerald-50 text-emerald-700 ring-emerald-200", Icon: Home },
@@ -97,6 +98,7 @@ export default function CoSoDetailPage() {
   const [, setLocation] = useLocation();
   const [tab, setTab] = useState<"overview" | "location" | "certs" | "employees" | "qr">("overview");
   const [showQrModal, setShowQrModal] = useState(false);
+  const [selectedEmp, setSelectedEmp] = useState<Employee | null>(null);
 
   const q = useQuery({
     queryKey: ["facility", id],
@@ -448,11 +450,12 @@ export default function CoSoDetailPage() {
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
                     {assignedEmployees.map((emp) => (
-                      <div key={emp.id} className="flex items-center gap-3 p-3.5 rounded-xl border border-border hover:border-emerald-200 hover:bg-emerald-50/30 transition-colors">
+                      <button key={emp.id} onClick={() => setSelectedEmp(emp)}
+                        className="flex items-center gap-3 p-3.5 rounded-xl border border-border hover:border-emerald-200 hover:bg-emerald-50/30 transition-colors text-left w-full cursor-pointer">
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-[13px] font-bold shrink-0">
                           {getInitials(emp.name)}
                         </div>
-                        <div className="min-w-0">
+                        <div className="min-w-0 flex-1">
                           <div className="text-[13.5px] font-semibold truncate">{emp.name}</div>
                           <div className="text-[11.5px] text-muted-foreground truncate">{emp.email}</div>
                           {emp.role && (
@@ -461,7 +464,8 @@ export default function CoSoDetailPage() {
                             </span>
                           )}
                         </div>
-                      </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 opacity-50" />
+                      </button>
                     ))}
                   </div>
                 )}
@@ -502,6 +506,11 @@ export default function CoSoDetailPage() {
         </div>
       </div>
 
+      {/* Employee Detail Panel */}
+      {selectedEmp && (
+        <EmployeeDetailPanel emp={selectedEmp} onClose={() => setSelectedEmp(null)} />
+      )}
+
       {/* QR Modal */}
       {showQrModal && (
         <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
@@ -528,6 +537,141 @@ function Row({ label, value }: { label: string; value: React.ReactNode }) {
     <div className="flex items-start gap-4">
       <span className="text-[13px] text-muted-foreground min-w-[140px] shrink-0">{label}</span>
       <span className="text-[13.5px] font-medium text-foreground">{value}</span>
+    </div>
+  );
+}
+
+const STATUS_CLR: Record<string, string> = {
+  active: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+  invited: "bg-amber-50 text-amber-700 ring-amber-200",
+  locked: "bg-rose-50 text-rose-700 ring-rose-200",
+};
+const STATUS_LABEL: Record<string, string> = {
+  active: "Đang hoạt động", invited: "Đã mời", locked: "Đã khóa",
+};
+
+function EmployeeDetailPanel({ emp, onClose }: { emp: Employee; onClose: () => void }) {
+  const facQ = useQuery({
+    queryKey: ["empFacilities", emp.id],
+    queryFn: () => fetchEmployeeFacilities(emp.id),
+  });
+  const allFacQ = useQuery({ queryKey: ["facilities"], queryFn: fetchFacilities });
+  const facilityIds = facQ.data?.facilityIds ?? [];
+  const allFacilities = allFacQ.data?.items ?? [];
+  const empFacilities = allFacilities.filter((f) => facilityIds.includes(f.id));
+
+  return (
+    <div className="fixed inset-0 bg-slate-900/40 z-50 flex justify-end" onClick={onClose}>
+      <div className="bg-white shadow-2xl w-full max-w-sm flex flex-col h-full overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}>
+
+        {/* Header */}
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0">
+          <span className="text-[15px] font-semibold">Chi tiết nhân viên</span>
+          <button onClick={onClose} className="p-1.5 rounded hover:bg-muted">
+            <X className="w-4 h-4 text-muted-foreground" />
+          </button>
+        </div>
+
+        <div className="flex-1 px-5 py-5 space-y-6">
+          {/* Avatar + Name */}
+          <div className="flex flex-col items-center text-center gap-3 py-2">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-[20px] font-bold">
+              {emp.name.trim().split(/\s+/).slice(-2).map((s) => s[0]?.toUpperCase() ?? "").join("")}
+            </div>
+            <div>
+              <div className="text-[16px] font-bold">{emp.name}</div>
+              {emp.role && (
+                <span className={`inline-flex mt-1 px-2.5 py-0.5 rounded-full text-[11.5px] font-medium ring-1 ring-inset ${ROLE_CLR[emp.role] ?? "bg-slate-50 text-slate-600 ring-slate-200"}`}>
+                  {emp.role}
+                </span>
+              )}
+            </div>
+            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11.5px] font-medium ring-1 ring-inset ${STATUS_CLR[emp.status] ?? STATUS_CLR.active}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${emp.status === "active" ? "bg-emerald-500" : emp.status === "invited" ? "bg-amber-400" : "bg-rose-500"}`} />
+              {STATUS_LABEL[emp.status] ?? emp.status}
+            </span>
+          </div>
+
+          {/* Contact info */}
+          <section>
+            <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Thông tin liên lạc</h4>
+            <div className="space-y-2.5">
+              <div className="flex items-center gap-3 text-[13px]">
+                <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
+                <span className="truncate">{emp.email || "—"}</span>
+              </div>
+              {emp.phone && (
+                <div className="flex items-center gap-3 text-[13px]">
+                  <Phone className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <span>{emp.phone}</span>
+                </div>
+              )}
+              {emp.enterpriseName && (
+                <div className="flex items-center gap-3 text-[13px]">
+                  <Building2 className="w-4 h-4 text-muted-foreground shrink-0" />
+                  <span>{emp.enterpriseName}</span>
+                </div>
+              )}
+            </div>
+          </section>
+
+          {/* Permissions */}
+          <section>
+            <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Phân quyền</h4>
+            <div className="flex items-center gap-3 p-3 rounded-xl bg-muted/40 border border-border">
+              <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
+              <div>
+                <div className="text-[12px] text-muted-foreground">Vai trò</div>
+                <div className="text-[13.5px] font-semibold">{emp.role || "—"}</div>
+              </div>
+            </div>
+          </section>
+
+          {/* Assigned facilities */}
+          <section>
+            <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              Cơ sở phụ trách {facQ.isLoading ? "" : `(${empFacilities.length})`}
+            </h4>
+            {facQ.isLoading ? (
+              <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
+                <Loader2 className="w-4 h-4 animate-spin" /> Đang tải…
+              </div>
+            ) : empFacilities.length === 0 ? (
+              <div className="text-[13px] text-muted-foreground italic py-2">Chưa phụ trách cơ sở nào.</div>
+            ) : (
+              <div className="space-y-2">
+                {empFacilities.map((fc) => (
+                  <div key={fc.id} className="flex items-center gap-2.5 p-2.5 rounded-xl border border-border bg-white">
+                    <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <div className="min-w-0">
+                      <div className="text-[13px] font-medium truncate">{fc.name}</div>
+                      <div className="text-[11px] text-muted-foreground">{fc.code} · {[fc.xa, fc.tinh].filter(Boolean).join(", ")}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </section>
+
+          {/* Timestamps */}
+          <section>
+            <h4 className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Thời gian</h4>
+            <div className="space-y-2 text-[13px]">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Clock className="w-3.5 h-3.5 shrink-0" />
+                <span>Tạo lúc: <span className="text-foreground font-medium">{formatDate(emp.createdAt)}</span></span>
+              </div>
+              {emp.lastSeen && (
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Clock className="w-3.5 h-3.5 shrink-0" />
+                  <span>Hoạt động lần cuối: <span className="text-foreground font-medium">{formatDate(emp.lastSeen)}</span></span>
+                </div>
+              )}
+            </div>
+          </section>
+        </div>
+      </div>
     </div>
   );
 }
