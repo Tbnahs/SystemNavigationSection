@@ -246,37 +246,6 @@ export default function CoSoDetailPage() {
               </div>
             </div>
           </div>
-
-          {/* Map banner */}
-          {(() => {
-            const mapQ = [f.address, f.xa, f.tinh].filter(Boolean).join(", ");
-            return mapQ ? (
-              <div className="relative mx-6 mb-6 rounded-xl overflow-hidden" style={{ height: 220 }}>
-                <iframe
-                  key={mapQ}
-                  src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQ)}&output=embed&z=15&t=k`}
-                  title="Bản đồ vị trí"
-                  className="w-full h-full border-0"
-                  loading="lazy"
-                />
-                {/* overlay label */}
-                <div className="absolute bottom-3 left-3 flex flex-col gap-1 pointer-events-none">
-                  <div className="flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md">
-                    <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span className="text-[13px] font-semibold text-slate-800 max-w-[220px] truncate">{f.name}</span>
-                  </div>
-                  <div className="flex items-center gap-1.5 px-3 py-0.5">
-                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[11px] font-medium text-white drop-shadow">Live view</span>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="mx-6 mb-6 rounded-xl border-2 border-dashed border-border h-36 flex items-center justify-center text-muted-foreground text-[13px]">
-                <MapPin className="w-4 h-4 mr-2" /> Nhập địa chỉ để xem bản đồ
-              </div>
-            );
-          })()}
         </div>
 
         {/* Tabs + Content */}
