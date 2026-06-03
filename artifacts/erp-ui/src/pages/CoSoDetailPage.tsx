@@ -190,63 +190,97 @@ export default function CoSoDetailPage() {
           <span className="text-[13px] font-medium truncate max-w-xs">{f.name}</span>
         </div>
 
-        {/* Hero card */}
+        {/* Hero card — map banner style */}
         <div className="bg-white border border-border rounded-2xl overflow-hidden">
-          <div className="h-1 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-400" />
-          <div className="px-6 py-5">
-            <div className="flex items-center justify-between mb-4">
-              <div className="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center">
-                <TypeIcon className="w-5 h-5 text-emerald-600" />
+
+          {/* Header */}
+          <div className="px-6 pt-5 pb-4 flex items-start justify-between gap-4">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center shrink-0 mt-0.5">
+                <MapPin className="w-5 h-5 text-white" />
               </div>
-              <div className="flex items-center gap-2">
-                {f.type === "ho_lien_ket" && (
-                  <button onClick={() => setShowQrModal(true)}
-                    className="h-9 px-4 rounded-lg bg-emerald-600 text-white text-[13px] font-medium flex items-center gap-2 hover:bg-emerald-700">
-                    <QrCode className="w-3.5 h-3.5" /> Xem QR
-                  </button>
-                )}
+              <div>
+                <h1 className="text-[17px] font-bold leading-snug">{f.name}</h1>
+                <p className="text-[13px] text-muted-foreground mt-0.5">
+                  {typeLabel(f.type)}{f.enterpriseName ? ` · ${f.enterpriseName}` : ""}{f.address ? ` · ${f.address}` : ""}
+                </p>
               </div>
             </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[12px] font-medium ring-1 ring-inset ${isActive ? "bg-emerald-50 text-emerald-700 ring-emerald-200" : "bg-slate-100 text-slate-600 ring-slate-300"}`}>
+                <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-slate-400"}`} />
+                {isActive ? "Hoạt động" : "Ngưng"}
+              </span>
+              {f.type === "ho_lien_ket" && (
+                <button onClick={() => setShowQrModal(true)}
+                  className="h-9 px-4 rounded-lg bg-emerald-600 text-white text-[13px] font-medium flex items-center gap-2 hover:bg-emerald-700">
+                  <QrCode className="w-3.5 h-3.5" /> Xem QR
+                </button>
+              )}
+            </div>
+          </div>
 
-            <div className="space-y-2">
-              <div className="flex items-start gap-3 flex-wrap">
-                <h1 className="text-xl font-bold">{f.name}</h1>
-                <span className={`inline-flex items-center px-2.5 py-1 rounded-lg text-[12px] font-medium ring-1 ring-inset ${typeColor(f.type)}`}>
-                  {typeLabel(f.type)}
-                </span>
-                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[12px] font-medium ring-1 ring-inset ${isActive ? "bg-emerald-50 text-emerald-700 ring-emerald-200" : "bg-slate-100 text-slate-600 ring-slate-300"}`}>
-                  <span className={`w-1.5 h-1.5 rounded-full ${isActive ? "bg-emerald-500" : "bg-slate-400"}`} />
-                  {isActive ? "Đang hoạt động" : "Ngưng hoạt động"}
-                </span>
+          {/* Stat cards */}
+          <div className="px-6 pb-4 grid grid-cols-4 gap-3">
+            <div className="border border-border rounded-xl p-3.5">
+              <div className="text-[11px] text-muted-foreground mb-1">Tên cơ sở</div>
+              <div className="text-[13.5px] font-bold truncate">{f.name}</div>
+              <div className="text-[11.5px] text-muted-foreground mt-0.5">{f.code || `CS-${f.id}`}</div>
+            </div>
+            <div className="border border-border rounded-xl p-3.5">
+              <div className="text-[11px] text-muted-foreground mb-1">Diện tích</div>
+              <div className="text-[13.5px] font-bold">{f.dienTich ? `${f.dienTich} ${f.donViDienTich}` : "—"}</div>
+              <div className="text-[11.5px] text-muted-foreground mt-0.5">Tổng diện tích</div>
+            </div>
+            <div className="border border-border rounded-xl p-3.5">
+              <div className="text-[11px] text-muted-foreground mb-1">Loại cơ sở</div>
+              <div className="text-[13.5px] font-bold">{typeLabel(f.type)}</div>
+              <div className="text-[11.5px] text-muted-foreground mt-0.5">
+                {f.gln ? <span className="font-mono">GLN: {f.gln}</span> : "Chưa có GLN"}
               </div>
-              <div className="flex flex-wrap gap-3 text-[13px] text-muted-foreground">
-                <span className="flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> Mã: <span className="font-mono font-medium text-foreground">{f.code || `CS-${f.id}`}</span></span>
-                {f.phone && <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" />{f.phone}</span>}
-                {(f.xa || f.tinh) && <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{[f.xa, f.tinh].filter(Boolean).join(", ")}</span>}
-                {f.enterpriseName && <span className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" />{f.enterpriseName}</span>}
+            </div>
+            <div className="border border-border rounded-xl p-3.5">
+              <div className="text-[11px] text-muted-foreground mb-1">Trạng thái</div>
+              <div className={`text-[13.5px] font-bold ${isActive ? "text-emerald-600" : "text-slate-500"}`}>
+                {isActive ? "Hoạt động" : "Ngưng hoạt động"}
+              </div>
+              <div className="flex items-center gap-1 mt-1">
+                <span className={`w-2 h-2 rounded-full ${isActive ? "bg-emerald-500" : "bg-slate-400"}`} />
+                <span className="text-[11.5px] text-muted-foreground">{isActive ? "Đang vận hành" : "Tạm dừng"}</span>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Stats */}
-        <div className="grid grid-cols-4 gap-3">
-          <div className="bg-white border border-border rounded-xl p-4 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0"><Globe className="w-4.5 h-4.5 text-blue-600" /></div>
-            <div><div className="text-[11px] text-muted-foreground">Mã GLN</div><div className="text-[13px] font-semibold font-mono">{f.gln || "—"}</div></div>
-          </div>
-          <div className="bg-white border border-border rounded-xl p-4 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center shrink-0"><Leaf className="w-4.5 h-4.5 text-amber-600" /></div>
-            <div><div className="text-[11px] text-muted-foreground">Diện tích</div><div className="text-[13px] font-semibold">{f.dienTich ? `${f.dienTich} ${f.donViDienTich}` : "—"}</div></div>
-          </div>
-          <div className="bg-white border border-border rounded-xl p-4 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-violet-50 flex items-center justify-center shrink-0"><Award className="w-4.5 h-4.5 text-violet-600" /></div>
-            <div><div className="text-[11px] text-muted-foreground">Chứng chỉ</div><div className="text-[13px] font-semibold">{chungChi.length} chứng chỉ</div></div>
-          </div>
-          <div className="bg-white border border-border rounded-xl p-4 flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0"><Users className="w-4.5 h-4.5 text-emerald-600" /></div>
-            <div><div className="text-[11px] text-muted-foreground">Nhân viên</div><div className="text-[13px] font-semibold">{assignedEmployees.length} người</div></div>
-          </div>
+          {/* Map banner */}
+          {(() => {
+            const mapQ = [f.address, f.xa, f.tinh].filter(Boolean).join(", ");
+            return mapQ ? (
+              <div className="relative mx-6 mb-6 rounded-xl overflow-hidden" style={{ height: 220 }}>
+                <iframe
+                  key={mapQ}
+                  src={`https://maps.google.com/maps?q=${encodeURIComponent(mapQ)}&output=embed&z=15&t=k`}
+                  title="Bản đồ vị trí"
+                  className="w-full h-full border-0"
+                  loading="lazy"
+                />
+                {/* overlay label */}
+                <div className="absolute bottom-3 left-3 flex flex-col gap-1 pointer-events-none">
+                  <div className="flex items-center gap-1.5 bg-white/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-md">
+                    <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span className="text-[13px] font-semibold text-slate-800 max-w-[220px] truncate">{f.name}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 px-3 py-0.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[11px] font-medium text-white drop-shadow">Live view</span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="mx-6 mb-6 rounded-xl border-2 border-dashed border-border h-36 flex items-center justify-center text-muted-foreground text-[13px]">
+                <MapPin className="w-4 h-4 mr-2" /> Nhập địa chỉ để xem bản đồ
+              </div>
+            );
+          })()}
         </div>
 
         {/* Tabs + Content */}
