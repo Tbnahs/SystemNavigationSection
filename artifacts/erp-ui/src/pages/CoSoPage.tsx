@@ -524,10 +524,7 @@ export default function CoSoPage() {
               <div className="text-[17px] font-semibold uppercase tracking-wide">
                 {editItem ? `Sửa: ${editItem.name}` : "Thêm mới cơ sở"}
               </div>
-              <div className="flex items-center gap-1">
-                <button className="p-1.5 rounded hover:bg-muted text-muted-foreground"><Maximize2 className="w-4 h-4" /></button>
-                <button onClick={close_} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
-              </div>
+              <button onClick={close_} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
 
             {/* Tabs */}
