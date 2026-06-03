@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useParams, useLocation } from "wouter";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   ArrowLeft, MapPin, Phone, Building2, Home, Factory,
   Users, QrCode, Printer, Award, Loader2, Globe, Hash,
   Leaf, Info, Map, CheckCircle2, AlertCircle, Calendar, BadgeCheck,
-  ChevronRight, X, Mail, Clock, ShieldCheck,
+  ChevronRight, X, Mail, Clock, ShieldCheck, Upload, ImageIcon,
 } from "lucide-react";
-import { fetchFacility, fetchTeaVarieties, fetchEmployeeFacilities, fetchFacilities, type Facility, type Employee } from "@/lib/api";
+import { fetchFacility, fetchTeaVarieties, fetchEmployeeFacilities, fetchFacilities, updateFacility, type Facility, type Employee } from "@/lib/api";
 
 const TYPE_OPTIONS: { value: Facility["type"]; label: string; color: string; Icon: typeof Home }[] = [
   { value: "ho_lien_ket", label: "Hộ liên kết", color: "bg-emerald-50 text-emerald-700 ring-emerald-200", Icon: Home },
@@ -99,6 +99,35 @@ export default function CoSoDetailPage() {
   const [tab, setTab] = useState<"overview" | "location" | "certs" | "employees" | "qr">("overview");
   const [showQrModal, setShowQrModal] = useState(false);
   const [selectedEmp, setSelectedEmp] = useState<Employee | null>(null);
+  const certImgRefs = useRef<Record<string, HTMLInputElement | null>>({});
+  const qc = useQueryClient();
+
+  const updateCertImg = useMutation({
+    mutationFn: ({ certId, dataUrl }: { certId: string; dataUrl: string }) => {
+      const updatedCerts = (q.data?.item.chungChi ?? []).map(c =>
+        c.id === certId ? { ...c, imageUrl: dataUrl } : c
+      );
+      return updateFacility(id, { chungChi: updatedCerts });
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["facility", id] }),
+  });
+
+  function handleCertImg(certId: string, e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = ev => updateCertImg.mutate({ certId, dataUrl: ev.target?.result as string });
+    reader.readAsDataURL(file);
+  }
+
+  function removeCertImg(certId: string) {
+    const updatedCerts = (q.data?.item.chungChi ?? []).map(c =>
+      c.id === certId ? { ...c, imageUrl: "" } : c
+    );
+    updateFacility(id, { chungChi: updatedCerts }).then(() =>
+      qc.invalidateQueries({ queryKey: ["facility", id] })
+    );
+  }
 
   const q = useQuery({
     queryKey: ["facility", id],
@@ -421,12 +450,44 @@ export default function CoSoDetailPage() {
                             </div>
                           </div>
 
-                          {c.imageUrl && (
-                            <div className="mt-3 pt-3 border-t border-border">
-                              <div className="text-[11px] text-muted-foreground mb-1.5">Ảnh chứng chỉ</div>
-                              <img src={c.imageUrl} alt={c.ten} className="w-28 h-36 object-cover rounded-lg border border-border" />
+                          <div className="mt-3 pt-3 border-t border-border">
+                            <div className="text-[11px] text-muted-foreground mb-2 flex items-center gap-1">
+                              <ImageIcon className="w-3 h-3" /> Ảnh chứng chỉ
                             </div>
-                          )}
+                            {c.imageUrl ? (
+                              <div className="relative w-28 h-36 group">
+                                <img src={c.imageUrl} alt={c.ten}
+                                  className="w-full h-full object-cover rounded-xl border border-border shadow-sm cursor-pointer"
+                                  onClick={() => window.open(c.imageUrl, "_blank")} />
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 rounded-xl transition-colors" />
+                                <button onClick={() => removeCertImg(c.id)}
+                                  className="absolute top-1 right-1 w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-rose-50">
+                                  <X className="w-3.5 h-3.5 text-rose-500" />
+                                </button>
+                                <button onClick={() => certImgRefs.current[c.id]?.click()}
+                                  className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-emerald-50"
+                                  title="Đổi ảnh">
+                                  <Upload className="w-3 h-3 text-emerald-600" />
+                                </button>
+                              </div>
+                            ) : (
+                              <button type="button" onClick={() => certImgRefs.current[c.id]?.click()}
+                                disabled={updateCertImg.isPending}
+                                className="flex flex-col items-center justify-center gap-2 w-28 h-36 rounded-xl border-2 border-dashed border-border hover:border-emerald-400 hover:bg-emerald-50/40 text-muted-foreground hover:text-emerald-600 transition-colors disabled:opacity-50">
+                                {updateCertImg.isPending ? (
+                                  <Loader2 className="w-5 h-5 animate-spin" />
+                                ) : (
+                                  <>
+                                    <Upload className="w-5 h-5" />
+                                    <span className="text-[11px] font-medium text-center leading-tight px-1">Tải lên ảnh</span>
+                                  </>
+                                )}
+                              </button>
+                            )}
+                            <input type="file" accept="image/*" className="hidden"
+                              ref={el => { certImgRefs.current[c.id] = el; }}
+                              onChange={e => handleCertImg(c.id, e)} />
+                          </div>
                         </div>
                       );
                     })}
