@@ -221,16 +221,11 @@ export default function CoSoDetailPage() {
           </div>
 
           {/* Stat cards */}
-          <div className="px-6 pb-4 grid grid-cols-4 gap-3">
+          <div className="px-6 pb-4 grid grid-cols-3 gap-3">
             <div className="border border-border rounded-xl p-3.5">
               <div className="text-[11px] text-muted-foreground mb-1">Tên cơ sở</div>
               <div className="text-[13.5px] font-bold truncate">{f.name}</div>
               <div className="text-[11.5px] text-muted-foreground mt-0.5">{f.code || `CS-${f.id}`}</div>
-            </div>
-            <div className="border border-border rounded-xl p-3.5">
-              <div className="text-[11px] text-muted-foreground mb-1">Diện tích</div>
-              <div className="text-[13.5px] font-bold">{f.dienTich ? `${f.dienTich} ${f.donViDienTich}` : "—"}</div>
-              <div className="text-[11.5px] text-muted-foreground mt-0.5">Tổng diện tích</div>
             </div>
             <div className="border border-border rounded-xl p-3.5">
               <div className="text-[11px] text-muted-foreground mb-1">Loại cơ sở</div>
