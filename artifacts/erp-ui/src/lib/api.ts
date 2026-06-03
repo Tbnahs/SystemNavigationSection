@@ -56,6 +56,19 @@ export type Unit = {
   updatedAt: string;
 };
 
+export type FacilityCertItem = {
+  id: string;
+  ten: string;
+  loai: "ocop" | "vietgap" | "organic" | "iso" | "khac";
+  soChungChi: string;
+  ngayCap: string;
+  ngayHetHan: string;
+  capBoi: string;
+  imageUrl: string;
+};
+
+export type FacilityBoPhanItem = { id: string; ma: string; ten: string; ghiChu: string };
+
 export type Facility = {
   id: number;
   enterpriseId: number | null;
@@ -70,6 +83,11 @@ export type Facility = {
   status: "active" | "inactive";
   notes: string;
   giong_che_ids: number[];
+  dienTich: string;
+  donViDienTich: string;
+  toaDo: string;
+  chungChi: FacilityCertItem[];
+  boPhan: FacilityBoPhanItem[];
   createdAt: string;
   updatedAt: string;
   enterpriseName?: string | null;
@@ -342,7 +360,9 @@ let facilities: Facility[] = [
     type: "ho_lien_ket", phone: "0912111222",
     address: "Xóm Quân Chu 1, xã Quân Chu", tinh: "Thái Nguyên", xa: "Quân Chu",
     gln: "8938500100011", status: "active", notes: "Hộ trồng chè búp tươi lâu năm",
-    giong_che_ids: [1, 2],
+    giong_che_ids: [1, 2], dienTich: "5", donViDienTich: "sào", toaDo: "21.7285, 105.6683",
+    chungChi: [{ id: "cc1", ten: "VietGAP 2024", loai: "vietgap", soChungChi: "VG-001-2024", ngayCap: "2024-03-01", ngayHetHan: "2025-03-01", capBoi: "Chi cục Trồng trọt Thái Nguyên", imageUrl: "" }],
+    boPhan: [],
     createdAt: "2024-01-15T00:00:00.000Z", updatedAt: "2024-01-15T00:00:00.000Z",
     enterpriseName: "Chè Quân Chu",
   },
@@ -351,7 +371,8 @@ let facilities: Facility[] = [
     type: "ho_lien_ket", phone: "0933444555",
     address: "Xóm Quân Chu 2, xã Quân Chu", tinh: "Thái Nguyên", xa: "Quân Chu",
     gln: "8938500100022", status: "active", notes: "",
-    giong_che_ids: [1],
+    giong_che_ids: [1], dienTich: "3", donViDienTich: "sào", toaDo: "",
+    chungChi: [], boPhan: [],
     createdAt: "2024-01-20T00:00:00.000Z", updatedAt: "2024-01-20T00:00:00.000Z",
     enterpriseName: "Chè Quân Chu",
   },
@@ -360,7 +381,15 @@ let facilities: Facility[] = [
     type: "co_so_noi_bo", phone: "0912345678",
     address: "Thôn Quân Chu, xã Quân Chu, huyện Đại Từ", tinh: "Thái Nguyên", xa: "Quân Chu",
     gln: "8938500100033", status: "active", notes: "Xưởng chế biến chính",
-    giong_che_ids: [],
+    giong_che_ids: [], dienTich: "500", donViDienTich: "m²", toaDo: "21.730, 105.670",
+    chungChi: [
+      { id: "cc2", ten: "ISO 22000:2018", loai: "iso", soChungChi: "ISO-QC-2024", ngayCap: "2024-01-10", ngayHetHan: "2027-01-10", capBoi: "Bureau Veritas Vietnam", imageUrl: "" },
+      { id: "cc3", ten: "OCOP 4 sao", loai: "ocop", soChungChi: "OCOP-TN-2024-001", ngayCap: "2024-06-15", ngayHetHan: "2026-06-15", capBoi: "UBND tỉnh Thái Nguyên", imageUrl: "" },
+    ],
+    boPhan: [
+      { id: "bp1", ma: "BP-01", ten: "Bộ phận thu mua", ghiChu: "Tiếp nhận nguyên liệu từ hộ liên kết" },
+      { id: "bp2", ma: "BP-02", ten: "Bộ phận sản xuất", ghiChu: "Sao chè, chế biến" },
+    ],
     createdAt: "2024-01-10T00:00:00.000Z", updatedAt: "2024-01-10T00:00:00.000Z",
     enterpriseName: "Chè Quân Chu",
   },
@@ -369,7 +398,8 @@ let facilities: Facility[] = [
     type: "ho_lien_ket", phone: "0977888999",
     address: "Xóm La Bằng, xã La Bằng", tinh: "Thái Nguyên", xa: "La Bằng",
     gln: "8938500200011", status: "active", notes: "",
-    giong_che_ids: [3],
+    giong_che_ids: [3], dienTich: "8", donViDienTich: "sào", toaDo: "",
+    chungChi: [], boPhan: [],
     createdAt: "2024-02-20T00:00:00.000Z", updatedAt: "2024-02-20T00:00:00.000Z",
     enterpriseName: "La Bằng Tea",
   },
@@ -675,6 +705,8 @@ export const createFacility = (body: Partial<Facility>) => {
     address: body.address ?? "", tinh: body.tinh ?? "", xa: body.xa ?? "",
     gln: body.gln ?? "", status: body.status ?? "active", notes: body.notes ?? "",
     giong_che_ids: body.giong_che_ids ?? [],
+    dienTich: body.dienTich ?? "", donViDienTich: body.donViDienTich ?? "Ha",
+    toaDo: body.toaDo ?? "", chungChi: body.chungChi ?? [], boPhan: body.boPhan ?? [],
     createdAt: now(), updatedAt: now(), enterpriseName: ent?.tenHienThi ?? null,
   };
   facilities.push(item);

@@ -12,7 +12,7 @@ import {
   fetchFacilities, createFacility, updateFacility, deleteFacility,
   fetchEnterprises, fetchEmployees, assignFacilityEmployees,
   fetchTeaVarieties,
-  type Facility, type TeaVariety,
+  type Facility, type TeaVariety, type FacilityCertItem, type FacilityBoPhanItem,
 } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { PROVINCES_VN, COMMUNE_MAP } from "@/lib/vietnam-data";
@@ -55,16 +55,7 @@ function printQR(facility: Facility) {
   win.document.close();
 }
 
-type CertItem = {
-  id: string;
-  ten: string;
-  loai: "ocop" | "vietgap" | "organic" | "iso" | "khac";
-  soChungChi: string;
-  ngayCap: string;
-  ngayHetHan: string;
-  capBoi: string;
-  imageUrl: string;
-};
+type CertItem = FacilityCertItem;
 const CERT_LOAI_OPTIONS = [
   { value: "ocop", label: "OCOP" },
   { value: "vietgap", label: "VietGAP" },
@@ -73,7 +64,7 @@ const CERT_LOAI_OPTIONS = [
   { value: "khac", label: "Khác" },
 ] as const;
 
-type BoPhanItem = { id: string; ma: string; ten: string; ghiChu: string };
+type BoPhanItem = FacilityBoPhanItem;
 
 type FForm = {
   enterpriseId: number | null;
@@ -110,14 +101,17 @@ function parseCoords(s: string): { lat: number; lng: number } | null {
   return null;
 }
 
-function MapView({ toaDo }: { toaDo: string }) {
-  const coords = parseCoords(toaDo);
-  const lat = coords?.lat ?? 21.7285;
-  const lng = coords?.lng ?? 105.6683;
-  const src = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.04}%2C${lat - 0.025}%2C${lng + 0.04}%2C${lat + 0.025}&layer=mapnik${coords ? `&marker=${lat}%2C${lng}` : ""}`;
+function MapView({ tinh, xa, address, toaDo }: { tinh?: string; xa?: string; address?: string; toaDo?: string }) {
+  const q = [address, xa, tinh].filter(Boolean).join(", ");
+  if (!q) return (
+    <div className="rounded-xl border border-border bg-muted/40 h-52 flex items-center justify-center text-muted-foreground text-sm">
+      <MapPin className="w-4 h-4 mr-2" /> Nhập địa chỉ để xem bản đồ
+    </div>
+  );
   return (
     <div className="rounded-xl overflow-hidden border border-border" style={{ height: 280 }}>
-      <iframe src={src} title="Bản đồ" className="w-full h-full" style={{ border: 0 }} loading="lazy" />
+      <iframe key={q} src={`https://maps.google.com/maps?q=${encodeURIComponent(q)}&output=embed&z=14`}
+        title="Bản đồ" className="w-full h-full" style={{ border: 0 }} loading="lazy" />
     </div>
   );
 }
@@ -696,10 +690,7 @@ export default function CoSoPage() {
                   {/* Map */}
                   <div>
                     <label className="block text-[13px] font-medium mb-2">Bản đồ</label>
-                    <MapView toaDo={form.toaDo} />
-                    {!parseCoords(form.toaDo) && (
-                      <div className="text-[11.5px] text-muted-foreground mt-1.5">Nhập tọa độ ở trên để định vị cơ sở trên bản đồ.</div>
-                    )}
+                    <MapView tinh={form.tinh} xa={form.xa} address={form.address} toaDo={form.toaDo} />
                   </div>
                 </div>
               )}

@@ -1,14 +1,13 @@
 import { useState } from "react";
 import { useParams, useLocation } from "wouter";
-import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
-  ArrowLeft, Pencil, MapPin, Phone, Building2, Home, Factory,
+  ArrowLeft, MapPin, Phone, Building2, Home, Factory,
   Users, QrCode, Printer, Award, Loader2, Globe, Hash,
-  CheckCircle2, AlertCircle, Leaf, Info, Map, Shield, LayoutGrid,
+  Leaf, Info, Map, LayoutGrid, CheckCircle2, AlertCircle, Calendar, BadgeCheck,
 } from "lucide-react";
 import { fetchFacility, fetchTeaVarieties, type Facility, type Employee } from "@/lib/api";
-
 
 const TYPE_OPTIONS: { value: Facility["type"]; label: string; color: string; Icon: typeof Home }[] = [
   { value: "ho_lien_ket", label: "Hộ liên kết", color: "bg-emerald-50 text-emerald-700 ring-emerald-200", Icon: Home },
@@ -18,6 +17,17 @@ const TYPE_OPTIONS: { value: Facility["type"]; label: string; color: string; Ico
 function typeLabel(t: Facility["type"]) { return TYPE_OPTIONS.find(o => o.value === t)?.label ?? t; }
 function typeColor(t: Facility["type"]) { return TYPE_OPTIONS.find(o => o.value === t)?.color ?? ""; }
 function typeIcon(t: Facility["type"]) { return TYPE_OPTIONS.find(o => o.value === t)?.Icon ?? Factory; }
+
+const CERT_LOAI_LABEL: Record<string, string> = {
+  ocop: "OCOP", vietgap: "VietGAP", organic: "Organic", iso: "ISO", khac: "Khác",
+};
+const CERT_LOAI_COLOR: Record<string, string> = {
+  ocop: "bg-amber-50 text-amber-700 ring-amber-200",
+  vietgap: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+  organic: "bg-green-50 text-green-700 ring-green-200",
+  iso: "bg-blue-50 text-blue-700 ring-blue-200",
+  khac: "bg-slate-50 text-slate-600 ring-slate-200",
+};
 
 function qrUrl(data: string) {
   return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data)}`;
@@ -43,33 +53,33 @@ function printQR(facility: Facility) {
 }
 
 function formatDate(iso: string) {
+  if (!iso) return "—";
   try {
     const d = new Date(iso);
     return `${String(d.getDate()).padStart(2, "0")}/${String(d.getMonth() + 1).padStart(2, "0")}/${d.getFullYear()}`;
   } catch { return iso; }
 }
 
+function isExpired(dateStr: string) {
+  if (!dateStr) return false;
+  return new Date(dateStr) < new Date();
+}
+
 function getInitials(name: string) {
   return name.trim().split(/\s+/).slice(-2).map((s) => s[0]?.toUpperCase() ?? "").join("") || "??";
 }
 
-function parseCoords(s: string): { lat: number; lng: number } | null {
-  if (!s) return null;
-  const m = s.match(/(-?\d+\.?\d*)[,\s]+(-?\d+\.?\d*)/);
-  if (!m) return null;
-  const lat = parseFloat(m[1]); const lng = parseFloat(m[2]);
-  if (lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) return { lat, lng };
-  return null;
-}
-
-function MapView({ toaDo }: { toaDo?: string }) {
-  const coords = toaDo ? parseCoords(toaDo) : null;
-  const lat = coords?.lat ?? 21.7285;
-  const lng = coords?.lng ?? 105.6683;
-  const src = `https://www.openstreetmap.org/export/embed.html?bbox=${lng - 0.04}%2C${lat - 0.025}%2C${lng + 0.04}%2C${lat + 0.025}&layer=mapnik${coords ? `&marker=${lat}%2C${lng}` : ""}`;
+function MapEmbed({ tinh, xa, address }: { tinh?: string; xa?: string; address?: string }) {
+  const q = [address, xa, tinh].filter(Boolean).join(", ");
+  if (!q) return (
+    <div className="rounded-xl border border-border bg-muted/40 h-64 flex items-center justify-center text-muted-foreground text-sm">
+      <MapPin className="w-4 h-4 mr-2" /> Chưa có địa chỉ để hiển thị bản đồ
+    </div>
+  );
   return (
-    <div className="rounded-xl overflow-hidden border border-border" style={{ height: 320 }}>
-      <iframe src={src} title="Bản đồ" className="w-full h-full" style={{ border: 0 }} loading="lazy" />
+    <div className="rounded-xl overflow-hidden border border-border" style={{ height: 300 }}>
+      <iframe key={q} src={`https://maps.google.com/maps?q=${encodeURIComponent(q)}&output=embed&z=14`}
+        title="Bản đồ vị trí" width="100%" height="100%" style={{ border: 0 }} loading="lazy" />
     </div>
   );
 }
@@ -85,7 +95,7 @@ export default function CoSoDetailPage() {
   const params = useParams<{ id?: string }>();
   const id = Number(params.id);
   const [, setLocation] = useLocation();
-  const [tab, setTab] = useState<"overview" | "location" | "employees" | "qr">("overview");
+  const [tab, setTab] = useState<"overview" | "location" | "certs" | "employees" | "qr">("overview");
   const [showQrModal, setShowQrModal] = useState(false);
 
   const q = useQuery({
@@ -93,7 +103,6 @@ export default function CoSoDetailPage() {
     queryFn: () => fetchFacility(id),
     enabled: Number.isFinite(id) && id > 0,
   });
-
   const tvQ = useQuery({ queryKey: ["teaVarieties"], queryFn: fetchTeaVarieties });
   const teaVarieties = tvQ.data?.items ?? [];
 
@@ -123,10 +132,13 @@ export default function CoSoDetailPage() {
   const assignedEmployees: Employee[] = q.data.employees;
   const TypeIcon = typeIcon(f.type);
   const isActive = f.status === "active";
+  const chungChi = f.chungChi ?? [];
+  const boPhan = f.boPhan ?? [];
 
   const tabs = [
     { key: "overview" as const, label: "Thông tin chung", Icon: Info },
     { key: "location" as const, label: "Địa lý & Bản đồ", Icon: Map },
+    { key: "certs" as const, label: "Chứng chỉ", Icon: Award, count: chungChi.length },
     { key: "employees" as const, label: "Nhân viên", Icon: Users, count: assignedEmployees.length },
     { key: "qr" as const, label: "Mã QR", Icon: QrCode },
   ];
@@ -135,8 +147,8 @@ export default function CoSoDetailPage() {
     <AppLayout>
       <div className="space-y-5">
 
-        {/* Breadcrumb + Back */}
-        <div className="flex items-center gap-3">
+        {/* Breadcrumb */}
+        <div className="flex items-center gap-2">
           <button onClick={() => setLocation("/portal/co-so")}
             className="flex items-center gap-1.5 text-[13px] text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="w-4 h-4" /> Quay lại
@@ -149,11 +161,8 @@ export default function CoSoDetailPage() {
 
         {/* Hero card */}
         <div className="bg-white border border-border rounded-2xl overflow-hidden">
-          {/* Top accent line */}
           <div className="h-1 bg-gradient-to-r from-emerald-600 via-emerald-500 to-teal-400" />
-
           <div className="px-6 py-5">
-            {/* Icon + actions row */}
             <div className="flex items-center justify-between mb-4">
               <div className="w-11 h-11 rounded-xl bg-emerald-100 flex items-center justify-center">
                 <TypeIcon className="w-5 h-5 text-emerald-600" />
@@ -168,7 +177,6 @@ export default function CoSoDetailPage() {
               </div>
             </div>
 
-            {/* Name + meta */}
             <div className="space-y-2">
               <div className="flex items-start gap-3 flex-wrap">
                 <h1 className="text-xl font-bold">{f.name}</h1>
@@ -180,72 +188,44 @@ export default function CoSoDetailPage() {
                   {isActive ? "Đang hoạt động" : "Ngưng hoạt động"}
                 </span>
               </div>
-
-              {/* Quick info pills */}
               <div className="flex flex-wrap gap-3 text-[13px] text-muted-foreground">
-                <span className="flex items-center gap-1.5">
-                  <Hash className="w-3.5 h-3.5" /> Mã: <span className="font-mono font-medium text-foreground">{f.code || `CS-${f.id}`}</span>
-                </span>
-                {f.phone && (
-                  <span className="flex items-center gap-1.5">
-                    <Phone className="w-3.5 h-3.5" /> {f.phone}
-                  </span>
-                )}
-                {(f.xa || f.tinh) && (
-                  <span className="flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5" /> {[f.xa, f.tinh].filter(Boolean).join(", ")}
-                  </span>
-                )}
-                {f.enterpriseName && (
-                  <span className="flex items-center gap-1.5">
-                    <Building2 className="w-3.5 h-3.5" /> {f.enterpriseName}
-                  </span>
-                )}
+                <span className="flex items-center gap-1.5"><Hash className="w-3.5 h-3.5" /> Mã: <span className="font-mono font-medium text-foreground">{f.code || `CS-${f.id}`}</span></span>
+                {f.phone && <span className="flex items-center gap-1.5"><Phone className="w-3.5 h-3.5" />{f.phone}</span>}
+                {(f.xa || f.tinh) && <span className="flex items-center gap-1.5"><MapPin className="w-3.5 h-3.5" />{[f.xa, f.tinh].filter(Boolean).join(", ")}</span>}
+                {f.enterpriseName && <span className="flex items-center gap-1.5"><Building2 className="w-3.5 h-3.5" />{f.enterpriseName}</span>}
               </div>
             </div>
           </div>
         </div>
 
-        {/* Stats row */}
-        <div className="grid grid-cols-3 gap-3">
+        {/* Stats */}
+        <div className="grid grid-cols-4 gap-3">
           <div className="bg-white border border-border rounded-xl p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
-              <Globe className="w-5 h-5 text-blue-600" />
-            </div>
-            <div>
-              <div className="text-[11.5px] text-muted-foreground">Mã GLN</div>
-              <div className="text-[14px] font-semibold font-mono">{f.gln || "—"}</div>
-            </div>
+            <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center shrink-0"><Globe className="w-4.5 h-4.5 text-blue-600" /></div>
+            <div><div className="text-[11px] text-muted-foreground">Mã GLN</div><div className="text-[13px] font-semibold font-mono">{f.gln || "—"}</div></div>
           </div>
           <div className="bg-white border border-border rounded-xl p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
-              <Users className="w-5 h-5 text-emerald-600" />
-            </div>
-            <div>
-              <div className="text-[11.5px] text-muted-foreground">Nhân viên</div>
-              <div className="text-[14px] font-semibold">{assignedEmployees.length} người</div>
-            </div>
+            <div className="w-9 h-9 rounded-xl bg-amber-50 flex items-center justify-center shrink-0"><Leaf className="w-4.5 h-4.5 text-amber-600" /></div>
+            <div><div className="text-[11px] text-muted-foreground">Diện tích</div><div className="text-[13px] font-semibold">{f.dienTich ? `${f.dienTich} ${f.donViDienTich}` : "—"}</div></div>
           </div>
           <div className="bg-white border border-border rounded-xl p-4 flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
-              <Leaf className="w-5 h-5 text-amber-600" />
-            </div>
-            <div>
-              <div className="text-[11.5px] text-muted-foreground">Giống chè</div>
-              <div className="text-[14px] font-semibold">{f.giong_che_ids?.length || 0} giống</div>
-            </div>
+            <div className="w-9 h-9 rounded-xl bg-violet-50 flex items-center justify-center shrink-0"><Award className="w-4.5 h-4.5 text-violet-600" /></div>
+            <div><div className="text-[11px] text-muted-foreground">Chứng chỉ</div><div className="text-[13px] font-semibold">{chungChi.length} chứng chỉ</div></div>
+          </div>
+          <div className="bg-white border border-border rounded-xl p-4 flex items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-emerald-50 flex items-center justify-center shrink-0"><Users className="w-4.5 h-4.5 text-emerald-600" /></div>
+            <div><div className="text-[11px] text-muted-foreground">Nhân viên</div><div className="text-[13px] font-semibold">{assignedEmployees.length} người</div></div>
           </div>
         </div>
 
         {/* Tabs + Content */}
         <div className="bg-white border border-border rounded-2xl overflow-hidden">
-          {/* Tab bar */}
-          <div className="flex border-b border-border">
+          <div className="flex border-b border-border overflow-x-auto">
             {tabs.map(({ key, label, Icon, count }) => (
               <button key={key} onClick={() => setTab(key)}
-                className={`flex items-center gap-2 flex-1 py-3.5 text-[13px] font-medium border-b-2 transition-colors ${tab === key ? "border-emerald-600 text-emerald-700 bg-emerald-50/50" : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"}`}>
+                className={`flex items-center gap-2 px-5 py-3.5 text-[13px] font-medium border-b-2 whitespace-nowrap transition-colors ${tab === key ? "border-emerald-600 text-emerald-700 bg-emerald-50/50" : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"}`}>
                 <Icon className="w-4 h-4" />
-                <span className="hidden sm:inline">{label}</span>
+                {label}
                 {count !== undefined && count > 0 && (
                   <span className="px-1.5 py-0.5 rounded-full bg-emerald-600 text-white text-[10px] font-bold">{count}</span>
                 )}
@@ -255,20 +235,17 @@ export default function CoSoDetailPage() {
 
           <div className="p-6">
 
-            {/* Tab: Thông tin chung */}
+            {/* ── Tab: Thông tin chung ── */}
             {tab === "overview" && (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {/* Left column */}
                 <div className="space-y-6">
                   <section>
-                    <h3 className="text-[13px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Thông tin cơ bản</h3>
+                    <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Thông tin cơ bản</h3>
                     <div className="space-y-3">
                       <Row label="Tên cơ sở" value={f.name} />
                       <Row label="Mã cơ sở" value={<span className="font-mono">{f.code || `CS-${f.id}`}</span>} />
                       <Row label="Loại cơ sở" value={
-                        <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[12px] font-medium ring-1 ring-inset ${typeColor(f.type)}`}>
-                          {typeLabel(f.type)}
-                        </span>
+                        <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[12px] font-medium ring-1 ring-inset ${typeColor(f.type)}`}>{typeLabel(f.type)}</span>
                       } />
                       <Row label="Số điện thoại" value={f.phone || "—"} />
                       <Row label="Trạng thái" value={
@@ -283,11 +260,11 @@ export default function CoSoDetailPage() {
 
                   {f.gln && (
                     <section>
-                      <h3 className="text-[13px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Định danh GS1</h3>
+                      <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Định danh GS1</h3>
                       <div className="flex items-center gap-3 p-3 rounded-xl bg-blue-50 border border-blue-100">
                         <Globe className="w-5 h-5 text-blue-600 shrink-0" />
                         <div>
-                          <div className="text-[11.5px] text-blue-600 font-medium">Global Location Number (GLN)</div>
+                          <div className="text-[11px] text-blue-600 font-medium">Global Location Number (GLN)</div>
                           <div className="text-[15px] font-mono font-semibold text-blue-900 tracking-wider">{f.gln}</div>
                         </div>
                       </div>
@@ -296,17 +273,16 @@ export default function CoSoDetailPage() {
 
                   {f.notes && (
                     <section>
-                      <h3 className="text-[13px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Ghi chú</h3>
+                      <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Ghi chú</h3>
                       <p className="text-[13.5px] text-foreground bg-muted/40 rounded-xl px-4 py-3 border border-border">{f.notes}</p>
                     </section>
                   )}
                 </div>
 
-                {/* Right column */}
                 <div className="space-y-6">
                   {f.type === "ho_lien_ket" && (
                     <section>
-                      <h3 className="text-[13px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Giống chè canh tác</h3>
+                      <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Giống chè canh tác</h3>
                       {f.giong_che_ids?.length > 0 ? (
                         <div className="flex flex-wrap gap-2">
                           {f.giong_che_ids.map(gid => {
@@ -314,8 +290,7 @@ export default function CoSoDetailPage() {
                             if (!tv) return null;
                             return (
                               <span key={gid} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-100 text-emerald-800 text-[12.5px] font-medium ring-1 ring-emerald-200">
-                                <Leaf className="w-3 h-3" />
-                                {tv.name}{tv.code && <span className="text-emerald-600 text-[11px]">({tv.code})</span>}
+                                <Leaf className="w-3 h-3" />{tv.name}{tv.code && <span className="text-emerald-600 text-[11px]">({tv.code})</span>}
                               </span>
                             );
                           })}
@@ -326,8 +301,44 @@ export default function CoSoDetailPage() {
                     </section>
                   )}
 
+                  {(f.dienTich) && (
+                    <section>
+                      <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Diện tích</h3>
+                      <div className="flex items-center gap-3 p-3 rounded-xl bg-amber-50 border border-amber-100">
+                        <Leaf className="w-5 h-5 text-amber-600 shrink-0" />
+                        <div className="text-[15px] font-semibold text-amber-900">{f.dienTich} <span className="text-[13px] font-normal text-amber-700">{f.donViDienTich}</span></div>
+                      </div>
+                    </section>
+                  )}
+
+                  {boPhan.length > 0 && (
+                    <section>
+                      <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Bộ phận ({boPhan.length})</h3>
+                      <div className="border border-border rounded-xl overflow-hidden">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="text-left text-[11px] uppercase tracking-wider text-muted-foreground bg-muted/40 border-b border-border">
+                              <th className="px-3 py-2.5">Mã</th>
+                              <th className="px-3 py-2.5">Tên bộ phận</th>
+                              <th className="px-3 py-2.5">Ghi chú</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {boPhan.map((bp, i) => (
+                              <tr key={bp.id} className={i > 0 ? "border-t border-border" : ""}>
+                                <td className="px-3 py-2.5 font-mono text-[12px] text-muted-foreground">{bp.ma || "—"}</td>
+                                <td className="px-3 py-2.5 font-medium text-[13px]">{bp.ten}</td>
+                                <td className="px-3 py-2.5 text-[12px] text-muted-foreground">{bp.ghiChu || "—"}</td>
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  )}
+
                   <section>
-                    <h3 className="text-[13px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Thời gian</h3>
+                    <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Thời gian</h3>
                     <div className="space-y-3">
                       <Row label="Ngày tạo" value={formatDate(f.createdAt)} />
                       <Row label="Cập nhật lần cuối" value={formatDate(f.updatedAt)} />
@@ -337,36 +348,98 @@ export default function CoSoDetailPage() {
               </div>
             )}
 
-            {/* Tab: Địa lý & Bản đồ */}
+            {/* ── Tab: Địa lý & Bản đồ ── */}
             {tab === "location" && (
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  <section className="space-y-3">
-                    <h3 className="text-[13px] font-semibold text-muted-foreground uppercase tracking-wider">Địa chỉ</h3>
-                    <Row label="Tỉnh / Thành phố" value={f.tinh || "—"} />
-                    <Row label="Xã / Phường" value={f.xa || "—"} />
-                    <Row label="Địa chỉ chi tiết" value={f.address || "—"} />
-                  </section>
+              <div className="space-y-5">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                  <Row label="Tỉnh / Thành phố" value={f.tinh || "—"} />
+                  <Row label="Xã / Phường" value={f.xa || "—"} />
+                  <Row label="Diện tích" value={f.dienTich ? `${f.dienTich} ${f.donViDienTich}` : "—"} />
                 </div>
-
+                <div>
+                  <Row label="Địa chỉ chi tiết" value={f.address || "—"} />
+                </div>
                 <section>
-                  <h3 className="text-[13px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Bản đồ vị trí</h3>
-                  <MapView toaDo="" />
-                  <p className="text-[11.5px] text-muted-foreground mt-2">
-                    Bản đồ hiện thị khu vực Tân Cương, Thái Nguyên. Nhập tọa độ GPS trong form chỉnh sửa để định vị chính xác.
-                  </p>
+                  <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Bản đồ vị trí</h3>
+                  <MapEmbed tinh={f.tinh} xa={f.xa} address={f.address} />
                 </section>
               </div>
             )}
 
-            {/* Tab: Nhân viên */}
+            {/* ── Tab: Chứng chỉ ── */}
+            {tab === "certs" && (
+              <div className="space-y-4">
+                <div>
+                  <h3 className="text-[15px] font-semibold">Chứng nhận / Chứng chỉ</h3>
+                  <p className="text-[13px] text-muted-foreground mt-0.5">{chungChi.length} chứng chỉ đã đăng ký</p>
+                </div>
+
+                {chungChi.length === 0 ? (
+                  <div className="py-14 text-center border border-dashed border-border rounded-xl text-muted-foreground">
+                    <Award className="w-8 h-8 mx-auto mb-2 opacity-25" />
+                    <div className="text-[13px]">Chưa có chứng chỉ nào được đăng ký.</div>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {chungChi.map((c, idx) => {
+                      const expired = isExpired(c.ngayHetHan);
+                      return (
+                        <div key={c.id} className={`border rounded-xl p-4 ${expired ? "border-rose-200 bg-rose-50/30" : "border-border bg-white"}`}>
+                          <div className="flex items-start justify-between gap-3 mb-3">
+                            <div className="flex items-center gap-2 flex-wrap">
+                              <span className="text-[14px] font-semibold">{c.ten || `Chứng chỉ #${idx + 1}`}</span>
+                              <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11.5px] font-medium ring-1 ring-inset ${CERT_LOAI_COLOR[c.loai] ?? CERT_LOAI_COLOR.khac}`}>
+                                {CERT_LOAI_LABEL[c.loai] ?? c.loai}
+                              </span>
+                            </div>
+                            {c.ngayHetHan && (
+                              <span className={`inline-flex items-center gap-1 text-[11.5px] font-medium shrink-0 ${expired ? "text-rose-600" : "text-emerald-600"}`}>
+                                {expired ? <AlertCircle className="w-3.5 h-3.5" /> : <CheckCircle2 className="w-3.5 h-3.5" />}
+                                {expired ? "Đã hết hạn" : "Còn hiệu lực"}
+                              </span>
+                            )}
+                          </div>
+
+                          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-[13px]">
+                            <div>
+                              <div className="text-[11px] text-muted-foreground mb-0.5">Số chứng chỉ</div>
+                              <div className="font-mono font-medium">{c.soChungChi || "—"}</div>
+                            </div>
+                            <div>
+                              <div className="text-[11px] text-muted-foreground mb-0.5 flex items-center gap-1"><Calendar className="w-3 h-3" /> Ngày cấp</div>
+                              <div className="font-medium">{formatDate(c.ngayCap)}</div>
+                            </div>
+                            <div>
+                              <div className="text-[11px] text-muted-foreground mb-0.5 flex items-center gap-1"><Calendar className="w-3 h-3" /> Ngày hết hạn</div>
+                              <div className={`font-medium ${expired ? "text-rose-600" : ""}`}>{formatDate(c.ngayHetHan)}</div>
+                            </div>
+                            <div>
+                              <div className="text-[11px] text-muted-foreground mb-0.5 flex items-center gap-1"><BadgeCheck className="w-3 h-3" /> Cấp bởi</div>
+                              <div className="font-medium">{c.capBoi || "—"}</div>
+                            </div>
+                          </div>
+
+                          {c.imageUrl && (
+                            <div className="mt-3 pt-3 border-t border-border">
+                              <div className="text-[11px] text-muted-foreground mb-1.5">Ảnh chứng chỉ</div>
+                              <img src={c.imageUrl} alt={c.ten} className="w-28 h-36 object-cover rounded-lg border border-border" />
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* ── Tab: Nhân viên ── */}
             {tab === "employees" && (
               <div className="space-y-4">
                 <div>
                   <h3 className="text-[15px] font-semibold">Nhân viên được giao</h3>
                   <p className="text-[13px] text-muted-foreground mt-0.5">{assignedEmployees.length} nhân viên phụ trách cơ sở này</p>
                 </div>
-
                 {assignedEmployees.length === 0 ? (
                   <div className="py-14 text-center border border-dashed border-border rounded-xl text-muted-foreground">
                     <Users className="w-8 h-8 mx-auto mb-2 opacity-25" />
@@ -395,20 +468,15 @@ export default function CoSoDetailPage() {
               </div>
             )}
 
-            {/* Tab: Mã QR */}
+            {/* ── Tab: Mã QR ── */}
             {tab === "qr" && (
               <div className="flex flex-col items-center py-6 space-y-5">
                 <div className="text-center">
                   <h3 className="text-[15px] font-semibold mb-1">Mã QR cơ sở</h3>
                   <p className="text-[13px] text-muted-foreground">Dùng để truy xuất nguồn gốc và nhận diện cơ sở trong hệ thống</p>
                 </div>
-
                 <div className="bg-white border-2 border-border rounded-2xl p-6 shadow-sm text-center">
-                  <img
-                    src={qrUrl(`CO-SO:${f.id}|${f.name}|${f.code || ""}`)}
-                    alt="QR Code"
-                    className="w-52 h-52 mx-auto"
-                  />
+                  <img src={qrUrl(`CO-SO:${f.id}|${f.name}|${f.code || ""}`)} alt="QR Code" className="w-52 h-52 mx-auto" />
                   <div className="mt-4 space-y-0.5">
                     <div className="text-[15px] font-semibold">{f.name}</div>
                     <div className="text-[12px] text-muted-foreground">Mã: {f.code || `CS-${f.id}`}</div>
@@ -416,24 +484,17 @@ export default function CoSoDetailPage() {
                     {f.gln && <div className="text-[11.5px] text-muted-foreground font-mono mt-1">GLN: {f.gln}</div>}
                   </div>
                 </div>
-
                 <div className="flex gap-3">
-                  <button onClick={() => printQR(f)}
-                    className="h-10 px-5 rounded-lg bg-emerald-600 text-white text-[13.5px] font-semibold flex items-center gap-2 hover:bg-emerald-700">
+                  <button onClick={() => printQR(f)} className="h-10 px-5 rounded-lg bg-emerald-600 text-white text-[13.5px] font-semibold flex items-center gap-2 hover:bg-emerald-700">
                     <Printer className="w-4 h-4" /> In QR
                   </button>
-                  <a
-                    href={qrUrl(`CO-SO:${f.id}|${f.name}|${f.code || ""}`)}
-                    download={`qr-${f.code || f.id}.png`}
-                    target="_blank"
-                    rel="noreferrer"
+                  <a href={qrUrl(`CO-SO:${f.id}|${f.name}|${f.code || ""}`)} download={`qr-${f.code || f.id}.png`} target="_blank" rel="noreferrer"
                     className="h-10 px-5 rounded-lg border border-border text-[13.5px] font-semibold flex items-center gap-2 hover:bg-muted">
                     Tải xuống
                   </a>
                 </div>
-
                 <div className="text-[11.5px] text-muted-foreground text-center max-w-xs">
-                  Dữ liệu mã QR: <span className="font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">{`CO-SO:${f.id}|${f.name}|${f.code || ""}`}</span>
+                  Dữ liệu QR: <span className="font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">{`CO-SO:${f.id}|${f.name}|${f.code || ""}`}</span>
                 </div>
               </div>
             )}
@@ -441,7 +502,7 @@ export default function CoSoDetailPage() {
         </div>
       </div>
 
-      {/* QR Quick Modal */}
+      {/* QR Modal */}
       {showQrModal && (
         <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
