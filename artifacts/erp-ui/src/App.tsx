@@ -27,6 +27,7 @@ import DoanhNghiepDetailPage from "@/pages/DoanhNghiepDetailPage";
 import NhanVienPage from "@/pages/NhanVienPage";
 import DonViTinhPage from "@/pages/DonViTinhPage";
 import CoSoPage from "@/pages/CoSoPage";
+import CoSoDetailPage from "@/pages/CoSoDetailPage";
 import ThuongPhamPage from "@/pages/ThuongPhamPage";
 import DonThuMuaPage from "@/pages/DonThuMuaPage";
 import GiongChePage from "@/pages/GiongChePage";
@@ -83,6 +84,9 @@ function Router() {
       </Route>
       <Route path="/portal/co-so">
         {() => <ProtectedRoute component={CoSoPage} />}
+      </Route>
+      <Route path="/portal/co-so/:id">
+        {() => <ProtectedRoute component={CoSoDetailPage} />}
       </Route>
 
       {/* Profile */}

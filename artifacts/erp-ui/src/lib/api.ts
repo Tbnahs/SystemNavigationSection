@@ -658,6 +658,14 @@ export const deleteUnit = (id: number) => {
 
 export const fetchFacilities = () => delay({ items: [...facilities] });
 
+export const fetchFacility = (id: number) => {
+  const f = facilities.find((x) => x.id === id);
+  if (!f) throw new Error("Không tìm thấy cơ sở");
+  const empIds = employeeFacilityMap.filter((m) => m.facilityId === id).map((m) => m.employeeId);
+  const assignedEmployees = employees.filter((e) => empIds.includes(e.id));
+  return delay({ item: { ...f }, employees: assignedEmployees });
+};
+
 export const createFacility = (body: Partial<Facility>) => {
   const ent = enterprises.find((e) => e.id === body.enterpriseId);
   const item: Facility = {

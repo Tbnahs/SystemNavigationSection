@@ -1,10 +1,11 @@
 import { useState, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
+import { useLocation } from "wouter";
 import {
   Plus, Pencil, X, Loader2, Search, Factory, QrCode, Printer,
   Building2, Home, MapPin, Phone, Users, Upload, Download, CheckCircle, ChevronDown,
-  Award, Trash2, HelpCircle, Maximize2,
+  Award, Trash2, HelpCircle, Maximize2, Eye,
 } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
@@ -162,6 +163,7 @@ function CommuneSelect({ province, value, onChange }: { province?: string; value
 
 export default function CoSoPage() {
   const { user } = useAuth();
+  const [, setLocation] = useLocation();
   const isSuperAdmin = !user?.enterpriseId;
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -459,6 +461,7 @@ export default function CoSoPage() {
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-1">
+                        <button onClick={() => setLocation(`/portal/co-so/${f.id}`)} className="p-1.5 rounded hover:bg-emerald-50" title="Xem chi tiết"><Eye className="w-4 h-4 text-emerald-600" /></button>
                         {f.type === "ho_lien_ket" && <button onClick={() => setQrTarget(f)} className="p-1.5 rounded hover:bg-muted" title="Xem QR"><QrCode className="w-4 h-4 text-muted-foreground" /></button>}
                         <button onClick={() => openEdit(f)} className="p-1.5 rounded hover:bg-muted" title="Sửa"><Pencil className="w-4 h-4 text-muted-foreground" /></button>
                         <button onClick={() => setDeleteTarget(f)} className="p-1.5 rounded hover:bg-rose-50" title="Xóa"><X className="w-4 h-4 text-muted-foreground hover:text-rose-600" /></button>
