@@ -525,7 +525,7 @@ export default function NhanVienPage() {
                     <td className="px-3 py-3 text-[12.5px] text-muted-foreground">{u.lastSeen}</td>
                     <td className="px-3 py-3">
                       <div className="flex items-center gap-1 text-muted-foreground">
-                        <button onClick={() => setLocation(`/portal/nguoi-dung/${u.id}`)} className="p-1.5 rounded hover:bg-blue-50 text-muted-foreground hover:text-blue-600" title="Xem chi tiết"><ExternalLink className="w-4 h-4" /></button>
+                        <button onClick={() => setLocation(`/portal/nguoi-dung/${u.id}`)} className="p-1.5 rounded hover:bg-blue-50 text-muted-foreground hover:text-blue-600" title="Xem chi tiết"><Eye className="w-4 h-4" /></button>
                         <button onClick={() => openEdit(u)} className="p-1.5 rounded hover:bg-muted text-muted-foreground" title="Sửa"><Pencil className="w-4 h-4" /></button>
                         <button onClick={() => setResetTarget(u)} className="p-1.5 rounded hover:bg-amber-50 text-muted-foreground hover:text-amber-600" title="Đặt lại mật khẩu"><RotateCcw className="w-4 h-4" /></button>
                         <button onClick={() => setLockTarget(u)} className="p-1.5 rounded hover:bg-amber-50 text-muted-foreground hover:text-amber-600" title="Ngừng hoạt động"><X className="w-4 h-4" /></button>
