@@ -74,7 +74,7 @@ export type Facility = {
   enterpriseId: number | null;
   name: string;
   code: string;
-  type: "ho_lien_ket" | "co_so_thue_ngoai" | "co_so_noi_bo";
+  type: "ho_lien_ket" | "vung_trong_noi_bo" | "dong_goi" | "co_so_thue_ngoai" | "co_so_noi_bo";
   phone: string;
   address: string;
   tinh: string;
@@ -238,7 +238,7 @@ export type AdminFacilityUser = {
 };
 export type AdminFacility = {
   id: number; enterpriseId: number | null; name: string; code: string;
-  type: "ho_lien_ket" | "co_so_thue_ngoai" | "co_so_noi_bo";
+  type: "ho_lien_ket" | "vung_trong_noi_bo" | "dong_goi" | "co_so_thue_ngoai" | "co_so_noi_bo";
   status: "active" | "inactive"; address: string; phone: string;
   users: AdminFacilityUser[];
 };

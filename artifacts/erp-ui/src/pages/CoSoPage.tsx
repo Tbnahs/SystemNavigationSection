@@ -18,10 +18,14 @@ import { useAuth } from "@/contexts/AuthContext";
 import { PROVINCES_VN, COMMUNE_MAP } from "@/lib/vietnam-data";
 
 const TYPE_OPTIONS: { value: Facility["type"]; label: string; color: string }[] = [
-  { value: "ho_lien_ket", label: "Hộ liên kết", color: "bg-emerald-50 text-emerald-700 ring-emerald-200" },
-  { value: "co_so_thue_ngoai", label: "Cơ sở sản xuất (thuê ngoài)", color: "bg-blue-50 text-blue-700 ring-blue-200" },
-  { value: "co_so_noi_bo", label: "Cơ sở sản xuất (nội bộ)", color: "bg-violet-50 text-violet-700 ring-violet-200" },
+  { value: "ho_lien_ket",       label: "Hộ liên kết",            color: "bg-emerald-50 text-emerald-700 ring-emerald-200" },
+  { value: "vung_trong_noi_bo", label: "Vùng trồng nội bộ",      color: "bg-teal-50 text-teal-700 ring-teal-200" },
+  { value: "dong_goi",          label: "Đóng gói",                color: "bg-orange-50 text-orange-700 ring-orange-200" },
+  { value: "co_so_thue_ngoai",  label: "Cơ sở sản xuất (thuê ngoài)", color: "bg-blue-50 text-blue-700 ring-blue-200" },
+  { value: "co_so_noi_bo",      label: "Cơ sở sản xuất (nội bộ)",     color: "bg-violet-50 text-violet-700 ring-violet-200" },
 ];
+
+const SHOW_GIONG_CHE_TYPES: Facility["type"][] = ["ho_lien_ket", "vung_trong_noi_bo"];
 function typeLabel(t: Facility["type"]) { return TYPE_OPTIONS.find(o => o.value === t)?.label ?? t; }
 function typeColor(t: Facility["type"]) { return TYPE_OPTIONS.find(o => o.value === t)?.color ?? ""; }
 
@@ -533,16 +537,13 @@ export default function CoSoPage() {
                 { key: "info", label: "Thông tin cơ sở" },
                 { key: "location", label: "Diện tích & vị trí địa lý" },
                 { key: "certs", label: "Thông tin chứng chỉ" },
-                { key: "departments", label: "Bộ phận" },
+                { key: "departments", label: "Nhân viên" },
               ] as const).map(tab => (
                 <button key={tab.key} onClick={() => setActiveTab(tab.key)}
                   className={`flex-1 py-3.5 text-[13px] font-medium border-b-2 transition-colors ${activeTab === tab.key ? "border-primary text-primary bg-primary/5" : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"}`}>
                   {tab.label}
                   {tab.key === "certs" && form.chungChi.length > 0 && (
                     <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">{form.chungChi.length}</span>
-                  )}
-                  {tab.key === "departments" && form.boPhan.length > 0 && (
-                    <span className="ml-1.5 px-1.5 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">{form.boPhan.length}</span>
                   )}
                 </button>
               ))}
@@ -567,7 +568,7 @@ export default function CoSoPage() {
                     </div>
                     <div>
                       <label className="block text-[13px] font-medium mb-1.5">Loại cơ sở</label>
-                      <select value={form.type} onChange={e => { setF("type", e.target.value as Facility["type"]); if (e.target.value !== "ho_lien_ket") setF("giong_che_ids", []); }}
+                      <select value={form.type} onChange={e => { const t = e.target.value as Facility["type"]; setF("type", t); if (!SHOW_GIONG_CHE_TYPES.includes(t)) setF("giong_che_ids", []); }}
                         className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
                         {TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
                       </select>
@@ -587,16 +588,6 @@ export default function CoSoPage() {
                       </select>
                     </div>
                   </div>
-                  {isSuperAdmin && (
-                    <div>
-                      <label className="block text-[13px] font-medium mb-1.5">Doanh nghiệp</label>
-                      <select value={form.enterpriseId ?? ""} onChange={e => setF("enterpriseId", e.target.value ? Number(e.target.value) : null)}
-                        className="w-full h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
-                        <option value="">-- Chưa gắn doanh nghiệp --</option>
-                        {enterprises.map(d => <option key={d.id} value={d.id}>{d.tenHienThi}</option>)}
-                      </select>
-                    </div>
-                  )}
                   <div>
                     <label className="block text-[13px] font-medium mb-1.5">
                       GLN <span className="text-[11px] text-muted-foreground font-normal">(Global Location Number)</span>
@@ -605,7 +596,7 @@ export default function CoSoPage() {
                       className="w-full h-10 px-3 rounded-lg border border-border text-sm font-mono outline-none focus:border-primary" />
                     <div className="text-[11.5px] text-muted-foreground mt-1">Mã định danh địa điểm toàn cầu GS1.</div>
                   </div>
-                  {form.type === "ho_lien_ket" && (
+                  {SHOW_GIONG_CHE_TYPES.includes(form.type) && (
                     <div>
                       <label className="block text-[13px] font-medium mb-1.5">Giống chè <span className="ml-1 text-[11px] text-muted-foreground font-normal">Chọn một hoặc nhiều giống</span></label>
                       {teaVarieties.length === 0 ? (
@@ -783,94 +774,47 @@ export default function CoSoPage() {
                 </div>
               )}
 
-              {/* TAB 4: Bộ phận */}
+              {/* TAB 4: Nhân viên */}
               {activeTab === "departments" && (
-                <div className="space-y-4">
-                  <div>
-                    <button onClick={addBoPhan} className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] font-medium border border-primary text-primary rounded-lg hover:bg-primary/5">
-                      <Plus className="w-3.5 h-3.5" /> Thêm bộ phận
-                    </button>
+                <div className="space-y-4 max-w-2xl">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Users className="w-4 h-4 text-primary" />
+                    <span className="text-[14px] font-semibold">Nhân viên phụ trách</span>
                   </div>
-                  {form.boPhan.length === 0 ? (
-                    <div className="py-16 text-center text-[13px] text-muted-foreground border border-dashed border-border rounded-xl">
+                  {relevantEmployees.length === 0 ? (
+                    <div className="py-12 text-center text-[13px] text-muted-foreground border border-dashed border-border rounded-xl">
                       <Users className="w-8 h-8 mx-auto mb-2 opacity-25" />
-                      Chưa có bộ phận nào. Nhấn "+ Thêm bộ phận" để bắt đầu.
+                      Chưa có nhân viên nào trong doanh nghiệp.
                     </div>
                   ) : (
-                    <div className="border border-border rounded-xl overflow-hidden">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="text-left text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/40 border-b border-border">
-                            <th className="px-4 py-3 w-12 text-center">STT</th>
-                            <th className="px-4 py-3 w-40">Mã bộ phận</th>
-                            <th className="px-4 py-3">Tên bộ phận</th>
-                            <th className="px-4 py-3">Ghi chú</th>
-                            <th className="px-4 py-3 w-20 text-center">Hành động</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {form.boPhan.map((b, idx) => (
-                            <tr key={b.id} className="border-t border-border hover:bg-muted/20">
-                              <td className="px-4 py-2.5 text-[13px] text-muted-foreground text-center">{idx + 1}</td>
-                              <td className="px-4 py-2.5">
-                                <input value={b.ma} onChange={e => updateBoPhan(b.id, "ma", e.target.value)} placeholder="BP-001"
-                                  className="w-full h-8 px-2 rounded border border-border text-sm outline-none focus:border-primary bg-white" />
-                              </td>
-                              <td className="px-4 py-2.5">
-                                <input value={b.ten} onChange={e => updateBoPhan(b.id, "ten", e.target.value)} placeholder="Tên bộ phận…"
-                                  className="w-full h-8 px-2 rounded border border-border text-sm outline-none focus:border-primary bg-white" />
-                              </td>
-                              <td className="px-4 py-2.5">
-                                <input value={b.ghiChu} onChange={e => updateBoPhan(b.id, "ghiChu", e.target.value)} placeholder="Ghi chú…"
-                                  className="w-full h-8 px-2 rounded border border-border text-sm outline-none focus:border-primary bg-white" />
-                              </td>
-                              <td className="px-4 py-2.5 text-center">
-                                <button onClick={() => removeBoPhan(b.id)} className="p-1.5 rounded hover:bg-rose-50 text-muted-foreground hover:text-rose-600">
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                    <div className="grid grid-cols-2 gap-2 max-h-72 overflow-y-auto">
+                      {relevantEmployees.map(emp => (
+                        <label key={emp.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border hover:bg-muted/40 cursor-pointer">
+                          <input type="checkbox" className="accent-primary" checked={selectedEmployeeIds.includes(emp.id)}
+                            onChange={e => { if (e.target.checked) setSelectedEmployeeIds(p => [...p, emp.id]); else setSelectedEmployeeIds(p => p.filter(id => id !== emp.id)); }} />
+                          <div className="w-8 h-8 rounded-full text-white text-[11px] font-semibold flex items-center justify-center shrink-0" style={{ backgroundColor: emp.avatarColor }}>
+                            {emp.name.slice(0, 2).toUpperCase()}
+                          </div>
+                          <div className="min-w-0">
+                            <div className="text-[12.5px] font-medium truncate">{emp.name}</div>
+                            <div className="text-[11px] text-muted-foreground truncate">{emp.role}</div>
+                          </div>
+                        </label>
+                      ))}
                     </div>
                   )}
-                  {/* Nhân viên phụ trách trong tab Bộ phận */}
-                  <div className="mt-6 pt-5 border-t border-border">
-                    <div className="flex items-center gap-2 mb-3">
-                      <Users className="w-4 h-4 text-primary" />
-                      <span className="text-[14px] font-semibold">Nhân viên phụ trách</span>
+                  {selectedEmployeeIds.length > 0 && (
+                    <div className="text-[12px] text-muted-foreground">
+                      Đã chọn <span className="font-semibold text-primary">{selectedEmployeeIds.length}</span> nhân viên phụ trách
                     </div>
-                    {relevantEmployees.length === 0 ? (
-                      <div className="py-6 text-center text-[13px] text-muted-foreground border border-dashed border-border rounded-xl">
-                        <Users className="w-7 h-7 mx-auto mb-2 opacity-25" />
-                        Chưa có nhân viên nào.
-                      </div>
-                    ) : (
-                      <div className="grid grid-cols-2 gap-2 max-h-56 overflow-y-auto">
-                        {relevantEmployees.map(emp => (
-                          <label key={emp.id} className="flex items-center gap-3 p-2.5 rounded-lg border border-border hover:bg-muted/40 cursor-pointer">
-                            <input type="checkbox" className="accent-primary" checked={selectedEmployeeIds.includes(emp.id)}
-                              onChange={e => { if (e.target.checked) setSelectedEmployeeIds(p => [...p, emp.id]); else setSelectedEmployeeIds(p => p.filter(id => id !== emp.id)); }} />
-                            <div className={`w-7 h-7 rounded-full text-white text-[10px] font-semibold flex items-center justify-center shrink-0 ${emp.avatarColor}`}>
-                              {emp.name.slice(-2).toUpperCase()}
-                            </div>
-                            <div className="min-w-0">
-                              <div className="text-[12.5px] font-medium truncate">{emp.name}</div>
-                              <div className="text-[11px] text-muted-foreground truncate">{emp.role}</div>
-                            </div>
-                          </label>
-                        ))}
-                      </div>
-                    )}
-                    {editItem && selectedEmployeeIds.length > 0 && (
-                      <button onClick={() => assignMu.mutate({ id: editItem.id, ids: selectedEmployeeIds })} disabled={assignMu.isPending}
-                        className="mt-3 h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 hover:brightness-110 disabled:opacity-60">
-                        {assignMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                        <Users className="w-4 h-4" /> Lưu phân công
-                      </button>
-                    )}
-                  </div>
+                  )}
+                  {editItem && selectedEmployeeIds.length > 0 && (
+                    <button onClick={() => assignMu.mutate({ id: editItem.id, ids: selectedEmployeeIds })} disabled={assignMu.isPending}
+                      className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 hover:brightness-110 disabled:opacity-60">
+                      {assignMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
+                      <Users className="w-4 h-4" /> Lưu phân công
+                    </button>
+                  )}
                 </div>
               )}
 
