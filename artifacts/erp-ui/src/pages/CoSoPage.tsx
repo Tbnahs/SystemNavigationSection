@@ -286,8 +286,9 @@ export default function CoSoPage() {
       phone: f.phone, tinh: f.tinh ?? "", xa: f.xa ?? "", address: f.address,
       gln: f.gln ?? "", status: f.status, notes: f.notes,
       giong_che_ids: f.giong_che_ids ?? [],
-      dienTich: "", donViDienTich: "Ha", toaDo: "",
-      chungChi: [], boPhan: [],
+      dienTich: f.dienTich ?? "", donViDienTich: f.donViDienTich ?? "Ha", toaDo: f.toaDo ?? "",
+      chungChi: f.chungChi ? f.chungChi.map(c => ({ ...c })) : [],
+      boPhan: f.boPhan ? f.boPhan.map(b => ({ ...b })) : [],
     });
     setErr(null); setDrawerOpen(true);
   }
@@ -439,7 +440,7 @@ export default function CoSoPage() {
                       {f.phone && <div className="flex items-center gap-1 text-[13px]"><Phone className="w-3.5 h-3.5 text-muted-foreground" />{f.phone}</div>}
                       {(f.xa || f.tinh) && <div className="flex items-center gap-1 text-[12px] text-muted-foreground mt-0.5"><MapPin className="w-3 h-3" />{[f.xa, f.tinh].filter(Boolean).join(", ")}</div>}
                       {f.address && <div className="text-[12px] text-muted-foreground mt-0.5">{f.address}</div>}
-                      {f.type === "ho_lien_ket" && f.giong_che_ids?.length > 0 && (
+                      {SHOW_GIONG_CHE_TYPES.includes(f.type) && f.giong_che_ids?.length > 0 && (
                         <div className="flex flex-wrap gap-1 mt-1.5">
                           {f.giong_che_ids.map(id => {
                             const tv = teaVarieties.find((t: TeaVariety) => t.id === id);
@@ -448,7 +449,13 @@ export default function CoSoPage() {
                           })}
                         </div>
                       )}
-                      {!f.phone && !f.xa && !f.tinh && !f.address && (!f.giong_che_ids?.length || f.type !== "ho_lien_ket") && <span className="text-muted-foreground">—</span>}
+                      {f.chungChi?.length > 0 && (
+                        <div className="flex items-center gap-1 mt-1.5">
+                          <Award className="w-3 h-3 text-amber-500" />
+                          <span className="text-[11px] text-amber-700 font-medium">{f.chungChi.length} chứng chỉ</span>
+                        </div>
+                      )}
+                      {!f.phone && !f.xa && !f.tinh && !f.address && !f.giong_che_ids?.length && !f.chungChi?.length && <span className="text-muted-foreground">—</span>}
                     </td>
                     <td className="px-4 py-3 text-[13px] font-mono">{f.gln || <span className="text-muted-foreground">—</span>}</td>
                     <td className="px-4 py-3">
@@ -749,19 +756,28 @@ export default function CoSoPage() {
                           </div>
                           <div>
                             <label className="block text-[12px] font-medium mb-1.5">Ảnh chứng chỉ</label>
-                            {c.imageUrl ? (
-                              <div className="relative w-28 h-36 group">
-                                <img src={c.imageUrl} alt={c.ten} className="w-full h-full object-cover rounded-lg border border-border" />
+                            <div className="flex items-center gap-2 mb-2">
+                              <input
+                                value={c.imageUrl.startsWith("data:") ? "" : c.imageUrl}
+                                onChange={e => updateCert(c.id, "imageUrl", e.target.value)}
+                                placeholder="Dán URL hình ảnh (https://…)"
+                                className="flex-1 h-9 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary"
+                              />
+                              <button type="button" onClick={() => certImgRefs.current[c.id]?.click()}
+                                className="h-9 px-3 rounded-lg border border-dashed border-border text-[12px] text-muted-foreground hover:border-primary hover:text-primary flex items-center gap-1.5 shrink-0 transition-colors">
+                                <Upload className="w-3.5 h-3.5" /> Tải lên
+                              </button>
+                            </div>
+                            {c.imageUrl && (
+                              <div className="relative inline-block group">
+                                <img src={c.imageUrl} alt={c.ten}
+                                  className="w-28 h-36 object-cover rounded-lg border border-border"
+                                  onError={e => { (e.target as HTMLImageElement).style.display = "none"; }} />
                                 <button onClick={() => updateCert(c.id, "imageUrl", "")}
                                   className="absolute top-1 right-1 w-5 h-5 rounded-full bg-white shadow flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                                   <X className="w-3 h-3 text-rose-500" />
                                 </button>
                               </div>
-                            ) : (
-                              <button type="button" onClick={() => certImgRefs.current[c.id]?.click()}
-                                className="flex items-center gap-2 px-3 py-2 rounded-lg border border-dashed border-border text-[12px] text-muted-foreground hover:border-primary hover:text-primary transition-colors">
-                                <Upload className="w-3.5 h-3.5" /> Tải lên ảnh chứng chỉ
-                              </button>
                             )}
                             <input type="file" accept="image/*" className="hidden"
                               ref={el => { certImgRefs.current[c.id] = el; }}
