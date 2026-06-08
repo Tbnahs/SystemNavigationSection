@@ -120,6 +120,9 @@ export default function DoanhNghiepPage() {
   const [deleteTarget, setDeleteTarget] = useState<Enterprise | null>(null);
   const [activeTab, setActiveTab] = useState<"general" | "location" | "modules" | "quangba">("general");
   const [search, setSearch] = useState("");
+  const [filterProvince, setFilterProvince] = useState("");
+  const [filterModule, setFilterModule] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
   const [submitErr, setSubmitErr] = useState<string | null>(null);
   const [showPwdInDrawer, setShowPwdInDrawer] = useState(false);
@@ -225,12 +228,15 @@ export default function DoanhNghiepPage() {
   const items = (listQ.data?.items ?? []).filter(d =>
     isSuperAdmin ? true : d.id === currentUser?.enterpriseId
   );
-  const filtered = search.trim()
-    ? items.filter((d) =>
-        [d.mst, d.ten, d.tenHienThi, d.daiDien]
-          .some((s) => s.toLowerCase().includes(search.toLowerCase()))
-      )
-    : items;
+  const provinces = Array.from(new Set(items.map(d => d.tinhThanh).filter(Boolean))) as string[];
+
+  const filtered = items.filter((d) => {
+    if (search.trim() && !([d.mst, d.ten, d.tenHienThi, d.daiDien].some(s => s.toLowerCase().includes(search.toLowerCase())))) return false;
+    if (filterProvince && d.tinhThanh !== filterProvince) return false;
+    if (filterModule && !d.modules.includes(filterModule as "ERP" | "TXNG" | "VT")) return false;
+    if (filterStatus && d.status !== filterStatus) return false;
+    return true;
+  });
 
   function setF<K extends keyof FormState>(k: K, v: FormState[K]) {
     setForm((p) => ({ ...p, [k]: v }));
@@ -289,9 +295,25 @@ export default function DoanhNghiepPage() {
               className="w-full h-10 pl-9 pr-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
             />
           </div>
-          <SelectChip label={t("common.province")} />
-          <SelectChip label={t("common.col.module")} />
-          <SelectChip label={t("common.col.status")} />
+          <select value={filterProvince} onChange={e => setFilterProvince(e.target.value)}
+            className={`h-10 px-3 rounded-lg border text-sm outline-none cursor-pointer ${filterProvince ? "border-primary text-primary bg-primary/5 font-medium" : "border-border text-muted-foreground hover:bg-muted"}`}>
+            <option value="">{t("common.province")}: Tất cả</option>
+            {provinces.map(p => <option key={p} value={p}>{p}</option>)}
+          </select>
+          <select value={filterModule} onChange={e => setFilterModule(e.target.value)}
+            className={`h-10 px-3 rounded-lg border text-sm outline-none cursor-pointer ${filterModule ? "border-primary text-primary bg-primary/5 font-medium" : "border-border text-muted-foreground hover:bg-muted"}`}>
+            <option value="">{t("common.col.module")}: Tất cả</option>
+            <option value="ERP">ERP</option>
+            <option value="TXNG">TXNG</option>
+            <option value="VT">Vùng trồng</option>
+          </select>
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+            className={`h-10 px-3 rounded-lg border text-sm outline-none cursor-pointer ${filterStatus ? "border-primary text-primary bg-primary/5 font-medium" : "border-border text-muted-foreground hover:bg-muted"}`}>
+            <option value="">{t("common.col.status")}: Tất cả</option>
+            <option value="active">Đang hoạt động</option>
+            <option value="pending">Chờ kích hoạt</option>
+            <option value="locked">Tạm khóa</option>
+          </select>
           <button className="h-10 px-3 rounded-lg border border-border text-sm flex items-center gap-2 hover:bg-muted text-muted-foreground">
             <Filter className="w-4 h-4" /> {t("common.filter")}
           </button>

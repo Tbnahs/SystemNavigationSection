@@ -246,6 +246,9 @@ export default function NhanVienPage() {
   const isSuperAdmin = !currentUser?.enterpriseId;
 
   const [, setLocation] = useLocation();
+  const [filterEnt, setFilterEnt] = useState("");
+  const [filterRole, setFilterRole] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<Employee | null>(null);
   const [lockTarget, setLockTarget] = useState<Employee | null>(null);
@@ -392,11 +395,16 @@ export default function NhanVienPage() {
   const items = (listQ.data?.items ?? []).filter(u =>
     isSuperAdmin ? true : u.enterpriseId === currentUser?.enterpriseId
   );
-  const filtered = search.trim()
-    ? items.filter((u) =>
-        [u.name, u.email, u.phone].some((s) => s.toLowerCase().includes(search.toLowerCase()))
-      )
-    : items;
+  const entOptions = Array.from(new Set(items.map(u => u.enterpriseName).filter(Boolean))) as string[];
+  const roleOptions = Array.from(new Set(items.map(u => u.role).filter(Boolean))) as string[];
+
+  const filtered = items.filter((u) => {
+    if (search.trim() && !([u.name, u.email, u.phone].some(s => (s ?? "").toLowerCase().includes(search.toLowerCase())))) return false;
+    if (filterEnt && u.enterpriseName !== filterEnt) return false;
+    if (filterRole && u.role !== filterRole) return false;
+    if (filterStatus && u.status !== filterStatus) return false;
+    return true;
+  });
 
   function handleSubmit() {
     setSubmitErr(null);
@@ -432,9 +440,25 @@ export default function NhanVienPage() {
               className="w-full h-10 pl-9 pr-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
             />
           </div>
-          <SelectChip label={t("common.col.enterprise")} />
-          <SelectChip label={t("nv.col.role")} />
-          <SelectChip label={t("common.col.status")} />
+          {isSuperAdmin && (
+            <select value={filterEnt} onChange={e => setFilterEnt(e.target.value)}
+              className={`h-10 px-3 rounded-lg border text-sm outline-none cursor-pointer ${filterEnt ? "border-primary text-primary bg-primary/5 font-medium" : "border-border text-muted-foreground hover:bg-muted"}`}>
+              <option value="">{t("common.col.enterprise")}: Tất cả</option>
+              {entOptions.map(e => <option key={e} value={e}>{e}</option>)}
+            </select>
+          )}
+          <select value={filterRole} onChange={e => setFilterRole(e.target.value)}
+            className={`h-10 px-3 rounded-lg border text-sm outline-none cursor-pointer ${filterRole ? "border-primary text-primary bg-primary/5 font-medium" : "border-border text-muted-foreground hover:bg-muted"}`}>
+            <option value="">{t("nv.col.role")}: Tất cả</option>
+            {roleOptions.map(r => <option key={r} value={r}>{r}</option>)}
+          </select>
+          <select value={filterStatus} onChange={e => setFilterStatus(e.target.value)}
+            className={`h-10 px-3 rounded-lg border text-sm outline-none cursor-pointer ${filterStatus ? "border-primary text-primary bg-primary/5 font-medium" : "border-border text-muted-foreground hover:bg-muted"}`}>
+            <option value="">{t("common.col.status")}: Tất cả</option>
+            <option value="active">Đang hoạt động</option>
+            <option value="invited">Đã mời</option>
+            <option value="locked">Tạm khóa</option>
+          </select>
           <button className="h-10 px-3 rounded-lg border border-border text-sm flex items-center gap-2 hover:bg-muted text-muted-foreground">
             <Filter className="w-4 h-4" /> {t("common.filter")}
           </button>
