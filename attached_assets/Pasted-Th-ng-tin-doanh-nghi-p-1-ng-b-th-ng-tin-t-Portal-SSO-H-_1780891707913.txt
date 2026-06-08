@@ -1,0 +1,125 @@
+Thông tin doanh nghiệp 	1	Đồng bộ thông tin từ Portal SSO	Hệ thống TXNG	Portal SSO	Đồng bộ các thông tin đã được thiết lập từ Portal SSO
+	2	Xem thông tin doanh nghiệp	Admin TXNG		Xem thông tin doanh nghiệp đã được đồng bộ 
+	3	Cập nhật thông tin doanh nghiệp 	Admin TXNG		Cho phép người dùng cập nhật thông tin về "Câu chuyện doanh nghiệp, link website..." phục vụ hiển thị ở màn quét tem TXNG
+Nhân viên (User được  từ SSO)	4	Đồng bộ danh sách user từ SSO	Hệ thống TXNG	Portal SSO	TXNG tự động lấy danh sách người dùng đã được cấp quyền từ SSO để sử dụng trong hệ thống, đảm bảo luôn đồng bộ với tài khoản đăng nhập.
+	5	Gán user vào cơ sở đóng gói/vùng trồng	Admin TXNG	ERP	Người dùng thực hiện thao tác gán user vào cơ sở hoặc vùng trồng ngay trên TXNG; hệ thống gửi yêu cầu sang ERP để cập nhật và chỉ ghi nhận khi ERP xác nhận thành công.
+	6	Phân quyền thao tác trong TXNG	Admin TXNG		Cho phép user khai báo, nhập dữ liệu các hoạt động canh tác, sự kiện sản xuất theo Cơ sở được phân quyền
+	7	Xem danh sách user	Admin TXNG	Portal SSO	Hiển thị danh sách Admin ERP đã đồng bộ từ Portal 
+	8	Xem chi tiết user	Admin TXNG		Xem thông tin 1 Admin ERP 
+	9	Cập nhật thông tin 	Admin TXNG	Portal SSO	Cập nhật thông tin cho Admin ERP -> gửi yêu cầu cập nhật về Portal SSO
+	10	Xóa	Admin TXNG	Portal SSO	Xóa tài khoản Admin ERP -> gửi yêu cầu về Portal SSO
+Cơ sở	11	Đồng bộ Cơ sở từ ERP	Hệ thống TXNG	ERP	Đồng bộ từ ERP, khi ERP có phát sinh thêm mới/cập nhật gửi thông tin sang TXNG đồng bộ
+	12	Xem danh sách cơ sở 	Admin TXNG		
+	13	Tạo Cơ sở	Admin TXNG	ERP	Tạo mới cơ sở (Nhà đóng gói, Nông hộ, Vùng trồng...) ở TXNG, gửi yêu cầu sang ERP để tạo mới, sau đó nhận kết quả và hiển thị trên TXNG
+	14	Cập nhật Cơ sở	Admin TXNG	ERP	Cho phép chỉnh sửa thông tin Cơ sở từ TXNG, dữ liệu được cập nhật tại ERP và đồng bộ ngược lại
+	15	Xem chi tiết cơ sở	Admin TXNG		Xem thông tin 1 cơ sở (Hộ liên kết/Nhà đóng gói)
+	16	Xóa Cơ sở	Admin TXNG	ERP	Xóa cơ sở -> gửi yêu cầu xóa vể ERP
+Sản phẩm nuôi trồng	17	Đồng bộ Sản phẩm nuôi trồng từ ERP	Hệ thống TXNG	ERP	Tương tự Cơ sở
+	18	Xem danh sách Sản phẩm nuôi trồng	Admin TXNG		Xem danh sách các Sản phẩm nuôi trồng đã được đồng bộ từ ERP
+	19	Thêm mới sản phẩm nuôi trồng (Giống chè)	Admin TXNG	ERP	Thêm mới sản phẩm nuôi trồng -> gửi yêu cầu về ERP
+	20	Cập nhật 	Admin TXNG	ERP	Cập nhật sản phẩm nuôi trồng -> gửi yêu cầu về ERP
+	21	Xem chi tiết	Admin TXNG		Xem chi tiết thông tin 1 sản phẩm 
+	22	Xóa	Admin TXNG	ERP	Xóa sản phẩm -> gửi yêu cầu về ERP
+	23	Gán Sản phẩm nuôi trồng với Thương phẩm 	Admin TXNG	ERP	Cho phép liên kết thông tin Thương phẩm khi Thu hoạch (sự kiện ở chuỗi cung ứng) với Sản phẩm nuôi trồng (hoạt động canh tác) để lấy thông tin hoạt động phục vụ TXNG 
+	24	Bỏ gán Sản phẩm nuôi trồng với Thương phẩm	Admin TXNG	ERP	Xóa thương phẩm đã gán với Sản phẩm
+Thương phẩm	25	Đồng bộ Thương phẩm từ ERP	Hệ thống TXNG	ERP	Tương tự Cơ sở
+	26	Xem danh sách Thương phẩm	Admin TXNG		Xem danh sách các Sản phẩm nuôi trồng đã được đồng bộ từ ERP
+	27	Thêm mới 	Admin TXNG	ERP	"- Tương tự Cơ sở
+- Là các dạng thức khác nhau của Sản phẩm nuôi trồng khi đi vào chuỗi cung ứng: Hộp chè 5kg, Hộp chè 3kg; Gói chè...
+- Hoặc các nguyên vật liệu phụ trợ sử dụng trong quá trình sản xuất"
+	28	Cập nhật 	Admin TXNG	ERP	Cập nhật Thương phẩm -> gửi yêu cầu sang ERP
+	29	Xem chi tiết	Admin TXNG	ERP	Xem thông tin 1 Thương phẩm 
+	30	Xóa	Admin TXNG	ERP	Xóa Thương phẩm -> gửi yêu cầu sang ERP
+Vùng trồng	31	Đồng bộ Vùng trồng từ ERP	Hệ thống TXNG	ERP	Tương tự Cơ sở
+	32	Xem danh sách Vùng trồng	Admin TXNG		Xem danh sách Vùng trồng đã đồng bộ
+	33	Tạo Vùng trồng	Admin TXNG	ERP	Thêm mới 1 Vùng trồng -> gửi yêu cầu sang ERP
+	34	Cập nhật Vùng trồng	Admin TXNG	ERP	Cập nhật Vùng trồng -> gửi yêu cầu sang ERP
+	35	Xem chi tiết Vùng trồng	Admin TXNG		Xem chi tiết 1 Vùng trồng
+	36	Xóa Vùng trồng	Admin TXNG	ERP	Xóa Vùng trồng -> gửi yêu cầu sang ERP
+	37	Gán Sản phẩm nuôi trồng với Vùng trồng	Admin TXNG	ERP	
+	38	Bỏ gán sản phẩm nuôi trồng với Vùng trồng	Admin TXNG	ERP	
+Cấu hình Biểu mẫu sự kiện trọng yếu	39	Thêm mới biểu mẫu sự kiện Thu mua/Thu hoạch	Admin TXNG		Cho phép người dùng thiết lập các thông tin về sự kiện sản xuất cần TXNG
+	40	Thêm mới biểu mẫu Sản xuất	Admin TXNG		
+	41	Thêm mới biểu mẫu Đóng gói	Admin TXNG		
+	42	Thiết lập các nhóm thông tin về TXNG theo chuẩn GS1	Admin TXNG	Hệ thống TXNG	Định nghĩa sẵn các nhóm thông tin cho mỗi loại sự kiện trọng yếu TXNG theo chuẩn GS1: 5W - Who, What, When, Where, Why
+	43	Cập nhật	Admin TXNG		
+	44	Xem chi tiết	Admin TXNG		
+	45	Xóa	Admin TXNG		
+	46	Cấu hình các trường thông tin cần ghi nhận	Admin TXNG		
+	47	Gán thương phẩm với sự kiện 	Admin TXNG		
+Cấu hình Biểu mẫu hoạt động	48	Thêm mới	Admin TXNG		Cấu hình biểu mẫu ghi nhận hoạt động canh tác trên web hoặc mobile app để ghi nhận các hoạt động Bón phân, Phun thuốc...
+	49	Cập nhật	Admin TXNG		Cập nhật biểu mẫu ghi nhận hoạt động canh tác trên web hoặc mobile app để ghi nhận các hoạt động Bón phân, Phun thuốc...
+	50	Xem chi tiết	Admin TXNG		Xem chi tiết thông tin hoạt động
+	51	Xóa	Admin TXNG		Xóa biểu mẫu 
+	52	Cấu hình các trường thông tin cần ghi nhận	Admin TXNG		Cấu hình các trường thông tin cần ghi nhận tương ứng với mỗi hoạt động 
+	53	Gán sản phẩm với hoạt động	Admin TXNG		Gán sản phẩm với hoạt động cần khai báo 
+	54	Gán Vật tư với hoạt động	Admin TXNG		Gán vật tư với hoạt động cần sử dụng
+Khai báo TXNG	55	Khai báo sự kiện Thu mua/Thu hoạch	Admin ERP		Cho phép khai báo trên web hoặc mobile app để ghi nhận sự kiện Thu hoạch/Thu mua bán thành phẩm hoặc nguyên vật liệu phụ trợ (bao bì, hộp dùng trong đóng gói)
+	56	Khai báo sự kiện Sản xuất	Nhân viên		Cho phép khai báo trên web hoặc mobile app để ghi nhận sự kiện Sản xuất: Hong, Sao, Sấy... gộp các lô đầu vào; ghi nhận đầu ra, số lượng 
+	57	Khai báo sự kiện Đóng gói	Nhân viên 		Cho phép khai báo trên web hoặc mobile app để ghi nhận sự kiện Đóng gói: Chè hộp, Chè gói dùng các lô đầu vào nào; ghi nhận đầu ra, số lượng 
+	58	Tự động ghi nhận các dữ liệu theo tài khoản khai báo	Hệ thống TXNG		Tự động ghi nhận các dữ liệu theo tài khoản Admin ERP khai báo: Cơ sở, Người thực hiện, Địa điểm, Thời gian real-time
+	59	Import thông tin từ Đơn mua/Bán/Lệnh sản xuất	Nhân viên 		Cho phép import các dữ liệu ở Đơn mua, Đơn bán, Lệnh sản xuất để hạn chế nhập lại các thông tin 
+	60	Khai báo hoạt động canh tác	Nhân viên 		- Cho phép khai báo trên web hoặc mobile app để ghi nhận các hoạt động Bón phân, Phun thuốc...
+	61	Sử dụng vật tư trong khai báo	Nhân viên 	ERP	"- Ghi nhận vật tư sử dụng để TXNG
+- Gửi yêu cầu ERP để tính tồn kho vật tư"
+Tạo lô/mẻ	62	Tạo lô/mẻ	Hệ thống TXNG		Tạo lô/mẻ khi thu mua/thu hoạch hoặc chế biến, đóng gói để theo dõi truy xuất.
+	63	Tạo serial trong lô	Hệ thống TXNG		Tạo và định danh mã serial trong lô
+	64	Đồng bộ lô/mẻ sang ERP	Hệ thống TXNG	ERP	Gửi thông tin lô/mẻ về ERP để phục vụ quản lý kho và bán hàng
+	65	Liên kết chuỗi sự kiện TXNG với lô	Hệ thống TXNG		Liên kết các sự kiện sản xuất vào từng lô để hình thành chuỗi truy xuất đầy đủ.
+	66	Liên kết với hoạt động nuôi trồng	Hệ thống TXNG		Liên kết các hoạt động canh tác vào từng lô để hình thành lịch sử truy xuất phục vụ ATTP.
+Kích hoạt tem TXNG	67	Kích hoạt tem TXNG theo từng serial tem 	Nhân viên 		Kích hoạt thông tin cho từng Serial của lô với từng serial tem 
+	68	Kích hoạt tem TXNG theo dải tem 	Nhân viên 		Kích hoạt thông tin cho lô sản phẩm với dải tem (gồm nhiều serial tem cùng lúc) 
+Hiển thị dữ liệu TXNG_Ngoài hệ thống	69	Quét tem để xem dữ liệu TXNG_ Thông tin sản phẩm/thương phẩm	Hệ thống TXNG	Khách hàng	"Quét mã tem để xem thông tin truy xuất của lô sản phẩm.
+Thông tin sản phẩm/thương phẩm: Tên, Khối lượng, Hướng dẫn sử dụng, Ngày sản xuất, Thông tin đặc điểm..."
+	70	Quét tem hiển thị dữ liệu TXNG_ Thông tin doanh nghiệp 	Hệ thống TXNG	Khách hàng	Quét mã tem để xem thông tin truy xuất của lô sản phẩm: hiển thị thông tin doanh nghiệp: Tên doanh nghiệp, Câu chuyện, Thông tin Website, Địa chỉ....
+	71	Quét tem hiển thị dữ liệu TXNG_ Chuỗi sản xuất	Hệ thống TXNG	Khách hàng	Quét mã tem để xem thông tin truy xuất của lô sản phẩm: hiển thị thông tin chuỗi sản xuất tương ứng cho lô: Thu mua, Thu hoạch ở Nông hộ cụ thể, Sản xuất, Đóng gói, thời gian thực hiện, địa điểm thực hiện, lô và sản phẩm tương ứng...
+	72	Quét tem hiển thị dữ liệu TXNG_ hoạt động canh tác 	Hệ thống TXNG	Khách hàng	Quét mã tem để xem thông tin truy xuất của lô sản phẩm: hiển thị thông tin hoạt động tương ứng cho lô: Bón phân, Phun thuốc... kèm thời gian thực hiện, thông tin vật tư sử dụng 
+Quản lý lô/mẻ_Nội bộ	73	Tìm kiếm, lọc tìm lô/mẻ	Admin TXNG		Cho phép tìm kiếm theo Mã lô/mẻ, Thương phẩm, Cơ sở, Thời gian tạo 
+	74	Xem danh sách lô/mẻ đã tạo	Admin TXNG		Xem danh sách các lô/mẻ thu mua, sản xuất, đóng gói đã tạo
+	75	Xem thông tin truy xuất lô/mẻ	Admin TXNG		Xem thông tin truy xuất nội bộ của lô: chuỗi sản xuất, hoạt động canh tác, tem kích hoạt 
+	76	Hiển thị dữ liệu TXNG theo chuỗi	Admin TXNG		Liên kết dữ liệu của lô theo quy tắc TXNG 1 bước trước - 1 bước sau
+	77	Xuất file Excel chuỗi truy xuất theo lô/mẻ	Admin TXNG		Cho phép tải xuống file Excel chuỗi sự kiện phục vụ TXNG
+	78	Xuất file Excel chuỗi hoạt động theo lô/mẻ	Admin TXNG		Cho phép tải xuống file Excel chuỗi hoạt động nuôi trồng phục vụ TXNG
+Lịch sử khai báo 	79	Xem danh sách lịch sử khai báo sự kiện	Admin TXNG		Xem danh sách các bản ghi sự kiện sản xuất đã khai báo 
+	80	Tìm kiếm, lọc lịch sử khai báo	Admin TXNG		Cho phép tìm kiếm theo Thương phẩm, Cơ sở, Thời gian khai báo
+	81	Xem chi tiết 1 bản ghi sự kiện đã khai báo	Admin TXNG		Xem thông tin chi tiết đã khai báo 
+	82	Xuất file Excel lịch sử sự kiện 	Admin TXNG		Tải xuống danh sách các bản ghi theo tiêu chí lọc
+	83	Xem danh sách lịch sử khai báo hoạt động	Admin TXNG		Xem danh sách các bản ghi hoạt động đã khai báo 
+	84	Xem chi tiết 1 bản ghi hoạt động đã khai báo	Admin TXNG		Xem thông tin chi tiết đã khai báo 
+	85	Tìm kiếm, lọc lịch sử khai báo hoạt động                                                                                                                                                                           	Admin TXNG		Cho phép tìm kiếm theo Sản phẩm nuôi trồng, Vùng trồng, Thời gian khai báo
+	86	Xuất file Excel lịch sử hoạt động 	Admin TXNG		Tải xuống danh sách các bản ghi theo tiêu chí lọc
+Vật tư	87	Đồng bộ Vật tư từ ERP	Hệ thống TXNG	ERP	Lấy danh sách vật tư từ ERP để sử dụng trong khai báo canh tác.
+	88	Xem danh sách vật tư	Admin TXNG		Hiển thị danh sách vật tư đã đồng bộ để phân loại quản lý TXNG
+	89	Thêm mới vật tư	Admin TXNG	Tương tự Cơ sở	
+	90	Xem chi tiết 	Admin TXNG		
+	91	Cập nhật	Admin TXNG		
+	92	Xóa	Admin TXNG		
+Đơn vị vật tư	93	Đồng bộ Đơn vị vật tư từ ERP	Hệ thống TXNG	ERP	
+	94	Xem danh sách vật tư	Admin TXNG	Tương tự Cơ sở	Hiển thị danh sách vật tư đã đồng bộ để lựa chọn khi sử dụng.
+	95	Thêm mới vật tư	Admin TXNG	ERP	
+	96	Xem chi tiết 	Admin TXNG		
+	97	Cập nhật	Admin TXNG	ERP	
+	98	Xóa	Admin TXNG	ERP	
+	99	Theo dõi sử dụng vật tư	Admin TXNG		Xem danh sách các bản ghi hoạt động có sử dụng vật tư
+	100	Truy xuất theo vật tư	Admin TXNG		Xem danh sách các lô/mẻ có sử dụng vật tư phục vụ truy xuất xuôi
+Tem TXNG	101	Tạo lô tem trắng 	Admin hệ thống		Tạo các lô tem trắng để phục vụ quét TXNG 
+	102	Phân phối cho doanh nghiệp sử dụng 	Admin hệ thống		Phân phối lô tem cho từng doanh nghiệp 
+	103	Xem danh sách lô tem 	Admin TXNG		Xem danh sách lô tem đã tạo 
+	104	Xem chi tiết 	Admin TXNG		Xem chi tiết thông tin 1 lô tem 
+	105	Xóa	Admin hệ thống		Xóa 1 lô tem đã tạo 
+	106	Quản lý trạng thái tem 	Admin TXNG		Theo dõi tình trạng sử dụng của tem (chưa dùng, đã dùng, đã kích hoạt bao nhiêu).
+Đồng bộ cổng TXNG quốc gia	107	Xem danh sách lô đủ điều kiện	Admin TXNG		Hiển thị các lô đã đủ thông tin để gửi lên Cổng TXNG quốc gia.
+	108	Đồng bộ lô lên Cổng TXNG	Admin TXNG		Thực hiện gửi dữ liệu lô từ TXNG lên Cổng quốc gia.
+	109	Đồng bộ Vùng trồng, Cơ sở, Thương phẩm 	Admin TXNG		Đồng bộ thông tin Vùng trồng, Cơ sở, Thương phẩm đủ điều kiện lên Cổng TXNG 
+	110	Xem trạng thái đồng bộ	Admin TXNG		Theo dõi trạng thái gửi dữ liệu (đã đồng bộ/chưa đồng bộ)
+Liên kết doanh nghiệp 	111	Liên kết doanh nghiệp trong chuỗi	Admin TXNG		Cho phép chia sẻ và sử dụng thông tin giữa các doanh nghiệp 
+	112	Liên kết cơ sở 	Admin TXNG		Cho phép sử dụng thông tin Cơ sở của doanh nghiệp liên kết để nối chuỗi truy xuất
+	113	Liên kết lô thương phẩm 	Admin TXNG		Cho phép sử dụng thông tin Lô của doanh nghiệp liên kết để nối chuỗi truy xuất 
+Khí thải Carbon	114	Ghi nhận dữ liệu khí thải trong quá trình sản xuất 	Hệ thống TXNG	Vùng trồng	
+	115	Tính toán phát thải theo công thức	Hệ thống TXNG		
+	116	Báo cáo khí thải trong quá trình sản xuất 	Hệ thống TXNG		
+	117	Cảnh báo vượt ngưỡng phát thải cho phép	Hệ thống TXNG		
+Dashboard	118	Xem tổng quan số lô thu mua/thu hoạch theo hộ liên kết	Admin TXNG		Cho phép người dùng xem thống kê về số lô đã thu mua/thu hoạch từ hộ liên kết
+	119	Xem số lô đóng gói theo loại Thành phẩm/Thương phẩm đóng gói	Admin TXNG		Cho phép người dùng xem số lô đóng gói đã khai báo theo từng Thành phẩm 
+	120	Xem thống kế số tem truy xuất đã kích hoạt 	Admin TXNG		Cho phép người dùng xem thống kê số lượng tem truy xuất đã kích hoạt 
+	121	Xem thống kê về lượng phản hồi tích cực/tiêu cực của lô hàng	Admin TXNG		Cho phép người dùng xem thống kê về số lượt phản hồi của lô hàng

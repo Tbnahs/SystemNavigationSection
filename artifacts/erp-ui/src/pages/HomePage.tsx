@@ -32,42 +32,54 @@ const ALL_SYSTEMS: {
   { id: "vung_trong", icon: Leaf,     labelKey: "nav.module.vung-trong", label: "Vùng trồng & IoT",  descKey: "home.system.vung-trong.desc", href: "/module/vung-trong", count: "10", gradient: "from-amber-500 to-orange-500",  badge: "bg-amber-100 text-amber-700" },
 ];
 
-const ERP_ACTIVITIES = [
-  { icon: CheckCircle2, ok: true,  text: "Lô sản xuất L018104 đã nhập kho thành công",     time: "5 phút trước" },
-  { icon: ShoppingCart, ok: true,  text: "Phiếu thu mua PO-0504-008 được tạo mới",          time: "32 phút trước" },
-  { icon: CheckCircle2, ok: true,  text: "Đơn bán #DH-20240401 đã giao thành công",         time: "2 giờ trước" },
-  { icon: AlertCircle,  ok: false, text: "Đơn PO-0404-007 chưa nhận hàng theo lịch",        time: "3 giờ trước" },
-  { icon: Package,      ok: true,  text: "Lô đóng gói S053103 xuất kho sang đại lý",        time: "5 giờ trước" },
+type ActivityItem = { icon: React.ElementType; ok: boolean; textKey: TranslationKey; time: string };
+
+const ERP_ACTIVITIES: ActivityItem[] = [
+  { icon: CheckCircle2, ok: true,  textKey: "home.activity.erp.1", time: "5 phút trước" },
+  { icon: ShoppingCart, ok: true,  textKey: "home.activity.erp.2", time: "32 phút trước" },
+  { icon: CheckCircle2, ok: true,  textKey: "home.activity.erp.3", time: "2 giờ trước" },
+  { icon: AlertCircle,  ok: false, textKey: "home.activity.erp.4", time: "3 giờ trước" },
+  { icon: Package,      ok: true,  textKey: "home.activity.erp.5", time: "5 giờ trước" },
 ];
 
-const TXNG_ACTIVITIES = [
-  { icon: QrCode,       ok: true,  text: "QR Code mới tạo cho sản phẩm Hồng trà L018104",  time: "10 phút trước" },
-  { icon: CheckCircle2, ok: true,  text: "Xác nhận nguồn gốc lô VCC-2024-089 thành công",  time: "1 giờ trước" },
-  { icon: Link2,        ok: true,  text: "Đối tác mới thêm vào chuỗi cung ứng",             time: "3 giờ trước" },
-  { icon: Award,        ok: true,  text: "Chứng nhận OCOP gia hạn cho 5 sản phẩm",          time: "Hôm qua" },
-  { icon: AlertCircle,  ok: false, text: "Lô BC003104 chưa có xác nhận truy xuất",          time: "Hôm qua" },
+const TXNG_ACTIVITIES: ActivityItem[] = [
+  { icon: QrCode,       ok: true,  textKey: "home.activity.txng.1", time: "10 phút trước" },
+  { icon: CheckCircle2, ok: true,  textKey: "home.activity.txng.2", time: "1 giờ trước" },
+  { icon: Link2,        ok: true,  textKey: "home.activity.txng.3", time: "3 giờ trước" },
+  { icon: Award,        ok: true,  textKey: "home.activity.txng.4", time: "Hôm qua" },
+  { icon: AlertCircle,  ok: false, textKey: "home.activity.txng.5", time: "Hôm qua" },
 ];
 
-const IOT_ACTIVITIES = [
-  { icon: Wifi,         ok: true,  text: "Cảm biến độ ẩm vùng Nà Hồng hoạt động bình thường", time: "Vừa xong" },
-  { icon: CheckCircle2, ok: true,  text: "Vùng trồng B3 hoàn thành kiểm định chất lượng",      time: "2 giờ trước" },
-  { icon: AlertCircle,  ok: false, text: "Cảnh báo: Vùng A1 cần bổ sung phân bón",             time: "3 giờ trước" },
-  { icon: Wifi,         ok: true,  text: "24 thiết bị IoT đang truyền dữ liệu ổn định",        time: "5 giờ trước" },
-  { icon: AlertCircle,  ok: false, text: "Cảm biến nhiệt độ khu B2 mất kết nối",               time: "Hôm qua" },
+const IOT_ACTIVITIES: ActivityItem[] = [
+  { icon: Wifi,         ok: true,  textKey: "home.activity.iot.1", time: "Vừa xong" },
+  { icon: CheckCircle2, ok: true,  textKey: "home.activity.iot.2", time: "2 giờ trước" },
+  { icon: AlertCircle,  ok: false, textKey: "home.activity.iot.3", time: "3 giờ trước" },
+  { icon: Wifi,         ok: true,  textKey: "home.activity.iot.4", time: "5 giờ trước" },
+  { icon: AlertCircle,  ok: false, textKey: "home.activity.iot.5", time: "Hôm qua" },
 ];
 
-const PORTAL_ACTIVITIES = [
-  { icon: Users,        ok: true,  text: "Tài khoản mới được kích hoạt thành công",         time: "15 phút trước" },
-  { icon: Building2,    ok: true,  text: "Doanh nghiệp Chè Quân Chu cập nhật thông tin",    time: "1 giờ trước" },
-  { icon: CheckCircle2, ok: true,  text: "Phân quyền module ERP cho HTX Hồng Hà",           time: "2 giờ trước" },
-  { icon: Store,        ok: true,  text: "Cơ sở chế biến Nà Hồng thêm mới",                time: "Hôm qua" },
-  { icon: AlertCircle,  ok: false, text: "2 tài khoản chờ kích hoạt",                       time: "Hôm qua" },
+const PORTAL_ACTIVITIES: ActivityItem[] = [
+  { icon: Users,        ok: true,  textKey: "home.activity.portal.1", time: "15 phút trước" },
+  { icon: Building2,    ok: true,  textKey: "home.activity.portal.2", time: "1 giờ trước" },
+  { icon: CheckCircle2, ok: true,  textKey: "home.activity.portal.3", time: "2 giờ trước" },
+  { icon: Store,        ok: true,  textKey: "home.activity.portal.4", time: "Hôm qua" },
+  { icon: AlertCircle,  ok: false, textKey: "home.activity.portal.5", time: "Hôm qua" },
 ];
 
 function fmtCur(v: number) {
   if (v >= 1_000_000_000) return (v / 1_000_000_000).toFixed(1) + " tỷ";
   if (v >= 1_000_000)     return (v / 1_000_000).toFixed(0) + " tr";
   return v.toLocaleString("vi-VN") + " đ";
+}
+
+function tTime(t: (k: TranslationKey) => string, time: string): string {
+  if (time === "Vừa xong") return t("time.just-now");
+  if (time === "Hôm qua")  return t("time.yesterday");
+  const minMatch = time.match(/^(\d+) phút trước$/);
+  if (minMatch) return `${minMatch[1]} ${t("time.min-ago")}`;
+  const hrMatch = time.match(/^(\d+) giờ trước$/);
+  if (hrMatch) return `${hrMatch[1]} ${t("time.hour-ago")}`;
+  return time;
 }
 
 const PIE_COLORS = ["#16a34a", "#15803d", "#4ade80", "#86efac", "#bbf7d0"];
@@ -86,18 +98,18 @@ const CustomTooltipBar = ({ active, payload, label }: any) => {
   );
 };
 
-const CustomTooltipPie = ({ active, payload }: any) => {
+function CustomTooltipPie({ active, payload, finishedKgLabel }: any) {
   if (!active || !payload?.length) return null;
   const d = payload[0];
   return (
     <div className="bg-white border border-border rounded-lg px-3 py-2 shadow-md text-xs">
       <p className="font-semibold text-foreground">{d.name}</p>
       <p style={{ color: d.payload.fill }} className="font-medium">
-        {d.value.toFixed(1)} kg thành phẩm
+        {d.value.toFixed(1)} {finishedKgLabel}
       </p>
     </div>
   );
-};
+}
 
 /* ── StatCard ────────────────────────────────────────────── */
 function StatCard({ icon: Icon, label, value, sub, color = "text-primary", bg = "bg-primary/10" }: {
@@ -211,12 +223,12 @@ export default function HomePage() {
       {/* ── ERP stats ────────────────────────────────────── */}
       {hasERP && (
         <section className="mb-8">
-          <SectionLabel>📊 Tổng quan ERP</SectionLabel>
+          <SectionLabel>{t("home.section.erp")}</SectionLabel>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <StatCard icon={TrendingUp}   label="Doanh thu đơn bán"     value={fmtCur(summary.totalSalesRevenue)}         sub={`${summary.completedSales} đơn HT`} />
-            <StatCard icon={ShoppingCart} label="Khối lượng thu mua"    value={`${summary.totalPurchaseKg.toFixed(0)} kg`} sub={`${summary.activePOs} PO đang xử lý`} />
-            <StatCard icon={Factory}      label="Lô sản xuất"           value={String(summary.totalProductionBatches)}     sub={`${summary.completedProductionKg.toFixed(0)} kg TP`} />
-            <StatCard icon={Package}      label="Lô đóng gói chờ xuất"  value={String(summary.pendingPackaging)}           sub={`${summary.totalSalesOrders} đơn bán`} />
+            <StatCard icon={TrendingUp}   label={t("home.erp.revenue")}    value={fmtCur(summary.totalSalesRevenue)}         sub={`${summary.completedSales} ${t("home.erp.completed")}`} />
+            <StatCard icon={ShoppingCart} label={t("home.erp.purchase.vol")} value={`${summary.totalPurchaseKg.toFixed(0)} kg`} sub={`${summary.activePOs} ${t("home.erp.po-active")}`} />
+            <StatCard icon={Factory}      label={t("home.erp.production")}  value={String(summary.totalProductionBatches)}     sub={`${summary.completedProductionKg.toFixed(0)} ${t("home.erp.kg-tp")}`} />
+            <StatCard icon={Package}      label={t("home.erp.packaging")}   value={String(summary.pendingPackaging)}           sub={`${summary.totalSalesOrders} ${t("home.erp.sales-orders")}`} />
           </div>
         </section>
       )}
@@ -224,12 +236,12 @@ export default function HomePage() {
       {/* ── TXNG stats ───────────────────────────────────── */}
       {hasTXNG && (
         <section className="mb-8">
-          <SectionLabel>🔍 Tổng quan Truy xuất nguồn gốc</SectionLabel>
+          <SectionLabel>{t("home.section.txng")}</SectionLabel>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <StatCard icon={QrCode}       label="QR Code đã tạo"             value="156"  sub="12 mới tuần này"     color="text-blue-600"    bg="bg-blue-50" />
-            <StatCard icon={CheckCircle2} label="Sản phẩm xác nhận nguồn gốc" value="42"  sub="3 đang chờ duyệt"   color="text-blue-600"    bg="bg-blue-50" />
-            <StatCard icon={Link2}        label="Chuỗi cung ứng hoạt động"    value="7"   sub="24 điểm liên kết"   color="text-cyan-600"    bg="bg-cyan-50" />
-            <StatCard icon={Award}        label="Chứng nhận còn hiệu lực"     value="18"  sub="2 sắp hết hạn"      color="text-cyan-600"    bg="bg-cyan-50" />
+            <StatCard icon={QrCode}       label={t("home.txng.qr")}       value="156" sub={t("home.txng.qr.sub")}       color="text-blue-600"  bg="bg-blue-50" />
+            <StatCard icon={CheckCircle2} label={t("home.txng.verified")} value="42"  sub={t("home.txng.verified.sub")} color="text-blue-600"  bg="bg-blue-50" />
+            <StatCard icon={Link2}        label={t("home.txng.chain")}    value="7"   sub={t("home.txng.chain.sub")}    color="text-cyan-600"  bg="bg-cyan-50" />
+            <StatCard icon={Award}        label={t("home.txng.cert")}     value="18"  sub={t("home.txng.cert.sub")}     color="text-cyan-600"  bg="bg-cyan-50" />
           </div>
         </section>
       )}
@@ -237,12 +249,12 @@ export default function HomePage() {
       {/* ── IoT / Vùng trồng stats ───────────────────────── */}
       {hasIoT && (
         <section className="mb-8">
-          <SectionLabel>🌿 Tổng quan Vùng trồng & IoT</SectionLabel>
+          <SectionLabel>{t("home.section.iot")}</SectionLabel>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <StatCard icon={MapPin}   label="Vùng nguyên liệu"      value="3"      sub="Nà Hồng · Nà Bay · Bản Chang"  color="text-amber-600" bg="bg-amber-50" />
-            <StatCard icon={Leaf}     label="Cây đang theo dõi"      value="1.247"  sub="82% đang mùa thu hoạch"         color="text-amber-600" bg="bg-amber-50" />
-            <StatCard icon={Wifi}     label="Thiết bị IoT online"    value="24/24"  sub="Truyền dữ liệu bình thường"     color="text-orange-600" bg="bg-orange-50" />
-            <StatCard icon={AlertCircle} label="Cảnh báo cần xử lý" value="2"      sub="1 khẩn cấp"                     color="text-rose-600" bg="bg-rose-50" />
+            <StatCard icon={MapPin}      label={t("home.iot.zones")}        value="3"      sub="Nà Hồng · Nà Bay · Bản Chang"  color="text-amber-600"  bg="bg-amber-50" />
+            <StatCard icon={Leaf}        label={t("home.iot.plants")}       value="1.247"  sub={t("home.iot.plants.sub")}       color="text-amber-600"  bg="bg-amber-50" />
+            <StatCard icon={Wifi}        label={t("home.iot.devices.label")} value="24/24" sub={t("home.iot.devices.sub")}     color="text-orange-600" bg="bg-orange-50" />
+            <StatCard icon={AlertCircle} label={t("home.iot.alerts")}       value="2"      sub={t("home.iot.alerts.sub")}      color="text-rose-600"   bg="bg-rose-50" />
           </div>
         </section>
       )}
@@ -250,12 +262,12 @@ export default function HomePage() {
       {/* ── Portal-only stats (real API data) ───────────── */}
       {isPortalOnly && (
         <section className="mb-8">
-          <SectionLabel>🏢 Tổng quan hệ thống</SectionLabel>
+          <SectionLabel>{t("home.section.portal")}</SectionLabel>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <StatCard icon={Building2} label="Doanh nghiệp đang hoạt động" value={String(entStats?.active ?? "—")}        sub={`${entStats?.total ?? 0} tổng`}            color="text-violet-600" bg="bg-violet-50" />
-            <StatCard icon={Users}     label="Người dùng hệ thống"          value={String(empStats?.total ?? "—")}          sub={`${empStats?.active ?? 0} đang hoạt động`}  color="text-violet-600" bg="bg-violet-50" />
-            <StatCard icon={Store}     label="Cơ sở vận hành"              value={String(facData?.items.length ?? "—")}    sub="Nhà xưởng & điểm thu mua"                   color="text-purple-600" bg="bg-purple-50" />
-            <StatCard icon={Ruler}     label="Đơn vị tính đã thiết lập"    value={String(unitData?.items.length ?? "—")}   sub="Dùng trong toàn hệ thống"                   color="text-purple-600" bg="bg-purple-50" />
+            <StatCard icon={Building2} label={t("home.portal.enterprises")} value={String(entStats?.active ?? "—")}       sub={`${entStats?.total ?? 0} ${t("home.portal.enterprises.sub")}`}  color="text-violet-600" bg="bg-violet-50" />
+            <StatCard icon={Users}     label={t("home.portal.users.label")} value={String(empStats?.total ?? "—")}         sub={`${empStats?.active ?? 0} ${t("home.portal.users.sub")}`}       color="text-violet-600" bg="bg-violet-50" />
+            <StatCard icon={Store}     label={t("home.portal.facilities")}  value={String(facData?.items.length ?? "—")}   sub={t("home.portal.facilities.sub")}                                 color="text-purple-600" bg="bg-purple-50" />
+            <StatCard icon={Ruler}     label={t("home.portal.units")}       value={String(unitData?.items.length ?? "—")}  sub={t("home.portal.units.sub")}                                      color="text-purple-600" bg="bg-purple-50" />
           </div>
         </section>
       )}
@@ -263,11 +275,11 @@ export default function HomePage() {
       {/* ── ERP Charts (chỉ hiện khi có module ERP) ──────── */}
       {hasERP && (
         <section className="mb-8">
-          <SectionLabel>THỐNG KÊ THU MUA & SẢN XUẤT</SectionLabel>
+          <SectionLabel>{t("home.section.purchase-stats")}</SectionLabel>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <div className="lg:col-span-2 bg-white border border-border rounded-xl p-4">
-              <p className="text-sm font-semibold text-foreground mb-1">Khối lượng thu mua theo ngày</p>
-              <p className="text-xs text-muted-foreground mb-4">Phân theo vùng nguyên liệu (kg)</p>
+              <p className="text-sm font-semibold text-foreground mb-1">{t("home.chart.purchase.title")}</p>
+              <p className="text-xs text-muted-foreground mb-4">{t("home.chart.purchase.sub")}</p>
               <ResponsiveContainer width="100%" height={220}>
                 <BarChart data={dailyPurchaseData} margin={{ top: 0, right: 8, left: -20, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -282,8 +294,8 @@ export default function HomePage() {
               </ResponsiveContainer>
             </div>
             <div className="bg-white border border-border rounded-xl p-4">
-              <p className="text-sm font-semibold text-foreground mb-1">Sản lượng theo loại chè</p>
-              <p className="text-xs text-muted-foreground mb-2">Thành phẩm sản xuất (kg)</p>
+              <p className="text-sm font-semibold text-foreground mb-1">{t("home.chart.production.title")}</p>
+              <p className="text-xs text-muted-foreground mb-2">{t("home.chart.production.sub")}</p>
               <ResponsiveContainer width="100%" height={220}>
                 <PieChart>
                   <Pie data={productionByType} cx="50%" cy="45%" innerRadius={50} outerRadius={75} paddingAngle={3} dataKey="value">
@@ -291,7 +303,7 @@ export default function HomePage() {
                       <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
                     ))}
                   </Pie>
-                  <Tooltip content={<CustomTooltipPie />} />
+                  <Tooltip content={<CustomTooltipPie finishedKgLabel={t("home.chart.finished-kg")} />} />
                   <Legend iconType="circle" iconSize={8} wrapperStyle={{ fontSize: 11 }} />
                 </PieChart>
               </ResponsiveContainer>
@@ -300,9 +312,9 @@ export default function HomePage() {
           <div className="mt-4 bg-white border border-border rounded-xl p-4">
             <div className="flex items-center gap-2 mb-1">
               <MapPin className="w-4 h-4 text-primary" strokeWidth={1.5} />
-              <p className="text-sm font-semibold text-foreground">Tổng thu mua theo vùng nguyên liệu</p>
+              <p className="text-sm font-semibold text-foreground">{t("home.chart.zone.title")}</p>
             </div>
-            <p className="text-xs text-muted-foreground mb-4">Toàn bộ đợt thu mua (kg)</p>
+            <p className="text-xs text-muted-foreground mb-4">{t("home.chart.zone.sub")}</p>
             <div className="space-y-3">
               {areaTotal.map((item, i) => {
                 const max = areaTotal[0].kg;
@@ -327,10 +339,10 @@ export default function HomePage() {
       {/* ── TXNG Charts placeholder ───────────────────────── */}
       {hasTXNG && !hasERP && (
         <section className="mb-8">
-          <SectionLabel>THỐNG KÊ TRUY XUẤT</SectionLabel>
+          <SectionLabel>{t("home.section.txng-stats")}</SectionLabel>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <PlaceholderChart label="Biểu đồ QR theo thời gian sẽ hiển thị tại đây" icon={QrCode} color="text-blue-500" />
-            <PlaceholderChart label="Bản đồ chuỗi cung ứng sẽ hiển thị tại đây"    icon={Link2}  color="text-cyan-500" />
+            <PlaceholderChart label={t("home.placeholder.txng.qr")}  icon={QrCode} color="text-blue-500" />
+            <PlaceholderChart label={t("home.placeholder.txng.map")} icon={Link2}  color="text-cyan-500" />
           </div>
         </section>
       )}
@@ -338,10 +350,10 @@ export default function HomePage() {
       {/* ── IoT Charts placeholder ────────────────────────── */}
       {hasIoT && !hasERP && !hasTXNG && (
         <section className="mb-8">
-          <SectionLabel>GIÁM SÁT VÙNG TRỒNG</SectionLabel>
+          <SectionLabel>{t("home.section.iot-monitor")}</SectionLabel>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-            <PlaceholderChart label="Biểu đồ nhiệt độ & độ ẩm theo cảm biến sẽ hiển thị tại đây" icon={Wifi}   color="text-amber-500" />
-            <PlaceholderChart label="Bản đồ vùng trồng & thiết bị IoT sẽ hiển thị tại đây"        icon={Layers} color="text-orange-500" />
+            <PlaceholderChart label={t("home.placeholder.iot.temp")} icon={Wifi}   color="text-amber-500" />
+            <PlaceholderChart label={t("home.placeholder.iot.map")}  icon={Layers} color="text-orange-500" />
           </div>
         </section>
       )}
@@ -365,13 +377,13 @@ export default function HomePage() {
                     <Icon className="w-5 h-5 text-white" strokeWidth={1.5} />
                   </div>
                   <span className={`text-[10.5px] font-medium px-2 py-0.5 rounded-full ${sys.badge}`}>
-                    {sys.count} chức năng
+                    {sys.count} {t("home.functions")}
                   </span>
                 </div>
                 <h3 className="font-semibold text-foreground text-sm mb-1">{sys.labelKey ? t(sys.labelKey) : sys.label}</h3>
                 <p className="text-xs text-muted-foreground mb-4">{t(sys.descKey)}</p>
                 <div className="flex items-center gap-1 text-primary text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">
-                  Vào hệ thống <ArrowRight className="w-3 h-3" />
+                  {t("home.enter-system")} <ArrowRight className="w-3 h-3" />
                 </div>
               </button>
             );
@@ -392,10 +404,10 @@ export default function HomePage() {
                 className={`flex items-start gap-3 px-4 py-3 hover:bg-muted/40 transition-colors ${i < activities.length - 1 ? "border-b border-border" : ""}`}
               >
                 <Icon className={`w-4 h-4 mt-0.5 shrink-0 ${activity.ok ? "text-primary" : "text-amber-500"}`} strokeWidth={1.5} />
-                <p className="flex-1 text-sm text-foreground">{activity.text}</p>
+                <p className="flex-1 text-sm text-foreground">{t(activity.textKey)}</p>
                 <div className="shrink-0 flex items-center gap-1 text-muted-foreground">
                   <Clock className="w-3 h-3" />
-                  <span className="text-xs whitespace-nowrap">{activity.time}</span>
+                  <span className="text-xs whitespace-nowrap">{tTime(t, activity.time)}</span>
                 </div>
               </div>
             );

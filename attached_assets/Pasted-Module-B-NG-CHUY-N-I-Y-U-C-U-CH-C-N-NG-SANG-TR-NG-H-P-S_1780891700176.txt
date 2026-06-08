@@ -1,0 +1,395 @@
+Module	BẢNG CHUYỂN ĐỔI YÊU CẦU CHỨC NĂNG SANG TRƯỜNG HỢP SỬ DỤNG (USE-CASE)								
+									
+									
+	TT	Tên Use-Case	Tên tác nhân chính	Tên tác nhân phụ	Mô tả trường hợp sử dụng	Số Trans	Mức độ cần thiết	Mức độ	Điếm số Trans
+Thông tin doanh nghiệp 	1	Đồng bộ thông tin từ Portal SSO	Hệ thống ERP	Portal SSO	Đồng bộ các thông tin đã được thiết lập từ Portal SSO				
+	2	Xem thông tin doanh nghiệp	Admin ERP		Xem thông tin doanh nghiệp đã được đồng bộ 				
+	3	Cập nhật thông tin doanh nghiệp 	Admin ERP		Cho phép người dùng cập nhật thông tin về "Câu chuyện doanh nghiệp, link website..." phục vụ hiển thị ở màn quét tem TXNG				
+Người dùng	4	Đồng bộ danh sách người dùng từ SSO	Hệ thống ERP	Portal SSO	TXNG tự động lấy danh sách người dùng đã được cấp quyền từ SSO để sử dụng trong hệ thống, đảm bảo luôn đồng bộ với tài khoản đăng nhập.				
+	5	Gán User vào vai trò cụ thể	Admin ERP		Người dùng thực hiện thao tác gán Admin ERP vào cơ sở hoặc vùng trồng ngay trên TXNG; hệ thống gửi yêu cầu sang ERP để cập nhật và chỉ ghi nhận khi ERP xác nhận thành công.				
+	6	Phân quyền thao tác theo vai trò trong ERP	Admin ERP		Cho phép user khai báo, nhập dữ liệu các hoạt động canh tác, sự kiện sản xuất theo Cơ sở được phân quyền				
+	7	Xem danh sách người dùng	Admin ERP	Portal SSO	Hiển thị danh sách Admin ERP đã đồng bộ từ Portal 				
+	8	Xem chi tiết người dùng	Admin ERP		Xem thông tin 1 Admin ERP 				
+	9	Cập nhật thông tin người dùng	Admin ERP	Portal SSO	Cập nhật thông tin cho Admin ERP -> gửi yêu cầu cập nhật về Portal SSO				
+	10	Xóa	Admin ERP	Portal SSO	Xóa tài khoản Admin ERP -> gửi yêu cầu về Portal SSO				
+	I. Dashboard ERP tổng thể								
+	11	Xem tổng quan hệ thống ERP	Admin ERP	Hệ thống	Hiển thị dashboard tổng quan với các chỉ số KPI chính: tổng đơn hàng, doanh thu, tồn kho, sản lượng thu mua và sản xuất theo ngày/tuần/tháng.		M	Trung bình	
+	12	Xem số liệu đơn hàng tổng thể	Admin ERP	Hệ thống	Hiển thị widget tổng số đơn hàng đang xử lý, đơn hàng hoàn thành, đơn hàng hủy trong kỳ lọc được chọn.		M	Trung bình	
+	13	Xem doanh thu tổng hợp trên Dashboard	Admin ERP	Hệ thống	Hiển thị tổng doanh thu và tổng tiền đã thu trong kỳ, so sánh với kỳ trước hoặc mục tiêu.		M	Trung bình	
+	14	Xem cảnh báo tồn kho trên Dashboard	Admin ERP	Hệ thống	Hiển thị danh sách sản phẩm sắp hết hàng hoặc hết hàng, giúp quản lý nhanh chóng xử lý.		M	Trung bình	
+	15	Xem tiến độ thu mua trên Dashboard	Admin ERP	Hệ thống	Hiển thị sản lượng thu mua thực tế so với kế hoạch (lệnh thu mua), % hoàn thành theo lệnh đang mở.		M	Trung bình	
+	16	Xem tiến độ sản xuất trên Dashboard	Admin ERP	Hệ thống	Hiển thị số lệnh sản xuất đang chạy, tổng khối lượng thành phẩm trong kỳ.		M	Trung bình	
+	17	Lọc Dashboard theo thời gian	Admin ERP	Hệ thống	Cho phép lọc toàn bộ Dashboard theo ngày, tuần, tháng, quý hoặc tùy chỉnh khoảng thời gian.		M	Trung bình	
+	18	Điều hướng từ Dashboard sang module chi tiết	Admin ERP	Hệ thống	Từ Dashboard, quản lý có thể click vào widget để chuyển sang màn hình chi tiết của module tương ứng (đơn hàng, kho, thu mua...).		M	Trung bình	
+	II. Báo cáo thống kê tổng thể								
+	19	Báo cáo doanh thu tổng hợp	Hệ thống		Hiển thị báo cáo tổng doanh thu theo ngày/tháng/năm, phân tách theo kênh bán (ERP thủ công, website), loại sản phẩm và khách hàng.		M	Trung bình	
+	20	Báo cáo sản lượng thu mua & sản xuất	Hệ thống		Báo cáo tổng sản lượng nguyên liệu thu mua và thành phẩm sản xuất theo kỳ, phân tách theo vùng trồng, loại chè, nông hộ.		M	Trung bình	
+	21	Báo cáo tồn kho tổng hợp	Hệ thống		Cung cấp báo cáo tồn kho đầu kỳ – nhập – xuất – tồn cuối kỳ, phân loại theo nhóm sản phẩm và lô batch.		M	Trung bình	
+	22	Báo cáo chất lượng tổng thể (QC)	Hệ thống		Thống kê tỷ lệ đạt QC theo từng giai đoạn (đầu vào, sản xuất, đầu ra), theo vùng trồng và nông hộ trong kỳ.		M	Trung bình	
+	23	Báo cáo công nợ tổng hợp	Hệ thống		Hiển thị tổng công nợ phải thu từ khách hàng, phân loại theo hạng khách, tình trạng nợ và hạn thanh toán.		M	Trung bình	
+	24	Xuất báo cáo tổng thể	Hệ thống		Cho phép xuất tất cả các loại báo cáo tổng thể ra định dạng Excel hoặc PDF để phục vụ lưu trữ và báo cáo nội bộ.		M	Trung bình	
+	III. Quản lý đơn hàng								
+	21	Tạo đơn hàng thủ công	Admin ERP	Hệ thống	Tạo đơn thủ công (không liên kết báo giá)				
+	22	Tạo đơn hàng tự động từ website marketing	Hệ thống	Admin ERP	Tạo đơn hàng tự động từ website marketing				
+	23	Cập nhật thông tin chung đơn hàng	Admin ERP		Sửa khách hàng, ngày, ghi chú				
+	24	Cập nhật sản phẩm trong đơn	Admin ERP		Thêm / sửa / xóa sản phẩm				
+	25	Cập nhật giá trị đơn hàng	Admin ERP	Hệ thống	Sửa giá, chiết khấu, VAT				
+	26	Cập nhật trạng thái đơn hàng	Admin ERP	Hệ thống	Xác nhận / xử lý / giao / hoàn thành / hủy				
+	27	Cập nhật thông tin giao hàng	Admin ERP		Mã vận đơn, đơn vị VC, ghi chú				
+	28	Xóa / hủy đơn hàng	Admin ERP		Hủy đơn hoặc xóa				
+	29	Xem danh sách đơn hàng	Admin ERP		Hiển thị danh sách				
+	30	Tìm kiếm / lọc đơn hàng	Admin ERP		Theo mã, khách, thời gian				
+	31	Xem chi tiết đơn hàng	Admin ERP		Xem full thông tin				
+	32	Nhập thông tin khách hàng	Admin ERP		Chọn / tìm khách				
+	33	Tính toán giá trị đơn hàng	Hệ thống		Tính tổng tiền, VAT				
+	34	Phân loại đơn Web / thủ công	Hệ thống		Phân biệt nguồn đơn				
+	35	In / xuất đơn hàng	Admin ERP		In / PDF / Excel				
+	IV. Quản lý lô & truy xuất								
+	36	Chọn lô xuất bán	Admin ERP	Hệ thống	Chọn batch sản phẩm				
+	37	Kiểm tra tồn kho theo lô	Hệ thống		Kiểm tra tồn				
+	38	Kiếm soát không nhập vượt tồn	Hệ thống		Chặn vượt tồn				
+	39	Xem tồn kho theo lô	Admin ERP		Hiển thị tồn				
+	V. Xử lý sau bán				In danh sách đơn mua				
+	40	Hủy đơn hàng	Admin ERP		Hủy đơn				
+	41	Cập nhật tồn kho sau khi hủy đơn	Hệ thống		Khi đơn hàng bị hủy, hệ thống tự động hoàn lại số lượng hàng đã xuất kho vào tồn kho tương ứng theo lô batch.				
+	42	Hoàn trả hàng	Admin ERP		Xử lý trả hàng				
+	43	Điều chỉnh đơn hàng	Admin ERP		Sửa sau khi tạo				
+	44	Ghi nhận lý do thay đổi	Admin ERP		Lưu lý do				
+	VI. Dashboard & báo cáo								
+	45	Xem số lượng đơn hàng đang xử lý	Admin ERP		Xem đơn hàng đang xử lý				
+	46	Xem tổng doanh thu	Admin ERP		Doanh thu				
+	47	Xem tiền đã thu	Admin ERP		Đã thanh toán				
+	48	Thống kê đơn hàng	Admin ERP		Số lượng				
+	49	Xem công nợ	Admin ERP		Danh sách nợ				
+	VII. Hệ thống & mở rộng								
+	50	Xuất Excel danh sách đơn hàng	Admin ERP		Export				
+	51	Xuất PDF danh sách đơn hàng	Admin ERP		Export				
+	52	In danh sách đơn hàng	Admin ERP		In				
+Quản lý sản phẩm nuôi trồng	53	Nhận dữ liệu Sản phẩm nuôi trồng từ TXNG	Hệ thống ERP	Hệ thống TXNG	Hệ thống ERP tiếp nhận dữ liệu sản phẩm nuôi trồng được đồng bộ từ TXNG và cập nhật vào danh mục sản phẩm.				
+	54	Nhận dữ liệu Sản phẩm nuôi trồng từ Vùng trồng	Hệ thống ERP	Hệ thống Vùng trồng	Hệ thống ERP tiếp nhận dữ liệu sản phẩm nuôi trồng từ hệ thống Vùng trồng và cập nhật vào danh mục sản phẩm.				
+	55	Xem danh sách Giống chè	Admin ERP		Admin ERP tra cứu danh sách sản phẩm nuôi trồng trong hệ thống, hỗ trợ tìm kiếm và lọc theo tiêu chí.				
+	56	Thêm mới Giống chè	Admin ERP		Admin ERP tạo mới sản phẩm nuôi trồng (giống chè), nhập các thông tin như tên, mã, mô tả để quản lý trong hệ thống.				
+	57	Cập nhật thông tin Giống chè	Admin ERP		Admin ERP chỉnh sửa thông tin sản phẩm nuôi trồng đã tạo.				
+	58	Xem chi tiết Giống chè	Admin ERP		Admin ERP xem thông tin chi tiết của một sản phẩm nuôi trồng.				
+	59	Xóa Giống chè	Admin ERP		Admin ERP thực hiện xóa sản phẩm nuôi trồng khỏi hệ thống khi không còn sử dụng.				
+	60	Gán Giống chè với Thương phẩm	Admin ERP	Hệ thống	Admin ERP thiết lập liên kết giữa sản phẩm nuôi trồng và sản phẩm thương phẩm để phục vụ truy xuất nguồn gốc.				
+	61	Gán Giống chè với Vùng trồng	Admin ERP	Hệ thống Vùng trồng	Admin ERP thiết lập liên kết giữa sản phẩm nuôi trồng và vùng trồng tương ứng.				
+	62	Bỏ gán Sản phẩm nuôi trồng với Thương phẩm	Admin ERP	Hệ thống	Admin ERP hủy liên kết giữa sản phẩm nuôi trồng và sản phẩm thương phẩm.				
+Quản lý Vùng trồng	63	Thêm mới vùng trồng							
+	64	Gán Giống chè với Vùng trồng	Admin ERP	Hệ thống Vùng trồng	Admin ERP hủy liên kết giữa sản phẩm nuôi trồng và vùng trồng.				
+	65	Nhận dữ liệu tạo mới Vùng trồng từ TXNG	Hệ thống ERP	Hệ thống TXNG	ERP nhận request tạo Vùng trồng mới do TXNG gửi (Khai báo vùng trồng); 				
+	66	Nhận dữ liệu tạo mới Vùng trồng từ Vùng Trồng	Hệ thống ERP	Vùng Trồng	ERP nhận request tạo Vùng trồng mới do Vùng Trồng gửi (Khai báo vùng trồng); 				
+	67	Đồng bộ Vùng trồng sang TXNG, Vùng Trồng	Hệ thống ERP	Hệ thống TXNG	Khi ERP phát sinh thêm/cập nhật Vùng trồng thì tự động gửi thông tin sang TXNG để đồng bộ.				
+	68	Cập nhật Vùng trồng 	Hệ thống ERP	Hệ thống TXNG	ERP nhận và xử lý request cập nhật thông tin Vùng trồng từ TXNG; xác nhận và đồng bộ ngược lại.				
+	69	Xem danh sách Vùng trồng	Admin ERP	Hệ thống	Hiển thị danh sách toàn bộ Vùng trồng trong DB chung ERP (đồng bộ với TXNG).				
+	70	Xem chi tiết Vùng trồng	Admin ERP	Hệ thống	Xem thông tin Vùng trồng: diện tích, GPS, nông hộ liên kết, sản phẩm nuôi trồng, lịch sử.				
+	71	Xóa / ngưng hoạt động Vùng trồng 	Admin ERP	Hệ thống TXNG	ERP nhận yêu cầu xóa Vùng trồng từ TXNG, quản lý xác nhận và gửi kết quả về TXNG.				
+Hộ liên kết	I. Quản lý Hộ liên kết								
+	72	Tạo hộ liên kết	Admin ERP		Tạo mới hộ liên kết: tên, mã hộ, SĐT, CCCD, vùng, diện tích, năm tham gia				
+	73	Nhập / import danh sách hộ từ file Excel.							
+	74	Gắn hộ liên kết với Giống chè			(quan hệ nhiều-nhiều).				
+	75	Cập nhật hộ liên kết	Admin ERP		Chỉnh sửa thông tin hộ liên kết				
+	76	Xóa / ngưng hoạt động hộ	Admin ERP		Xóa hoặc chuyển trạng thái ngưng hợp tác				
+	77	Xem danh sách hộ liên kết	Admin ERP		Hiển thị danh sách hộ				
+	78	Tìm kiếm hộ liên kết	Admin ERP		Tìm theo tên, mã hộ, SĐT				
+	79	Lọc hộ theo Giống chè	Admin ERP		Lọc theo vùng trồng (Bản Chang, Nà Bay...)				
+	80	Sắp xếp danh sách hộ	Admin ERP		Sắp xếp theo mã, tên, sản lượng				
+	81	Xem chi tiết hộ liên kết	Admin ERP		Xem thông tin chi tiết hộ,từ vùng nào, diện tích bao nhiêu,...				
+	82	Xuất danh sách hộ	Admin ERP		Xuất Excel / PDF				
+	83	In danh sách hộ	Admin ERP		In danh sách				
+	II. Quản lý QR hộ liên kết								
+	90	Sinh mã QR hộ liên kết	Hệ thống		Tạo QR theo mã hộ				
+	91	Xem QR hộ liên kết	Admin ERP		Hiển thị QR				
+	92	Tải xuống QR hộ liên kết	Admin ERP		In QR dùng khi thu mua				
+	III. Thống kê & Dashboard								
+	93	Xem tổng số hộ liên kết	Admin ERP	Hệ thống	Tổng số hộ				
+	94	Xem tổng số Giống chè của hộ	Admin ERP	Hệ thống	Tổng vùng				
+	95	Xem tổng diện tích	Admin ERP	Hệ thống	Tổng ha				
+	96	Xem tổng sản lượng	Admin ERP	Hệ thống	Tổng kg/tấn				
+	97	Xem chất lượng trung bình	Admin ERP	Hệ thống	% CL trung bình				
+Quy cách và tiêu chuẩn	I. Quản lý Quy cách thu hái & đơn giá								
+	98	Tạo quy cách thu hái	Admin ERP		Tạo quy cách (1 tôm, 1 tôm 1 lá, 2 lá…)				
+	99	Cập nhật quy cách	Admin ERP		Chỉnh sửa thông tin quy cách				
+	100	Xóa quy cách	Admin ERP		Xóa quy cách không sử dụng				
+	101	Xem danh sách quy cách	Admin ERP		Hiển thị danh sách				
+	102	Xem chi tiết quy cách	Admin ERP		Xem thông tin chi tiết				
+	103	Thiết lập đơn giá theo quy cách	Admin ERP		Nhập đơn giá cố định hoặc khoảng giá				
+	104	Gán Giống chè cho quy cách	Admin ERP		Gán Giống chè: Trung du, Lai, Shan Tuyết...				
+	105	Gán Thương phẩm cho quy cách	Admin ERP		Chè xanh, hồng trà, bạch trà…				
+	106	Xuất danh sách quy cách	Admin ERP		Export Excel / PDF				
+	107	In danh sách quy cách	Admin ERP		In				
+	II. Quản lý đơn giá theo % chất lượng								
+	108	Tạo mức đánh giá chất lượng	Admin ERP		Tạo khoảng % (70–79, 80–89…)				
+	109	Cập nhật mức đánh giá	Admin ERP		Sửa khoảng %				
+	110	Xóa mức đánh giá	Admin ERP		Xóa				
+	111	Thiết lập đơn giá theo %	Admin ERP		Gán giá tương ứng từng mức				
+	112	Gán quy cách áp dụng	Admin ERP		Áp dụng cho 1 tôm, 1 tôm 2 lá				
+	113	Xếp loại chất lượng	Admin ERP		Đạt / Khá / Tốt / Xuất sắc				
+	114	Xem bảng đơn giá	Admin ERP		Hiển thị bảng				
+	115	Xuất bảng đơn giá	Admin ERP		Excel / PDF				
+	III. Quản lý tiêu chuẩn đánh giá chất lượng								
+	116	Tạo tiêu chuẩn đánh giá	Admin ERP		Tạo tiêu chí (độ non, đồng đều…)				
+	117	Cập nhật tiêu chuẩn	Admin ERP		Sửa nội dung				
+	118	Xóa tiêu chuẩn	Admin ERP		Xóa				
+	119	Xem danh sách tiêu chuẩn	Admin ERP		Hiển thị				
+	120	Xem chi tiết tiêu chuẩn	Admin ERP		Nội dung mô tả				
+Quản lý Nguyên vật liệu phụ trợ	I. Quản lý Nguyên vật liệu phụ trợ								
+	121	Tạo mới Nguyên vật liệu phụ trợ	Admin ERP		Admin ERP tạo mới  nguyên vật liệu phụ trợ trong hệ thống ERP, nhập các thông tin như tên, mã, nhà cung cấp,..mô tả để phục vụ sản xuất và quản lý tồn kho.				
+	122	Cập nhật thông tin Nguyên vật liệu phụ trợ	Admin ERP		Admin ERP chỉnh sửa thông tin  nguyên vật liệu phụ trợ đã tạo, bao gồm tên, mã, đơn vị tính, mô tả và các thuộc tính liên quan.				
+	123	Gán đơn vị tính khi tạo Nguyên vật liệu phụ trợ	Admin ERP	Hệ thống	Khi tạo mới  nguyên vật liệu phụ trợ, người dùng lựa chọn đơn vị tính từ danh sách đã được khai báo, hệ thống ghi nhận để phục vụ quản lý tồn kho và sản xuất.				
+	124	Đồng bộ danh sách Nguyên vật liệu phụ trợ sang TXNG	Hệ thống ERP	Hệ thống TXNG	Hệ thống ERP tự động gửi danh sách  nguyên vật liệu phụ trợ sang hệ thống TXNG để sử dụng trong quá trình khai báo sản xuất.				
+	125	Nhận thông báo sử dụng Nguyên vật liệu phụ trợ từ TXNG	Hệ thống ERP	Hệ thống TXNG	Khi TXNG ghi nhận việc sử dụng  nguyên vật liệu phụ trợ trong sản xuất, ERP tiếp nhận dữ liệu và tự động cập nhật, trừ tồn kho tương ứng.				
+	126	Xem danh sách Nguyên vật liệu phụ trợ	Admin ERP		Admin ERP tra cứu danh sách nguyên vật liệu phụ trợ trong hệ thống, hỗ trợ tìm kiếm và lọc theo các tiêu chí.				
+	127	Tính tồn kho Nguyên vật liệu phụ trợ	Admin ERP	Hệ thống	Admin ERP kho xem số lượng tồn của từng  nguyên vật liệu phụ trợ , hệ thống hiển thị cảnh báo khi tồn kho dưới mức tối thiểu.				
+	128	Tạo mới đơn vị tính	Admin ERP	Quản lý	Admin ERP tạo mới đơn vị tính (kg, g, cái, hộp, bao, lít...) để sử dụng khi khai báo vật tư trong hệ thống.				
+	129	Cập nhật đơn vị tính	Admin ERP		Admin ERP chỉnh sửa thông tin đơn vị tính như tên, ký hiệu, mô tả.				
+	130	Xem danh sách đơn vị tính	Admin ERP		Admin ERP tra cứu danh sách các đơn vị tính đã khai báo trong hệ thống.				
+Quản lý Vật tư	I. Quản lý vật tư								
+	131	Tạo mới vật tư							
+	132	Cập nhật vật tư	Hệ thống ERP	Hệ thống TXNG	ERP đẩy danh sách Nguyên vật liệu phụ trợ sang TXNG để Admin ERP có thể chọn khi khai báo hoạt động sản xuất.				
+	133	Xem chi tiết thông tin 	Hệ thống ERP	Hệ thống TXNG	Khi TXNG ghi nhận sử dụng vật tư trong khai báo sản xuất, ERP nhận thông tin để tính trừ tồn kho Nguyên vật liệu phụ trợ.				
+	134	Ẩn vật tư							
+	135	Xem danh sách vật tư	Admin ERP		Hiển thị toàn bộ danh sách Nguyên vật liệu phụ trợtrong hệ thống ERP.				
+	136	Tính tồn kho vật tư	Admin ERP	Hệ thống	Xem số lượng tồn hiện tại của từng Nguyên vật liệu phụ trợ, cảnh báo khi dưới ngưỡng tối thiểu.				
+"Quản lý đơn vị Vật tư
+"	II. Quản lý đơn vị vật tư								
+		Tạo mới đơn vị vật tư							
+		Cập nhật đơn vị vật tư							
+		Xem chi tiết thông tin đơn vị vật tư							
+		Ẩn đơn vị vật tư							
+		Xem danh sách đơn vị 							
+		Tính tồn kho đơn vị vật tư							
+Thu mua / Thu hái	I. Quản lý Lệnh thu mua								
+	136	Tạo lệnh thu mua	Admin ERP		Tạo kế hoạch thu mua theo thời gian				
+	137	Nhập mục tiêu thu mua	Admin ERP		Nhập tổng sản lượng cần				
+	138	Cảnh báo thu mua ít / nhiều hơn so với mục tiêu	Hệ thống		Hiển thị cảnh báo				
+	139	Chọn Giống chè	Admin ERP		Chè / vỏ quýt				
+	140	Chọn quy cách thu mua	Admin ERP		1 tôm, 1 tôm 2 lá…				
+	141	Chọn Hộ thu mua/Cơ sở thu hái	Admin ERP		Bản Chang, Nà Bay…				
+	142	Phân bổ sản lượng theo hộ	Admin ERP	Hệ thống	Giao chỉ tiêu cho từng hộ				
+	143	Thiết lập thời gian thu mua	Admin ERP		Từ ngày – đến ngày				
+	144	Cập nhật lệnh thu mua	Admin ERP		Chỉnh sửa				
+	145	Hủy lệnh thu mua	Admin ERP		Hủy kế hoạch				
+	146	Xem danh sách lệnh	Admin ERP		Danh sách lệnh				
+	147	Xem chi tiết lệnh	Admin ERP		Xem kế hoạch				
+	148	Theo dõi tiến độ lệnh	Hệ thống		% hoàn thành				
+	149	Đóng lệnh thu mua	Admin ERP		Khi hoàn thành				
+	II. Quản lý đơn thu mua/thu hái								
+	150	Tạo đơn thu mua	Hệ thống	TXNG	Nhận các sự kiện thu mua đã khai báo				
+	151	Gán Giống chè vào Đơn thu mua	Hệ thống	TXNG	Nhận batch nguyên liệu từ TXNG				
+	152	Gán thông tin QC thu mua	Hệ thống	TXNG	Nhận % chất lượng đã đánh giá				
+	153	Tính giá tiền	Hệ thống	TXNG	Nhận mapping: hộ, vùng, quy cách				
+	154	Gán lô thu mua vào lệnh	Hệ thống		Mapping lô TXNG vào kế hoạch ERP				
+	155	Cập nhật đơn thu mua	Hệ thống		Tổng hợp theo lệnh				
+	156	Xem chi tiết 	Admin ERP	Hệ thống					
+Quản lý Cơ sở đóng gói	I. Quản lý Cơ sở								
+	157	Nhận yêu cầu tạo mới Cơ sở từ TXNG	Hệ thống ERP	Hệ thống TXNG	ERP nhận request tạo mới Cơ sở (Nhà đóng gói, Nông hộ, Vùng trồng, Cơ sở chế biến...) do TXNG gửi sang để phê duyệt.				
+	158	Tạo cơ sở sản xuất	Admin ERP	Hệ thống	Tạo mới cơ sở sản xuất				
+	159	Cập nhật thông tin Cơ sở (từ TXNG)	Hệ thống ERP	Hệ thống TXNG	ERP nhận request cập nhật thông tin Cơ sở từ TXNG, xác nhận và đồng bộ lại sang TXNG.				
+	160	Xóa / vô hiệu hóa Cơ sở (từ TXNG)	Admin ERP	Hệ thống TXNG	ERP nhận yêu cầu xóa Cơ sở từ TXNG, quản lý xác nhận hoặc từ chối, gửi kết quả về TXNG.				
+	161	Cập nhật cơ sở sản xuất	Admin ERP	Hệ thống	Chỉnh sửa thông tin cơ sở: tên, địa chỉ, mã cơ sở, trạng thái hoạt động				
+	162	Xem danh sách cơ sở sản xuất	Admin ERP	Hệ thống	Hiển thị danh sách tất cả cơ sở sản xuất đang hoạt động trong hệ thống				
+	163	Xem chi tiết cơ sở sản xuất	Admin ERP	Hệ thống	Xem thông tin chi tiết: địa điểm, lịch sử sản xuất, nhân sự, liên kết TXNG				
+	164	Ngừng hoạt động cơ sở sản xuất	Admin ERP	Hệ thống	Khóa cơ sở sản xuất không cho sử dụng trong lệnh sản xuất mới				
+		Gán nhân viên thuộc Cơ sở							
+Quản lý Lệnh sản xuất	I. Quản lý Lệnh sản xuất								
+	165	Tạo lệnh sản xuất	Admin ERP 	Quản lý	Tạo mới lệnh sản xuất				
+	166	Gán loại chè/thương phẩm sản xuất	Admin ERP		Chọn loại chè (Chè xanh / Hồng trà / Bạch trà)				
+	167	Nhập ngày sản xuất	Admin ERP		Thiết lập ngày sản xuất				
+	168	Nhập ghi chú sản xuất	Admin ERP		Ghi chú thông tin				
+	169	Cập nhật lệnh sản xuất	Admin ERP		Chỉnh sửa thông tin				
+	170	Hủy lệnh sản xuất	Admin ERP	Quản lý	Hủy lệnh				
+	171	Xem danh sách lệnh SX	Admin ERP	Quản lý	Hiển thị danh sách				
+	172	Tìm kiếm / lọc lệnh SX	Admin ERP		Theo mã, loại chè, trạng thái				
+	173	Xem chi tiết lệnh SX	Admin ERP		Xem đầy đủ thông tin				
+Quản lý lô sản xuất	V. Quản lý lô sản xuất (NHẬN TỪ TXNG)								
+	174	Nhận lô sản xuất từ TXNG	Admin ERP 	Hệ thống TXNG	Admin ERP ERP kiểm tra và xác nhận lô sản xuất (batch Lxxxxx) do TXNG gửi sang, bao gồm thông tin nguyên liệu đầu vào, đầu ra và mapping liên quan để ghi nhận vào hệ thống				
+	175	Xem danh sách lô sản xuất	Admin ERP		Hiển thị danh sách các lô sản xuất đã được đồng bộ từ TXNG, bao gồm mã lô, loại chè, ngày sản xuất, khối lượng và trạng thái QC.				
+	176	Tìm kiếm / lọc lô sản xuất	Admin ERP		Cho phép tìm kiếm lô sản xuất theo mã lô, loại chè, thời gian sản xuất hoặc trạng thái để dễ dàng tra cứu và quản lý.				
+	177	Xem chi tiết lô sản xuất	Admin ERP	Hệ thống TXNG	Hiển thị chi tiết thông tin của một lô sản xuất bao gồm nguyên liệu đầu vào, các công đoạn sản xuất, khối lượng thành phẩm và thông tin truy xuất nguồn gốc liên quan.				
+	178	Theo dõi nguồn gốc lô sản xuất	Admin ERP	Hệ thống TXNG	Cho phép truy vết ngược từ lô sản xuất về các lô nguyên liệu thu mua (RAW batch), nông hộ, vùng trồng và các hoạt động canh tác liên quan.				
+	179	Theo dõi sản lượng sản xuất	Admin ERP		Hiển thị tổng khối lượng thành phẩm được tạo ra từ các lô sản xuất để phục vụ quản lý sản lượng và lập kế hoạch kinh doanh.				
+	180	Tính tồn kho cho lô sản xuất	Hệ thống	Hệ thống TXNG	Kiểm tra trạng thái QC của lô sản xuất (Đạt / Không đạt), chỉ cho phép các lô đạt tiêu chuẩn được đưa vào đóng gói hoặc nhập kho.				
+Quản lý Cơ sở đóng gói	I. Quản lý Cơ sở đóng gói								
+		Tạo mới cơ sở đóng gói	Admin ERP	Hệ thống	Tạo mới cơ sở đóng gói				
+	181	Nhận yêu cầu tạo mới Cơ sở đóng gói từ TXNG	Hệ thống ERP	Hệ thống TXNG	ERP nhận request tạo Nhà đóng gói mới từ TXNG, hiển thị để quản lý xác nhận hoặc từ chối.				
+	182	Xem danh sách Cơ sở đóng gói	Admin ERP	Hệ thống	Hiển thị danh sách tất cả cơ sở đóng gói (Nhà đóng gói) đang hoạt động trong hệ thống.				
+	183	Xem chi tiết Cơ sở đóng gói	Admin ERP	Hệ thống	Xem thông tin chi tiết: địa chỉ, liên hệ, lịch sử đóng gói, nhân sự, liên kết TXNG.				
+	184	Cập nhật Cơ sở đóng gói (từ TXNG)	Hệ thống ERP	Hệ thống TXNG	ERP nhận và xử lý request cập nhật thông tin Cơ sở đóng gói do TXNG gửi sang.				
+	185	Ngừng hoạt động Cơ sở đóng gói	Admin ERP	Hệ thống	Khóa Cơ sở đóng gói không cho sử dụng trong các lệnh đóng gói mới.				
+	I. Nhận dữ liệu đóng gói từ TXNG								
+	186	Nhận lô đóng gói 5kg từ TXNG	Hệ thống	Hệ thống TXNG	Hệ thống ERP tự động nhận các lô đóng gói sơ cấp (bao 5kg – batch Bxxxxx) từ hệ thống TXNG sau khi người dùng khai báo sự kiện đóng gói. Thông tin bao gồm loại chè, khối lượng, nguồn gốc từ các lô sản xuất.				
+	187	Nhận lô đóng gói thành phẩm từ TXNG	Hệ thống	Hệ thống TXNG	Hệ thống ERP nhận các lô đóng gói thứ cấp (batch Sxxxxx) từ TXNG, bao gồm sản phẩm đóng gói nhỏ (500g, 250g…) và chè vụn (trà túi lọc), phục vụ quản lý tồn kho và bán hàng.				
+	188	Xem lịch sử đóng gói theo thời gian.							
+Quản lý Sản phẩm 	I. Quản lý Danh mục Sản phẩm đầu ra								
+	189	Tạo mới Sản phẩm (Thương phẩm)	Admin ERP	Quản lý	Thêm mới sản phẩm đầu ra vào ERP: Hộp chè 5kg, Hộp chè 3kg, Gói chè 500g, 250g, Trà túi lọc... kèm thông tin loại, khối lượng, giá.				
+		Thiết lập thông tin quảng bá			Đặc điểm, Công dụng, Tính chất, ....				
+	190	Nhận yêu cầu tạo mới thương phẩm	Hệ thống	Hệ thống TXNG					
+	191	Cập nhật thông tin Sản phẩm	Admin ERP		Chỉnh sửa thông tin sản phẩm: tên, quy cách đóng gói, giá niêm yết, trạng thái kinh doanh.				
+	192	Đồng bộ Sản phẩm sang TXNG	Hệ thống ERP	Hệ thống TXNG	ERP đẩy danh sách Thương phẩm (sản phẩm đầu ra) sang TXNG để sử dụng trong khai báo sự kiện đóng gói.				
+	193	Phân loại sản phẩm để quản lý 	Admin ERP		Admin ERP thiết lập loại sản phẩm theo từng sự kiện nghiệp vụ (Nguyên liệu – Thu mua, Bán thành phẩm – Sản xuất, Thương phẩm – Đóng gói)				
+	194	Phân loại danh mục sản phẩm	Admin ERP		Tạo, sửa, xóa nhóm sản phẩm (Chè xanh, Hồng trà, Trà túi lọc...) để phân loại và lọc nhanh.	M			
+	195	Quản lý đơn vị tính	Admin ERP		Tạo và quản lý các đơn vị tính sử dụng trong hệ thống: kg, hộp, túi, thùng...	M			
+	196	Xem danh sách Sản phẩm	Admin ERP	Hệ thống	Hiển thị danh sách toàn bộ sản phẩm đầu ra trong hệ thống.				
+	197	Xem chi tiết Sản phẩm	Admin ERP		Xem thông tin chi tiết sản phẩm: mô tả, giá, quy cách, tồn kho hiện tại.				
+	198	Ngừng hoạt động Sản phẩm	Admin ERP	Hệ thống	Đánh dấu sản phẩm không còn kinh doanh, không cho tạo đơn hàng mới với sản phẩm này.				
+	199	Đồng bộ Sản phẩm sang Website	Hệ thống ERP	Website	Đẩy thông tin sản phẩm (tên, giá, hình ảnh, mô tả) sang website bán hàng.				
+	II. Quản lý Giá bán								
+	200	Thiết lập giá bán mặc định theo sản phẩm	Admin ERP		Cấu hình giá bán lẻ mặc định cho từng sản phẩm, áp dụng khi tạo đơn hàng.	M			
+	201	Thiết lập thời hạn hiệu lực bảng giá	Admin ERP		Cấu hình ngày bắt đầu và ngày hết hạn của bảng giá để quản lý giá theo mùa vụ / chương trình khuyến mại.	M			
+	202	Xem lịch sử thay đổi giá	Admin ERP	Hệ thống	Tra cứu audit trail thay đổi giá: ai thay đổi, thay đổi lúc nào, từ giá nào sang giá nào.	M			
+	203	Xuất bảng giá ra Excel / PDF	Admin ERP		Xuất toàn bộ bảng giá sản phẩm ra file để chia sẻ với khách hàng hoặc lưu trữ nội bộ.	M			
+Kho	I. Quản lý tồn kho								
+	204	Xem tổng quan tồn kho	Admin ERP		Hiển thị tổng tồn kho thành phẩm (bao 5kg, đóng gói nhỏ) và vật tư, bao gồm số lượng tồn, giá trị kho, cảnh báo sắp hết và hết hàng để phục vụ điều hành.				
+	205	Xem danh sách tồn kho	Admin ERP		Hiển thị danh sách tất cả sản phẩm trong kho, bao gồm bao 5kg (Bxxxxx), thành phẩm đóng gói nhỏ (Sxxxxx) và vật tư.				
+	206	Xem tồn theo phân loại	Admin ERP		Phân loại tồn kho theo nhóm: bao 5kg, thành phẩm bán lẻ, vật tư đóng gói.				
+	207	Xem tồn theo lô/mẻ	Admin ERP		Hiển thị tồn kho chi tiết theo từng lô batch (Bxxxxx, Sxxxxx) để phục vụ truy xuất nguồn gốc.				
+	208	Tìm kiếm tồn kho	Admin ERP		Tìm kiếm theo mã batch, tên sản phẩm hoặc loại sản phẩm.				
+	209	Lọc tồn kho	Admin ERP		Lọc theo kho, loại sản phẩm hoặc trạng thái tồn kho.				
+	210	Cảnh báo sắp hết hàng	Hệ thống		Tự động cảnh báo khi tồn kho xuống dưới ngưỡng tối thiểu.				
+	211	Cảnh báo hết hàng	Hệ thống		Cảnh báo khi tồn kho bằng 0.				
+	II. Nhập kho								
+	212	Tạo phiếu nhập kho thương phẩm, nguyên liệu phụ trợ	Hệ thống		Hệ thống ERP tự động nhận batch bao 5kg (Bxxxxx) từ TXNG sau khi hoàn tất sự kiện đóng gói sơ cấp, bao gồm thông tin loại chè, khối lượng và nguồn gốc lô sản xuất.				
+	213	Gán lô sản xuất, đóng gói với phiếu nhập kho	Hệ thống		ERP nhận batch Sxxxxx từ TXNG, bao gồm sản phẩm đóng gói nhỏ và chè vụn (trà túi lọc) để phục vụ quản lý tồn kho và bán hàng.				
+	214	Gán lô nguyên vật liệu phụ trợ với phiếu nhập kho	Admin ERP		Admin ERP ghi nhận nhập kho vật tư từ nhà cung cấp như bao bì, hộp, túi, nhiên liệu sau khi kiểm tra số lượng và chất lượng.				
+	215	Cập nhật số lượng tồn kho	Hệ thống		Sau khi nhập kho (từ TXNG hoặc vật tư), hệ thống tự động cộng tồn kho tương ứng.				
+	216	Ghi nhận lịch sử nhập kho 	Hệ thống		Log lại lịch sử từng lần nhập kho				
+	III. Xuất kho								
+	217	Tạo phiếu Xuất kho	Hệ thống		Khi đơn hàng được xác nhận, hệ thống tự động xuất kho thành phẩm (Sxxxxx) theo số lượng bán.				
+	218	Gán lô sản xuất, đóng gói với phiếu xuất kho	Admin ERP		Admin ERP thực hiện xuất kho bao 5kg (Bxxxxx) để phục vụ đóng gói nhỏ, đồng thời ghi nhận cho TXNG sử dụng.				
+	219	Gán lô nguyên vật liệu phụ trợ với phiếu xuất kho 	Admin ERP		Xuất vật tư (bao bì, hộp…) cho hoạt động đóng gói và gửi thông tin sang TXNG để ghi nhận sử dụng vật tư.				
+	220	Kiểm tra tồn trước khi xuất	Hệ thống		Kiểm tra số lượng tồn kho trước khi cho phép xuất, đảm bảo không xuất vượt tồn.				
+	221	Trừ tồn kho	Hệ thống		Tự động trừ tồn kho tương ứng sau khi xuất.				
+	222	Ghi nhận lịch sử xuất kho	Hệ thống		Lưu lại toàn bộ lịch sử xuất kho phục vụ kiểm tra, truy vết và đối soát.				
+	IV. Theo dõi biến động kho								
+	223	Xem lịch sử nhập kho	Admin ERP		Hiển thị toàn bộ lịch sử nhập – xuất kho theo thời gian dưới dạng timeline.				
+	224	Xem lịch sử xuất kho	Hệ thống		Cung cấp báo cáo tổng hợp tồn kho theo kỳ (ngày/tháng) để phục vụ quản lý.				
+	225	Theo dõi tồn đầu – nhập – xuất – tồn cuối	Admin ERP		Theo dõi biến động tồn kho theo từng batch (Bxxxxx, Sxxxxx).				
+	226	Kiểm kê kho	Admin ERP		Thực hiện kiểm kê thực tế và so sánh với số liệu hệ thống để phát hiện chênh lệch.				
+	227	Điều chỉnh tồn kho	Admin ERP		Điều chỉnh số liệu tồn kho khi có sai lệch, cần có xác nhận của quản lý.				
+Quản lý Chất lượng (QC)	I. Quản lý phiếu QC								
+	228	Tạo phiếu QC	Admin ERP	Hệ thống	Admin ERP QC tạo mới phiếu kiểm tra chất lượng cho nguyên liệu, lô sản xuất hoặc thành phẩm, lựa chọn giai đoạn QC (đầu vào, sản xuất, đầu ra), nhập thông tin đối tượng kiểm tra và các chỉ tiêu đánh giá.				
+	229	Chọn giai đoạn QC	Admin ERP	Hệ thống	Admin ERP lựa chọn loại QC tương ứng: QC đầu vào (nguyên liệu), QC sản xuất (đang chế biến), QC đầu ra (thành phẩm) để hệ thống áp dụng tiêu chí kiểm tra phù hợp.				
+	230	Nhập lô/mẻ QC	Admin ERP	Hệ thống	Admin ERP nhập hoặc chọn mã lô (RAW / Lxxxxx / Sxxxxx), hệ thống tự động lấy thông tin liên quan như nông hộ, loại chè, quy cách.				
+	231	Nhập chỉ tiêu kiểm tra	Admin ERP		Admin ERP nhập các chỉ tiêu đánh giá như độ ẩm, độ non búp, độ sạch hoặc các tiêu chí khác theo cấu hình tiêu chuẩn QC.				
+	232	Tính điểm QC	Hệ thống		Hệ thống tự động tính tổng điểm QC dựa trên các tiêu chí và trọng số đã được cấu hình trước.				
+	233	Đánh giá kết quả QC	Hệ thống	Admin ERP	Hệ thống tự động xác định kết quả (Đạt / Không đạt / Giảm giá) dựa trên tổng điểm hoặc ngưỡng cấu hình, cho phép Admin ERP điều chỉnh nếu cần.				
+	234	Nhập ghi chú QC	Admin ERP		Admin ERP nhập ghi chú chi tiết về tình trạng nguyên liệu hoặc sản phẩm khi kiểm tra.				
+	235	Lưu phiếu QC	Admin ERP	Hệ thống	Lưu lại toàn bộ thông tin phiếu QC và liên kết với batch tương ứng trong hệ thống.				
+	236	Cập nhật phiếu QC	Admin ERP		Cho phép chỉnh sửa phiếu QC trong trường hợp cần điều chỉnh thông tin trước khi khóa dữ liệu.				
+	237	Xóa phiếu QC	Admin ERP		Cho phép xóa phiếu QC trong trường hợp nhập sai, cần có quyền xác nhận từ quản lý.				
+	238	Xem danh sách phiếu QC	Admin ERP		Hiển thị danh sách toàn bộ phiếu QC theo từng giai đoạn (đầu vào, sản xuất, đầu ra).				
+	239	Tìm kiếm / lọc phiếu QC	Admin ERP		Tìm kiếm theo mã QC, batch, nông hộ, loại chè, thời gian hoặc trạng thái kết quả.				
+	240	Xem chi tiết phiếu QC	Admin ERP		Hiển thị đầy đủ thông tin chi tiết của một phiếu QC bao gồm các chỉ tiêu, điểm số và kết quả đánh giá.				
+	241	Xuất file QC	Admin ERP		Xuất danh sách hoặc chi tiết phiếu QC ra Excel hoặc PDF phục vụ báo cáo.				
+	II. QC Đầu vào (Nguyên liệu thu mua)								
+	242	Kiểm tra nguyên liệu đầu vào	Admin ERP		Thực hiện kiểm tra chất lượng nguyên liệu ngay sau khi thu mua từ nông hộ trước khi đưa vào sản xuất.				
+	243	Đánh giá chất lượng nguyên liệu	Admin ERP		Đánh giá chất lượng theo % hoặc theo tiêu chí (độ non, độ sạch, độ ẩm...).				
+	244	Quyết định kết quả QC đầu vào	Admin ERP	Hệ thống	Xác định nguyên liệu đạt, giảm giá hoặc không đạt để quyết định sử dụng trong sản xuất.				
+	245	Gắn kết quả QC với lô thu mua	Hệ thống		Liên kết kết quả QC với mã lô RAW để phục vụ truy xuất nguồn gốc.				
+	246	Chặn sử dụng lô không đạt	Hệ thống		Không cho phép đưa lô nguyên liệu không đạt vào sản xuất.				
+	III. QC trong sản xuất								
+	247	Kiểm tra trong quá trình sản xuất	Admin ERP	Admin ERP	Thực hiện kiểm tra chất lượng trong quá trình chế biến (ví dụ: độ ẩm, nhiệt độ, trạng thái chè).				
+	248	Ghi nhận sự kiện QC sản xuất	Admin ERP	Hệ thống	Ghi nhận các lần kiểm tra trong quá trình sản xuất vào hệ thống.				
+	249	Cảnh báo chất lượng	Hệ thống	Admin ERP	Cảnh báo khi chỉ số vượt ngưỡng cho phép để kịp thời xử lý.				
+	250	Theo dõi lịch sử QC sản xuất	Admin ERP		Xem lại toàn bộ lịch sử kiểm tra của một lệnh sản xuất.				
+	IV. QC đầu ra (Thành phẩm)								
+	251	Kiểm tra thành phẩm	Admin ERP		Kiểm tra chất lượng thành phẩm sau sản xuất hoặc trước khi đóng gói / xuất kho.				
+	252	Đánh giá chất lượng thành phẩm	Admin ERP		Đánh giá dựa trên tiêu chuẩn chất lượng của từng loại chè thành phẩm.				
+	253	Xác nhận đạt / không đạt	Admin ERP	Hệ thống	Xác nhận lô thành phẩm đủ điều kiện nhập kho hoặc cần xử lý lại.				
+	254	Chặn xuất kho nếu không đạt	Hệ thống		Không cho phép xuất bán các lô thành phẩm không đạt QC.				
+	V. Quản lý tiêu chuẩn QC								
+	255	Tạo tiêu chuẩn QC	Admin ERP	Admin ERP	Thiết lập các tiêu chuẩn kiểm tra cho từng giai đoạn (đầu vào, sản xuất, đầu ra).				
+	256	Cấu hình tiêu chí QC	Admin ERP		Cấu hình các tiêu chí như độ ẩm, độ sạch, độ non, trọng số tính điểm.				
+	257	Cấu hình thang điểm đánh giá	Admin ERP		Thiết lập ngưỡng điểm để phân loại kết quả (Đạt / Không đạt / Giảm giá).				
+	258	Áp dụng tiêu chuẩn theo loại chè	Admin ERP		Áp dụng tiêu chuẩn QC khác nhau cho chè xanh, hồng trà, bạch trà…				
+	259	Cập nhật tiêu chuẩn QC	Admin ERP		Cho phép điều chỉnh tiêu chuẩn theo từng vụ mùa hoặc quy định mới.				
+	VI. Báo cáo & Dashboard QC								
+	260	Thống kê số lô đạt QC	Admin ERP		Hiển thị % số lô đạt tiêu chuẩn QC trên tổng số lô kiểm tra.				
+	261	Thống kê số phiếu QC	Admin ERP		Thống kê tổng số phiếu QC theo từng giai đoạn.				
+	262	Thống kê lô không đạt	Admin ERP		Hiển thị danh sách và số lượng lô không đạt cần xử lý.				
+	263	Theo dõi QC theo thời gian	Admin ERP		Phân tích chất lượng theo ngày / tháng / vụ mùa.				
+Khách hàng	I. Quản lý khách hàng (tổng thể)								
+	264	Xem danh sách khách hàng	Admin ERP	Admin ERP	Hiển thị danh sách toàn bộ khách hàng trong hệ thống bao gồm khách tạo thủ công và khách từ website, kèm theo các thông tin như mã khách, tên, loại khách, hạng khách, số đơn, doanh thu tích lũy.				
+	265	Tìm kiếm theo tên, mã khách hàng	Admin ERP		Cho phép tìm kiếm khách hàng theo tên, mã khách, số điện thoại, email; lọc theo loại khách (bán lẻ, đại lý, siêu thị, xuất khẩu, web), hạng khách hoặc trạng thái.				
+	266	Xem chi tiết khách hàng	Admin ERP		Hiển thị đầy đủ thông tin khách hàng gồm thông tin liên hệ, địa chỉ, loại khách, hạng khách, lịch sử mua hàng, tổng doanh thu, công nợ và các ghi chú liên quan.				
+	267	Lọc theo phân loại khách hàng	Admin ERP	Hệ thống	Phân loại khách hàng theo nhóm như bán lẻ, đại lý, siêu thị, xuất khẩu hoặc khách từ website để phục vụ chính sách giá và vận hành bán hàng.				
+	268	Xem doanh thu theo khách hàng	Hệ thống	Admin ERP	Hệ thống tự động phân biệt khách hàng được tạo từ ERP (thủ công) hoặc từ website bán hàng, giúp theo dõi hiệu quả kênh bán.				
+	269	Cập nhật trạng thái khách hàng	Admin ERP		Cho phép cập nhật trạng thái khách hàng như đang hoạt động, ngừng hợp tác hoặc bị khóa.				
+	270	Xuất danh sách khách hàng	Admin ERP		Xuất dữ liệu khách hàng ra Excel hoặc PDF phục vụ báo cáo, marketing hoặc quản lý nội bộ.				
+	II. Khách hàng tạo thủ công (ERP)								
+	271	Tạo khách hàng thủ công	Admin ERP		Admin ERP nhập thông tin khách hàng mới vào hệ thống bao gồm tên, SĐT, email, địa chỉ, loại khách và các thông tin liên quan.				
+	272	Nhập thông tin liên hệ	Admin ERP		Nhập và lưu thông tin liên hệ của khách hàng bao gồm số điện thoại, email, địa chỉ giao hàng để phục vụ bán hàng và vận chuyển.				
+	273	Gán loại khách hàng	Admin ERP	Hệ thống	Chọn loại khách hàng (bán lẻ, đại lý, siêu thị, xuất khẩu) để hệ thống áp dụng chính sách giá phù hợp trong bán hàng.				
+	274	Thiết lập hạn mức công nợ	Admin ERP		Cấu hình hạn mức công nợ tối đa cho khách hàng khi bán hàng theo hình thức thanh toán chậm.				
+	275	Cập nhật thông tin khách hàng	Admin ERP		Cho phép chỉnh sửa thông tin khách hàng khi có thay đổi như địa chỉ, liên hệ, loại khách.				
+	276	Xóa / khóa khách hàng	Admin ERP		Xóa hoặc khóa khách hàng không còn sử dụng, đảm bảo không ảnh hưởng đến dữ liệu lịch sử giao dịch.				
+	III. Khách hàng từ Website								
+	277	Nhận khách hàng từ website	Hệ thống	Website bán hàng	Hệ thống tự động nhận thông tin khách hàng khi người dùng đăng ký hoặc đặt hàng trên website bán hàng.				
+	278	Tự động tạo hồ sơ khách hàng	Hệ thống		Khi có khách hàng mới từ website, hệ thống tự động tạo hồ sơ khách hàng trong ERP với thông tin cơ bản.				
+	279	Đồng bộ thông tin khách hàng	Hệ thống	Website	Đồng bộ thông tin khách hàng giữa website và ERP khi có thay đổi (email, SĐT, địa chỉ).				
+	280	Gán loại khách từ web	Hệ thống	Admin ERP	Tự động gán loại khách là “Khách từ website” để phục vụ phân tích kênh bán.				
+	281	Cập nhật thông tin khách từ ERP	Admin ERP		Cho phép chỉnh sửa thông tin khách hàng từ website trong ERP khi cần thiết.				
+	IV. Quản lý hạng khách hàng								
+	282	Tính toán hạng khách hàng tự động	Hệ thống		Hệ thống tự động tính toán hạng khách hàng dựa trên số đơn hàng và doanh thu tích lũy theo các tiêu chí cấu hình.				
+	283	Cấu hình tiêu chí xếp hạng	Admin ERP	Hệ thống	Cho phép thiết lập tiêu chí phân hạng như VIP (≥10 đơn hoặc ≥200 triệu), Vàng, Bạc…				
+	284	Cập nhật hạng khách hàng	Hệ thống		Hệ thống tự động cập nhật hạng khách khi khách đạt hoặc thay đổi điều kiện.				
+	285	Hiển thị hạng khách	Admin ERP		Hiển thị hạng khách hàng (VIP, Vàng, Bạc…) trên danh sách và chi tiết khách để hỗ trợ bán hàng.				
+	V. Quản lý đơn bán								
+	286	Xem lịch sử đơn bán	Admin ERP		Hiển thị danh sách các đơn hàng đã phát sinh của khách hàng.				
+	287	Xem tổng doanh thu khách hàng	Admin ERP	Hệ thống	Hiển thị tổng doanh thu tích lũy của khách hàng dựa trên các đơn hàng đã hoàn thành.				
+	288	Theo dõi công nợ khách hàng	Admin ERP	Admin ERP	Theo dõi số tiền khách hàng còn nợ, đã thanh toán và hạn thanh toán.				
+	289	Xem lịch sử thanh toán	Admin ERP		Hiển thị các lần thanh toán của khách hàng theo từng đơn hàng.				
+		Xem chi tiết đơn bán 							
+		Xem thống kế doanh thu theo đơn bán 							
+Quản lý phương tiện vận chuyển	I. Quản lý phương tiện vận chuyển								
+	290	Tạo mới phương tiện vận chuyển	Admin ERP	Admin ERP	Thêm mới phương tiện (xe tải, xe máy...) vào danh sách quản lý: biển số, loại xe, tải trọng, tài xế phụ trách.				
+	291	Cập nhật thông tin phương tiện	Admin ERP		Chỉnh sửa thông tin phương tiện: biển số, trạng thái hoạt động, tài xế.				
+	292	Xem danh sách phương tiện	Admin ERP	Admin ERP	Hiển thị danh sách tất cả phương tiện vận chuyển đang hoạt động.				
+	293	Gán phương tiện vào đơn hàng	Admin ERP	Hệ thống	Liên kết phương tiện và tài xế vào đơn hàng khi xử lý giao hàng.				
+	294	Theo dõi lịch sử vận chuyển	Admin ERP		Xem lịch sử các chuyến vận chuyển theo phương tiện, ngày, đơn hàng.				
+	295	Xem chi tiết phương tiện 	Admin ERP	Hệ thống	Thống kê số chuyến, sản lượng vận chuyển theo phương tiện / thời gian.				
+Website MKT & Bán hàng	296	Cấu hình thông tin hiển thị Website	Khách hàng	-	Khách hàng truy cập và xem các trang thông tin trên website				
+	297	Cấu hình thông tin bài viết	Khách hàng	-	Khách hàng xem các bài viết/blog phục vụ SEO				
+	298	Tìm kiếm sản phẩm	Khách hàng	-	Khách hàng tìm kiếm sản phẩm theo từ khóa hoặc bộ lọc				
+	300	Thêm vào giỏ hàng	Khách hàng	-	Khách hàng thêm sản phẩm vào giỏ hàng				
+	301	Xử lý đặt hàng	Khách hàng	Hệ thống ERP	Khách hàng thực hiện đặt hàng trên website				
+	302	Tạo đơn hàng từ website	Hệ thống ERP	-	Hệ thống tạo đơn hàng tương ứng trong ERP				
+	303	Xem danh sách sản phẩm	Admin ERP	Hệ thống ERP	Admin tạo/sửa/xóa sản phẩm trong hệ thống				
+	299	Cấu hình hiển thị sản phẩm	Khách hàng	-	Hiển thị thông tin chi tiết sản phẩm				
+	304	Đồng bộ website	Hệ thống ERP	Website	Đồng bộ dữ liệu sản phẩm từ ERP sang website				
+	305	Quản lý nội dung website	Admin ERP	-	Admin quản lý bài viết, banner, nội dung website				
+	306	Quản lý SEO	Admin ERP	-	Admin thực hiện các hoạt động tối ưu SEO				
+	307	Tối ưu bài viết	Admin ERP	-	Tối ưu nội dung bài viết chuẩn SEO				
+	308	SEO sản phẩm	Admin ERP	-	Tối ưu SEO cho trang sản phẩm				
+	309	Quản lý URL & redirect	Admin ERP	-	Quản lý đường dẫn và redirect 301				
+	310	Tracking SEO	Admin ERP	-	Theo dõi hiệu quả SEO (traffic, keyword, conversion)				
+	311	Xem báo cáo	Admin ERP	Hệ thống ERP	Xem báo cáo tổng hợp dữ liệu				
+	312	Quản lý đơn hàng	Admin ERP	Hệ thống ERP	Quản lý danh sách đơn hàng				
+	313	Cập nhật trạng thái đơn	Admin ERP	Hệ thống ERP	Cập nhật trạng thái xử lý đơn hàng				
+Khởi tạo Doanh nghiệp		Xem danh sách Doanh nghiệp 	Super Admin 		Super Admin xem danh sách các doanh nghiệp trên hệ thống SSO				
+		Tạo doanh nghiệp	Super Admin 		Super Admin tạo mới một doanh nghiệp trên hệ thống SSO, bao gồm thông tin định danh như tên, mã số thuế, địa chỉ để quản lý độc lập.				
+		Cấu hình phân hệ cho Doanh nghiệp	Super Admin 		Super Admin lựa chọn và cấu hình các phân hệ (ERP, Truy xuất nguồn gốc, Vùng trồng) mà doanh nghiệp được phép sử dụng.				
+		Cấu hình giới hạn tính năng theo phân hệ	Super Admin 		Super Admin thiết lập phạm vi chức năng chi tiết trong từng phân hệ (ví dụ bật/tắt module vật tư trong TXNG hoặc module quản lý kho trong ERP).				
+		Cấu hình giới hạn tính năng theo tổ chức/nhóm người dùng	Super Admin 		Admin doanh nghiệp khai báo cấu trúc nội bộ như phòng ban, nhóm vận hành hoặc vùng quản lý để phục vụ phân quyền.				
+		Xem chi tiết thông tin Doanh nghiệp	Super Admin 		Super Admin xem thông tin chi tiết 1 doanh nghiệp				
+		Cập nhật thông tin Doanh nghiệp 	Super Admin 		Super Admin cập nhật thông tin cho 1 doanh nghiệp 				
+		Khóa tài khoản Doanh nghiệp 	Super Admin 		Super Admin khóa tài khoản Doanh nghiệp khi doanh nghiệp không còn sử dụng hệ thống 				
+Quản lý User		Xem danh sách User	Admin Doanh nghiệp		Cho phép Admin Doanh nghiệp xem danh sách các người dùng thuộc doanh nghiệp 				
+		Tạo User nội bộ	Admin Doanh nghiệp		Admin doanh nghiệp tạo tài khoản cho người dùng nội bộ và khai báo thông tin cơ bản như tên, email, số điện thoại.				
+		Gán User vào tổ chức / nhóm	Admin Doanh nghiệp		Admin gán người dùng vào các phòng ban hoặc nhóm chức năng để phục vụ quản lý và phân quyền.				
+		Cập nhật thông tin User	Admin Doanh nghiệp		Cho phép Admin Doanh nghiệp cập nhật thông tin người dùng đã tạo 				
+		Xem chi tiết thông tin User	Admin Doanh nghiệp		Cho phép Admin Doanh nghiệp xem chi tiết thông tin người dùng đã tạo 				
+		Khóa User	Admin Doanh nghiệp		Admin khóa tài khoản người dùng khi có thay đổi nhân sự hoặc vi phạm chính sách.				
+Thông tin doanh nghiệp		Xem Dashboard Portal	Admin Doanh nghiệp		Hiển thị tổng quan thông tin doanh nghiệp và hoạt động				
+		Xem thống kê người dùng	Admin Doanh nghiệp		Hiển thị số lượng User, hoạt động truy cập hệ thống				
+		Xem danh sách module có sẵn	Admin Doanh nghiệp		Hiển thị danh sách các module có thể sử dụng				
+		Xem thông tin doanh nghiệp	Admin Doanh nghiệp		Xem tên, link website, thông tin liên hệ, gói phân hệ được phân quyền 				
+		Xem hướng dẫn sử dụng	Admin Doanh nghiệp		Truy cập tài liệu hướng dẫn sử dụng các module				
+		Liên hệ hỗ trợ kỹ thuật	Admin Doanh nghiệp		Gửi yêu cầu hỗ trợ kỹ thuật đến team support				
+Danh mục dùng chung		CRUD & quản lý danh sách Đơn vị tính 	Super Admin 		Tạo, cập nhật và xem danh sách các đơn vị tính dùng chung trong hệ thống 				
+		Quản lý Đơn vị hành chính (Tỉnh thành phố, Xã phường)	Hệ thống 		Quản lý danh mục dữ liệu Đơn vị hành chính để dùng chung trong toàn hệ thống				
+		Loại chứng chỉ, chứng nhận	Super Admin 		Tạo, cập nhật và xem danh sách loại chứng chỉ, chứng nhận dùng chung trong hệ thống 				
+Lưu trữ tập trung		API Upload (File Service)	Hệ thống 		Hỗ trợ upload đa phương thức; Kiểm soát định dạng; Hỗ trợ Multipart Upload cho các file dung lượng lớn để đảm bảo tính ổn định				
+		API View truy xuất	Hệ thống 		Cung cấp Endpoint trả về luồng dữ liệu (Stream) với Header Content-Type phù hợp (ví dụ: image/jpeg) để hiển thị trực tiếp trên thẻ <img> của trình duyệt				
+		API Hỗ trợ tham số tùy chỉnh kích thước ảnh qua URL	Hệ thống 		Hỗ trợ tùy chỉnh kích thước ảnh upload lên hệ thống cho phù hợp, ví dụ:?width=200&height=200				
