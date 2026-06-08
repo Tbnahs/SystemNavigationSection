@@ -34,6 +34,19 @@ export type TranslationKey =
   | "module.farming.desc"
   | "module.iot"
   | "module.iot.desc"
+  | "module.portal"
+  | "module.portal.desc"
+  | "ms.welcome"
+  | "ms.hello"
+  | "ms.subtitle"
+  | "ms.enter"
+  | "ms.footer"
+  | "ms.contact-admin"
+  | "ms.footer-end"
+  | "ms.portal.features"
+  | "ms.erp.features"
+  | "ms.txng.features"
+  | "ms.vung-trong.features"
   | "submodule.back"
   | "submodule.erp.sales"
   | "submodule.erp.sales.desc"
@@ -358,6 +371,19 @@ const vi: Translations = {
   "submodule.iot.reports.desc": "Phân tích dữ liệu IoT",
   "module.iot": "Hệ thống IoT & IOC",
   "module.iot.desc": "Giám sát và thu thập dữ liệu từ cảm biến",
+  "module.portal": "Portal",
+  "module.portal.desc": "Quản lý tài khoản, doanh nghiệp và phân quyền truy cập hệ thống",
+  "ms.welcome": "Chào mừng trở lại",
+  "ms.hello": "Xin chào",
+  "ms.subtitle": "Chọn phân hệ bạn muốn làm việc hôm nay",
+  "ms.enter": "Vào phân hệ",
+  "ms.footer": "Bạn chỉ thấy các phân hệ được cấp quyền.",
+  "ms.contact-admin": "Liên hệ quản trị viên",
+  "ms.footer-end": "nếu cần thêm quyền truy cập.",
+  "ms.portal.features": "Doanh nghiệp,Người dùng,Cơ sở,Phân quyền",
+  "ms.erp.features": "Thu mua,Sản xuất,Đóng gói,Bán hàng",
+  "ms.txng.features": "QR Code,Chuỗi cung ứng,Chứng nhận,Tra cứu",
+  "ms.vung-trong.features": "Vùng trồng,Cây trồng,Thu hoạch,IoT",
   "nav.home": "Trang chủ",
   "nav.erp": "ERP",
   "nav.txng": "Truy xuất",
@@ -652,6 +678,19 @@ const en: Translations = {
   "submodule.iot.reports.desc": "IoT data analysis",
   "module.iot": "IoT & IOC System",
   "module.iot.desc": "Sensor monitoring and data collection",
+  "module.portal": "Portal",
+  "module.portal.desc": "Account, enterprise and access permission management",
+  "ms.welcome": "Welcome back",
+  "ms.hello": "Hello",
+  "ms.subtitle": "Choose the module you want to work in today",
+  "ms.enter": "Enter module",
+  "ms.footer": "You only see modules you have access to.",
+  "ms.contact-admin": "Contact administrator",
+  "ms.footer-end": "if you need additional access.",
+  "ms.portal.features": "Enterprise,Users,Facilities,Permissions",
+  "ms.erp.features": "Purchasing,Production,Packaging,Sales",
+  "ms.txng.features": "QR Code,Supply Chain,Certification,Lookup",
+  "ms.vung-trong.features": "Farming Zones,Crops,Harvest,IoT",
   "nav.home": "Home",
   "nav.erp": "ERP",
   "nav.txng": "Traceability",
@@ -954,6 +993,19 @@ const ko: Translations = {
   "submodule.iot.reports.desc": "IoT 데이터 분석",
   "module.iot": "IoT & IOC 시스템",
   "module.iot.desc": "센서 모니터링 및 데이터 수집",
+  "module.portal": "포털",
+  "module.portal.desc": "계정, 기업 및 접근 권한 관리",
+  "ms.welcome": "다시 오신 것을 환영합니다",
+  "ms.hello": "안녕하세요",
+  "ms.subtitle": "오늘 작업할 모듈을 선택하세요",
+  "ms.enter": "모듈 입장",
+  "ms.footer": "권한이 부여된 모듈만 표시됩니다.",
+  "ms.contact-admin": "관리자에게 문의",
+  "ms.footer-end": "추가 접근 권한이 필요한 경우.",
+  "ms.portal.features": "기업,사용자,시설,권한",
+  "ms.erp.features": "구매,생산,포장,판매",
+  "ms.txng.features": "QR 코드,공급망,인증,조회",
+  "ms.vung-trong.features": "농업 구역,작물,수확,IoT",
   "nav.home": "홈",
   "nav.erp": "ERP",
   "nav.txng": "추적",
@@ -1247,6 +1299,19 @@ const ja: Translations = {
   "submodule.iot.reports.desc": "IoTデータ分析",
   "module.iot": "IoT & IOCシステム",
   "module.iot.desc": "センサー監視とデータ収集",
+  "module.portal": "ポータル",
+  "module.portal.desc": "アカウント、企業、アクセス権限の管理",
+  "ms.welcome": "お帰りなさい",
+  "ms.hello": "こんにちは",
+  "ms.subtitle": "今日作業するモジュールを選択してください",
+  "ms.enter": "モジュールへ",
+  "ms.footer": "権限が付与されたモジュールのみ表示されます。",
+  "ms.contact-admin": "管理者に連絡",
+  "ms.footer-end": "追加のアクセス権限が必要な場合。",
+  "ms.portal.features": "企業,ユーザー,施設,権限",
+  "ms.erp.features": "購買,生産,梱包,販売",
+  "ms.txng.features": "QRコード,サプライチェーン,認証,照会",
+  "ms.vung-trong.features": "農業地域,作物,収穫,IoT",
   "nav.home": "ホーム",
   "nav.erp": "ERP",
   "nav.txng": "トレース",

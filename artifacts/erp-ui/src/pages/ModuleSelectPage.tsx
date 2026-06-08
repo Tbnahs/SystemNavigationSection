@@ -1,72 +1,73 @@
 import { useLocation } from "wouter";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { languageLabels, type Language } from "@/i18n/translations";
+import { useState } from "react";
 import {
-  Globe, BarChart3, ScanLine, Leaf, ArrowRight, LogOut,
+  Globe, BarChart3, ScanLine, Leaf, ArrowRight, LogOut, ChevronDown,
 } from "lucide-react";
 import logoImg from "@assets/Logo ESG.png";
-
-const ALL_MODULES = [
-  {
-    id: "portal",
-    icon: Globe,
-    label: "Portal",
-    labelShort: "Portal",
-    desc: "Quản lý tài khoản, doanh nghiệp và phân quyền truy cập hệ thống",
-    href: "/portal",
-    gradient: "from-violet-500 to-purple-600",
-    gradientLight: "from-violet-50 to-purple-50",
-    border: "border-violet-200 hover:border-violet-400",
-    iconBg: "bg-gradient-to-br from-violet-500 to-purple-600",
-    badge: "bg-violet-100 text-violet-700",
-    features: ["Doanh nghiệp", "Người dùng", "Cơ sở", "Phân quyền"],
-  },
-  {
-    id: "erp",
-    icon: BarChart3,
-    label: "ERP",
-    labelShort: "ERP",
-    desc: "Quản lý thu mua, sản xuất, đóng gói và bán hàng toàn diện",
-    href: "/module/erp",
-    gradient: "from-emerald-500 to-green-600",
-    gradientLight: "from-emerald-50 to-green-50",
-    border: "border-emerald-200 hover:border-emerald-400",
-    iconBg: "bg-gradient-to-br from-emerald-500 to-green-600",
-    badge: "bg-emerald-100 text-emerald-700",
-    features: ["Thu mua", "Sản xuất", "Đóng gói", "Bán hàng"],
-  },
-  {
-    id: "txng",
-    icon: ScanLine,
-    label: "Truy xuất nguồn gốc",
-    labelShort: "TXNG",
-    desc: "Tạo mã QR, quản lý chuỗi cung ứng và chứng nhận sản phẩm",
-    href: "/module/txng",
-    gradient: "from-blue-500 to-cyan-600",
-    gradientLight: "from-blue-50 to-cyan-50",
-    border: "border-blue-200 hover:border-blue-400",
-    iconBg: "bg-gradient-to-br from-blue-500 to-cyan-600",
-    badge: "bg-blue-100 text-blue-700",
-    features: ["QR Code", "Chuỗi cung ứng", "Chứng nhận", "Tra cứu"],
-  },
-  {
-    id: "vung_trong",
-    icon: Leaf,
-    label: "Vùng trồng & IoT",
-    labelShort: "Vùng trồng",
-    desc: "Quản lý vùng nguyên liệu, cây trồng, thu hoạch và thiết bị IoT",
-    href: "/module/vung-trong",
-    gradient: "from-amber-500 to-orange-500",
-    gradientLight: "from-amber-50 to-orange-50",
-    border: "border-amber-200 hover:border-amber-400",
-    iconBg: "bg-gradient-to-br from-amber-500 to-orange-500",
-    badge: "bg-amber-100 text-amber-700",
-    features: ["Vùng trồng", "Cây trồng", "Thu hoạch", "IoT"],
-  },
-];
 
 export default function ModuleSelectPage() {
   const { user, logout } = useAuth();
   const [, setLocation] = useLocation();
+  const { t, language, setLanguage } = useLanguage();
+  const [showLangMenu, setShowLangMenu] = useState(false);
+
+  const ALL_MODULES = [
+    {
+      id: "portal",
+      icon: Globe,
+      label: t("module.portal"),
+      desc: t("module.portal.desc"),
+      href: "/portal",
+      gradient: "from-violet-500 to-purple-600",
+      gradientLight: "from-violet-50 to-purple-50",
+      border: "border-violet-200 hover:border-violet-400",
+      iconBg: "bg-gradient-to-br from-violet-500 to-purple-600",
+      badge: "bg-violet-100 text-violet-700",
+      features: t("ms.portal.features").split(","),
+    },
+    {
+      id: "erp",
+      icon: BarChart3,
+      label: t("module.erp"),
+      desc: t("module.erp.desc"),
+      href: "/module/erp",
+      gradient: "from-emerald-500 to-green-600",
+      gradientLight: "from-emerald-50 to-green-50",
+      border: "border-emerald-200 hover:border-emerald-400",
+      iconBg: "bg-gradient-to-br from-emerald-500 to-green-600",
+      badge: "bg-emerald-100 text-emerald-700",
+      features: t("ms.erp.features").split(","),
+    },
+    {
+      id: "txng",
+      icon: ScanLine,
+      label: t("module.txng"),
+      desc: t("module.txng.desc"),
+      href: "/module/txng",
+      gradient: "from-blue-500 to-cyan-600",
+      gradientLight: "from-blue-50 to-cyan-50",
+      border: "border-blue-200 hover:border-blue-400",
+      iconBg: "bg-gradient-to-br from-blue-500 to-cyan-600",
+      badge: "bg-blue-100 text-blue-700",
+      features: t("ms.txng.features").split(","),
+    },
+    {
+      id: "vung_trong",
+      icon: Leaf,
+      label: t("module.farming"),
+      desc: t("module.farming.desc"),
+      href: "/module/vung-trong",
+      gradient: "from-amber-500 to-orange-500",
+      gradientLight: "from-amber-50 to-orange-50",
+      border: "border-amber-200 hover:border-amber-400",
+      iconBg: "bg-gradient-to-br from-amber-500 to-orange-500",
+      badge: "bg-amber-100 text-amber-700",
+      features: t("ms.vung-trong.features").split(","),
+    },
+  ];
 
   const userModules: string[] = user?.modules ?? ["portal"];
   const visibleModules = ALL_MODULES.filter((m) => {
@@ -93,6 +94,35 @@ export default function ModuleSelectPage() {
           </div>
         </div>
         <div className="flex items-center gap-3">
+          {/* Language switcher */}
+          <div className="relative">
+            <button
+              onClick={() => setShowLangMenu(p => !p)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-muted-foreground hover:bg-muted transition-colors border border-border"
+            >
+              <span>{languageLabels[language].flag}</span>
+              <span className="hidden sm:inline">{languageLabels[language].label}</span>
+              <ChevronDown className="w-3 h-3" />
+            </button>
+            {showLangMenu && (
+              <>
+                <div className="fixed inset-0 z-10" onClick={() => setShowLangMenu(false)} />
+                <div className="absolute right-0 mt-1 w-40 bg-white border border-border rounded-xl shadow-lg overflow-hidden z-20">
+                  {(Object.keys(languageLabels) as Language[]).map((lang) => (
+                    <button
+                      key={lang}
+                      onClick={() => { setLanguage(lang); setShowLangMenu(false); }}
+                      className={`w-full flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-accent transition-colors ${language === lang ? "text-primary font-medium bg-accent/50" : "text-foreground"}`}
+                    >
+                      <span>{languageLabels[lang].flag}</span>
+                      <span>{languageLabels[lang].label}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
+
           <div className="hidden sm:flex items-center gap-2.5 px-3 py-1.5 rounded-xl bg-muted/60">
             <div className="w-7 h-7 rounded-full bg-primary flex items-center justify-center shrink-0">
               <span className="text-white text-xs font-semibold">{user?.avatar}</span>
@@ -107,7 +137,7 @@ export default function ModuleSelectPage() {
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors border border-border"
           >
             <LogOut className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Đăng xuất</span>
+            <span className="hidden sm:inline">{t("topbar.logout")}</span>
           </button>
         </div>
       </header>
@@ -118,13 +148,13 @@ export default function ModuleSelectPage() {
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-4 border border-primary/20">
             <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-            Chào mừng trở lại
+            {t("ms.welcome")}
           </div>
           <h1 className="text-3xl lg:text-4xl font-bold text-foreground mb-2">
-            Xin chào, <span className="text-primary">{firstName}</span>!
+            {t("ms.hello")}, <span className="text-primary">{firstName}</span>!
           </h1>
           <p className="text-muted-foreground text-base max-w-md mx-auto">
-            Chọn phân hệ bạn muốn làm việc hôm nay
+            {t("ms.subtitle")}
           </p>
         </div>
 
@@ -177,7 +207,7 @@ export default function ModuleSelectPage() {
 
                   {/* CTA */}
                   <div className="flex items-center gap-1.5 text-sm font-semibold text-foreground group-hover:gap-2.5 transition-all duration-150">
-                    Vào phân hệ
+                    {t("ms.enter")}
                     <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
                   </div>
                 </div>
@@ -188,11 +218,11 @@ export default function ModuleSelectPage() {
 
         {/* Footer note */}
         <p className="mt-10 text-xs text-muted-foreground text-center">
-          Bạn chỉ thấy các phân hệ được cấp quyền.{" "}
+          {t("ms.footer")}{" "}
           <span className="text-primary cursor-pointer hover:underline" onClick={() => setLocation("/portal")}>
-            Liên hệ quản trị viên
+            {t("ms.contact-admin")}
           </span>{" "}
-          nếu cần thêm quyền truy cập.
+          {t("ms.footer-end")}
         </p>
       </main>
     </div>
