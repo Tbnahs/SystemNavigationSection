@@ -4,8 +4,8 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
 import {
   ArrowLeft, Mail, Phone, Building2, MapPin, Loader2,
-  ShieldCheck, Clock, Factory, Users, Hash, Pencil,
-  RotateCcw, Lock, Unlock, Award, Calendar,
+  Clock, Factory,
+  RotateCcw, Lock, Unlock, Calendar,
 } from "lucide-react";
 import {
   fetchEmployee, updateEmployee, resetEmployeePassword,
@@ -50,7 +50,6 @@ export default function NhanVienDetailPage() {
   const params = useParams<{ id?: string }>();
   const id = Number(params.id);
   const [, setLocation] = useLocation();
-  const [tab, setTab] = useState<"overview" | "permissions" | "facilities">("overview");
   const [showResetModal, setShowResetModal] = useState(false);
   const [newPassword, setNewPassword] = useState<string | null>(null);
   const qc = useQueryClient();
@@ -99,12 +98,6 @@ export default function NhanVienDetailPage() {
   const assignedFacilities = q.data.assignedFacilities;
   const st = STATUS_MAP[emp.status];
   const ent = enterprises.find(e => e.id === emp.enterpriseId);
-
-  const tabs = [
-    { key: "overview"     as const, label: "Thông tin",  Icon: Users },
-    { key: "permissions"  as const, label: "Phân quyền", Icon: ShieldCheck },
-    { key: "facilities"   as const, label: "Cơ sở phụ trách", Icon: Factory, count: assignedFacilities.length },
-  ];
 
   return (
     <AppLayout>
@@ -189,144 +182,94 @@ export default function NhanVienDetailPage() {
           </div>
         </div>
 
-        {/* Tabs */}
-        <div className="bg-white border border-border rounded-2xl overflow-hidden">
-          <div className="flex border-b border-border overflow-x-auto">
-            {tabs.map(({ key, label, Icon, count }) => (
-              <button key={key} onClick={() => setTab(key)}
-                className={`flex items-center gap-2 px-5 py-3.5 text-[13px] font-medium border-b-2 whitespace-nowrap transition-colors ${tab === key ? "border-blue-600 text-blue-700 bg-blue-50/50" : "border-transparent text-muted-foreground hover:text-foreground hover:bg-muted/30"}`}>
-                <Icon className="w-4 h-4" />{label}
-                {count !== undefined && count > 0 && (
-                  <span className="px-1.5 py-0.5 rounded-full bg-blue-600 text-white text-[10px] font-bold">{count}</span>
-                )}
-              </button>
-            ))}
+        {/* All info — single card */}
+        <div className="bg-white border border-border rounded-2xl p-6 space-y-8">
+
+          {/* Thông tin cá nhân + Thời gian */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div>
+              <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Thông tin cá nhân</h3>
+              <div>
+                <InfoRow label="Họ và tên" value={emp.name} />
+                <InfoRow label="Email" value={
+                  <a href={`mailto:${emp.email}`} className="text-blue-600 hover:underline">{emp.email || "—"}</a>
+                } />
+                <InfoRow label="Số điện thoại" value={emp.phone || "—"} />
+                <InfoRow label="Doanh nghiệp" value={emp.enterpriseName || "—"} />
+                <InfoRow label="Vai trò" value={
+                  emp.role ? (
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11.5px] font-medium ring-1 ring-inset ${ROLE_CLR[emp.role] ?? "bg-slate-50 text-slate-600 ring-slate-200"}`}>
+                      {emp.role}
+                    </span>
+                  ) : "—"
+                } />
+                <InfoRow label="Trạng thái" value={
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11.5px] font-medium ring-1 ring-inset ${st.cls}`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />{st.label}
+                  </span>
+                } />
+              </div>
+            </div>
+            <div>
+              <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Thời gian</h3>
+              <div>
+                <InfoRow label="Ngày tạo tài khoản" value={
+                  <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-muted-foreground" />{formatDate(emp.createdAt)}</span>
+                } />
+                <InfoRow label="Cập nhật lần cuối" value={formatDate(emp.updatedAt)} />
+                <InfoRow label="Hoạt động lần cuối" value={
+                  <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-muted-foreground" />{formatDate(emp.lastSeen)}</span>
+                } />
+              </div>
+
+              {ent && (
+                <div className="mt-6">
+                  <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Doanh nghiệp</h3>
+                  <div className="flex items-center gap-3 p-3.5 rounded-xl border border-border bg-muted/20 hover:border-blue-200 cursor-pointer transition-colors"
+                    onClick={() => setLocation(`/portal/doanh-nghiep/${ent.id}`)}>
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
+                      <Building2 className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <div className="min-w-0">
+                      <div className="text-[13.5px] font-semibold truncate">{ent.tenHienThi}</div>
+                      <div className="text-[11.5px] text-muted-foreground">{ent.maSoThue || "—"} · {ent.tinhThanh || "—"}</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
 
-          <div className="p-6">
+          {/* Divider */}
+          <div className="border-t border-border" />
 
-            {/* ── Thông tin ── */}
-            {tab === "overview" && (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div>
-                  <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Thông tin cá nhân</h3>
-                  <div>
-                    <InfoRow label="Họ và tên" value={emp.name} />
-                    <InfoRow label="Email" value={
-                      <a href={`mailto:${emp.email}`} className="text-blue-600 hover:underline">{emp.email || "—"}</a>
-                    } />
-                    <InfoRow label="Số điện thoại" value={emp.phone || "—"} />
-                    <InfoRow label="Doanh nghiệp" value={emp.enterpriseName || "—"} />
-                    <InfoRow label="Vai trò" value={
-                      emp.role ? (
-                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[11.5px] font-medium ring-1 ring-inset ${ROLE_CLR[emp.role] ?? "bg-slate-50 text-slate-600 ring-slate-200"}`}>
-                          {emp.role}
-                        </span>
-                      ) : "—"
-                    } />
-                    <InfoRow label="Trạng thái" value={
-                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11.5px] font-medium ring-1 ring-inset ${st.cls}`}>
-                        <span className={`w-1.5 h-1.5 rounded-full ${st.dot}`} />{st.label}
-                      </span>
-                    } />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Thời gian</h3>
-                  <div>
-                    <InfoRow label="Ngày tạo tài khoản" value={
-                      <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-muted-foreground" />{formatDate(emp.createdAt)}</span>
-                    } />
-                    <InfoRow label="Cập nhật lần cuối" value={formatDate(emp.updatedAt)} />
-                    <InfoRow label="Hoạt động lần cuối" value={
-                      <span className="flex items-center gap-1.5"><Clock className="w-3.5 h-3.5 text-muted-foreground" />{formatDate(emp.lastSeen)}</span>
-                    } />
-                  </div>
-
-                  {ent && (
-                    <div className="mt-6">
-                      <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">Doanh nghiệp</h3>
-                      <div className="flex items-center gap-3 p-3.5 rounded-xl border border-border bg-muted/20 hover:border-blue-200 cursor-pointer transition-colors"
-                        onClick={() => setLocation(`/portal/doanh-nghiep/${ent.id}`)}>
-                        <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shrink-0">
-                          <Building2 className="w-5 h-5 text-blue-600" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-[13.5px] font-semibold truncate">{ent.tenHienThi}</div>
-                          <div className="text-[11.5px] text-muted-foreground">{ent.maSoThue || "—"} · {ent.tinhThanh || "—"}</div>
-                        </div>
-                      </div>
+          {/* Cơ sở phụ trách */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider">Cơ sở phụ trách</h3>
+              <span className="text-[12px] text-muted-foreground">{assignedFacilities.length} cơ sở</span>
+            </div>
+            {assignedFacilities.length === 0 ? (
+              <div className="py-10 text-center border border-dashed border-border rounded-xl text-muted-foreground">
+                <Factory className="w-7 h-7 mx-auto mb-2 opacity-25" />
+                <div className="text-[13px]">Chưa được giao phụ trách cơ sở nào.</div>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {assignedFacilities.map(fc => (
+                  <div key={fc.id}
+                    onClick={() => setLocation(`/portal/co-so/${fc.id}`)}
+                    className="flex items-start gap-3 p-4 rounded-xl border border-border hover:border-blue-200 hover:bg-blue-50/30 transition-colors cursor-pointer">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
+                      <MapPin className="w-4 h-4 text-emerald-600" />
                     </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* ── Phân quyền ── */}
-            {tab === "permissions" && (
-              <div className="space-y-5">
-                <div className="flex items-center gap-4 p-4 rounded-xl bg-blue-50 border border-blue-100">
-                  <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center shrink-0">
-                    <ShieldCheck className="w-6 h-6 text-white" />
+                    <div className="min-w-0">
+                      <div className="text-[13.5px] font-semibold truncate">{fc.name}</div>
+                      <div className="text-[11.5px] text-muted-foreground font-mono">{fc.code}</div>
+                      <div className="text-[11.5px] text-muted-foreground mt-0.5">{[fc.xa, fc.tinh].filter(Boolean).join(", ")}</div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="text-[15px] font-bold">{emp.role || "—"}</div>
-                    <div className="text-[12.5px] text-blue-700 mt-0.5">Vai trò trong hệ thống</div>
-                  </div>
-                </div>
-                <div>
-                  <h3 className="text-[12px] font-semibold text-muted-foreground uppercase tracking-wider mb-3">Quyền truy cập theo vai trò</h3>
-                  <div className="space-y-2">
-                    {[
-                      { label: "Xem danh sách nhân viên",   allow: true },
-                      { label: "Chỉnh sửa thông tin cơ sở", allow: emp.role === "Admin" || emp.role === "Quản lý" },
-                      { label: "Tạo / xóa tài khoản",       allow: emp.role === "Admin" },
-                      { label: "Xuất báo cáo",               allow: emp.role === "Admin" || emp.role === "Kế toán" || emp.role === "Quản lý" },
-                      { label: "Quản lý đơn thu mua",        allow: emp.role !== "Nhân viên" },
-                      { label: "Phân quyền hệ thống",        allow: emp.role === "Admin" },
-                    ].map((p, i) => (
-                      <div key={i} className={`flex items-center justify-between px-4 py-2.5 rounded-xl border ${p.allow ? "border-emerald-100 bg-emerald-50/50" : "border-border bg-muted/20"}`}>
-                        <span className="text-[13px] font-medium">{p.label}</span>
-                        <span className={`text-[12px] font-semibold ${p.allow ? "text-emerald-600" : "text-slate-400"}`}>
-                          {p.allow ? "✓ Có quyền" : "✗ Không có"}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* ── Cơ sở phụ trách ── */}
-            {tab === "facilities" && (
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-[15px] font-semibold">Cơ sở đang phụ trách</h3>
-                  <p className="text-[13px] text-muted-foreground mt-0.5">{assignedFacilities.length} cơ sở được giao</p>
-                </div>
-                {assignedFacilities.length === 0 ? (
-                  <div className="py-14 text-center border border-dashed border-border rounded-xl text-muted-foreground">
-                    <Factory className="w-8 h-8 mx-auto mb-2 opacity-25" />
-                    <div className="text-[13px]">Chưa được giao phụ trách cơ sở nào.</div>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {assignedFacilities.map(fc => (
-                      <div key={fc.id}
-                        onClick={() => setLocation(`/portal/co-so/${fc.id}`)}
-                        className="flex items-start gap-3 p-4 rounded-xl border border-border hover:border-blue-200 hover:bg-blue-50/30 transition-colors cursor-pointer">
-                        <div className="w-9 h-9 rounded-lg bg-emerald-100 flex items-center justify-center shrink-0 mt-0.5">
-                          <MapPin className="w-4.5 h-4.5 text-emerald-600" />
-                        </div>
-                        <div className="min-w-0">
-                          <div className="text-[13.5px] font-semibold truncate">{fc.name}</div>
-                          <div className="text-[11.5px] text-muted-foreground font-mono">{fc.code}</div>
-                          <div className="text-[11.5px] text-muted-foreground mt-0.5">{[fc.xa, fc.tinh].filter(Boolean).join(", ")}</div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                ))}
               </div>
             )}
           </div>
