@@ -607,6 +607,14 @@ export const fetchEnterpriseStats = () => {
 
 export const fetchEmployees = () => delay({ items: [...employees] });
 
+export const fetchEmployee = (id: number) => {
+  const item = employees.find((e) => e.id === id);
+  if (!item) throw new Error("Không tìm thấy nhân viên");
+  const facilityIds = employeeFacilityMap.filter((m) => m.employeeId === id).map((m) => m.facilityId);
+  const assignedFacilities = facilities.filter((f) => facilityIds.includes(f.id));
+  return delay({ item: { ...item }, assignedFacilities });
+};
+
 export const createEmployee = (body: Partial<Employee> & { matKhau?: string }) => {
   const ent = enterprises.find((e) => e.id === body.enterpriseId);
   const item: Employee = {

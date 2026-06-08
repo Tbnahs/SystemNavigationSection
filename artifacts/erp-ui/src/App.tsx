@@ -25,6 +25,7 @@ import SettingsPage from "@/pages/SettingsPage";
 import DoanhNghiepPage from "@/pages/DoanhNghiepPage";
 import DoanhNghiepDetailPage from "@/pages/DoanhNghiepDetailPage";
 import NhanVienPage from "@/pages/NhanVienPage";
+import NhanVienDetailPage from "@/pages/NhanVienDetailPage";
 import DonViTinhPage from "@/pages/DonViTinhPage";
 import CoSoPage from "@/pages/CoSoPage";
 import CoSoDetailPage from "@/pages/CoSoDetailPage";
@@ -87,6 +88,9 @@ function Router() {
       </Route>
       <Route path="/portal/nguoi-dung">
         {() => <ProtectedRoute component={NhanVienPage} />}
+      </Route>
+      <Route path="/portal/nguoi-dung/:id">
+        {() => <ProtectedRoute component={NhanVienDetailPage} />}
       </Route>
       <Route path="/portal/don-vi-tinh">
         {() => <ProtectedRoute component={DonViTinhPage} />}
