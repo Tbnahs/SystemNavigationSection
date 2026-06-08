@@ -347,7 +347,7 @@ export default function CoSoPage() {
 
         {/* Stats */}
         <div className="grid grid-cols-3 gap-3">
-          {TYPE_OPTIONS.map(opt => {
+          {TYPE_OPTIONS.filter(o => ["ho_lien_ket", "co_so_thue_ngoai", "co_so_noi_bo"].includes(o.value)).map(opt => {
             const cnt = items.filter(f => f.type === opt.value).length;
             const Icon = opt.value === "ho_lien_ket" ? Home : opt.value === "co_so_thue_ngoai" ? Building2 : Factory;
             return (
