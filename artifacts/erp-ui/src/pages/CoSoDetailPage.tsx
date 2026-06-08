@@ -520,18 +520,48 @@ export default function CoSoDetailPage() {
 
       {/* QR Modal */}
       {showQrModal && (
-        <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[16px] font-semibold">Mã QR - {f.name}</h3>
-              <button onClick={() => setShowQrModal(false)} className="p-1.5 rounded hover:bg-muted">✕</button>
+        <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4" onClick={() => setShowQrModal(false)}>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm overflow-hidden" onClick={e => e.stopPropagation()}>
+            {/* Header */}
+            <div className="relative px-6 pt-6 pb-2 text-center">
+              <button onClick={() => setShowQrModal(false)}
+                className="absolute top-4 right-4 w-8 h-8 rounded-full flex items-center justify-center hover:bg-muted text-muted-foreground hover:text-foreground transition-colors">
+                <X className="w-4 h-4" />
+              </button>
+              <h3 className="text-[17px] font-bold">Mã QR cơ sở</h3>
+              <p className="text-[12.5px] text-muted-foreground mt-1">Dùng để truy xuất nguồn gốc và nhận diện cơ sở trong hệ thống</p>
             </div>
-            <img src={qrUrl(`CO-SO:${f.id}|${f.name}|${f.code || ""}`)} alt="QR Code" className="w-48 h-48 mx-auto mb-3" />
-            <p className="text-[13px] text-muted-foreground mb-1">{f.name}</p>
-            <p className="text-[12px] text-muted-foreground mb-4">Mã: {f.code || `CS-${f.id}`}</p>
-            <button onClick={() => printQR(f)} className="h-10 px-5 rounded-lg bg-emerald-600 text-white text-sm font-semibold flex items-center gap-2 mx-auto hover:bg-emerald-700">
-              <Printer className="w-4 h-4" /> In QR
-            </button>
+
+            {/* QR Card */}
+            <div className="px-6 py-4">
+              <div className="border border-border rounded-2xl p-5 text-center bg-white shadow-sm">
+                <img src={qrUrl(`CO-SO:${f.id}|${f.name}|${f.code || ""}`)} alt="QR Code" className="w-52 h-52 mx-auto" />
+                <div className="mt-4 space-y-0.5">
+                  <div className="text-[15px] font-bold">{f.name}</div>
+                  <div className="text-[12.5px] text-muted-foreground">Mã: {f.code || `CS-${f.id}`}</div>
+                  <div className="text-[12.5px] text-muted-foreground">{typeLabel(f.type)}</div>
+                  {f.gln && <div className="text-[12px] text-muted-foreground font-mono mt-1">GLN: {f.gln}</div>}
+                </div>
+              </div>
+            </div>
+
+            {/* Actions */}
+            <div className="px-6 pb-4 flex gap-3 justify-center">
+              <button onClick={() => printQR(f)}
+                className="h-10 px-6 rounded-lg bg-emerald-600 text-white text-[13.5px] font-semibold flex items-center gap-2 hover:bg-emerald-700 transition-colors">
+                <Printer className="w-4 h-4" /> In QR
+              </button>
+              <a href={qrUrl(`CO-SO:${f.id}|${f.name}|${f.code || ""}`)} download={`qr-${f.code || f.id}.png`} target="_blank" rel="noreferrer"
+                className="h-10 px-6 rounded-lg border border-border text-[13.5px] font-semibold flex items-center gap-2 hover:bg-muted transition-colors">
+                Tải xuống
+              </a>
+            </div>
+
+            {/* Data footer */}
+            <div className="px-6 pb-5 text-center">
+              <span className="text-[11.5px] text-muted-foreground">Dữ liệu QR: </span>
+              <span className="text-[11.5px] font-mono bg-muted px-2 py-0.5 rounded text-foreground">{`CO-SO:${f.id}|${f.name}|${f.code || ""}`}</span>
+            </div>
           </div>
         </div>
       )}
