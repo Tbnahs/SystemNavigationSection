@@ -314,9 +314,6 @@ function Card({ title, actionLabel, children }: { title: string; actionLabel?: s
     <div className="bg-white border border-border rounded-xl">
       <div className="px-5 py-3.5 border-b border-border flex items-center justify-between">
         <div className="text-[14px] font-semibold text-foreground">{title}</div>
-        {actionLabel && (
-          <button className="text-[12.5px] font-medium text-primary hover:brightness-90">{actionLabel}</button>
-        )}
       </div>
       <div className="p-5">{children}</div>
     </div>
