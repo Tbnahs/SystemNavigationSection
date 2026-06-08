@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import AppLayout from "@/components/AppLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 import {
   Plus, Pencil, X, Loader2, Search, ShoppingBasket, Trash2,
   MapPin, QrCode, ChevronDown, Printer, Download,
@@ -96,6 +97,7 @@ type QrInfo = {
 };
 
 export default function DonThuMuaPage() {
+  const { t } = useLanguage();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [editItem, setEditItem] = useState<PurchaseOrder | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<PurchaseOrder | null>(null);
@@ -411,29 +413,29 @@ export default function DonThuMuaPage() {
       <div className="space-y-5">
         <div>
           <div className="text-[12px] text-muted-foreground">ERP / Thu mua</div>
-          <h1 className="text-xl lg:text-2xl font-bold mt-0.5">Đơn Thu mua Chè</h1>
+          <h1 className="text-xl lg:text-2xl font-bold mt-0.5">{t("thu.page-title")}</h1>
         </div>
 
         {/* Toolbar */}
         <div className="bg-white border border-border rounded-xl p-3 lg:p-4 flex items-center gap-2 flex-wrap">
           <div className="relative min-w-[180px]">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Tìm cơ sở, mã lô…" className="w-full h-10 pl-9 pr-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
+            <input value={search} onChange={e => setSearch(e.target.value)} placeholder={t("thu.search-placeholder")} className="w-full h-10 pl-9 pr-3 rounded-lg border border-border text-sm outline-none focus:border-primary" />
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-[12px] text-muted-foreground whitespace-nowrap">Từ</span>
+            <span className="text-[12px] text-muted-foreground whitespace-nowrap">{t("common.date-from")}</span>
             <input type="date" value={dateFrom} onChange={e => setDateFrom(e.target.value)} className="h-10 px-2 rounded-lg border border-border text-[13px] outline-none focus:border-primary" />
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="text-[12px] text-muted-foreground whitespace-nowrap">đến</span>
+            <span className="text-[12px] text-muted-foreground whitespace-nowrap">{t("common.date-to")}</span>
             <input type="date" value={dateTo} onChange={e => setDateTo(e.target.value)} className="h-10 px-2 rounded-lg border border-border text-[13px] outline-none focus:border-primary" />
           </div>
           {(dateFrom || dateTo) && (
-            <button onClick={() => { setDateFrom(""); setDateTo(""); }} className="h-8 px-2 rounded-lg border border-border text-[12px] hover:bg-muted text-muted-foreground">Xóa lọc</button>
+            <button onClick={() => { setDateFrom(""); setDateTo(""); }} className="h-8 px-2 rounded-lg border border-border text-[12px] hover:bg-muted text-muted-foreground">{t("common.clear-filter")}</button>
           )}
           <div className="flex-1" />
           <button onClick={() => setDrawerOpen(true)} className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 shadow-sm hover:brightness-110">
-            <Plus className="w-4 h-4" /> Tạo phiếu thu mua
+            <Plus className="w-4 h-4" /> {t("thu.add")}
           </button>
         </div>
 
@@ -443,20 +445,20 @@ export default function DonThuMuaPage() {
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/40">
-                  <th className="px-4 py-3">Ngày thu mua</th>
-                  <th className="px-4 py-3">Cơ sở thu mua</th>
-                  <th className="px-4 py-3">Mã lô mẻ</th>
-                  <th className="px-4 py-3">Khối lượng</th>
-                  <th className="px-4 py-3">Tổng tiền</th>
+                  <th className="px-4 py-3">{t("thu.col.date")}</th>
+                  <th className="px-4 py-3">{t("thu.col.facility")}</th>
+                  <th className="px-4 py-3">{t("thu.col.batch")}</th>
+                  <th className="px-4 py-3">{t("thu.col.weight")}</th>
+                  <th className="px-4 py-3">{t("thu.col.total")}</th>
                   <th className="px-4 py-3 w-20"></th>
                 </tr>
               </thead>
               <tbody>
-                {listQ.isLoading && <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>}
+                {listQ.isLoading && <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />{t("common.loading")}</td></tr>}
                 {!listQ.isLoading && filtered.length === 0 && (
                   <tr><td colSpan={6} className="px-4 py-10 text-center text-muted-foreground">
                     <ShoppingBasket className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                    {search || dateFrom || dateTo ? "Không tìm thấy phiếu phù hợp." : "Chưa có phiếu thu mua nào."}
+                    {search || dateFrom || dateTo ? t("thu.not-found") : t("thu.empty")}
                   </td></tr>
                 )}
                 {filtered.map(o => (
@@ -519,7 +521,7 @@ export default function DonThuMuaPage() {
           <div className="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] flex flex-col">
             <div id="qr-print-hide" className="px-5 py-4 border-b border-border flex items-center justify-between shrink-0">
-              <h3 className="text-[17px] font-semibold flex items-center gap-2"><QrCode className="w-5 h-5 text-primary" /> Mã QR phiếu thu mua</h3>
+              <h3 className="text-[17px] font-semibold flex items-center gap-2"><QrCode className="w-5 h-5 text-primary" /> {t("thu.qr-title")}</h3>
               <button onClick={() => setQrInfo(null)} className="p-1.5 rounded hover:bg-muted"><X className="w-4 h-4 text-muted-foreground" /></button>
             </div>
             <div id="qr-print-area" className="overflow-auto flex-1 px-5 py-4 space-y-4">
@@ -604,12 +606,12 @@ export default function DonThuMuaPage() {
         <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
             <div className="w-11 h-11 rounded-full bg-rose-50 flex items-center justify-center mx-auto mb-4"><X className="w-5 h-5 text-rose-600" /></div>
-            <h3 className="text-[16px] font-semibold text-center mb-1">Xóa phiếu thu mua?</h3>
-            <p className="text-[13px] text-muted-foreground text-center mb-5">Ngày <span className="font-semibold text-foreground">{fmtDate(deleteTarget.ngayThu)}</span> — {deleteTarget.facilityName}</p>
+            <h3 className="text-[16px] font-semibold text-center mb-1">{t("thu.delete-title")}</h3>
+            <p className="text-[13px] text-muted-foreground text-center mb-5">{fmtDate(deleteTarget.ngayThu)} — {deleteTarget.facilityName}</p>
             <div className="flex gap-3">
-              <button onClick={() => setDeleteTarget(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">Hủy</button>
+              <button onClick={() => setDeleteTarget(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">{t("common.cancel")}</button>
               <button disabled={deleteMu.isPending} onClick={() => deleteMu.mutate(deleteTarget.id)} className="flex-1 h-10 rounded-xl bg-rose-600 text-white font-semibold text-sm hover:bg-rose-700 disabled:opacity-60 flex items-center justify-center gap-2">
-                {deleteMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />} Xóa
+                {deleteMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />} {t("common.delete")}
               </button>
             </div>
           </div>
@@ -622,7 +624,7 @@ export default function DonThuMuaPage() {
           <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={close_} />
           <aside className="fixed top-0 right-0 h-full w-full lg:w-[680px] bg-white shadow-2xl z-50 flex flex-col">
             <div className="px-6 py-5 border-b border-border flex items-center justify-between">
-              <div className="text-[18px] font-semibold">{editItem ? "Sửa phiếu thu mua" : "Tạo phiếu thu mua"}</div>
+              <div className="text-[18px] font-semibold">{editItem ? t("thu.edit-title") : t("thu.add-title")}</div>
               <button onClick={close_} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
 

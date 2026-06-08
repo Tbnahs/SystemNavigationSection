@@ -178,7 +178,76 @@ export type TranslationKey =
   | "home.activity.erp.1" | "home.activity.erp.2" | "home.activity.erp.3" | "home.activity.erp.4" | "home.activity.erp.5"
   | "home.activity.txng.1" | "home.activity.txng.2" | "home.activity.txng.3" | "home.activity.txng.4" | "home.activity.txng.5"
   | "home.activity.iot.1" | "home.activity.iot.2" | "home.activity.iot.3" | "home.activity.iot.4" | "home.activity.iot.5"
-  | "home.activity.portal.1" | "home.activity.portal.2" | "home.activity.portal.3" | "home.activity.portal.4" | "home.activity.portal.5";
+  | "home.activity.portal.1" | "home.activity.portal.2" | "home.activity.portal.3" | "home.activity.portal.4" | "home.activity.portal.5"
+  /* ── Common UI ── */
+  | "common.save" | "common.cancel" | "common.add" | "common.edit" | "common.delete"
+  | "common.confirm-delete" | "common.confirm" | "common.close" | "common.view-detail" | "common.save-changes"
+  | "common.real-data" | "common.delete-item" | "common.all-types" | "common.date-from" | "common.date-to"
+  | "common.clear-filter" | "common.optional" | "common.no"
+  | "common.filter" | "common.export-excel" | "common.import-excel" | "common.file-template"
+  | "common.print" | "common.loading" | "common.no-results" | "common.status"
+  | "common.phone" | "common.address" | "common.note" | "common.province" | "common.commune"
+  | "common.detail-address" | "common.total" | "common.weight" | "common.unit-price"
+  | "common.amount" | "common.add-line" | "common.password" | "common.email"
+  | "common.col.enterprise" | "common.col.status" | "common.col.module" | "common.col.name" | "common.col.address"
+  | "common.status.active" | "common.status.inactive" | "common.status.locked"
+  | "common.status.pending" | "common.status.invited"
+  | "common.status.draft" | "common.status.confirmed" | "common.status.cancelled"
+  /* ── DoanhNghiep ── */
+  | "dn.page-title" | "dn.add" | "dn.add-title" | "dn.edit-title" | "dn.delete-title" | "dn.created"
+  | "dn.stat.total" | "dn.stat.active" | "dn.stat.pending" | "dn.stat.locked"
+  | "dn.stat.pending-note" | "dn.showing"
+  | "dn.col.account" | "dn.col.representative"
+  | "dn.form.tax-id" | "dn.form.full-name" | "dn.form.display-name" | "dn.form.username"
+  | "dn.form.representative" | "dn.form.logo" | "dn.form.gcp" | "dn.form.gln"
+  | "dn.form.video" | "dn.form.story" | "dn.form.modules" | "dn.form.email"
+  | "dn.section.profile" | "dn.section.location" | "dn.section.modules" | "dn.section.promo"
+  | "dn.search-ph" | "dn.empty" | "dn.not-found"
+  /* ── NhanVien ── */
+  | "nv.page-title" | "nv.add" | "nv.add-title" | "nv.add-subtitle" | "nv.edit-title" | "nv.edit-subtitle"
+  | "nv.reset-pwd" | "nv.lock-account" | "nv.lock-title" | "nv.lock-desc"
+  | "nv.reset-title" | "nv.reset-desc" | "nv.reset-success" | "nv.reset-new-pw" | "nv.reset-notify"
+  | "nv.pwd-given"
+  | "nv.stat.total" | "nv.stat.active" | "nv.stat.locked"
+  | "nv.col.contact" | "nv.col.facility" | "nv.col.last-active"
+  | "nv.form.avatar" | "nv.form.full-name" | "nv.form.enterprise" | "nv.form.role"
+  | "nv.form.modules" | "nv.form.facilities" | "nv.form.init-pwd"
+  | "nv.search-ph" | "nv.empty" | "nv.not-found"
+  /* ── CoSo ── */
+  | "cs.page-title" | "cs.add" | "cs.add-title" | "cs.edit-title" | "cs.delete-title" | "cs.qr-title"
+  | "cs.print-qr" | "cs.stat.linked" | "cs.stat.external" | "cs.stat.internal"
+  | "cs.col.fac-name" | "cs.col.type" | "cs.col.gln"
+  | "cs.form.enterprise" | "cs.form.fac-name" | "cs.form.code" | "cs.form.type"
+  | "cs.form.gln" | "cs.form.area" | "cs.form.unit" | "cs.form.coordinates" | "cs.form.tea-varieties"
+  | "cs.section.general" | "cs.section.location" | "cs.section.certs" | "cs.section.depts"
+  | "cs.add-cert" | "cs.add-dept"
+  | "cs.search-ph" | "cs.empty" | "cs.not-found"
+  | "cs.type.ho_lien_ket" | "cs.type.vung_trong_noi_bo" | "cs.type.dong_goi"
+  | "cs.type.co_so_thue_ngoai" | "cs.type.co_so_noi_bo"
+  | "cs.status.active" | "cs.status.inactive"
+  /* ── ThuMua ── */
+  | "thu.page-title" | "thu.add" | "thu.save" | "thu.print"
+  | "thu.add-title" | "thu.edit-title" | "thu.delete-title" | "thu.print-title"
+  | "thu.qr-title" | "thu.download-qr"
+  | "thu.col.date" | "thu.col.facility" | "thu.col.lot-code" | "thu.col.weight"
+  | "thu.col.total" | "thu.col.product" | "thu.col.grade" | "thu.col.quality-pct"
+  | "thu.col.unit-price" | "thu.col.amount"
+  | "thu.form.code" | "thu.form.date" | "thu.form.facility" | "thu.form.address"
+  | "thu.form.lot-code" | "thu.form.notes" | "thu.form.rounding"
+  | "thu.section.general" | "thu.section.products" | "thu.section.total"
+  | "thu.clear-filter" | "thu.search-ph" | "thu.empty" | "thu.not-found"
+  | "thu.rounding.minus" | "thu.rounding.plus"
+  /* ── QuyCach ── */
+  | "qc.page-title" | "qc.tab.grade" | "qc.tab.quality" | "qc.tab.standard"
+  | "qc.add-grade" | "qc.add-quality" | "qc.add-standard"
+  | "qc.add-grade-title" | "qc.edit-grade-title" | "qc.delete-grade-title"
+  | "qc.add-quality-title" | "qc.edit-quality-title" | "qc.delete-quality-title"
+  | "qc.add-standard-title" | "qc.delete-standard-title"
+  | "qc.col.grade-name" | "qc.col.tea-variety" | "qc.col.product" | "qc.col.quality-pct"
+  | "qc.col.unit-price" | "qc.col.grade-applied" | "qc.col.standard-title" | "qc.col.standard-desc"
+  | "qc.form.grade-name" | "qc.form.tea-variety" | "qc.form.product" | "qc.form.quality-pct"
+  | "qc.form.grade-applied" | "qc.form.standard-title" | "qc.form.standard-desc"
+  | "qc.deselect-all" | "qc.empty.grade" | "qc.empty.quality" | "qc.empty.standard";
 
 type Translations = Record<TranslationKey, string>;
 
@@ -411,6 +480,71 @@ const vi: Translations = {
   "home.activity.portal.3": "Phân quyền module ERP cho HTX Hồng Hà",
   "home.activity.portal.4": "Cơ sở chế biến Nà Hồng thêm mới",
   "home.activity.portal.5": "2 tài khoản chờ kích hoạt",
+  "common.save": "Lưu", "common.cancel": "Hủy", "common.add": "Thêm", "common.edit": "Sửa", "common.delete": "Xóa",
+  "common.confirm-delete": "Xóa vĩnh viễn", "common.confirm": "Xác nhận", "common.close": "Đóng", "common.view-detail": "Xem chi tiết", "common.save-changes": "Lưu thay đổi",
+  "common.real-data": "Dữ liệu thực tế", "common.delete-item": "Xóa {name}", "common.all-types": "Tất cả loại", "common.date-from": "Từ ngày", "common.date-to": "Đến ngày",
+  "common.clear-filter": "Xóa lọc", "common.optional": "Tùy chọn", "common.no": "STT",
+  "common.filter": "Bộ lọc", "common.export-excel": "Xuất Excel", "common.import-excel": "Import Excel", "common.file-template": "File mẫu",
+  "common.print": "In", "common.loading": "Đang tải…", "common.no-results": "Không tìm thấy kết quả phù hợp", "common.status": "Trạng thái",
+  "common.phone": "Số điện thoại", "common.address": "Địa chỉ", "common.note": "Ghi chú", "common.province": "Tỉnh / Thành phố", "common.commune": "Xã / Phường",
+  "common.detail-address": "Địa chỉ chi tiết", "common.total": "Tổng", "common.weight": "Khối lượng", "common.unit-price": "Đơn giá",
+  "common.amount": "Thành tiền", "common.add-line": "Thêm dòng", "common.password": "Mật khẩu", "common.email": "Email",
+  "common.col.enterprise": "Doanh nghiệp", "common.col.status": "Trạng thái", "common.col.module": "Phân hệ", "common.col.name": "Tên", "common.col.address": "Địa chỉ",
+  "common.status.active": "Đang hoạt động", "common.status.inactive": "Ngưng hoạt động", "common.status.locked": "Tạm khóa",
+  "common.status.pending": "Chờ duyệt", "common.status.invited": "Đã mời",
+  "common.status.draft": "Bản nháp", "common.status.confirmed": "Đã xác nhận", "common.status.cancelled": "Đã hủy",
+  "dn.page-title": "Quản lý Doanh nghiệp", "dn.add": "Thêm doanh nghiệp", "dn.add-title": "Thêm doanh nghiệp mới", "dn.edit-title": "Sửa thông tin doanh nghiệp",
+  "dn.delete-title": "Xóa doanh nghiệp?", "dn.created": "Doanh nghiệp đã được tạo!",
+  "dn.stat.total": "Tổng doanh nghiệp", "dn.stat.active": "Đang hoạt động", "dn.stat.pending": "Chờ duyệt", "dn.stat.locked": "Tạm khóa",
+  "dn.stat.pending-note": "Cần xử lý", "dn.showing": "Hiển thị {n} / {total} doanh nghiệp",
+  "dn.col.account": "Tên tài khoản", "dn.col.representative": "Người đại diện",
+  "dn.form.tax-id": "Mã số thuế", "dn.form.full-name": "Tên doanh nghiệp", "dn.form.display-name": "Tên hiển thị", "dn.form.username": "Tên đăng nhập",
+  "dn.form.representative": "Người đại diện", "dn.form.logo": "Ảnh logo", "dn.form.gcp": "Mã GCP", "dn.form.gln": "Mã GLN",
+  "dn.form.video": "Video giới thiệu", "dn.form.story": "Câu chuyện thương hiệu", "dn.form.modules": "Phân hệ sử dụng", "dn.form.email": "Email doanh nghiệp",
+  "dn.section.profile": "Hồ sơ chung", "dn.section.location": "Vị trí địa lý", "dn.section.modules": "Phân hệ", "dn.section.promo": "Quảng bá",
+  "dn.search-ph": "Tìm theo MST, tên doanh nghiệp, người đại diện…", "dn.empty": "Chưa có doanh nghiệp nào", "dn.not-found": "Không tìm thấy doanh nghiệp phù hợp",
+  "nv.page-title": "Quản lý Nhân viên", "nv.add": "Thêm nhân viên", "nv.add-title": "Thêm nhân viên mới", "nv.edit-title": "Sửa thông tin nhân viên",
+  "nv.reset-pwd": "Đặt lại mật khẩu", "nv.lock-account": "Khóa tài khoản", "nv.lock-title": "Khóa tài khoản?", "nv.reset-title": "Đặt lại mật khẩu?", "nv.pwd-given": "Mật khẩu mới đã được cấp",
+  "nv.lock-desc": "Tài khoản {name} sẽ bị tạm khóa và không thể đăng nhập.",
+  "nv.add-subtitle": "Tạo tài khoản và gửi lời mời qua email.", "nv.edit-subtitle": "Cập nhật thông tin nhân viên.",
+  "nv.reset-desc": "Đặt lại mật khẩu của {name} về mật khẩu mặc định.", "nv.reset-success": "Đặt lại thành công!",
+  "nv.reset-new-pw": "Mật khẩu mặc định mới:", "nv.reset-notify": "Vui lòng thông báo cho nhân viên và yêu cầu đổi mật khẩu sau khi đăng nhập.",
+  "nv.stat.total": "Tổng nhân viên", "nv.stat.active": "Đang hoạt động", "nv.stat.locked": "Tạm khóa",
+  "nv.col.contact": "Liên hệ", "nv.col.facility": "Cơ sở phụ trách", "nv.col.last-active": "Hoạt động cuối",
+  "nv.form.avatar": "Ảnh đại diện", "nv.form.full-name": "Họ và tên", "nv.form.enterprise": "Thuộc doanh nghiệp", "nv.form.role": "Vai trò",
+  "nv.form.modules": "Phân hệ phụ trách", "nv.form.facilities": "Cơ sở phụ trách", "nv.form.init-pwd": "Mật khẩu khởi tạo",
+  "nv.search-ph": "Tìm theo tên, email, SĐT…", "nv.empty": "Chưa có nhân viên nào.", "nv.not-found": "Không tìm thấy nhân viên phù hợp",
+  "cs.page-title": "Quản lý Cơ sở", "cs.add": "Thêm cơ sở", "cs.add-title": "Thêm cơ sở", "cs.edit-title": "Sửa cơ sở", "cs.delete-title": "Xóa cơ sở?", "cs.qr-title": "Mã QR Cơ sở",
+  "cs.print-qr": "In mã QR", "cs.stat.linked": "Hộ liên kết", "cs.stat.external": "Cơ sở thuê ngoài", "cs.stat.internal": "Cơ sở nội bộ",
+  "cs.col.fac-name": "Tên cơ sở", "cs.col.type": "Loại", "cs.col.gln": "GLN",
+  "cs.form.enterprise": "Doanh nghiệp quản lý", "cs.form.fac-name": "Tên cơ sở / Hộ liên kết", "cs.form.code": "Mã cơ sở", "cs.form.type": "Loại hình",
+  "cs.form.gln": "Mã GLN", "cs.form.area": "Diện tích", "cs.form.unit": "Đơn vị", "cs.form.coordinates": "Tọa độ (Lat, Lng)", "cs.form.tea-varieties": "Giống chè canh tác",
+  "cs.section.general": "Thông tin chung", "cs.section.location": "Vị trí & Bản đồ", "cs.section.certs": "Chứng chỉ & Chứng nhận", "cs.section.depts": "Bộ phận nội bộ",
+  "cs.add-cert": "Thêm chứng chỉ", "cs.add-dept": "Thêm bộ phận",
+  "cs.search-ph": "Tìm tên, mã, địa chỉ, tỉnh…", "cs.empty": "Chưa có cơ sở nào. Thêm cơ sở đầu tiên!", "cs.not-found": "Không tìm thấy cơ sở phù hợp",
+  "cs.type.ho_lien_ket": "Hộ liên kết", "cs.type.vung_trong_noi_bo": "Vùng trồng nội bộ", "cs.type.dong_goi": "Đóng gói",
+  "cs.type.co_so_thue_ngoai": "Cơ sở sản xuất (thuê ngoài)", "cs.type.co_so_noi_bo": "Cơ sở sản xuất (nội bộ)",
+  "cs.status.active": "Đang hoạt động", "cs.status.inactive": "Ngưng hoạt động",
+  "thu.page-title": "Đơn Thu mua Chè", "thu.add": "Tạo phiếu thu mua", "thu.save": "Lưu phiếu", "thu.print": "In phiếu",
+  "thu.add-title": "Tạo phiếu thu mua", "thu.edit-title": "Cập nhật phiếu thu mua", "thu.delete-title": "Xóa phiếu thu mua?", "thu.print-title": "In phiếu thu mua",
+  "thu.qr-title": "Mã QR phiếu thu mua", "thu.download-qr": "Tải ảnh QR",
+  "thu.col.date": "Ngày thu mua", "thu.col.facility": "Cơ sở thu mua", "thu.col.lot-code": "Mã lô mẻ", "thu.col.weight": "Khối lượng", "thu.col.total": "Tổng tiền",
+  "thu.col.product": "Sản phẩm", "thu.col.grade": "Phân loại", "thu.col.quality-pct": "% Chất lượng", "thu.col.unit-price": "Đơn giá", "thu.col.amount": "Thành tiền",
+  "thu.form.code": "Mã phiếu", "thu.form.date": "Ngày thu mua", "thu.form.facility": "Cơ sở thu mua", "thu.form.address": "Địa chỉ thu",
+  "thu.form.lot-code": "Mã lô mẻ", "thu.form.notes": "Ghi chú", "thu.form.rounding": "Tiền lẻ",
+  "thu.section.general": "Thông tin chung", "thu.section.products": "Danh sách sản phẩm", "thu.section.total": "Tổng cộng",
+  "thu.clear-filter": "Xóa lọc", "thu.search-ph": "Tìm cơ sở, mã lô…", "thu.empty": "Chưa có phiếu thu mua nào.", "thu.not-found": "Không tìm thấy phiếu phù hợp",
+  "thu.rounding.minus": "Trừ", "thu.rounding.plus": "Cộng",
+  "qc.page-title": "Quy cách & Tiêu chuẩn", "qc.tab.grade": "Quy cách", "qc.tab.quality": "% Chất lượng", "qc.tab.standard": "Tiêu chuẩn",
+  "qc.add-grade": "Thêm quy cách", "qc.add-quality": "Thêm % chất lượng", "qc.add-standard": "Thêm tiêu chuẩn",
+  "qc.add-grade-title": "Thêm quy cách", "qc.edit-grade-title": "Sửa quy cách", "qc.delete-grade-title": "Xóa quy cách?",
+  "qc.add-quality-title": "Thêm % chất lượng", "qc.edit-quality-title": "Sửa % chất lượng", "qc.delete-quality-title": "Xóa mức chất lượng?",
+  "qc.add-standard-title": "Thêm tiêu chuẩn", "qc.delete-standard-title": "Xóa tiêu chuẩn?",
+  "qc.col.grade-name": "Tên quy cách", "qc.col.tea-variety": "Giống chè", "qc.col.product": "Thương phẩm", "qc.col.quality-pct": "% Đánh giá",
+  "qc.col.unit-price": "Đơn giá", "qc.col.grade-applied": "Quy cách áp dụng", "qc.col.standard-title": "Tiêu đề tiêu chuẩn", "qc.col.standard-desc": "Mô tả nội dung",
+  "qc.form.grade-name": "Tên quy cách", "qc.form.tea-variety": "Giống chè", "qc.form.product": "Thương phẩm", "qc.form.quality-pct": "% Đánh giá",
+  "qc.form.grade-applied": "Quy cách áp dụng", "qc.form.standard-title": "Tiêu đề tiêu chuẩn", "qc.form.standard-desc": "Mô tả nội dung",
+  "qc.deselect-all": "Bỏ chọn tất cả", "qc.empty.grade": "Chưa có quy cách nào", "qc.empty.quality": "Chưa có mức chất lượng nào", "qc.empty.standard": "Chưa có tiêu chuẩn nào",
 };
 
 const en: Translations = {
@@ -642,6 +776,71 @@ const en: Translations = {
   "home.activity.portal.3": "ERP module permissions assigned to HTX Hồng Hà",
   "home.activity.portal.4": "Processing facility Nà Hồng added",
   "home.activity.portal.5": "2 accounts pending activation",
+  "common.save": "Save", "common.cancel": "Cancel", "common.add": "Add", "common.edit": "Edit", "common.delete": "Delete",
+  "common.confirm-delete": "Delete permanently", "common.confirm": "Confirm", "common.close": "Close", "common.view-detail": "View detail", "common.save-changes": "Save changes",
+  "common.real-data": "Real data", "common.delete-item": "Delete {name}", "common.all-types": "All types", "common.date-from": "From date", "common.date-to": "To date",
+  "common.clear-filter": "Clear filter", "common.optional": "Optional", "common.no": "No.",
+  "common.filter": "Filter", "common.export-excel": "Export Excel", "common.import-excel": "Import Excel", "common.file-template": "Template",
+  "common.print": "Print", "common.loading": "Loading…", "common.no-results": "No matching results", "common.status": "Status",
+  "common.phone": "Phone", "common.address": "Address", "common.note": "Note", "common.province": "Province / City", "common.commune": "Commune / Ward",
+  "common.detail-address": "Detailed address", "common.total": "Total", "common.weight": "Weight", "common.unit-price": "Unit price",
+  "common.amount": "Amount", "common.add-line": "Add line", "common.password": "Password", "common.email": "Email",
+  "common.col.enterprise": "Enterprise", "common.col.status": "Status", "common.col.module": "Module", "common.col.name": "Name", "common.col.address": "Address",
+  "common.status.active": "Active", "common.status.inactive": "Inactive", "common.status.locked": "Locked",
+  "common.status.pending": "Pending", "common.status.invited": "Invited",
+  "common.status.draft": "Draft", "common.status.confirmed": "Confirmed", "common.status.cancelled": "Cancelled",
+  "dn.page-title": "Enterprise Management", "dn.add": "Add enterprise", "dn.add-title": "Add new enterprise", "dn.edit-title": "Edit enterprise",
+  "dn.delete-title": "Delete enterprise?", "dn.created": "Enterprise created!",
+  "dn.stat.total": "Total enterprises", "dn.stat.active": "Active", "dn.stat.pending": "Pending", "dn.stat.locked": "Locked",
+  "dn.stat.pending-note": "Needs action", "dn.showing": "Showing {n} of {total} enterprises",
+  "dn.col.account": "Account name", "dn.col.representative": "Representative",
+  "dn.form.tax-id": "Tax ID", "dn.form.full-name": "Enterprise name", "dn.form.display-name": "Display name", "dn.form.username": "Username",
+  "dn.form.representative": "Representative", "dn.form.logo": "Logo image", "dn.form.gcp": "GCP Code", "dn.form.gln": "GLN Code",
+  "dn.form.video": "Introduction video", "dn.form.story": "Brand story", "dn.form.modules": "Modules in use", "dn.form.email": "Enterprise email",
+  "dn.section.profile": "General profile", "dn.section.location": "Location", "dn.section.modules": "Modules", "dn.section.promo": "Promotion",
+  "dn.search-ph": "Search by tax ID, name, representative…", "dn.empty": "No enterprises yet", "dn.not-found": "No matching enterprises",
+  "nv.page-title": "Employee Management", "nv.add": "Add employee", "nv.add-title": "Add new employee", "nv.edit-title": "Edit employee",
+  "nv.reset-pwd": "Reset password", "nv.lock-account": "Lock account", "nv.lock-title": "Lock account?", "nv.reset-title": "Reset password?", "nv.pwd-given": "New password issued",
+  "nv.lock-desc": "Account {name} will be temporarily locked and cannot log in.",
+  "nv.add-subtitle": "Create account and send invitation by email.", "nv.edit-subtitle": "Update employee information.",
+  "nv.reset-desc": "Reset {name}'s password to default.", "nv.reset-success": "Reset successful!",
+  "nv.reset-new-pw": "New default password:", "nv.reset-notify": "Please notify the employee and ask them to change their password after logging in.",
+  "nv.stat.total": "Total employees", "nv.stat.active": "Active", "nv.stat.locked": "Locked",
+  "nv.col.contact": "Contact", "nv.col.facility": "Assigned facility", "nv.col.last-active": "Last active",
+  "nv.form.avatar": "Avatar", "nv.form.full-name": "Full name", "nv.form.enterprise": "Belongs to enterprise", "nv.form.role": "Role",
+  "nv.form.modules": "Assigned modules", "nv.form.facilities": "Assigned facilities", "nv.form.init-pwd": "Initial password",
+  "nv.search-ph": "Search by name, email, phone…", "nv.empty": "No employees yet.", "nv.not-found": "No matching employees",
+  "cs.page-title": "Facility Management", "cs.add": "Add facility", "cs.add-title": "Add facility", "cs.edit-title": "Edit facility", "cs.delete-title": "Delete facility?", "cs.qr-title": "Facility QR Code",
+  "cs.print-qr": "Print QR code", "cs.stat.linked": "Partner households", "cs.stat.external": "Outsourced facilities", "cs.stat.internal": "Internal facilities",
+  "cs.col.fac-name": "Facility name", "cs.col.type": "Type", "cs.col.gln": "GLN",
+  "cs.form.enterprise": "Managing enterprise", "cs.form.fac-name": "Facility / Partner name", "cs.form.code": "Facility code", "cs.form.type": "Type",
+  "cs.form.gln": "GLN Code", "cs.form.area": "Area", "cs.form.unit": "Unit", "cs.form.coordinates": "Coordinates (Lat, Lng)", "cs.form.tea-varieties": "Tea varieties grown",
+  "cs.section.general": "General information", "cs.section.location": "Location & Map", "cs.section.certs": "Certificates & Certifications", "cs.section.depts": "Internal departments",
+  "cs.add-cert": "Add certificate", "cs.add-dept": "Add department",
+  "cs.search-ph": "Search by name, code, address…", "cs.empty": "No facilities yet. Add the first one!", "cs.not-found": "No matching facilities",
+  "cs.type.ho_lien_ket": "Partner household", "cs.type.vung_trong_noi_bo": "Internal growing zone", "cs.type.dong_goi": "Packaging",
+  "cs.type.co_so_thue_ngoai": "Production facility (outsourced)", "cs.type.co_so_noi_bo": "Production facility (internal)",
+  "cs.status.active": "Active", "cs.status.inactive": "Inactive",
+  "thu.page-title": "Tea Purchase Orders", "thu.add": "Create purchase order", "thu.save": "Save order", "thu.print": "Print order",
+  "thu.add-title": "Create purchase order", "thu.edit-title": "Update purchase order", "thu.delete-title": "Delete purchase order?", "thu.print-title": "Print purchase order",
+  "thu.qr-title": "Purchase order QR code", "thu.download-qr": "Download QR image",
+  "thu.col.date": "Purchase date", "thu.col.facility": "Purchase facility", "thu.col.lot-code": "Lot code", "thu.col.weight": "Weight", "thu.col.total": "Total",
+  "thu.col.product": "Product", "thu.col.grade": "Grade", "thu.col.quality-pct": "% Quality", "thu.col.unit-price": "Unit price", "thu.col.amount": "Amount",
+  "thu.form.code": "Order code", "thu.form.date": "Purchase date", "thu.form.facility": "Purchase facility", "thu.form.address": "Collection address",
+  "thu.form.lot-code": "Lot code", "thu.form.notes": "Notes", "thu.form.rounding": "Rounding",
+  "thu.section.general": "General information", "thu.section.products": "Product list", "thu.section.total": "Total",
+  "thu.clear-filter": "Clear filter", "thu.search-ph": "Search facility, lot code…", "thu.empty": "No purchase orders yet.", "thu.not-found": "No matching orders",
+  "thu.rounding.minus": "Minus", "thu.rounding.plus": "Plus",
+  "qc.page-title": "Standards & Specs", "qc.tab.grade": "Grade", "qc.tab.quality": "% Quality", "qc.tab.standard": "Standard",
+  "qc.add-grade": "Add grade", "qc.add-quality": "Add % quality", "qc.add-standard": "Add standard",
+  "qc.add-grade-title": "Add grade", "qc.edit-grade-title": "Edit grade", "qc.delete-grade-title": "Delete grade?",
+  "qc.add-quality-title": "Add % quality", "qc.edit-quality-title": "Edit % quality", "qc.delete-quality-title": "Delete quality level?",
+  "qc.add-standard-title": "Add standard", "qc.delete-standard-title": "Delete standard?",
+  "qc.col.grade-name": "Grade name", "qc.col.tea-variety": "Tea variety", "qc.col.product": "Product", "qc.col.quality-pct": "% Rating",
+  "qc.col.unit-price": "Unit price", "qc.col.grade-applied": "Applied grade", "qc.col.standard-title": "Standard title", "qc.col.standard-desc": "Description",
+  "qc.form.grade-name": "Grade name", "qc.form.tea-variety": "Tea variety", "qc.form.product": "Product", "qc.form.quality-pct": "% Rating",
+  "qc.form.grade-applied": "Applied grade", "qc.form.standard-title": "Standard title", "qc.form.standard-desc": "Description",
+  "qc.deselect-all": "Deselect all", "qc.empty.grade": "No grades yet", "qc.empty.quality": "No quality levels yet", "qc.empty.standard": "No standards yet",
 };
 
 const ko: Translations = {
@@ -873,6 +1072,62 @@ const ko: Translations = {
   "home.activity.portal.3": "HTX Hồng Hà ERP 모듈 권한 부여",
   "home.activity.portal.4": "Nà Hồng 가공 시설 추가됨",
   "home.activity.portal.5": "계정 2개 활성화 대기 중",
+  "common.save": "저장", "common.cancel": "취소", "common.add": "추가", "common.edit": "수정", "common.delete": "삭제",
+  "common.confirm-delete": "영구 삭제", "common.close": "닫기", "common.view-detail": "상세 보기", "common.save-changes": "변경사항 저장",
+  "common.filter": "필터", "common.export-excel": "엑셀 내보내기", "common.import-excel": "엑셀 가져오기", "common.file-template": "템플릿",
+  "common.print": "인쇄", "common.loading": "로딩 중…", "common.no-results": "일치하는 결과 없음", "common.status": "상태",
+  "common.phone": "전화번호", "common.address": "주소", "common.note": "비고", "common.province": "성 / 시", "common.commune": "읍 / 면 / 동",
+  "common.detail-address": "상세 주소", "common.total": "합계", "common.weight": "중량", "common.unit-price": "단가",
+  "common.amount": "금액", "common.add-line": "행 추가", "common.password": "비밀번호", "common.email": "이메일",
+  "common.col.enterprise": "기업", "common.col.status": "상태", "common.col.module": "모듈", "common.col.name": "이름", "common.col.address": "주소",
+  "common.status.active": "활성", "common.status.inactive": "비활성", "common.status.locked": "잠금",
+  "common.status.pending": "승인 대기", "common.status.invited": "초대됨",
+  "common.status.draft": "초안", "common.status.confirmed": "확인됨", "common.status.cancelled": "취소됨",
+  "dn.page-title": "기업 관리", "dn.add": "기업 추가", "dn.add-title": "새 기업 추가", "dn.edit-title": "기업 정보 수정",
+  "dn.delete-title": "기업 삭제?", "dn.created": "기업이 생성되었습니다!",
+  "dn.stat.total": "총 기업", "dn.stat.active": "활성", "dn.stat.pending": "승인 대기", "dn.stat.locked": "잠금",
+  "dn.col.account": "계정 이름", "dn.col.representative": "대표자",
+  "dn.form.tax-id": "사업자 번호", "dn.form.full-name": "기업명", "dn.form.display-name": "표시 이름", "dn.form.username": "사용자 이름",
+  "dn.form.representative": "대표자", "dn.form.logo": "로고 이미지", "dn.form.gcp": "GCP 코드", "dn.form.gln": "GLN 코드",
+  "dn.form.video": "소개 동영상", "dn.form.story": "브랜드 스토리", "dn.form.modules": "사용 모듈", "dn.form.email": "기업 이메일",
+  "dn.section.profile": "일반 프로필", "dn.section.location": "위치", "dn.section.modules": "모듈", "dn.section.promo": "홍보",
+  "dn.search-ph": "세금번호, 이름, 대표자로 검색…", "dn.empty": "아직 기업 없음", "dn.not-found": "일치하는 기업 없음",
+  "nv.page-title": "직원 관리", "nv.add": "직원 추가", "nv.add-title": "새 직원 추가", "nv.edit-title": "직원 정보 수정",
+  "nv.reset-pwd": "비밀번호 초기화", "nv.lock-account": "계정 잠금", "nv.lock-title": "계정 잠금?", "nv.reset-title": "비밀번호 초기화?", "nv.pwd-given": "새 비밀번호 발급됨",
+  "nv.stat.total": "총 직원", "nv.stat.active": "활성", "nv.stat.locked": "잠금",
+  "nv.col.contact": "연락처", "nv.col.facility": "담당 시설", "nv.col.last-active": "마지막 활동",
+  "nv.form.avatar": "아바타", "nv.form.full-name": "성명", "nv.form.enterprise": "소속 기업", "nv.form.role": "역할",
+  "nv.form.modules": "담당 모듈", "nv.form.facilities": "담당 시설", "nv.form.init-pwd": "초기 비밀번호",
+  "nv.search-ph": "이름, 이메일, 전화로 검색…", "nv.empty": "아직 직원 없음.", "nv.not-found": "일치하는 직원 없음",
+  "cs.page-title": "시설 관리", "cs.add": "시설 추가", "cs.add-title": "시설 추가", "cs.edit-title": "시설 수정", "cs.delete-title": "시설 삭제?", "cs.qr-title": "시설 QR 코드",
+  "cs.print-qr": "QR 코드 인쇄", "cs.stat.linked": "연계 농가", "cs.stat.external": "외부 시설", "cs.stat.internal": "내부 시설",
+  "cs.col.fac-name": "시설명", "cs.col.type": "유형", "cs.col.gln": "GLN",
+  "cs.form.enterprise": "관리 기업", "cs.form.fac-name": "시설 / 연계 농가명", "cs.form.code": "시설 코드", "cs.form.type": "유형",
+  "cs.form.gln": "GLN 코드", "cs.form.area": "면적", "cs.form.unit": "단위", "cs.form.coordinates": "좌표 (위도, 경도)", "cs.form.tea-varieties": "재배 차 품종",
+  "cs.section.general": "기본 정보", "cs.section.location": "위치 & 지도", "cs.section.certs": "인증서 & 인증", "cs.section.depts": "내부 부서",
+  "cs.add-cert": "인증서 추가", "cs.add-dept": "부서 추가",
+  "cs.search-ph": "이름, 코드, 주소로 검색…", "cs.empty": "아직 시설 없음. 첫 시설을 추가하세요!", "cs.not-found": "일치하는 시설 없음",
+  "cs.type.ho_lien_ket": "연계 농가", "cs.type.vung_trong_noi_bo": "내부 재배 구역", "cs.type.dong_goi": "포장",
+  "cs.type.co_so_thue_ngoai": "생산 시설 (외부)", "cs.type.co_so_noi_bo": "생산 시설 (내부)",
+  "cs.status.active": "활성", "cs.status.inactive": "비활성",
+  "thu.page-title": "차 구매 주문", "thu.add": "구매 주문 생성", "thu.save": "주문 저장", "thu.print": "주문 인쇄",
+  "thu.add-title": "구매 주문 생성", "thu.edit-title": "구매 주문 업데이트", "thu.delete-title": "구매 주문 삭제?", "thu.print-title": "구매 주문 인쇄",
+  "thu.col.date": "구매 날짜", "thu.col.facility": "구매 시설", "thu.col.lot-code": "로트 코드", "thu.col.weight": "중량", "thu.col.total": "총액",
+  "thu.col.product": "제품", "thu.col.grade": "등급", "thu.col.quality-pct": "% 품질", "thu.col.unit-price": "단가", "thu.col.amount": "금액",
+  "thu.form.code": "주문 코드", "thu.form.date": "구매 날짜", "thu.form.facility": "구매 시설", "thu.form.address": "수거 주소",
+  "thu.form.lot-code": "로트 코드", "thu.form.notes": "비고", "thu.form.rounding": "단수",
+  "thu.section.general": "기본 정보", "thu.section.products": "제품 목록", "thu.section.total": "합계",
+  "thu.clear-filter": "필터 초기화", "thu.search-ph": "시설, 로트 코드 검색…", "thu.empty": "아직 구매 주문 없음.", "thu.not-found": "일치하는 주문 없음",
+  "thu.rounding.minus": "차감", "thu.rounding.plus": "추가",
+  "qc.page-title": "규격 & 기준", "qc.tab.grade": "규격", "qc.tab.quality": "% 품질", "qc.tab.standard": "기준",
+  "qc.add-grade": "규격 추가", "qc.add-quality": "% 품질 추가", "qc.add-standard": "기준 추가",
+  "qc.add-grade-title": "규격 추가", "qc.edit-grade-title": "규격 수정", "qc.delete-grade-title": "규격 삭제?",
+  "qc.add-quality-title": "% 품질 추가", "qc.add-standard-title": "기준 추가",
+  "qc.col.grade-name": "규격명", "qc.col.tea-variety": "차 품종", "qc.col.product": "상품", "qc.col.quality-pct": "% 평가",
+  "qc.col.unit-price": "단가", "qc.col.grade-applied": "적용 규격", "qc.col.standard-title": "기준 제목", "qc.col.standard-desc": "내용 설명",
+  "qc.form.grade-name": "규격명", "qc.form.tea-variety": "차 품종", "qc.form.product": "상품", "qc.form.quality-pct": "% 평가",
+  "qc.form.grade-applied": "적용 규격", "qc.form.standard-title": "기준 제목", "qc.form.standard-desc": "내용 설명",
+  "qc.deselect-all": "전체 해제", "qc.empty.grade": "아직 규격 없음", "qc.empty.quality": "아직 품질 등급 없음", "qc.empty.standard": "아직 기준 없음",
 };
 
 const ja: Translations = {
@@ -1104,6 +1359,62 @@ const ja: Translations = {
   "home.activity.portal.3": "HTX Hồng Hà に ERP モジュール権限を付与",
   "home.activity.portal.4": "Nà Hồng 加工施設を追加",
   "home.activity.portal.5": "アカウント 2件が有効化待ち",
+  "common.save": "保存", "common.cancel": "キャンセル", "common.add": "追加", "common.edit": "編集", "common.delete": "削除",
+  "common.confirm-delete": "完全に削除", "common.close": "閉じる", "common.view-detail": "詳細を見る", "common.save-changes": "変更を保存",
+  "common.filter": "フィルター", "common.export-excel": "Excelエクスポート", "common.import-excel": "Excelインポート", "common.file-template": "テンプレート",
+  "common.print": "印刷", "common.loading": "読み込み中…", "common.no-results": "一致する結果なし", "common.status": "ステータス",
+  "common.phone": "電話番号", "common.address": "住所", "common.note": "備考", "common.province": "都道府県 / 市", "common.commune": "区 / 町",
+  "common.detail-address": "詳細住所", "common.total": "合計", "common.weight": "重量", "common.unit-price": "単価",
+  "common.amount": "金額", "common.add-line": "行追加", "common.password": "パスワード", "common.email": "メール",
+  "common.col.enterprise": "企業", "common.col.status": "ステータス", "common.col.module": "モジュール", "common.col.name": "名前", "common.col.address": "住所",
+  "common.status.active": "有効", "common.status.inactive": "停止中", "common.status.locked": "ロック中",
+  "common.status.pending": "承認待ち", "common.status.invited": "招待済み",
+  "common.status.draft": "下書き", "common.status.confirmed": "確認済み", "common.status.cancelled": "キャンセル済み",
+  "dn.page-title": "企業管理", "dn.add": "企業追加", "dn.add-title": "新規企業追加", "dn.edit-title": "企業情報編集",
+  "dn.delete-title": "企業削除?", "dn.created": "企業が作成されました!",
+  "dn.stat.total": "総企業数", "dn.stat.active": "有効", "dn.stat.pending": "承認待ち", "dn.stat.locked": "ロック中",
+  "dn.col.account": "アカウント名", "dn.col.representative": "代表者",
+  "dn.form.tax-id": "税番号", "dn.form.full-name": "企業名", "dn.form.display-name": "表示名", "dn.form.username": "ユーザー名",
+  "dn.form.representative": "代表者", "dn.form.logo": "ロゴ画像", "dn.form.gcp": "GCPコード", "dn.form.gln": "GLNコード",
+  "dn.form.video": "紹介動画", "dn.form.story": "ブランドストーリー", "dn.form.modules": "使用モジュール", "dn.form.email": "企業メール",
+  "dn.section.profile": "一般プロファイル", "dn.section.location": "場所", "dn.section.modules": "モジュール", "dn.section.promo": "プロモーション",
+  "dn.search-ph": "税番号・名前・代表者で検索…", "dn.empty": "企業はまだありません", "dn.not-found": "一致する企業なし",
+  "nv.page-title": "従業員管理", "nv.add": "従業員追加", "nv.add-title": "新規従業員追加", "nv.edit-title": "従業員情報編集",
+  "nv.reset-pwd": "パスワードリセット", "nv.lock-account": "アカウントロック", "nv.lock-title": "アカウントロック?", "nv.reset-title": "パスワードリセット?", "nv.pwd-given": "新パスワード発行済み",
+  "nv.stat.total": "総従業員数", "nv.stat.active": "有効", "nv.stat.locked": "ロック中",
+  "nv.col.contact": "連絡先", "nv.col.facility": "担当施設", "nv.col.last-active": "最終活動",
+  "nv.form.avatar": "アバター", "nv.form.full-name": "氏名", "nv.form.enterprise": "所属企業", "nv.form.role": "役割",
+  "nv.form.modules": "担当モジュール", "nv.form.facilities": "担当施設", "nv.form.init-pwd": "初期パスワード",
+  "nv.search-ph": "名前・メール・電話で検索…", "nv.empty": "従業員はまだいません。", "nv.not-found": "一致する従業員なし",
+  "cs.page-title": "施設管理", "cs.add": "施設追加", "cs.add-title": "施設追加", "cs.edit-title": "施設編集", "cs.delete-title": "施設削除?", "cs.qr-title": "施設QRコード",
+  "cs.print-qr": "QRコード印刷", "cs.stat.linked": "連携農家", "cs.stat.external": "外部施設", "cs.stat.internal": "内部施設",
+  "cs.col.fac-name": "施設名", "cs.col.type": "種別", "cs.col.gln": "GLN",
+  "cs.form.enterprise": "管理企業", "cs.form.fac-name": "施設 / 連携農家名", "cs.form.code": "施設コード", "cs.form.type": "種別",
+  "cs.form.gln": "GLNコード", "cs.form.area": "面積", "cs.form.unit": "単位", "cs.form.coordinates": "座標 (緯度, 経度)", "cs.form.tea-varieties": "栽培茶品種",
+  "cs.section.general": "基本情報", "cs.section.location": "場所 & 地図", "cs.section.certs": "証明書 & 認証", "cs.section.depts": "内部部門",
+  "cs.add-cert": "証明書追加", "cs.add-dept": "部門追加",
+  "cs.search-ph": "名前・コード・住所で検索…", "cs.empty": "施設はまだありません。最初の施設を追加！", "cs.not-found": "一致する施設なし",
+  "cs.type.ho_lien_ket": "連携農家", "cs.type.vung_trong_noi_bo": "内部栽培ゾーン", "cs.type.dong_goi": "梱包",
+  "cs.type.co_so_thue_ngoai": "生産施設 (外部委託)", "cs.type.co_so_noi_bo": "生産施設 (内部)",
+  "cs.status.active": "有効", "cs.status.inactive": "停止中",
+  "thu.page-title": "茶買付注文", "thu.add": "購買注文作成", "thu.save": "注文保存", "thu.print": "注文印刷",
+  "thu.add-title": "購買注文作成", "thu.edit-title": "購買注文更新", "thu.delete-title": "購買注文削除?", "thu.print-title": "購買注文印刷",
+  "thu.col.date": "購買日", "thu.col.facility": "購買施設", "thu.col.lot-code": "ロットコード", "thu.col.weight": "重量", "thu.col.total": "合計",
+  "thu.col.product": "製品", "thu.col.grade": "等級", "thu.col.quality-pct": "% 品質", "thu.col.unit-price": "単価", "thu.col.amount": "金額",
+  "thu.form.code": "注文コード", "thu.form.date": "購買日", "thu.form.facility": "購買施設", "thu.form.address": "収集住所",
+  "thu.form.lot-code": "ロットコード", "thu.form.notes": "備考", "thu.form.rounding": "端数",
+  "thu.section.general": "基本情報", "thu.section.products": "製品リスト", "thu.section.total": "合計",
+  "thu.clear-filter": "フィルタークリア", "thu.search-ph": "施設・ロットコード検索…", "thu.empty": "購買注文はまだありません。", "thu.not-found": "一致する注文なし",
+  "thu.rounding.minus": "差引", "thu.rounding.plus": "追加",
+  "qc.page-title": "規格・基準", "qc.tab.grade": "規格", "qc.tab.quality": "% 品質", "qc.tab.standard": "基準",
+  "qc.add-grade": "規格追加", "qc.add-quality": "% 品質追加", "qc.add-standard": "基準追加",
+  "qc.add-grade-title": "規格追加", "qc.edit-grade-title": "規格編集", "qc.delete-grade-title": "規格削除?",
+  "qc.add-quality-title": "% 品質追加", "qc.add-standard-title": "基準追加",
+  "qc.col.grade-name": "規格名", "qc.col.tea-variety": "茶品種", "qc.col.product": "商品", "qc.col.quality-pct": "% 評価",
+  "qc.col.unit-price": "単価", "qc.col.grade-applied": "適用規格", "qc.col.standard-title": "基準タイトル", "qc.col.standard-desc": "内容説明",
+  "qc.form.grade-name": "規格名", "qc.form.tea-variety": "茶品種", "qc.form.product": "商品", "qc.form.quality-pct": "% 評価",
+  "qc.form.grade-applied": "適用規格", "qc.form.standard-title": "基準タイトル", "qc.form.standard-desc": "内容説明",
+  "qc.deselect-all": "すべて解除", "qc.empty.grade": "規格はまだありません", "qc.empty.quality": "品質レベルはまだありません", "qc.empty.standard": "基準はまだありません",
 };
 
 export const translations: Record<Language, Translations> = { vi, en, ko, ja };

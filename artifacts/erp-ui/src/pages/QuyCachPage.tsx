@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useLocation } from "wouter";
 import AppLayout from "@/components/AppLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { ArrowLeft, Leaf, Plus, Pencil, Trash2, X, Loader2, Download, Check } from "lucide-react";
 import * as XLSX from "xlsx";
 import {
@@ -176,6 +177,7 @@ function GiongRowsEditor({ rows, onChange, productNames }: { rows: GiongRow[]; o
 }
 
 export default function QuyCachPage() {
+  const { t } = useLanguage();
   const [, navigate] = useLocation();
 
   const [gD, setGD] = useState(false); const [gE, setGE] = useState<Grade | null>(null); const [gF, setGF] = useState<GForm>(EMPTY_G); const [gErr, setGErr] = useState<string | null>(null); const [gDel, setGDel] = useState<Grade | null>(null);
@@ -288,12 +290,12 @@ export default function QuyCachPage() {
             <div>
               <div className="text-[12px] text-muted-foreground">ERP / Quy cách & Tiêu chuẩn</div>
               <h1 className="text-xl font-bold mt-0.5 flex items-center gap-2">
-                <Leaf className="w-5 h-5 text-emerald-600" />Quy cách & Tiêu chuẩn
+                <Leaf className="w-5 h-5 text-emerald-600" />{t("qc.page-title")}
               </h1>
             </div>
           </div>
           <button onClick={exportExcel} className="h-9 px-3 rounded-lg border border-border text-[13px] font-medium flex items-center gap-2 hover:bg-muted">
-            <Download className="w-4 h-4 text-muted-foreground" /> Xuất Excel
+            <Download className="w-4 h-4 text-muted-foreground" /> {t("common.export-excel")}
           </button>
         </div>
 
@@ -301,26 +303,26 @@ export default function QuyCachPage() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-[15px] font-bold">Quy cách</h2>
-              <p className="text-[12px] text-muted-foreground mt-0.5">{grades.length} quy cách</p>
+              <h2 className="text-[15px] font-bold">{t("qc.section.grade")}</h2>
+              <p className="text-[12px] text-muted-foreground mt-0.5">{grades.length} {t("qc.section.grade-count")}</p>
             </div>
             <button onClick={() => setGD(true)} className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 hover:brightness-110">
-              <Plus className="w-4 h-4" />Thêm quy cách
+              <Plus className="w-4 h-4" />{t("qc.add-grade")}
             </button>
           </div>
           {gQ.isLoading && <div className="py-8 text-center"><Loader2 className="w-5 h-5 animate-spin inline text-muted-foreground" /></div>}
           {grades.length === 0 && !gQ.isLoading && (
-            <div className="py-8 text-center text-muted-foreground text-[13px] bg-white border border-border rounded-xl">Chưa có quy cách nào.</div>
+            <div className="py-8 text-center text-muted-foreground text-[13px] bg-white border border-border rounded-xl">{t("qc.grade-empty")}</div>
           )}
           {grades.length > 0 && (
             <div className="bg-white border border-border rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-[12px] uppercase text-muted-foreground bg-muted/40">
-                    <th className="px-4 py-3 w-12">Stt</th>
-                    <th className="px-4 py-3">Tên quy cách</th>
-                    <th className="px-4 py-3">Giống chè</th>
-                    <th className="px-4 py-3">Thương phẩm</th>
+                    <th className="px-4 py-3 w-12">{t("common.no")}</th>
+                    <th className="px-4 py-3">{t("qc.col.grade-name")}</th>
+                    <th className="px-4 py-3">{t("qc.col.variety")}</th>
+                    <th className="px-4 py-3">{t("qc.col.product")}</th>
                     <th className="px-4 py-3 w-20"></th>
                   </tr>
                 </thead>
@@ -360,26 +362,26 @@ export default function QuyCachPage() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-[15px] font-bold">% Chất lượng</h2>
-              <p className="text-[12px] text-muted-foreground mt-0.5">{qualityLevels.length} mức</p>
+              <h2 className="text-[15px] font-bold">{t("qc.section.quality")}</h2>
+              <p className="text-[12px] text-muted-foreground mt-0.5">{qualityLevels.length} {t("qc.section.quality-count")}</p>
             </div>
             <button onClick={() => setQlD(true)} className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 hover:brightness-110">
-              <Plus className="w-4 h-4" />Thêm % chất lượng
+              <Plus className="w-4 h-4" />{t("qc.add-quality")}
             </button>
           </div>
           {qlQ.isLoading && <div className="py-8 text-center"><Loader2 className="w-5 h-5 animate-spin inline text-muted-foreground" /></div>}
           {qualityLevels.length === 0 && !qlQ.isLoading && (
-            <div className="py-8 text-center text-muted-foreground text-[13px] bg-white border border-border rounded-xl">Chưa có mức chất lượng nào.</div>
+            <div className="py-8 text-center text-muted-foreground text-[13px] bg-white border border-border rounded-xl">{t("qc.quality-empty")}</div>
           )}
           {qualityLevels.length > 0 && (
             <div className="bg-white border border-border rounded-xl overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr className="text-left text-[12px] uppercase text-muted-foreground bg-muted/40">
-                    <th className="px-4 py-3">% Đánh giá</th>
-                    <th className="px-4 py-3">Đơn giá</th>
-                    <th className="px-4 py-3">Ghi chú</th>
-                    <th className="px-4 py-3">Quy cách</th>
+                    <th className="px-4 py-3">{t("qc.col.quality-pct")}</th>
+                    <th className="px-4 py-3">{t("qc.col.unit-price")}</th>
+                    <th className="px-4 py-3">{t("qc.col.note")}</th>
+                    <th className="px-4 py-3">{t("qc.section.grade")}</th>
                     <th className="px-4 py-3 w-20"></th>
                   </tr>
                 </thead>
@@ -425,16 +427,16 @@ export default function QuyCachPage() {
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-[15px] font-bold">Tiêu chuẩn</h2>
-              <p className="text-[12px] text-muted-foreground mt-0.5">{standards.length} tiêu chuẩn</p>
+              <h2 className="text-[15px] font-bold">{t("qc.section.standard")}</h2>
+              <p className="text-[12px] text-muted-foreground mt-0.5">{standards.length} {t("qc.section.standard-count")}</p>
             </div>
             <button onClick={() => setSD(true)} className="h-9 px-4 rounded-lg bg-primary text-primary-foreground text-[13px] font-semibold flex items-center gap-2 hover:brightness-110">
-              <Plus className="w-4 h-4" />Thêm tiêu chuẩn
+              <Plus className="w-4 h-4" />{t("qc.add-standard")}
             </button>
           </div>
           {sQ.isLoading && <div className="py-8 text-center"><Loader2 className="w-5 h-5 animate-spin inline text-muted-foreground" /></div>}
           {standards.length === 0 && !sQ.isLoading && (
-            <div className="py-8 text-center text-muted-foreground text-[13px] bg-white border border-border rounded-xl">Chưa có tiêu chuẩn nào.</div>
+            <div className="py-8 text-center text-muted-foreground text-[13px] bg-white border border-border rounded-xl">{t("qc.standard-empty")}</div>
           )}
           <div className="grid gap-3">
             {standards.map(s => (
@@ -465,12 +467,12 @@ export default function QuyCachPage() {
       {gDel && (
         <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-            <h3 className="text-[16px] font-semibold text-center mb-2">Xóa quy cách?</h3>
-            <p className="text-[13px] text-muted-foreground text-center mb-5">Xóa <span className="font-semibold text-foreground">{gDel.name}</span>.</p>
+            <h3 className="text-[16px] font-semibold text-center mb-2">{t("qc.delete-grade-title")}</h3>
+            <p className="text-[13px] text-muted-foreground text-center mb-5">{t("common.delete-item").replace("{name}", gDel.name)}</p>
             <div className="flex gap-3">
-              <button onClick={() => setGDel(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">Hủy</button>
+              <button onClick={() => setGDel(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">{t("common.cancel")}</button>
               <button disabled={gX.isPending} onClick={() => gX.mutate(gDel.id)} className="flex-1 h-10 rounded-xl bg-rose-600 text-white font-semibold text-sm disabled:opacity-60 flex items-center justify-center gap-2">
-                {gX.isPending && <Loader2 className="w-4 h-4 animate-spin" />}Xóa
+                {gX.isPending && <Loader2 className="w-4 h-4 animate-spin" />}{t("common.delete")}
               </button>
             </div>
           </div>
@@ -479,12 +481,12 @@ export default function QuyCachPage() {
       {qlDel && (
         <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-            <h3 className="text-[16px] font-semibold text-center mb-2">Xóa mức chất lượng?</h3>
-            <p className="text-[13px] text-muted-foreground text-center mb-5">Xóa <span className="font-semibold text-foreground">{qlDel.danhGia}</span>.</p>
+            <h3 className="text-[16px] font-semibold text-center mb-2">{t("qc.delete-quality-title")}</h3>
+            <p className="text-[13px] text-muted-foreground text-center mb-5">{t("common.delete-item").replace("{name}", qlDel.danhGia)}</p>
             <div className="flex gap-3">
-              <button onClick={() => setQlDel(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">Hủy</button>
+              <button onClick={() => setQlDel(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">{t("common.cancel")}</button>
               <button disabled={qlX.isPending} onClick={() => qlX.mutate(qlDel.id)} className="flex-1 h-10 rounded-xl bg-rose-600 text-white font-semibold text-sm disabled:opacity-60 flex items-center justify-center gap-2">
-                {qlX.isPending && <Loader2 className="w-4 h-4 animate-spin" />}Xóa
+                {qlX.isPending && <Loader2 className="w-4 h-4 animate-spin" />}{t("common.delete")}
               </button>
             </div>
           </div>
@@ -493,12 +495,12 @@ export default function QuyCachPage() {
       {sDel && (
         <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6">
-            <h3 className="text-[16px] font-semibold text-center mb-2">Xóa tiêu chuẩn?</h3>
-            <p className="text-[13px] text-muted-foreground text-center mb-5">Xóa <span className="font-semibold text-foreground">{sDel.title}</span>.</p>
+            <h3 className="text-[16px] font-semibold text-center mb-2">{t("qc.delete-standard-title")}</h3>
+            <p className="text-[13px] text-muted-foreground text-center mb-5">{t("common.delete-item").replace("{name}", sDel.title)}</p>
             <div className="flex gap-3">
-              <button onClick={() => setSDel(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">Hủy</button>
+              <button onClick={() => setSDel(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">{t("common.cancel")}</button>
               <button disabled={sX.isPending} onClick={() => sX.mutate(sDel.id)} className="flex-1 h-10 rounded-xl bg-rose-600 text-white font-semibold text-sm disabled:opacity-60 flex items-center justify-center gap-2">
-                {sX.isPending && <Loader2 className="w-4 h-4 animate-spin" />}Xóa
+                {sX.isPending && <Loader2 className="w-4 h-4 animate-spin" />}{t("common.delete")}
               </button>
             </div>
           </div>
@@ -511,13 +513,13 @@ export default function QuyCachPage() {
           <div className="fixed inset-0 bg-slate-900/30 z-40" onClick={closeG} />
           <aside className="fixed top-0 right-0 h-full w-full sm:w-[600px] bg-white shadow-2xl z-50 flex flex-col">
             <div className="px-6 py-4 border-b border-border flex items-center justify-between shrink-0">
-              <div className="text-[18px] font-semibold">{gE ? "Sửa quy cách" : "Thêm quy cách"}</div>
+              <div className="text-[18px] font-semibold">{gE ? t("qc.edit-grade-title") : t("qc.add-grade-title")}</div>
               <button onClick={closeG} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
             <div className="flex-1 overflow-auto px-6 py-6 space-y-5">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-[13px] font-medium mb-1.5">Tên quy cách <span className="text-rose-500">*</span></label>
+                  <label className="block text-[13px] font-medium mb-1.5">{t("qc.col.grade-name")} <span className="text-rose-500">*</span></label>
                   <input
                     value={gF.name}
                     onChange={e => setGF(p => ({ ...p, name: e.target.value }))}
@@ -545,14 +547,14 @@ export default function QuyCachPage() {
               {gErr && <div className="px-3 py-2 rounded-lg bg-rose-50 border border-rose-200 text-rose-700 text-[12.5px]">{gErr}</div>}
             </div>
             <div className="px-6 py-4 border-t border-border flex justify-end gap-2 bg-muted/30 shrink-0">
-              <button onClick={closeG} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">Hủy</button>
+              <button onClick={closeG} className="h-10 px-4 rounded-lg border border-border text-[13.5px] font-medium hover:bg-muted">{t("common.cancel")}</button>
               <button
                 disabled={gC.isPending || gU.isPending}
                 onClick={submitGrade}
                 className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-[13.5px] font-semibold hover:brightness-110 disabled:opacity-60 flex items-center gap-2"
               >
                 {(gC.isPending || gU.isPending) && <Loader2 className="w-4 h-4 animate-spin" />}
-                {gE ? "Lưu thay đổi" : "Thêm"}
+                {gE ? t("common.save-changes") : t("common.add")}
               </button>
             </div>
           </aside>
@@ -564,7 +566,7 @@ export default function QuyCachPage() {
         <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
             <div className="px-6 py-5 flex items-center justify-between border-b border-border">
-              <div className="text-[17px] font-semibold">{qlE ? "Sửa % chất lượng" : "Thêm % chất lượng"}</div>
+              <div className="text-[17px] font-semibold">{qlE ? t("qc.edit-quality-title") : t("qc.add-quality-title")}</div>
               <button onClick={closeQL} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>
             <div className="px-6 py-5 space-y-4">

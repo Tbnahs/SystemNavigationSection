@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import AppLayout from "@/components/AppLayout";
 import {
   Search, Plus, Filter, Download, X, Upload,
@@ -239,6 +240,7 @@ function toggleMod(arr: ("ERP" | "TXNG" | "VT")[], m: "ERP" | "TXNG" | "VT", on:
 
 /* ─── Main Page ─────────────────────────────────────────────────── */
 export default function NhanVienPage() {
+  const { t } = useLanguage();
   const { user: currentUser } = useAuth();
   const isSuperAdmin = !currentUser?.enterpriseId;
 
@@ -409,13 +411,13 @@ export default function NhanVienPage() {
       <div className="space-y-5">
         <div>
           <div className="text-[12px] text-muted-foreground">Quản trị hệ thống / Người dùng</div>
-          <h1 className="text-xl lg:text-2xl font-bold mt-0.5">Quản lý Nhân viên</h1>
+          <h1 className="text-xl lg:text-2xl font-bold mt-0.5">{t("nv.page-title")}</h1>
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          <Stat label="Tổng nhân viên" value={String(statsQ.data?.total ?? "—")} delta="Dữ liệu thực tế" tone="emerald" icon={Users} />
-          <Stat label="Đang hoạt động" value={String(statsQ.data?.active ?? "—")} delta={statsQ.data ? `${Math.round(((statsQ.data.active || 0) / Math.max(statsQ.data.total, 1)) * 100)}% tổng` : ""} tone="blue" icon={Shield} />
-          <Stat label="Tạm khóa" value={String(statsQ.data?.locked ?? "—")} delta="" tone="rose" icon={X} />
+          <Stat label={t("nv.stat.total")} value={String(statsQ.data?.total ?? "—")} delta={t("common.real-data")} tone="emerald" icon={Users} />
+          <Stat label={t("nv.stat.active")} value={String(statsQ.data?.active ?? "—")} delta={statsQ.data ? `${Math.round(((statsQ.data.active || 0) / Math.max(statsQ.data.total, 1)) * 100)}% tổng` : ""} tone="blue" icon={Shield} />
+          <Stat label={t("nv.stat.locked")} value={String(statsQ.data?.locked ?? "—")} delta="" tone="rose" icon={X} />
         </div>
 
         <div className="bg-white border border-border rounded-xl p-3 lg:p-4 flex items-center gap-2 flex-wrap">
@@ -424,25 +426,25 @@ export default function NhanVienPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Tìm theo tên, email, SĐT…"
+              placeholder={t("nv.search-placeholder")}
               className="w-full h-10 pl-9 pr-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
             />
           </div>
-          <SelectChip label="Doanh nghiệp" />
-          <SelectChip label="Vai trò" />
-          <SelectChip label="Trạng thái" />
+          <SelectChip label={t("common.col.enterprise")} />
+          <SelectChip label={t("nv.col.role")} />
+          <SelectChip label={t("common.col.status")} />
           <button className="h-10 px-3 rounded-lg border border-border text-sm flex items-center gap-2 hover:bg-muted text-muted-foreground">
-            <Filter className="w-4 h-4" /> Bộ lọc
+            <Filter className="w-4 h-4" /> {t("common.filter")}
           </button>
           <div className="hidden md:block h-6 w-px bg-border" />
           <button className="h-10 px-3 rounded-lg border border-border text-sm flex items-center gap-2 hover:bg-muted text-muted-foreground">
-            <Download className="w-4 h-4" /> Xuất Excel
+            <Download className="w-4 h-4" /> {t("common.export-excel")}
           </button>
           <button
             onClick={() => setDrawerOpen(true)}
             className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 shadow-sm hover:brightness-110"
           >
-            <Plus className="w-4 h-4" /> Thêm nhân viên
+            <Plus className="w-4 h-4" /> {t("nv.add")}
           </button>
         </div>
 
@@ -452,25 +454,25 @@ export default function NhanVienPage() {
               <thead>
                 <tr className="text-left text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/40">
                   <th className="px-4 py-3 w-10"><input type="checkbox" className="accent-primary" /></th>
-                  <th className="px-3 py-3">Nhân viên</th>
-                  <th className="px-3 py-3">Liên hệ</th>
-                  <th className="px-3 py-3">Doanh nghiệp</th>
-                  <th className="px-3 py-3">Cơ sở phụ trách</th>
-                  <th className="px-3 py-3">Phân hệ</th>
-                  <th className="px-3 py-3">Trạng thái</th>
-                  <th className="px-3 py-3">Hoạt động cuối</th>
+                  <th className="px-3 py-3">{t("nv.col.employee")}</th>
+                  <th className="px-3 py-3">{t("nv.col.contact")}</th>
+                  <th className="px-3 py-3">{t("common.col.enterprise")}</th>
+                  <th className="px-3 py-3">{t("nv.col.facility")}</th>
+                  <th className="px-3 py-3">{t("common.col.module")}</th>
+                  <th className="px-3 py-3">{t("common.col.status")}</th>
+                  <th className="px-3 py-3">{t("nv.col.last-active")}</th>
                   <th className="px-3 py-3 w-16"></th>
                 </tr>
               </thead>
               <tbody>
                 {listQ.isLoading && (
-                  <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>
+                  <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />{t("common.loading")}</td></tr>
                 )}
                 {listQ.isError && (
                   <tr><td colSpan={9} className="px-4 py-10 text-center text-rose-600">Lỗi: {(listQ.error as Error).message}</td></tr>
                 )}
                 {!listQ.isLoading && !listQ.isError && filtered.length === 0 && (
-                  <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">{search ? "Không tìm thấy nhân viên phù hợp." : "Chưa có nhân viên nào."}</td></tr>
+                  <tr><td colSpan={9} className="px-4 py-10 text-center text-muted-foreground">{search ? t("nv.not-found") : t("nv.empty")}</td></tr>
                 )}
                 {filtered.map((u, i) => {
                   return (
@@ -506,7 +508,7 @@ export default function NhanVienPage() {
                           ))}
                         </div>
                       ) : (
-                        <span className="text-[12px] text-muted-foreground italic">Chưa gán</span>
+                        <span className="text-[12px] text-muted-foreground italic">{t("nv.not-assigned")}</span>
                       )}
                     </td>
                     <td className="px-3 py-3">
@@ -515,7 +517,7 @@ export default function NhanVienPage() {
                     <td className="px-3 py-3">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ring-1 ring-inset ${STATUS[u.status].cls}`}>
                         <span className={`w-1.5 h-1.5 rounded-full mr-1.5 ${STATUS[u.status].dot}`} />
-                        {STATUS[u.status].text}
+                        {u.status === "active" ? t("common.status.active") : u.status === "locked" ? t("common.status.locked") : t("common.status.pending")}
                       </span>
                     </td>
                     <td className="px-3 py-3 text-[12.5px] text-muted-foreground">{u.lastSeen}</td>
@@ -553,19 +555,19 @@ export default function NhanVienPage() {
             <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4">
               <X className="w-6 h-6" />
             </div>
-            <h3 className="text-[17px] font-semibold text-center mb-1">Ngừng hoạt động tài khoản?</h3>
+            <h3 className="text-[17px] font-semibold text-center mb-1">{t("nv.lock-title")}</h3>
             <p className="text-[13.5px] text-muted-foreground text-center mb-6">
-              Tài khoản <span className="font-semibold text-foreground">{lockTarget.name}</span> sẽ bị khóa và không thể đăng nhập vào hệ thống.
+              {t("nv.lock-desc").replace("{name}", lockTarget.name)}
             </p>
             <div className="flex gap-3">
-              <button onClick={() => setLockTarget(null)} className="flex-1 h-11 rounded-xl border border-border font-medium text-[14px] hover:bg-muted">Hủy</button>
+              <button onClick={() => setLockTarget(null)} className="flex-1 h-11 rounded-xl border border-border font-medium text-[14px] hover:bg-muted">{t("common.cancel")}</button>
               <button
                 disabled={lockMu.isPending}
                 onClick={() => lockMu.mutate(lockTarget.id)}
                 className="flex-1 h-11 rounded-xl bg-amber-500 text-white font-semibold text-[14px] hover:bg-amber-600 disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {lockMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                Xác nhận ngừng
+                {t("nv.lock-account")}
               </button>
             </div>
           </div>
@@ -579,19 +581,19 @@ export default function NhanVienPage() {
             <div className="w-12 h-12 rounded-full bg-amber-50 text-amber-600 flex items-center justify-center mx-auto mb-4">
               <RotateCcw className="w-6 h-6" />
             </div>
-            <h3 className="text-[17px] font-semibold text-center mb-1">Đặt lại mật khẩu?</h3>
+            <h3 className="text-[17px] font-semibold text-center mb-1">{t("nv.reset-title")}</h3>
             <p className="text-[13px] text-muted-foreground text-center mb-5">
-              Đặt lại mật khẩu của <span className="font-semibold text-foreground">{resetTarget.name}</span> về mật khẩu mặc định.
+              {t("nv.reset-desc").replace("{name}", resetTarget.name)}
             </p>
             <div className="flex gap-3">
-              <button onClick={() => setResetTarget(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">Hủy</button>
+              <button onClick={() => setResetTarget(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">{t("common.cancel")}</button>
               <button
                 disabled={resetMu.isPending}
                 onClick={() => resetMu.mutate(resetTarget.id)}
                 className="flex-1 h-10 rounded-xl bg-amber-500 text-white font-semibold text-sm hover:bg-amber-600 disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {resetMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                Xác nhận
+                {t("common.confirm")}
               </button>
             </div>
           </div>
@@ -605,13 +607,13 @@ export default function NhanVienPage() {
             <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
               <Check className="w-6 h-6" />
             </div>
-            <h3 className="text-[17px] font-semibold text-center mb-2">Đặt lại thành công!</h3>
-            <p className="text-[13px] text-muted-foreground text-center mb-3">Mật khẩu mặc định mới:</p>
+            <h3 className="text-[17px] font-semibold text-center mb-2">{t("nv.reset-success")}</h3>
+            <p className="text-[13px] text-muted-foreground text-center mb-3">{t("nv.reset-new-pw")}</p>
             <div className="bg-muted rounded-lg px-4 py-3 text-center font-mono font-semibold text-[16px] tracking-wider mb-5 select-all">
               {resetDonePassword}
             </div>
-            <p className="text-[12px] text-muted-foreground text-center mb-5">Vui lòng thông báo cho nhân viên và yêu cầu đổi mật khẩu sau khi đăng nhập.</p>
-            <button onClick={() => setResetDonePassword(null)} className="w-full h-10 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110">Đóng</button>
+            <p className="text-[12px] text-muted-foreground text-center mb-5">{t("nv.reset-notify")}</p>
+            <button onClick={() => setResetDonePassword(null)} className="w-full h-10 rounded-xl bg-primary text-primary-foreground text-sm font-semibold hover:brightness-110">{t("common.close")}</button>
           </div>
         </div>
       )}
@@ -623,8 +625,8 @@ export default function NhanVienPage() {
           <aside className="fixed top-0 right-0 h-full w-full sm:w-[520px] bg-white shadow-2xl z-50 flex flex-col">
             <div className="px-6 py-5 border-b border-border flex items-center justify-between">
               <div>
-                <div className="text-[18px] font-semibold">{editItem ? "Sửa thông tin nhân viên" : "Thêm nhân viên mới"}</div>
-                <div className="text-[12.5px] text-muted-foreground">{editItem ? "Cập nhật thông tin nhân viên." : "Tạo tài khoản và gửi lời mời qua email."}</div>
+                <div className="text-[18px] font-semibold">{editItem ? t("nv.edit-title") : t("nv.add-title")}</div>
+                <div className="text-[12.5px] text-muted-foreground">{editItem ? t("nv.edit-subtitle") : t("nv.add-subtitle")}</div>
               </div>
               <button onClick={closeDrawer} className="p-1.5 rounded hover:bg-muted">
                 <X className="w-5 h-5 text-muted-foreground" />

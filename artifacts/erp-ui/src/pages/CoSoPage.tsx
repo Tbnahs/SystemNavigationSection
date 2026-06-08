@@ -15,6 +15,7 @@ import {
   type Facility, type TeaVariety, type FacilityCertItem, type FacilityBoPhanItem,
 } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { PROVINCES_VN, COMMUNE_MAP } from "@/lib/vietnam-data";
 
 const TYPE_OPTIONS: { value: Facility["type"]; label: string; color: string }[] = [
@@ -160,6 +161,7 @@ function CommuneSelect({ province, value, onChange }: { province?: string; value
 }
 
 export default function CoSoPage() {
+  const { t } = useLanguage();
   const { user } = useAuth();
   const [, setLocation] = useLocation();
   const isSuperAdmin = !user?.enterpriseId;
@@ -342,7 +344,7 @@ export default function CoSoPage() {
       <div className="space-y-5">
         <div>
           <div className="text-[12px] text-muted-foreground">Quản trị hệ thống / Cơ sở</div>
-          <h1 className="text-xl lg:text-2xl font-bold mt-0.5">Quản lý Cơ sở</h1>
+          <h1 className="text-xl lg:text-2xl font-bold mt-0.5">{t("cs.page-title")}</h1>
         </div>
 
         {/* Stats */}
@@ -375,29 +377,29 @@ export default function CoSoPage() {
         <div className="bg-white border border-border rounded-xl p-3 lg:p-4 flex items-center gap-2 flex-wrap">
           <div className="relative flex-1 min-w-[200px]">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Tìm tên, mã, địa chỉ, tỉnh…"
+            <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder={t("cs.search-placeholder")}
               className="w-full h-10 pl-9 pr-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary" />
           </div>
           <select value={typeFilter} onChange={e => setTypeFilter(e.target.value)}
             className="h-10 px-3 rounded-lg border border-border text-sm outline-none focus:border-primary bg-white">
-            <option value="all">Tất cả loại</option>
+            <option value="all">{t("common.all-types")}</option>
             {TYPE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
           </select>
           <button onClick={exportExcel} className="h-10 px-3 rounded-lg border border-border text-sm font-medium flex items-center gap-2 hover:bg-muted">
-            <Download className="w-4 h-4 text-muted-foreground" /> Xuất Excel
+            <Download className="w-4 h-4 text-muted-foreground" /> {t("common.export-excel")}
           </button>
           <button onClick={downloadTemplate} className="h-10 px-3 rounded-lg border border-border text-sm font-medium flex items-center gap-2 hover:bg-muted">
-            <Download className="w-4 h-4 text-muted-foreground" /> File mẫu
+            <Download className="w-4 h-4 text-muted-foreground" /> {t("cs.template-file")}
           </button>
           <button onClick={() => importRef.current?.click()} disabled={importLoading}
             className="h-10 px-3 rounded-lg border border-border text-sm font-medium flex items-center gap-2 hover:bg-muted disabled:opacity-60">
             {importLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4 text-muted-foreground" />}
-            Import Excel
+            {t("cs.import-excel")}
           </button>
           <input ref={importRef} type="file" accept=".xlsx,.xls,.csv" className="hidden" onChange={handleImportFile} />
           <button onClick={() => { setForm({ ...EMPTY_F, enterpriseId: isSuperAdmin ? null : (user?.enterpriseId ?? null) }); setDrawerOpen(true); }}
             className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 shadow-sm hover:brightness-110">
-            <Plus className="w-4 h-4" /> Thêm cơ sở
+            <Plus className="w-4 h-4" /> {t("cs.add")}
           </button>
         </div>
 
@@ -407,23 +409,23 @@ export default function CoSoPage() {
             <table className="w-full text-sm min-w-[900px]">
               <thead>
                 <tr className="text-left text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/40">
-                  <th className="px-4 py-3">Tên cơ sở</th>
-                  <th className="px-4 py-3">Loại</th>
-                  <th className="px-4 py-3">Doanh nghiệp</th>
-                  <th className="px-4 py-3">Địa chỉ</th>
+                  <th className="px-4 py-3">{t("cs.col.name")}</th>
+                  <th className="px-4 py-3">{t("cs.col.type")}</th>
+                  <th className="px-4 py-3">{t("common.col.enterprise")}</th>
+                  <th className="px-4 py-3">{t("cs.col.address")}</th>
                   <th className="px-4 py-3">GLN</th>
-                  <th className="px-4 py-3">Trạng thái</th>
+                  <th className="px-4 py-3">{t("common.col.status")}</th>
                   <th className="px-4 py-3 w-28"></th>
                 </tr>
               </thead>
               <tbody>
                 {listQ.isLoading && (
-                  <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải…</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />{t("common.loading")}</td></tr>
                 )}
                 {!listQ.isLoading && filtered.length === 0 && (
                   <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
                     <Factory className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                    {search || typeFilter !== "all" ? "Không tìm thấy cơ sở phù hợp." : "Chưa có cơ sở nào. Thêm cơ sở đầu tiên!"}
+                    {search || typeFilter !== "all" ? t("cs.not-found") : t("cs.empty")}
                   </td></tr>
                 )}
                 {filtered.map(f => (
@@ -488,7 +490,7 @@ export default function CoSoPage() {
         <div className="fixed inset-0 bg-slate-900/50 z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-[16px] font-semibold">Mã QR - {qrTarget.name}</h3>
+              <h3 className="text-[16px] font-semibold">{t("cs.qr-title")} - {qrTarget.name}</h3>
               <button onClick={() => setQrTarget(null)} className="p-1.5 rounded hover:bg-muted"><X className="w-4 h-4" /></button>
             </div>
             <div className="flex justify-center mb-3">
@@ -497,7 +499,7 @@ export default function CoSoPage() {
             <p className="text-[13px] text-muted-foreground mb-1">{qrTarget.name}</p>
             <p className="text-[12px] text-muted-foreground mb-4">Mã: {qrTarget.code || `CS-${qrTarget.id}`}</p>
             <button onClick={() => printQR(qrTarget)} className="h-10 px-5 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 mx-auto hover:brightness-110">
-              <Printer className="w-4 h-4" /> In QR
+              <Printer className="w-4 h-4" /> {t("cs.print-qr")}
             </button>
           </div>
         </div>
@@ -510,15 +512,15 @@ export default function CoSoPage() {
             <div className="w-11 h-11 rounded-full bg-rose-50 flex items-center justify-center mx-auto mb-4">
               <X className="w-5 h-5 text-rose-600" />
             </div>
-            <h3 className="text-[16px] font-semibold text-center mb-1">Xóa cơ sở?</h3>
+            <h3 className="text-[16px] font-semibold text-center mb-1">{t("cs.delete-confirm")}</h3>
             <p className="text-[13px] text-muted-foreground text-center mb-5">
-              Xóa <span className="font-semibold text-foreground">{deleteTarget.name}</span> khỏi hệ thống.
+              {t("cs.delete-desc").replace("{name}", deleteTarget.name)}
             </p>
             <div className="flex gap-3">
-              <button onClick={() => setDeleteTarget(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">Hủy</button>
+              <button onClick={() => setDeleteTarget(null)} className="flex-1 h-10 rounded-xl border border-border text-sm font-medium hover:bg-muted">{t("common.cancel")}</button>
               <button disabled={deleteMu.isPending} onClick={() => deleteMu.mutate(deleteTarget.id)}
                 className="flex-1 h-10 rounded-xl bg-rose-600 text-white font-semibold text-sm hover:bg-rose-700 disabled:opacity-60 flex items-center justify-center gap-2">
-                {deleteMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />} Xóa
+                {deleteMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />} {t("common.delete")}
               </button>
             </div>
           </div>
@@ -533,7 +535,7 @@ export default function CoSoPage() {
             {/* Header */}
             <div className="px-6 py-4 border-b border-border flex items-center justify-between shrink-0">
               <div className="text-[17px] font-semibold uppercase tracking-wide">
-                {editItem ? `Sửa: ${editItem.name}` : "Thêm mới cơ sở"}
+                {editItem ? `${t("common.edit")}: ${editItem.name}` : t("cs.add")}
               </div>
               <button onClick={close_} className="p-1.5 rounded hover:bg-muted"><X className="w-5 h-5 text-muted-foreground" /></button>
             </div>

@@ -3,6 +3,7 @@ import RichTextEditor from "@/components/RichTextEditor";
 import { useLocation } from "wouter";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import AppLayout from "@/components/AppLayout";
 import {
   Search, Plus, Filter, Download, ChevronDown, X, Upload,
@@ -110,6 +111,7 @@ function fmtDateCC(s: string) {
 }
 
 export default function DoanhNghiepPage() {
+  const { t } = useLanguage();
   const { user: currentUser } = useAuth();
   const isSuperAdmin = !currentUser?.enterpriseId;
   const [, setLocation] = useLocation();
@@ -265,15 +267,15 @@ export default function DoanhNghiepPage() {
         {/* Page header */}
         <div>
           <div className="text-[12px] text-muted-foreground">Quản trị hệ thống / Doanh nghiệp</div>
-          <h1 className="text-xl lg:text-2xl font-bold mt-0.5">Quản lý Doanh nghiệp</h1>
+          <h1 className="text-xl lg:text-2xl font-bold mt-0.5">{t("dn.page-title")}</h1>
         </div>
 
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Stat label="Tổng doanh nghiệp" value={String(statsQ.data?.total ?? "—")} delta="Dữ liệu thực tế" tone="emerald" icon={Building2} />
-          <Stat label="Đang hoạt động" value={String(statsQ.data?.active ?? "—")} delta={statsQ.data ? `${Math.round(((statsQ.data.active || 0) / Math.max(statsQ.data.total, 1)) * 100)}% tổng` : ""} tone="blue" icon={Users} />
-          <Stat label="Chờ duyệt" value={String(statsQ.data?.pending ?? "—")} delta="Cần xử lý" tone="amber" icon={Bell} />
-          <Stat label="Tạm khóa" value={String(statsQ.data?.locked ?? "—")} delta="" tone="rose" icon={X} />
+          <Stat label={t("dn.stat.total")} value={String(statsQ.data?.total ?? "—")} delta={t("common.real-data")} tone="emerald" icon={Building2} />
+          <Stat label={t("dn.stat.active")} value={String(statsQ.data?.active ?? "—")} delta={statsQ.data ? `${Math.round(((statsQ.data.active || 0) / Math.max(statsQ.data.total, 1)) * 100)}% tổng` : ""} tone="blue" icon={Users} />
+          <Stat label={t("dn.stat.pending")} value={String(statsQ.data?.pending ?? "—")} delta={t("dn.stat.pending-note")} tone="amber" icon={Bell} />
+          <Stat label={t("dn.stat.locked")} value={String(statsQ.data?.locked ?? "—")} delta="" tone="rose" icon={X} />
         </div>
 
         {/* Toolbar */}
@@ -283,26 +285,26 @@ export default function DoanhNghiepPage() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Tìm theo MST, tên doanh nghiệp, người đại diện…"
+              placeholder={t("dn.search-ph")}
               className="w-full h-10 pl-9 pr-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-primary"
             />
           </div>
-          <SelectChip label="Tỉnh / Thành phố" />
-          <SelectChip label="Phân hệ" />
-          <SelectChip label="Trạng thái" />
+          <SelectChip label={t("common.province")} />
+          <SelectChip label={t("common.col.module")} />
+          <SelectChip label={t("common.col.status")} />
           <button className="h-10 px-3 rounded-lg border border-border text-sm flex items-center gap-2 hover:bg-muted text-muted-foreground">
-            <Filter className="w-4 h-4" /> Bộ lọc
+            <Filter className="w-4 h-4" /> {t("common.filter")}
           </button>
           <div className="hidden md:block h-6 w-px bg-border" />
           <button className="h-10 px-3 rounded-lg border border-border text-sm flex items-center gap-2 hover:bg-muted text-muted-foreground">
-            <Download className="w-4 h-4" /> Xuất Excel
+            <Download className="w-4 h-4" /> {t("common.export-excel")}
           </button>
           {isSuperAdmin && (
             <button
               onClick={() => setDrawerOpen(true)}
               className="h-10 px-4 rounded-lg bg-primary text-primary-foreground text-sm font-semibold flex items-center gap-2 shadow-sm hover:brightness-110"
             >
-              <Plus className="w-4 h-4" /> Thêm doanh nghiệp
+              <Plus className="w-4 h-4" /> {t("dn.add")}
             </button>
           )}
         </div>
@@ -314,23 +316,23 @@ export default function DoanhNghiepPage() {
               <thead>
                 <tr className="text-left text-[12px] uppercase tracking-wider text-muted-foreground bg-muted/40">
                   <th className="px-4 py-3 w-10"><input type="checkbox" className="accent-primary" /></th>
-                  <th className="px-3 py-3">Doanh nghiệp</th>
-                  <th className="px-3 py-3">Tên tài khoản</th>
-                  <th className="px-3 py-3">Người đại diện</th>
-                  <th className="px-3 py-3">Phân hệ</th>
-                  <th className="px-3 py-3">Trạng thái</th>
+                  <th className="px-3 py-3">{t("common.col.enterprise")}</th>
+                  <th className="px-3 py-3">{t("dn.col.account")}</th>
+                  <th className="px-3 py-3">{t("dn.col.representative")}</th>
+                  <th className="px-3 py-3">{t("common.col.module")}</th>
+                  <th className="px-3 py-3">{t("common.col.status")}</th>
                   <th className="px-3 py-3 w-20"></th>
                 </tr>
               </thead>
               <tbody>
                 {listQ.isLoading && (
-                  <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />Đang tải dữ liệu…</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin inline mr-2" />{t("common.loading")}</td></tr>
                 )}
                 {listQ.isError && (
                   <tr><td colSpan={7} className="px-4 py-10 text-center text-rose-600">Lỗi tải dữ liệu: {(listQ.error as Error).message}</td></tr>
                 )}
                 {!listQ.isLoading && !listQ.isError && filtered.length === 0 && (
-                  <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">{search ? "Không tìm thấy doanh nghiệp phù hợp." : "Chưa có doanh nghiệp nào — bấm \"Thêm doanh nghiệp\" để bắt đầu."}</td></tr>
+                  <tr><td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">{search ? t("dn.not-found") : t("dn.empty")}</td></tr>
                 )}
                 {filtered.map((dn) => (
                   <tr key={dn.id} className="border-t border-border hover:bg-emerald-50/30">
@@ -369,7 +371,7 @@ export default function DoanhNghiepPage() {
                     <td className="px-3 py-3">
                       <span className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-medium ring-1 ring-inset ${STATUS_BADGE[dn.status].cls}`}>
                         <span className="w-1.5 h-1.5 rounded-full bg-current mr-1.5 opacity-70" />
-                        {STATUS_BADGE[dn.status].text}
+                        {dn.status === "active" ? t("common.status.active") : dn.status === "pending" ? t("common.status.pending") : t("common.status.locked")}
                       </span>
                     </td>
                     <td className="px-3 py-3">
@@ -386,7 +388,7 @@ export default function DoanhNghiepPage() {
           </div>
 
           <div className="flex items-center justify-between px-4 py-3 border-t border-border text-[13px] text-muted-foreground">
-            <div>Hiển thị {filtered.length} / {items.length} doanh nghiệp</div>
+            <div>{t("dn.showing").replace("{n}", String(filtered.length)).replace("{total}", String(items.length))}</div>
             <div className="flex items-center gap-1">
               <button className="w-8 h-8 rounded-lg border border-border flex items-center justify-center hover:bg-muted"><ArrowLeft className="w-4 h-4" /></button>
               {[1, 2, 3, "…", 8].map((p, i) => (
@@ -405,7 +407,7 @@ export default function DoanhNghiepPage() {
             <div className="w-12 h-12 rounded-full bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto mb-4">
               <KeyRound className="w-6 h-6" />
             </div>
-            <h3 className="text-[17px] font-semibold text-center mb-1">Doanh nghiệp đã được tạo!</h3>
+            <h3 className="text-[17px] font-semibold text-center mb-1">{t("dn.created")}</h3>
             <p className="text-[13px] text-muted-foreground text-center mb-5">
               Tài khoản Admin cho <span className="font-semibold text-foreground">{createdCreds.name}</span> đã sẵn sàng đăng nhập.
             </p>
@@ -420,7 +422,7 @@ export default function DoanhNghiepPage() {
               onClick={() => setCreatedCreds(null)}
               className="w-full h-11 rounded-xl bg-primary text-primary-foreground font-semibold text-[14px] hover:brightness-110"
             >
-              Đã lưu, đóng lại
+              {t("common.save-changes")}
             </button>
           </div>
         </div>
@@ -433,17 +435,16 @@ export default function DoanhNghiepPage() {
             <div className="w-12 h-12 rounded-full bg-rose-50 text-rose-600 flex items-center justify-center mx-auto mb-4">
               <X className="w-6 h-6" />
             </div>
-            <h3 className="text-[17px] font-semibold text-center mb-1">Xóa doanh nghiệp?</h3>
+            <h3 className="text-[17px] font-semibold text-center mb-1">{t("dn.delete-confirm")}</h3>
             <p className="text-[13.5px] text-muted-foreground text-center mb-6">
-              Bạn sắp xóa <span className="font-semibold text-foreground">{deleteTarget.tenHienThi}</span> khỏi hệ thống.
-              Thao tác này không thể hoàn tác.
+              {t("dn.delete-desc").replace("{name}", deleteTarget.tenHienThi)}
             </p>
             <div className="flex gap-3">
               <button
                 onClick={() => setDeleteTarget(null)}
                 className="flex-1 h-11 rounded-xl border border-border font-medium text-[14px] hover:bg-muted"
               >
-                Hủy
+                {t("common.cancel")}
               </button>
               <button
                 disabled={deleteMu.isPending}
@@ -451,7 +452,7 @@ export default function DoanhNghiepPage() {
                 className="flex-1 h-11 rounded-xl bg-rose-600 text-white font-semibold text-[14px] hover:bg-rose-700 disabled:opacity-60 flex items-center justify-center gap-2"
               >
                 {deleteMu.isPending && <Loader2 className="w-4 h-4 animate-spin" />}
-                Xóa vĩnh viễn
+                {t("common.delete-permanent")}
               </button>
             </div>
           </div>
@@ -465,8 +466,8 @@ export default function DoanhNghiepPage() {
           <aside className="fixed top-0 right-0 h-full w-full sm:w-[540px] bg-white shadow-2xl z-50 flex flex-col">
             <div className="px-6 py-5 border-b border-border flex items-center justify-between">
               <div>
-                <div className="text-[18px] font-semibold">{editItem ? "Sửa thông tin doanh nghiệp" : "Thêm doanh nghiệp mới"}</div>
-                <div className="text-[12.5px] text-muted-foreground">Điền đầy đủ thông tin để khởi tạo hồ sơ doanh nghiệp.</div>
+                <div className="text-[18px] font-semibold">{editItem ? t("dn.edit-title") : t("dn.add-title")}</div>
+                <div className="text-[12.5px] text-muted-foreground">{t("dn.drawer-subtitle")}</div>
               </div>
               <button onClick={closeDrawer} className="p-1.5 rounded hover:bg-muted">
                 <X className="w-5 h-5 text-muted-foreground" />
@@ -476,19 +477,19 @@ export default function DoanhNghiepPage() {
             <div className="px-6 pt-4 border-b border-border">
               <div className="flex gap-1 overflow-x-auto">
                 {[
-                  { k: "general",  label: "Hồ sơ chung", n: 1 },
-                  { k: "location", label: "Vị trí địa lý", n: 2 },
-                  { k: "modules",  label: "Phân hệ", n: 3 },
-                  { k: "quangba",  label: "Quảng bá", n: 4 },
-                ].map((t) => (
+                  { k: "general",  label: t("dn.section.profile"), n: 1 },
+                  { k: "location", label: t("dn.section.location"), n: 2 },
+                  { k: "modules",  label: t("dn.section.modules"), n: 3 },
+                  { k: "quangba",  label: t("dn.section.promo"), n: 4 },
+                ].map((tab) => (
                   <button
-                    key={t.k}
-                    onClick={() => setActiveTab(t.k as typeof activeTab)}
-                    className={`px-3 py-2.5 text-[13px] font-medium border-b-2 -mb-px flex items-center gap-2 transition whitespace-nowrap ${activeTab === t.k ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
+                    key={tab.k}
+                    onClick={() => setActiveTab(tab.k as typeof activeTab)}
+                    className={`px-3 py-2.5 text-[13px] font-medium border-b-2 -mb-px flex items-center gap-2 transition whitespace-nowrap ${activeTab === tab.k ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"}`}
                   >
-                    <span className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center shrink-0 ${activeTab === t.k ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{t.n}</span>
-                    {t.label}
-                    {t.k === "quangba" && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-normal">tuỳ chọn</span>}
+                    <span className={`w-5 h-5 rounded-full text-[11px] flex items-center justify-center shrink-0 ${activeTab === tab.k ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground"}`}>{tab.n}</span>
+                    {tab.label}
+                    {tab.k === "quangba" && <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground font-normal">{t("common.optional")}</span>}
                   </button>
                 ))}
               </div>
