@@ -96,7 +96,7 @@ export default function CoSoDetailPage() {
   const params = useParams<{ id?: string }>();
   const id = Number(params.id);
   const [, setLocation] = useLocation();
-  const [tab, setTab] = useState<"overview" | "location" | "certs" | "employees" | "qr">("overview");
+  const [tab, setTab] = useState<"overview" | "location" | "certs" | "employees">("overview");
   const [showQrModal, setShowQrModal] = useState(false);
   const [selectedEmp, setSelectedEmp] = useState<Employee | null>(null);
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
@@ -172,7 +172,6 @@ export default function CoSoDetailPage() {
     { key: "location" as const, label: "Địa lý & Bản đồ", Icon: Map },
     { key: "certs" as const, label: "Chứng chỉ", Icon: Award, count: chungChi.length },
     { key: "employees" as const, label: "Nhân viên", Icon: Users, count: assignedEmployees.length },
-    { key: "qr" as const, label: "Mã QR", Icon: QrCode },
   ];
 
   return (
@@ -497,36 +496,6 @@ export default function CoSoDetailPage() {
               </div>
             )}
 
-            {/* ── Tab: Mã QR ── */}
-            {tab === "qr" && (
-              <div className="flex flex-col items-center py-6 space-y-5">
-                <div className="text-center">
-                  <h3 className="text-[15px] font-semibold mb-1">Mã QR cơ sở</h3>
-                  <p className="text-[13px] text-muted-foreground">Dùng để truy xuất nguồn gốc và nhận diện cơ sở trong hệ thống</p>
-                </div>
-                <div className="bg-white border-2 border-border rounded-2xl p-6 shadow-sm text-center">
-                  <img src={qrUrl(`CO-SO:${f.id}|${f.name}|${f.code || ""}`)} alt="QR Code" className="w-52 h-52 mx-auto" />
-                  <div className="mt-4 space-y-0.5">
-                    <div className="text-[15px] font-semibold">{f.name}</div>
-                    <div className="text-[12px] text-muted-foreground">Mã: {f.code || `CS-${f.id}`}</div>
-                    <div className="text-[12px] text-muted-foreground">{typeLabel(f.type)}</div>
-                    {f.gln && <div className="text-[11.5px] text-muted-foreground font-mono mt-1">GLN: {f.gln}</div>}
-                  </div>
-                </div>
-                <div className="flex gap-3">
-                  <button onClick={() => printQR(f)} className="h-10 px-5 rounded-lg bg-emerald-600 text-white text-[13.5px] font-semibold flex items-center gap-2 hover:bg-emerald-700">
-                    <Printer className="w-4 h-4" /> In QR
-                  </button>
-                  <a href={qrUrl(`CO-SO:${f.id}|${f.name}|${f.code || ""}`)} download={`qr-${f.code || f.id}.png`} target="_blank" rel="noreferrer"
-                    className="h-10 px-5 rounded-lg border border-border text-[13.5px] font-semibold flex items-center gap-2 hover:bg-muted">
-                    Tải xuống
-                  </a>
-                </div>
-                <div className="text-[11.5px] text-muted-foreground text-center max-w-xs">
-                  Dữ liệu QR: <span className="font-mono bg-muted px-1.5 py-0.5 rounded text-foreground">{`CO-SO:${f.id}|${f.name}|${f.code || ""}`}</span>
-                </div>
-              </div>
-            )}
           </div>
         </div>
       </div>
