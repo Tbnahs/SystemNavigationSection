@@ -522,7 +522,7 @@ const vi: Translations = {
   "common.detail-address": "Địa chỉ chi tiết", "common.total": "Tổng", "common.weight": "Khối lượng", "common.unit-price": "Đơn giá",
   "common.amount": "Thành tiền", "common.add-line": "Thêm dòng", "common.password": "Mật khẩu", "common.email": "Email",
   "common.col.enterprise": "Doanh nghiệp", "common.col.status": "Trạng thái", "common.col.module": "Phân hệ", "common.col.name": "Tên", "common.col.address": "Địa chỉ",
-  "common.status.active": "Đang hoạt động", "common.status.inactive": "Ngưng hoạt động", "common.status.locked": "Tạm khóa",
+  "common.status.active": "Đang hoạt động", "common.status.inactive": "Ngưng hoạt động", "common.status.locked": "Ngưng hoạt động",
   "common.status.pending": "Chờ duyệt", "common.status.invited": "Đã mời",
   "common.status.draft": "Bản nháp", "common.status.confirmed": "Đã xác nhận", "common.status.cancelled": "Đã hủy",
   "dn.page-title": "Quản lý Doanh nghiệp", "dn.add": "Thêm doanh nghiệp", "dn.add-title": "Thêm doanh nghiệp mới", "dn.edit-title": "Sửa thông tin doanh nghiệp",

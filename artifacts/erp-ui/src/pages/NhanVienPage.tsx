@@ -26,7 +26,7 @@ const AVATAR_COLORS = [
 const STATUS: Record<Employee["status"], { text: string; cls: string; dot: string }> = {
   active: { text: "Đang hoạt động", cls: "bg-emerald-50 text-emerald-700 ring-emerald-600/20", dot: "bg-emerald-500" },
   invited: { text: "Đã mời", cls: "bg-amber-50 text-amber-700 ring-amber-600/20", dot: "bg-amber-500" },
-  locked: { text: "Tạm khóa", cls: "bg-slate-100 text-slate-600 ring-slate-500/20", dot: "bg-slate-400" },
+  locked: { text: "Ngưng hoạt động", cls: "bg-slate-100 text-slate-600 ring-slate-500/20", dot: "bg-slate-400" },
 };
 
 const ROLE_CLR: Record<string, string> = {
@@ -457,7 +457,7 @@ export default function NhanVienPage() {
             <option value="">{t("common.col.status")}: Tất cả</option>
             <option value="active">Đang hoạt động</option>
             <option value="invited">Đã mời</option>
-            <option value="locked">Tạm khóa</option>
+            <option value="locked">Ngưng hoạt động</option>
           </select>
           <button className="h-10 px-3 rounded-lg border border-border text-sm flex items-center gap-2 hover:bg-muted text-muted-foreground">
             <Filter className="w-4 h-4" /> {t("common.filter")}

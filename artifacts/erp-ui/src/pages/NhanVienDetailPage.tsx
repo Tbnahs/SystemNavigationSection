@@ -15,7 +15,7 @@ import {
 const STATUS_MAP: Record<Employee["status"], { label: string; cls: string; dot: string }> = {
   active:  { label: "Đang hoạt động", cls: "bg-emerald-50 text-emerald-700 ring-emerald-200", dot: "bg-emerald-500" },
   invited: { label: "Đã mời",         cls: "bg-amber-50 text-amber-700 ring-amber-200",       dot: "bg-amber-400" },
-  locked:  { label: "Tạm khóa",       cls: "bg-slate-100 text-slate-600 ring-slate-300",      dot: "bg-slate-400" },
+  locked:  { label: "Ngưng hoạt động", cls: "bg-slate-100 text-slate-600 ring-slate-300",      dot: "bg-slate-400" },
 };
 
 const ROLE_CLR: Record<string, string> = {
