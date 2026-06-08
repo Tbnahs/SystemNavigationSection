@@ -247,7 +247,11 @@ export type TranslationKey =
   | "qc.col.unit-price" | "qc.col.grade-applied" | "qc.col.standard-title" | "qc.col.standard-desc"
   | "qc.form.grade-name" | "qc.form.tea-variety" | "qc.form.product" | "qc.form.quality-pct"
   | "qc.form.grade-applied" | "qc.form.standard-title" | "qc.form.standard-desc"
-  | "qc.deselect-all" | "qc.empty.grade" | "qc.empty.quality" | "qc.empty.standard";
+  | "qc.deselect-all" | "qc.empty.grade" | "qc.empty.quality" | "qc.empty.standard"
+  | "qc.section.grade" | "qc.section.grade-count" | "qc.section.quality" | "qc.section.quality-count"
+  | "qc.section.standard" | "qc.section.standard-count"
+  | "qc.col.variety" | "qc.col.note"
+  | "qc.grade-empty" | "qc.quality-empty" | "qc.standard-empty";
 
 type Translations = Record<TranslationKey, string>;
 
@@ -545,6 +549,10 @@ const vi: Translations = {
   "qc.form.grade-name": "Tên quy cách", "qc.form.tea-variety": "Giống chè", "qc.form.product": "Thương phẩm", "qc.form.quality-pct": "% Đánh giá",
   "qc.form.grade-applied": "Quy cách áp dụng", "qc.form.standard-title": "Tiêu đề tiêu chuẩn", "qc.form.standard-desc": "Mô tả nội dung",
   "qc.deselect-all": "Bỏ chọn tất cả", "qc.empty.grade": "Chưa có quy cách nào", "qc.empty.quality": "Chưa có mức chất lượng nào", "qc.empty.standard": "Chưa có tiêu chuẩn nào",
+  "qc.section.grade": "Quy cách", "qc.section.grade-count": "quy cách", "qc.section.quality": "% Chất lượng", "qc.section.quality-count": "mức chất lượng",
+  "qc.section.standard": "Tiêu chuẩn", "qc.section.standard-count": "tiêu chuẩn",
+  "qc.col.variety": "Giống chè", "qc.col.note": "Ghi chú",
+  "qc.grade-empty": "Chưa có quy cách nào", "qc.quality-empty": "Chưa có mức chất lượng nào", "qc.standard-empty": "Chưa có tiêu chuẩn nào",
 };
 
 const en: Translations = {
@@ -841,6 +849,10 @@ const en: Translations = {
   "qc.form.grade-name": "Grade name", "qc.form.tea-variety": "Tea variety", "qc.form.product": "Product", "qc.form.quality-pct": "% Rating",
   "qc.form.grade-applied": "Applied grade", "qc.form.standard-title": "Standard title", "qc.form.standard-desc": "Description",
   "qc.deselect-all": "Deselect all", "qc.empty.grade": "No grades yet", "qc.empty.quality": "No quality levels yet", "qc.empty.standard": "No standards yet",
+  "qc.section.grade": "Grades", "qc.section.grade-count": "grades", "qc.section.quality": "% Quality", "qc.section.quality-count": "quality levels",
+  "qc.section.standard": "Standards", "qc.section.standard-count": "standards",
+  "qc.col.variety": "Tea variety", "qc.col.note": "Note",
+  "qc.grade-empty": "No grades yet", "qc.quality-empty": "No quality levels yet", "qc.standard-empty": "No standards yet",
 };
 
 const ko: Translations = {
@@ -1128,6 +1140,10 @@ const ko: Translations = {
   "qc.form.grade-name": "규격명", "qc.form.tea-variety": "차 품종", "qc.form.product": "상품", "qc.form.quality-pct": "% 평가",
   "qc.form.grade-applied": "적용 규격", "qc.form.standard-title": "기준 제목", "qc.form.standard-desc": "내용 설명",
   "qc.deselect-all": "전체 해제", "qc.empty.grade": "아직 규격 없음", "qc.empty.quality": "아직 품질 등급 없음", "qc.empty.standard": "아직 기준 없음",
+  "qc.section.grade": "규격", "qc.section.grade-count": "규격", "qc.section.quality": "% 품질", "qc.section.quality-count": "품질 등급",
+  "qc.section.standard": "기준", "qc.section.standard-count": "기준",
+  "qc.col.variety": "차 품종", "qc.col.note": "메모",
+  "qc.grade-empty": "아직 규격 없음", "qc.quality-empty": "아직 품질 등급 없음", "qc.standard-empty": "아직 기준 없음",
 };
 
 const ja: Translations = {
@@ -1415,6 +1431,10 @@ const ja: Translations = {
   "qc.form.grade-name": "規格名", "qc.form.tea-variety": "茶品種", "qc.form.product": "商品", "qc.form.quality-pct": "% 評価",
   "qc.form.grade-applied": "適用規格", "qc.form.standard-title": "基準タイトル", "qc.form.standard-desc": "内容説明",
   "qc.deselect-all": "すべて解除", "qc.empty.grade": "規格はまだありません", "qc.empty.quality": "品質レベルはまだありません", "qc.empty.standard": "基準はまだありません",
+  "qc.section.grade": "規格", "qc.section.grade-count": "規格", "qc.section.quality": "% 品質", "qc.section.quality-count": "品質レベル",
+  "qc.section.standard": "基準", "qc.section.standard-count": "基準",
+  "qc.col.variety": "茶品種", "qc.col.note": "備考",
+  "qc.grade-empty": "規格はまだありません", "qc.quality-empty": "品質レベルはまだありません", "qc.standard-empty": "基準はまだありません",
 };
 
 export const translations: Record<Language, Translations> = { vi, en, ko, ja };
