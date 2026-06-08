@@ -33,6 +33,15 @@ import DonThuMuaPage from "@/pages/DonThuMuaPage";
 import GiongChePage from "@/pages/GiongChePage";
 import TxngSuKienPage from "@/pages/TxngSuKienPage";
 import TxngPage from "@/pages/TxngPage";
+import TxngTemPage from "@/pages/TxngTemPage";
+import TxngTheoLoPage from "@/pages/TxngTheoLoPage";
+import TxngChungChiPage from "@/pages/TxngChungChiPage";
+import TxngBieuMauHoatDongPage from "@/pages/TxngBieuMauHoatDongPage";
+import VungTrongPage from "@/pages/VungTrongPage";
+import VungTrongZonesPage from "@/pages/VungTrongZonesPage";
+import VungTrongHarvestPage from "@/pages/VungTrongHarvestPage";
+import VungTrongIoTPage from "@/pages/VungTrongIoTPage";
+import VungTrongCanhTacPage from "@/pages/VungTrongCanhTacPage";
 import PortalPage from "@/pages/PortalPage";
 import HoSoPage from "@/pages/HoSoPage";
 import ModuleSelectPage from "@/pages/ModuleSelectPage";
@@ -185,6 +194,56 @@ function Router() {
       </Route>
       <Route path="/module/txng/su-kien">
         {() => <ProtectedRoute component={TxngSuKienPage} />}
+      </Route>
+      <Route path="/module/txng/tem">
+        {() => <ProtectedRoute component={TxngTemPage} />}
+      </Route>
+      <Route path="/module/txng/theo-lo">
+        {() => <ProtectedRoute component={TxngTheoLoPage} />}
+      </Route>
+      <Route path="/module/txng/chung-chi-dn">
+        {() => <ProtectedRoute component={TxngChungChiPage} />}
+      </Route>
+      <Route path="/module/txng/chung-chi-tp">
+        {() => <ProtectedRoute component={TxngChungChiPage} />}
+      </Route>
+      <Route path="/module/txng/bieu-mau-hd">
+        {() => <ProtectedRoute component={TxngBieuMauHoatDongPage} />}
+      </Route>
+      <Route path="/module/txng/vung-nuoi-trong">
+        {() => <ProtectedRoute component={VungTrongZonesPage} />}
+      </Route>
+      <Route path="/module/txng/lich-su-tem">
+        {() => <ProtectedRoute component={TxngTemPage} />}
+      </Route>
+      <Route path="/module/txng/bao-cao-tem">
+        {() => <ProtectedRoute component={TxngTemPage} />}
+      </Route>
+
+      {/* Vùng trồng module */}
+      <Route path="/module/vung-trong">
+        {() => <ProtectedRoute component={VungTrongPage} />}
+      </Route>
+      <Route path="/module/vung-trong/zones">
+        {() => <ProtectedRoute component={VungTrongZonesPage} />}
+      </Route>
+      <Route path="/module/vung-trong/crops">
+        {() => <ProtectedRoute component={GiongChePage} />}
+      </Route>
+      <Route path="/module/vung-trong/harvest">
+        {() => <ProtectedRoute component={VungTrongHarvestPage} />}
+      </Route>
+      <Route path="/module/vung-trong/pesticides">
+        {() => <ProtectedRoute component={VungTrongCanhTacPage} />}
+      </Route>
+      <Route path="/module/vung-trong/weather">
+        {() => <ProtectedRoute component={VungTrongCanhTacPage} />}
+      </Route>
+      <Route path="/module/vung-trong/inspection">
+        {() => <ProtectedRoute component={VungTrongCanhTacPage} />}
+      </Route>
+      <Route path="/module/vung-trong/iot/:sub">
+        {() => <ProtectedRoute component={VungTrongIoTPage} />}
       </Route>
 
       {/* Generic sub-module and module fallbacks */}

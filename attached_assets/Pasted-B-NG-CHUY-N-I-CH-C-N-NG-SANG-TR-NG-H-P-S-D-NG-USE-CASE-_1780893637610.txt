@@ -1,0 +1,994 @@
+BẢNG CHUYỂN ĐỔI CHỨC NĂNG SANG TRƯỜNG HỢP SỬ DỤNG (USE-CASE)																									
+STT	Tên Use-case	Tên tác nhân	Mô tả trường hợp sử dụng	Mức độ cần thiết	Mức độ phức tạp																				
+C QUẢN LÝ VÙNG TRỒNG																									
+I Dashboard																									
+1a	Xem tổng quan ESG trên Dashboard	Quản trị viên DN		B	Phức tạp																				
+			Người dùng truy cập Dashboard; Hệ thống xác thực phiên đăng nhập và quyền truy cập.																						
+			Hệ thống gọi API lấy dữ liệu ESG mới nhất từ module Quản lý ESG; Module ESG trả về dữ liệu E, S, G theo kỳ báo cáo gần nhất.																						
+			Hệ thống kiểm tra tính hợp lệ của dữ liệu ESG nhận được; Nếu hợp lệ, hệ thống xử lý và chuẩn bị dữ liệu để hiển thị.																						
+			Hệ thống render widget tổng quan ESG lên Dashboard; Hiển thị các chỉ số E (phát thải CO₂, lượng nước), S (lao động, nông hộ), G (chứng nhận).																						
+			Người dùng xem các chỉ số ESG tổng quan; Hệ thống làm nổi bật các chỉ số vượt ngưỡng hoặc cần chú ý.																						
+			Người dùng chọn lọc dữ liệu ESG theo kỳ/vùng trồng; Hệ thống cập nhật lại widget theo điều kiện lọc.																						
+			Người dùng chọn xem chi tiết một chỉ số ESG; Hệ thống điều hướng sang trang Quản lý ESG tương ứng.																						
+			Hệ thống ghi nhận thao tác xem Dashboard vào log hệ thống; Cập nhật thời gian truy cập lần cuối.																						
+1b	Xem tổng quan sản lượng trên Dashboard	Quản trị viên DN		M	Phức tạp																				
+			Người dùng truy cập Dashboard; Hệ thống xác thực phiên đăng nhập và quyền truy cập.																						
+			Hệ thống gọi API sang phân hệ ERP để lấy dữ liệu sản lượng thu hoạch; ERP trả về tổng sản lượng nguyên liệu theo từng vùng trồng.																						
+			Hệ thống gọi API sang phân hệ TXNG để lấy dữ liệu sản phẩm đầu ra; TXNG trả về tổng sản lượng sản phẩm đã sản xuất.																						
+			Hệ thống tổng hợp dữ liệu từ ERP và TXNG; Tính toán các chỉ số so sánh kỳ hiện tại và kỳ trước.																						
+			Hệ thống render widget tổng quan sản lượng lên Dashboard; Hiển thị biểu đồ thu hoạch và sản phẩm đầu ra theo thời gian.																						
+			Người dùng xem tổng quan sản lượng; Hệ thống hiển thị xu hướng tăng/giảm so với kỳ trước.																						
+			Người dùng chọn lọc sản lượng theo vùng trồng hoặc khoảng thời gian; Hệ thống cập nhật lại widget theo điều kiện lọc.																						
+			Người dùng chọn xem chi tiết sản lượng; Hệ thống điều hướng sang trang Quản lý sản lượng tương ứng.																						
+1c	Xem tổng quan nông hộ & nhân sự trên Dashboard	Quản trị viên DN		B	Phức tạp																				
+			Người dùng truy cập Dashboard; Hệ thống xác thực phiên đăng nhập và quyền truy cập.																						
+			Hệ thống gọi API lấy danh sách nhân viên từ module Nhân viên; Module trả về tổng số nhân viên theo từng vùng trồng.																						
+			Hệ thống gọi API lấy dữ liệu nông hộ từ module ESG (chỉ số S); Module ESG trả về số lượng nông hộ tham gia và lao động.																						
+			Hệ thống tổng hợp dữ liệu nhân viên và nông hộ; Tính toán biến động so với kỳ trước.																						
+			Hệ thống render widget tổng quan nông hộ & nhân sự lên Dashboard; Hiển thị tổng số nhân viên, nông hộ và xu hướng thay đổi.																						
+			Người dùng xem tổng quan nông hộ & nhân sự; Hệ thống làm nổi bật biến động bất thường nếu có.																						
+			Người dùng chọn lọc theo vùng trồng hoặc khoảng thời gian; Hệ thống cập nhật lại widget theo điều kiện lọc.																						
+			Người dùng chọn xem chi tiết nhân viên hoặc nông hộ; Hệ thống điều hướng sang trang quản lý tương ứng.																						
+1d	Xem bản đồ vùng trồng trên Dashboard	Quản trị viên DN		B	Phức tạp																				
+			Người dùng truy cập Dashboard; Hệ thống xác thực phiên đăng nhập và quyền truy cập.																						
+			Hệ thống gọi API lấy danh sách vùng trồng và toạ độ GPS từ module Vùng trồng; Module trả về danh sách vùng trồng kèm tọa độ và ranh giới.																						
+			Hệ thống kiểm tra tính hợp lệ dữ liệu GIS nhận được; Lọc và chuẩn bị dữ liệu để render lên bản đồ số.																						
+			Hệ thống render bản đồ GIS với các vùng trồng được đánh dấu; Hiển thị màu sắc phân biệt theo trạng thái vùng trồng.																						
+			Người dùng xem bản đồ tổng quan các vùng trồng; Hệ thống hiển thị tooltip thông tin tóm tắt khi hover vào từng vùng.																						
+			Người dùng sử dụng bộ lọc trạng thái/khu vực; Hệ thống lọc và làm nổi bật các vùng trồng theo điều kiện.																						
+			Người dùng chọn một vùng trồng trên bản đồ; Hệ thống hiển thị popup thông tin chi tiết vùng trồng đó.																						
+			Người dùng chọn xem chi tiết đầy đủ vùng trồng; Hệ thống điều hướng sang trang chi tiết vùng trồng tương ứng.																						
+1e	Xem cảnh báo AI trên Dashboard	Quản trị viên DN		T	Phức tạp																				
+			Hệ thống AI định kỳ phân tích dữ liệu môi trường, ESG và canh tác; Tạo danh sách cảnh báo kèm mức độ ưu tiên (cao/trung/thấp).																						
+			Người dùng truy cập Dashboard; Hệ thống xác thực phiên đăng nhập và quyền truy cập.																						
+			Hệ thống lấy danh sách cảnh báo AI từ engine AI; Lọc các cảnh báo chưa xử lý và sắp xếp theo mức độ ưu tiên.																						
+			Hệ thống render widget cảnh báo AI lên Dashboard; Hiển thị số lượng cảnh báo theo từng mức độ ưu tiên.																						
+			Người dùng xem tổng quan cảnh báo AI; Hệ thống làm nổi bật các cảnh báo mức cao cần xử lý ngay.																						
+			Người dùng chọn lọc cảnh báo theo mức độ hoặc vùng trồng; Hệ thống cập nhật lại danh sách cảnh báo theo điều kiện lọc.																						
+			Người dùng chọn một cảnh báo cụ thể; Hệ thống hiển thị chi tiết phân tích AI và gợi ý hành động cần thực hiện.																						
+			Người dùng xác nhận đã xem/xử lý cảnh báo; Hệ thống cập nhật trạng thái cảnh báo và ghi nhận thao tác vào log.																						
+II Thông tin doanh nghiệp																									
+1	Đồng bộ thông tin từ Hệ thống định danh (Portal SSO)	Hệ thống định danh (Portal)		M	Đơn giản																				
+			HT Portal phát hiện thông tin doanh nghiệp có thay đổi, tự động gọi sang HT Vùng Trồng để đẩy dữ liệu mới; Hệ thống vùng trồng nhận dữ liệu từ Portal, cập nhật thông tin Doanh nghiệp.																						
+2	Cập nhật thông tin doanh nghiệp	Quản trị viên DN; Nhân viên được cấp quyền; Hệ thống định danh (Portal)		M	Phức tạp																				
+			Người dùng truy cập mục "Thông tin Doanh nghiệp"; Hệ thống thông tin chi tiết Doanh nghiệp.																						
+			Người dùng chọn chỉnh sửa; Hệ thống chuyển sang màn hình chỉnh sửa thông tin.																						
+			Người dùng thực hiện chỉnh sửa thông tin và ấn Lưu; Hệ thống gửi yêu cầu cập nhật về HT Portal.																						
+			Portal xử lý yêu cầu và trả về kết quả; Hệ thống nhận kết quả từ Portal và cập nhật lại thông tin hiển thị và thông báo thành công / lỗi.																						
+III Nhân viên – đồng bộ & phân quyền																									
+1	Đồng bộ danh sách Nhân viên vùng trồng từ SSO	Quản trị viên DN; Nhân viên được cấp quyền		M	Đơn giản																				
+			HT Portal phát hiện có thay đổi về danh sách nhân viên được phân quyền vào HT Vùng trồng, tự động gọi sang HT Vùng trồng để đẩy dữ liệu; HT Vùng trồng nhận dữ liệu từ Portal, cập nhật thông tin nhân viên. 																						
+2	Phân quyền thao tác trong Vùng trồng	Quản trị viên DN; Nhân viên được cấp quyền		B	Trung bình																				
+			Người dùng truy cập vào mục Phân quyền; Hệ thống hiển thị danh sách các quyền hiện có																						
+			Người dùng chọn nhân viên cần phân quyền và gán với quyền tương ứng và chọn xác nhận; Hệ thống kiểm tra thông tin và cấp quyền cho nhân viên tương ứng.																						
+3	Xem danh sách và chi tiết Nhân viên	Quản trị viên DN; Nhân viên được cấp quyền		B	Trung bình																				
+			Người dùng truy cập mục "Vùng trồng"; Hệ thống hiển thị danh sách vùng trồng kèm bộ lọc.																						
+			Người dùng nhập điều kiện tìm kiếm/lọc danh sách; Hệ thống hiển thị kết quả theo điều kiện tìm kiếm																						
+			Người dùng chọn 1 nhân viên trong danh sách để xem chi tiết; Hệ thống hiển thị thông tin chi tiết của nhân viên đó.																						
+4	Cập nhật thông tin Nhân viên	Quản trị viên DN; Nhân viên được cấp quyền; Hệ thống định danh (Portal)		M	Trung bình																				
+			Người dùng chọn nhân viên cần chỉnh sửa; Hệ thống hiển thị màn hình chỉnh sửa																						
+			Người dùng chỉnh sửa các trường cần thay đổi và ấn lưu; Hệ thống gửi yêu cầu cập nhật về HT Portal																						
+			HT Portal xử lý yêu cầu và trả về kết quả; Hệ thống nhận kết quả từ HT Portal và cập nhật lại thông tin hiển thị và thông báo thành công / lỗi.																						
+5	Khóa tài khoản Nhân viên	Quản trị viên DN; Nhân viên được cấp quyền; Hệ thống định danh (Portal)		M	Trung bình																				
+			Người dùng chọn nhân viên cần khóa tài khoản; Hệ thống hiển thị màn hình xác nhận khóa																						
+			Người dùng chọn xác nhận; Hệ thống gửi yêu cầu cập nhật về HT Portal																						
+			HT Portal xử lý yêu cầu và trả về kết quả; Hệ thống nhận kết quả từ HT Portal và cập nhật lại thông tin hiển thị và thông báo thành công / lỗi.																						
+A VÙNG TRỒNG																									
+I Vùng trồng – CRUD																									
+1	Đồng bộ danh sách Vùng trồng từ ERP	Hệ thống ERP		M	Đơn giản																				
+			HT ERP phát hiện có thay đổi về Vùng trồng, tự động gọi sang HT Vùng trồng để đẩy dữ liệu mới; HT Vùng trồng nhận dữ liệu từ ERP, cập nhật thông tin vùng trồng.																						
+2	Xem danh sách và chi tiết vùng trồng	Quản trị viên DN; Nhân viên được cấp quyền		B	Đơn giản																				
+			Người dùng truy cập mục "Vùng trồng"; Hệ thống hiển thị danh sách vùng trồng kèm bộ lọc.																						
+			Người dùng nhập điều kiện tìm kiếm/lọc danh sách; Hệ thống hiển thị kết quả theo điều kiện tìm kiếm																						
+			Người dùng chọn 1 vùng trồng trong danh sách để xem chi tiết; Hệ thống hiển thị thông tin chi tiết của vùng trồng đó.																						
+3	Thêm mới vùng trồng	Quản trị viên DN; Nhân viên được cấp quyền; Hệ thống ERP		M	Trung bình																				
+			Người dùng chọn "Thêm vùng trồng"; Hệ thống hiển thị màn hình nhập thông tin khởi tạo Vùng trồng (Tên, Mã, Diện tích, Tọa độ...)																						
+			Người dùng điền thông tin và nhấn "Lưu"; Hệ thống gửi thông tin vùng trồng sang ERP để khởi tạo và đồng bộ																						
+			HT ERP xử lý yêu cầu và trả về kết quả; Hệ thống nhận kết quả từ HT ERP và cập nhật lại thông tin hiển thị và thông báo thành công / lỗi.																						
+	Gán mã định danh vùng trồng	Quản trị viên DN; Nhân viên được cấp quyền; Hệ thống ERP																							
+																									
+4	Cập nhật vùng trồng	Quản trị viên DN; Nhân viên được cấp quyền; Hệ thống ERP		M	Trung bình																				
+			Người dùng chọn vùng trồng cần chỉnh sửa; Hệ thống hiển thị màn hình chỉnh sửa																						
+			Người dùng chỉnh sửa các trường cần thay đổi và ấn lưu; Hệ thống gửi yêu cầu cập nhật về HT ERP																						
+			HT ERP xử lý yêu cầu và trả về kết quả; Hệ thống nhận kết quả từ HT ERP và cập nhật lại thông tin hiển thị và thông báo thành công / lỗi.																						
+5	Xóa vùng trồng	Quản trị viên DN; Nhân viên được cấp quyền		M	Trung bình																				
+			Người dùng chọn vùng trồng cần chỉnh sửa; Hệ thống hiển thị màn hình xác nhận xóa																						
+			Người dùng chọn xác nhận; Hệ thống gửi yêu cầu xóa về HT ERP																						
+			HT ERP xử lý yêu cầu và trả về kết quả; Hệ thống nhận kết quả từ HT ERP và cập nhật lại thông tin hiển thị và thông báo thành công / lỗi.																						
+II Vùng trồng – GIS & thuộc tính																									
+1	Định vị GPS vùng trồng	Quản trị viên DN		B	Đơn giản																				
+			Người dùng chọn gán tọa độ địa lý cho vùng trồng; Hệ thống hiển thị bản đồ số và cho phép đánh dấu vị trí vùng trồng.																						
+			Người dùng đánh dấu vị trí trên bản đồ; Hệ thống hiển thị tọa độ tương ứng được chọn.																						
+2	Vẽ ranh giới vùng trồng	Quản trị viên DN		B	Phức tạp																				
+			Người dùng chọn chức năng vẽ ranh giới; Hệ thống hiển thị bản đồ GIS cho phép vẽ đa giác.																						
+			Người dùng vẽ ranh giới vùng trồng trên bản đồ; Hệ thống xác định ranh giới hình học của vùng trồng.																						
+3	Tính diện tích vùng trồng	Quản trị viên DN		B	Trung bình																				
+			Người dùng chọn tính diện tích; Hệ thống tự động tính diện tích vùng trồng dựa trên dữ liệu bản đồ và hiển thị kết quả.																						
+4	Cập nhật trạng thái vùng trồng	Quản trị viên DN		B	Đơn giản																				
+			Người dùng chọn gán trạng thái; Hệ thống thiết lập trạng thái hoạt động của vùng trồng.																						
+			Người dùng cập nhật trạng thái vùng trồng và ấn xác nhận; Hệ thống thay đổi trạng thái của vùng trồng.																						
+5	Tìm kiếm vùng trồng trên bản đồ GIS	Quản trị viên DN																							
+			Người dùng mở chế độ xem bản đồ GIS, áp dụng bộ lọc; Hệ thống rneder bản đồ với các vùng trồng được đánh dấu,																						
+			Người dùng chọn 1 vùng trồng trên bản đồ; Hệ thống hiển thị popup thông tin tóm tắt vùng trồng.																						
+III Lịch sử  và xuất dữ liệu vùng trồng																									
+1	Lưu và xem lịch sử thay đổi vùng trồng	Quản trị viên DN		B	Trung bình																				
+			Người dùng thao tác cập nhật vùng trồng; Hệ thống ghi nhận các dữ liệu thay đổi																						
+			Người dùng chọn xem lịch sử chỉnh sửa vùng trồng; Hệ thống hiển thị lịch sử thay đổi của vùng trồng theo thứ tự thời gian.																						
+2	Xuất dữ liệu vùng trồng	Quản trị viên DN		B	Đơn giản																				
+			Người dùng chọn xuất dữ liệu; Hệ thống hiển thị màn hình xác nhận dữ liệu cần xuất.																						
+			Người dùng chọn xác nhận; Hệ thống tải file xuống và lưu vào máy của người dùng.																						
+B THỔ NHƯỠNG																									
+I Cấu hình thổ nhưỡng																									
+1	Khai báo loại đất	Quản trị viên DN		B	Trung bình																				
+			Quản trị viên DN chọn khai báo loại đất; Hệ thống hiển thị màn hình nhập danh mục loại đất.																						
+			Quản trị viên DN nhập thông tin loại đất (đất thịt, đất cát, đất phù sa…) và lưu; Hệ thống kiểm tra và lưu danh mục loại đất sử dụng trong hệ thống.																						
+2	Xóa loại đât	Quản trị viên DN																							
+			Người dùng chọn bản ghi cần xóa; Hệ thống hiển thị màn hình xác nhận.																						
+			Người dùng chọn xác nhận;  Hệ thống kiểm tra ràng buộc, xóa bản ghi và thông báo kết quả																						
+3	Nhập chỉ số thổ nhưỡng	Quản trị viên DN		B	Trung bình																				
+			Quản trị viên DN chọn nhập chỉ số thổ nhưỡng; Hệ thống hiển thị màn hình nhập dữ liệu thổ nhưỡng.																						
+			Quản trị viên DN nhập dữ liệu theo vùng trồng hoặc theo kỳ đo, bao gồm pH, độ ẩm, nhiệt độ đất, EC và các chỉ số dinh dưỡng (N, P, K) và lưu; Hệ thống kiểm tra và lưu dữ liệu thổ nhưỡng.																						
+4	Cập nhật chỉ số thổ nhưỡng	Quản trị viên DN		B	Trung bình																				
+			Quản trị viên DN chọn chỉnh sửa chỉ số thổ nhưỡng; Hệ thống hiển thị màn hình chỉnh sửa cấu hình thổ nhưỡng.																						
+			Quản trị viên DN cập nhật thông tin và lưu; Hệ thống kiểm tra và lưu thay đổi.																						
+5	Xem chi tiết chỉ số thổ nhưỡng	Quản trị viên DN																							
+			Người dùng chọn mục "Thổ nhưỡng"; Hệ thống hiển thị danh sách chỉ số thổ nhưỡng và bộ lọc.																						
+			Người dùng chọn áp dụng bộ lọc																						
+C KHÍ HẬU																									
+I Cấu hình khí hậu																									
+1	Nhập dữ liệu khí hậu	Quản trị viên DN		B	Trung bình																				
+			Quản trị viên DN chọn nhập dữ liệu khí hậu; Hệ thống hiển thị màn hình nhập dữ liệu.																						
+			Quản trị viên DN nhập dữ liệu theo vùng trồng hoặc theo thời gian, bao gồm nhiệt độ không khí, độ ẩm không khí và lưu; Hệ thống kiểm tra và lưu dữ liệu khí hậu.																						
+2	Cập nhật dữ liệu khí hậu	Quản trị viên DN		B	Trung bình																				
+			Quản trị viên DN chọn chỉnh sửa dữ liệu khí hậu; Hệ thống hiển thị màn hình chỉnh sửa cấu hình khí hậu.																						
+			Quản trị viên DN cập nhật thông tin và lưu; Hệ thống kiểm tra và lưu thay đổi.																						
+3	Gán dữ liệu khí hậu cho vùng trồng	Quản trị viên DN		B	Trung bình																				
+			Quản trị viên DN chọn gán dữ liệu khí hậu cho vùng trồng; Hệ thống hiển thị danh sách vùng trồng và dữ liệu khí hậu.																						
+			Quản trị viên DN chọn vùng trồng và dữ liệu khí hậu tương ứng rồi lưu; Hệ thống liên kết dữ liệu khí hậu với từng vùng trồng để phục vụ theo dõi và phân tích.																						
+4	Xem dữ liệu khí hậu 	Quản trị viên DN																							
+			Người dùng chọn mục "Khí hậu";  Hiển thị dữ liệu khí hậu hiện tại và bộ lọc																						
+			Người dùng chọn áp dụng bộ lọc; Hệ thống cập nhật màn hình hiển thị khí hậu theo bộ lọc																						
+			Người dùng chọn 1 bản ghi để xem chi tiết; Hệ thống hiển thị thông tin chi tiết dữ liệu khí hậu																						
+																									
+D NGUỒN NƯỚC																									
+I Quản lý nguồn nước																									
+1	Khai báo nguồn nước	Quản trị viên DN		B	Trung bình																				
+			Quản trị viên DN chọn khai báo nguồn nước; Hệ thống hiển thị màn hình nhập thông tin nguồn nước.																						
+			Quản trị viên DN nhập thông tin nguồn nước phục vụ vùng trồng và lưu; Hệ thống kiểm tra và lưu thông tin nguồn nước.																						
+2	Gán nguồn nước cho vùng trồng	Quản trị viên DN		B	Trung bình																				
+			Quản trị viên DN chọn gán nguồn nước cho vùng trồng; Hệ thống hiển thị danh sách vùng trồng và nguồn nước.																						
+			Quản trị viên DN chọn liên kết nguồn nước với vùng trồng tương ứng và lưu; Hệ thống lưu liên kết nguồn nước với vùng trồng.																						
+3	Nhập loại nguồn nước	Quản trị viên DN		B	Trung bình																				
+			Quản trị viên DN chọn nhập loại nguồn nước; Hệ thống hiển thị màn hình nhập thông tin.																						
+			Quản trị viên DN nhập loại nguồn nước và lưu; Hệ thống ghi nhận loại nguồn nước.																						
+4	Nhập chất lượng nước	Quản trị viên DN		B	Trung bình																				
+			Quản trị viên DN chọn nhập chất lượng nước; Hệ thống hiển thị màn hình nhập thông tin.																						
+			Quản trị viên DN nhập các chỉ số chất lượng nước và lưu; Hệ thống ghi nhận chất lượng nước.																						
+5	Xem thông tin nguồn nước	Quản trị viên DN		B	Đơn giản																				
+			Quản trị viên DN chọn xem thông tin nguồn nước; Hệ thống hiển thị thông tin nguồn nước đã được khai báo.																						
+6	Cập nhật nguồn nước	Quản trị viên DN																							
+			Người dùng chọn nguồn nước cần chỉnh sửa; Hiển thị màn hình chỉnh sửa thông tin nguồn nước																						
+			Người dùng chỉnh sửa thông tin và nhấn lưu; Hệ thống kiểm tra và lưu thay đổi, thông báo kết quả.																						
+																									
+E SẢN PHẨM NUÔI TRỒNG – GIỐNG CHÈ																									
+1	Đồng bộ dữ liệu Giống chè từ ERP	Hệ thống ERP		M	Đơn giản																				
+			HT ERP phát hiện có thay đổi về Giống chè, tự động gọi sang HT Vùng trồng để đẩy dữ liệu mới; HT vùng trồng nhận dữ liệu từ ERP, cập nhật thông tin giống chè.																						
+2	Xem danh sách & chi tiết Giống chè	Quản trị viên DN; Nhân viên được cấp quyền		B	Đơn giản																				
+			Người dùng truy cập mục "Giống chè"; Hệ thống hiển thị danh sách giống chè kèm bộ lọc.																						
+			Người dùng nhập điều kiện tìm kiếm/lọc danh sách; Hệ thống hiển thị kết quả theo điều kiện tìm kiếm																						
+			Người dùng chọn 1 giống chè trong danh sách để xem chi tiết; Hệ thống hiển thị thông tin chi tiết của giống chè đó.																						
+3	Thêm mới Giống chè	Quản trị viên DN; Nhân viên được cấp quyền, Hệ thống ERP		M	Trung bình																				
+			Người dùng chọn "Thêm giống chè"; Hệ thống hiển thị màn hình nhập thông tin khởi tạo giống chè																						
+			Người dùng điền thông tin và nhấn "Lưu"; Hệ thống gửi thông tin giống chè sang ERP để khởi tạo và đồng bộ																						
+			HT ERP xử lý yêu cầu và trả về kết quả; Hệ thống nhận kết quả từ HT ERP và cập nhật lại thông tin hiển thị và thông báo thành công / lỗi.																						
+4	Cập nhật thông tin giống chè	Quản trị viên DN; Nhân viên được cấp quyền; Hệ thống ERP		M	Trung bình																				
+			Người dùng chọn giống chè cần chỉnh sửa; Hệ thống hiển thị màn hình chỉnh sửa																						
+			Người dùng chỉnh sửa các trường cần thay đổi và ấn lưu; Hệ thống gửi yêu cầu cập nhật về HT ERP																						
+			HT ERP xử lý yêu cầu và trả về kết quả; Hệ thống nhận kết quả từ HT ERP và cập nhật lại thông tin hiển thị và thông báo thành công / lỗi.																						
+5	Xóa Giống chè	Quản trị viên DN; Nhân viên được cấp quyền; Hệ thống ERP		M	Trung bình																				
+			Người dùng chọn giống chè cần chỉnh sửa; Hệ thống hiển thị màn hình xác nhận xóa																						
+			Người dùng chọn xác nhận; Hệ thống gửi yêu cầu xóa về HT ERP																						
+			HT ERP xử lý yêu cầu và trả về kết quả; Hệ thống nhận kết quả từ HT ERP và cập nhật lại thông tin hiển thị và thông báo thành công / lỗi.																						
+6	So sánh đặc điểm Giống chè	Hệ thống		B	Trung bình																				
+			Người dùng truy cập vào mục danh sách giống chè; Hệ thống hiển thị tất cả giống chè hiện có																						
+			Người dùng chọn so sánh đặc điểm sản phẩm nuôi trồng; Hệ thống hiển thị màn hình so sánh các giống chè theo các tiêu chí đã cấu hình.																						
+F GIÁM SÁT MÔI TRƯỜNG																									
+I Giám sát & hiển thị môi trường																									
+1	Xem dashboard môi trường tổng quan	Quản trị viên DN; Hệ thống IoT		M	Phức tạp																				
+			Người dùng truy cập màn hình dashboard môi trường; Hệ thống gọi API lấy dữ liệu mới nhất từ các trạm IoT và hiển thị tổng quan các chỉ số đất, không khí.																						
+			Người dùng chọn bộ lọc để xem; Hệ thống cập nhật lại dashboard theo điều kiện lọc và hiển thị thông tin tương ứng.																						
+			Người dùng chọn xem chi tiết một chỉ số cụ thể; Hệ thống hiển thị dữ liệu lịch sử và bảng số liệu chi tiết.																						
+5	Xem chi tiết chỉ số môi trường	Quản trị viên DN		B	Đơn giản																				
+			Người dùng chọn một chỉ số cụ thể; Hệ thống hiển thị chi tiết từng chỉ số theo thời gian và vùng trồng.																						
+			Người dùng thay đổi khoảng thời gian xem hoặc chọn trạm đo cụ thể; Hệ thống cập nhật lại biểu đồ và bảng số liệu theo điều kiện đã chọn.																						
+	Thu thập và xử lý dữ liệu đất từ IoT	Hệ thống IoT																							
+			Thiết bị IoT đo và gửi dữ liệu các chỉ số đất (độ ẩm, nhiệt độ, pH, EC, N, K, P) theo chu kỳ đã cấu hình; Hệ thống nhận luồng dữ liệu, kiểm tra tính hợp lệ và lưu vào cơ sở dữ liệu theo từng chỉ số.																						
+			Hệ thống so sánh từng giá trị vừa nhận với ngưỡng cảnh báo tương ứng đã được cấu hình; Nếu bất kỳ chỉ số nào vượt ngưỡng, hệ thống cập nhật trạng thái cảnh báo lên Dashboard																						
+	Thu thập và xử lý dữ liệu không khí từ IoT	Hệ thống IoT																							
+			IoTThiết bị IoT đo và gửi dữ liệu các chỉ số không khí (nhiệt độ, độ ẩm) theo chu kỳ đã cấu hình; Hệ thống nhận luồng dữ liệu, kiểm tra tính hợp lệ và lưu vào cơ sở dữ liệu theo từng chỉ số.																						
+			Hệ thống so sánh từng giá trị vừa nhận với ngưỡng cảnh báo tương ứng đã được cấu hình; Nếu bất kỳ chỉ số nào vượt ngưỡng, hệ thống cập nhật trạng thái cảnh báo lên Dashboard																						
+	Xem cảnh báo môi trường	Quản trị viên DN																							
+			Người dùng nhận thông báo cảnh báo trên Dashboard và chọn xem danh sách cảnh báo; Hệ thống hiển thị danh sách cảnh báo đang hoạt động kèm thông tin loại chỉ số, giá trị vi phạm, mức độ, thời điểm và vùng trồng liên quan.																						
+			Người dùng chọn xem chi tiết một cảnh báo; Hệ thống hiển thị thông tin chỉ số tại thời điểm cảnh báo.																						
+3	Chat box AI hỗ trợ phân tích	Quản trị viên DN		T	Phức tạp																				
+			Người dùng nhập câu hỏi/tình huống thực tế trên vùng trồng vào chatbox; Hệ thống AI phân tích dựa trên dữ liệu hệ thống.																						
+			Hệ thống AI trả về phân tích và gợi ý hành động cụ thể phù hợp với tình huống được mô tả																						
+			Người dùng tiếp tục đặt câu hỏi bổ sung, hệ thống duy trì ngữ cảnh hội thoại và phản hồi theo từng lượt.																						
+IV Quản lý dữ liệu môi trường																									
+1	Xem lịch sử, biểu đồ xu hướng	Quản trị viên DN		B	Đơn giản																				
+			Người dùng chọn xem lịch sử dữ liệu môi trường; Hệ thống hiển thị màn hình tra cứu với bộ lọc tương ứng.																						
+			Người dùng điều chỉnh bộ lọc và chọn vẽ biểu đồ xu hướng; Hệ thống cập nhật lại bảng số liệu và biểu đồ xu hướng theo điều kiện lọc đã chọn.																						
+2	Xuất dữ liệu môi trường	Quản trị viên DN		B	Đơn giản																				
+			Người dùng chọn xuất dữ liệu môi trường; Hệ thống hiển thị màn hình xác nhận thông tin muốn xuất.																						
+G QUẢN LÝ ESG			Người dùng chọn xác nhận; Hệ thống xuất ra file và tải xuống máy người dùng.																						
+I Quản lý ESG																									
+1	Nhập dữ liệu môi trường (E)	Quản trị viên DN		B	Trung bình																				
+			Người dùng chọn nhập dữ liệu môi trường; Hệ thống hiển thị màn hình nhập dữ liệu theo kỳ báo cáo.																						
+			Người dùng nhập dữ liệu bao gồm phát thải CO₂, lượng nước sử dụng, chỉ số đa dạng sinh học (BDI) và thông tin hệ sinh thái rồi lưu; Hệ thống kiểm tra và lưu dữ liệu.																						
+2	Nhập dữ liệu xã hội (S)	Quản trị viên DN		B	Trung bình																				
+			Người dùng chọn nhập dữ liệu xã hội; Hệ thống hiển thị màn hình nhập thông tin xã hội.																						
+			Người dùng nhập thông tin bao gồm số lượng lao động, nông hộ tham gia và các thông tin liên quan đến nhân sự rồi lưu; Hệ thống kiểm tra và lưu dữ liệu.																						
+3	Nhập dữ liệu quản trị (G)	Quản trị viên DN		B	Trung bình																				
+			Người dùng chọn nhập dữ liệu quản trị; Hệ thống hiển thị màn hình nhập thông tin quản trị.																						
+			Người dùng khai báo thông tin quản trị bao gồm các chứng nhận (USDA Organic, EU Organic, Fair Trade…) và thời gian hiệu lực rồi lưu; Hệ thống kiểm tra và lưu dữ liệu.																						
+4	Cập nhật dữ liệu ESG	Quản trị viên DN		B	Trung bình																				
+			Người dùng chọn cập nhật dữ liệu ESG; Hệ thống hiển thị màn hình chỉnh sửa dữ liệu ESG.																						
+			Người dùng chỉnh sửa, bổ sung thông tin ESG khi có thay đổi thực tế hoặc cập nhật số liệu mới rồi lưu; Hệ thống kiểm tra và lưu thay đổi.																						
+5	Xuất báo cáo ESG	Quản trị viên DN		B	Trung bình																				
+			Người dùng chọn xuất báo cáo ESG; Hệ thống hiển thị màn hình xác nhận thông tin được chọn.																						
+			Người dùng chọn xác nhận; Hệ thống tạo và xuất báo cáo ESG dưới dạng file phục vụ kiểm toán, báo cáo nội bộ hoặc đối tác.																						
+6	Ghi nhận và Xem lịch sử ESG	Quản trị viên DN		B	Trung bình																				
+			Người dùng thao tác cập nhật dữ liệu ESG; Hệ thống ghi nhận và lưu lại toàn bộ lịch sử thay đổi.																						
+			Người dùng chọn xem lịch sử cập nhật ESG; Hệ thống hiển thị màn hình tra cứu lịch sử thay đổi dữ liệu ESG theo thời gian hoặc theo từng vùng trồng.																						
+			Người dùng nhập thông tin tra cứu; Hệ thống hiển thị màn hình dữ liệu theo tiêu chí được chọn.																						
+H HOẠT ĐỘNG CANH TÁC																									
+I Quản lý hoạt động canh tác																									
+1	Xem danh sách hoạt động canh tác	Quản trị viên DN; Nhân viên được cấp quyền; Hệ thống TXNG		M	Đơn giản																				
+			Người dùng chọn Vùng trồng cụ thể và chọn khai báo hoạt động; Hệ thống gọi API sang phân hệ TXNG để lấy danh sách loại hoạt động canh tác đã được cấu hình.																						
+			HT TXNG xử lý yêu cầu và trả về danh sách loại hoạt động canh tác; Hệ thống nhận kết quả từ HT TXNG, hiển thị danh sách hoạt động tương ứng (Bón phân / Phun thuốc / Tưới nước / ...)																						
+2	Khai báo hoạt động canh tác	Quản trị viên DN; Nhân viên được cấp quyền; Hệ thống TXNG		M	Trung bình																				
+			Người dùng chọn loại hoạt động cần khai báo; Hệ thống điều hướng sang màn hình khai báo tương ứng trên HT-TXNG.																						
+			HT TXNG xử lý khai báo và gửi dữ liệu kết quả; Hệ thống nhận dữ liệu từ HT-TXNG, tạo bản ghi nhật ký canh tác và cập nhật vào danh sách của Vùng trồng tương ứng.																						
+I NHẬT KÝ CANH TÁC																									
+I Quản lý nhật ký canh tác																									
+1	Theo dõi tất cả nhật ký canh tác từng Vùng trồng	Quản trị viên DN; Nhân viên được cấp quyền		B	Đơn giản																				
+			Người dùng chọn vùng trồng cần tra cứu, chọn "Nhật ký canh tác"; Hệ thống hiển thị danh sách nhật ký canh tác của vùng trồng, sắp xếp theo thứ tự mới nhất lên trên, kèm bộ lọc.																						
+			Người dùng áp dụng bộ lọc/nhập điều kiện tìm kiếm; Hệ thống hiển thị danh sách bản ghi nhật ký theo điều kiện.																						
+			Người dùng chọn 1 bản ghi để xem chi tiết; Hệ thống hiển thị màn hình thông tin chi tiết.																						
+2	Xuất danh sách nhật ký	Quản trị viên DN; Nhân viên được cấp quyền		B	Trung bình																				
+			Người dùng chọn các bản ghi cần xuất file; Hệ thống tô đậm các bản ghi được chọn.																						
+			Người dùng bấm chọn tải xuống; Hệ thống hiển thị màn hình thống kê số bản ghi được chọn và nút xác nhận.																						
+			Người dùng chọn xác nhận; Hệ thống tải xuống file gồm các bản ghi đã được chọn.																						
+J THIẾT BỊ IOT/IOC																									
+I Quản lý thiết bị																									
+1	Xem danh sách và chi tiết Thiết bị IOT	Quản trị viên DN		B	Đơn giản																				
+			Người dùng chọn xem danh sách thiết bị; Hệ thống hiển thị danh sách thiết bị (sensor, gateway), trạng thái hoạt động, vị trí, vùng trồng gắn thiết bị kèm bộ lọc.																						
+			Người dùng chọn lọc và tìm kiếm; Hệ thống cập nhật màn hình danh sách theo tiêu chí được chọn.																						
+			Người dùng chọn 1 thiết bị để xem chi tiết; Hệ thống hiển thị màn hình thông tin chi tiết của thiết bị.																						
+2	Cập nhật thông tin/trạng thái thiết bị IoT	Quản trị viên DN																							
+			Người dùng chọn thiết bị cần cập nhật; Hệ thống hiển thị màn hình chỉnh sửa thông tin thiết bị.																						
+			Người dùng cập nhật vị trí/vùng trồng/trạng thái và ấn Lưu; Hệ thống kiểm tra và lưu thay đổi, thông báo kết quả.																						
+II Quản lý sản lượng																									
+1	Xem sản lượng thu hoạch theo vùng trồng	Quản trị viên DN		B	Đơn giản																				
+			Quản trị viên DN chọn xem sản lượng thu hoạch; Hệ thống hiển thị tổng khối lượng nguyên liệu đã thu hoạch từ vùng trồng theo thời gian và bộ lọc.																						
+			Người dùng chọn lọc để xem thông tin; Hệ thống cập nhật màn hình sản lượng theo tiêu chí lọc.																						
+2	So sánh sản lượng theo vùng	Quản trị viên DN		B	Trung bình																				
+			Quản trị viên DN chọn so sánh sản lượng theo vùng; Hệ thống hiển thị biểu đồ so sánh sản lượng thu hoạch giữa các vùng trồng kèm bộ lọc.																						
+			Người dùng chọn lọc theo điều kiện; Hệ thống cập nhật lại biểu đồ so sánh theo tiêu chí lọc.																						
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
+																									
