@@ -1019,7 +1019,7 @@ export default function TxngKhaiBaoThuMuaPage() {
                           return (
                             <tr key={serial} className="border-b border-border last:border-0 hover:bg-muted/20">
                               <td className="px-4 py-2.5 font-mono text-[12px] font-semibold text-primary">{serial}</td>
-                              <td className="px-4 py-2.5 text-[12px]">{assign.loTem || <span className="text-muted-foreground">—</span>}</td>
+                              <td className="px-4 py-2.5 text-[12px]">{assign.loTem || modalLotLoTem || <span className="text-muted-foreground">—</span>}</td>
                               <td className="px-4 py-2.5">
                                 <input
                                   type="number"
