@@ -70,7 +70,7 @@ type OutputProduct = {
   hanSuDung: string;
 };
 
-type LotRow = { id: string; maLo: string; tenThuongPham: string; soLuong: number; serials: string[] };
+type LotRow = { id: string; maLo: string; tenThuongPham: string; soLuong: number; donVi: string; serials: string[] };
 type TemAssign = { loTem: string; seriDau: string; seriCuoi: string; ganTemLo: boolean };
 
 const LOT_TEM_OPTIONS = ["LT-ESG-001", "LT-ESG-002", "LT-ESG-003", "LT-ESG-004"];
@@ -221,6 +221,7 @@ export default function TxngKhaiBaoCheBienPage() {
           maLo: op.loThuongPham || genLotCode(product?.code || "CB", ngayCheBien),
           tenThuongPham: product?.name || "Không xác định",
           soLuong: qty,
+          donVi: product?.unitName || "",
           serials: [],
         };
       });
@@ -704,8 +705,8 @@ export default function TxngKhaiBaoCheBienPage() {
                             <td className="px-3 py-3 max-w-[130px]">
                               <span title={lot.tenThuongPham} className="block truncate text-[12px]">{lot.tenThuongPham}</span>
                             </td>
-                            <td className="px-3 py-3 text-[12px] text-right">
-                              {lot.soLuong.toLocaleString()}
+                            <td className="px-3 py-3 text-[12px] text-right whitespace-nowrap">
+                              {lot.soLuong > 0 ? `${lot.soLuong.toLocaleString()}${lot.donVi ? ` ${lot.donVi}` : ""}` : "—"}
                             </td>
                             <td className="px-3 py-3">
                               <select
