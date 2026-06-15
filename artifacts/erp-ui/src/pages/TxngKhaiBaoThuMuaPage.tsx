@@ -137,7 +137,7 @@ export default function TxngKhaiBaoThuMuaPage() {
   useEffect(() => {
     const text = qrSerial ?? qrLot?.maLo ?? "";
     if (!text) { setQrDataUrl(""); return; }
-    QRCode.toDataURL(text, { width: 128, margin: 1, color: { dark: "#1e40af", light: "#ffffff" } })
+    QRCode.toDataURL(text, { width: 128, margin: 1, color: { dark: "#000000", light: "#ffffff" } })
       .then(setQrDataUrl)
       .catch(() => setQrDataUrl(""));
   }, [qrLot, qrSerial]);

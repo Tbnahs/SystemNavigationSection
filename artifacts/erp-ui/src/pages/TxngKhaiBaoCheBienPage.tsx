@@ -146,7 +146,7 @@ export default function TxngKhaiBaoCheBienPage() {
   useEffect(() => {
     const text = qrSerial ?? qrLot?.maLo ?? "";
     if (!text) { setQrDataUrl(""); return; }
-    QRCode.toDataURL(text, { width: 128, margin: 1, color: { dark: "#92400e", light: "#ffffff" } })
+    QRCode.toDataURL(text, { width: 128, margin: 1, color: { dark: "#000000", light: "#ffffff" } })
       .then(setQrDataUrl)
       .catch(() => setQrDataUrl(""));
   }, [qrLot, qrSerial]);
