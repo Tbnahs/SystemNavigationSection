@@ -454,15 +454,15 @@ export default function TxngKhaiBaoCheBienPage() {
                               </label>
                               <span className="text-[10px] text-muted-foreground">Tối đa: {sl.soLuongMax} {sl.donVi}</span>
                             </div>
-                            <div className="flex gap-1.5">
+                            <div className="flex">
                               <input
                                 type="number"
                                 value={sl.soLuongSuDung}
                                 onChange={(e) => updateInputLot(sl.lotId, { soLuongSuDung: e.target.value })}
                                 placeholder="0"
-                                className={`flex-1 h-9 px-3 rounded-lg border text-sm outline-none focus:border-green-400 ${hasError ? "border-rose-400 bg-rose-50/50" : "border-border bg-white"}`}
+                                className={`min-w-0 flex-1 h-9 px-3 rounded-l-lg border border-r-0 text-sm outline-none focus:border-green-400 ${hasError ? "border-rose-400 bg-rose-50/50" : "border-border bg-white"}`}
                               />
-                              <select className="h-9 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-green-400 w-20">
+                              <select className="h-9 w-20 px-1 rounded-r-lg border border-border bg-muted/20 text-[11px] outline-none shrink-0">
                                 <option>{sl.donVi}</option>
                                 <option>Kg</option>
                               </select>
