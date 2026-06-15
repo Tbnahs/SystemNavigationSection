@@ -112,6 +112,36 @@ export default function TxngKhaiBaoThuMuaPage() {
     reader.readAsDataURL(file);
   }
 
+  async function downloadQr(text: string, filename: string) {
+    const dataUrl = await QRCode.toDataURL(text, {
+      width: 512, margin: 2, color: { dark: "#000000", light: "#ffffff" },
+    });
+    const a = document.createElement("a");
+    a.href = dataUrl;
+    a.download = `${filename}.png`;
+    a.click();
+  }
+
+  async function printQr(text: string, label: string) {
+    const dataUrl = await QRCode.toDataURL(text, {
+      width: 512, margin: 2, color: { dark: "#000000", light: "#ffffff" },
+    });
+    const win = window.open("", "_blank", "width=420,height=560");
+    if (!win) return;
+    win.document.write(`<!DOCTYPE html><html><head><title>In QR — ${label}</title>
+      <style>
+        body{font-family:sans-serif;display:flex;flex-direction:column;align-items:center;padding:32px;margin:0}
+        img{width:260px;height:260px;border:1px solid #e5e7eb;border-radius:8px}
+        p{font-family:monospace;font-size:13px;margin-top:14px;text-align:center;color:#374151;word-break:break-all;max-width:260px}
+        @media print{button{display:none}}
+      </style></head><body>
+      <img src="${dataUrl}" alt="QR"/>
+      <p>${label}</p>
+      <script>window.onload=()=>window.print();<\/script>
+      </body></html>`);
+    win.document.close();
+  }
+
   const { data: facilitiesData } = useQuery({ queryKey: ["facilities"], queryFn: fetchFacilities });
   const { data: productsData } = useQuery({ queryKey: ["products"], queryFn: fetchProducts });
   const { data: ordersData } = useQuery({ queryKey: ["purchase-orders"], queryFn: fetchPurchaseOrders });
@@ -479,8 +509,8 @@ export default function TxngKhaiBaoThuMuaPage() {
                             <div className="flex items-center justify-center gap-1">
                               {[
                                 { icon: QrCode, label: "Xem QR", action: () => { setQrLot(lot); setQrSerial(null); }, color: "hover:bg-blue-50 hover:text-blue-600" },
-                                { icon: Download, label: "Tải xuống", action: () => {}, color: "hover:bg-muted" },
-                                { icon: Printer, label: "In", action: () => {}, color: "hover:bg-muted" },
+                                { icon: Download, label: "Tải xuống", action: () => downloadQr(lot.maLo, lot.maLo), color: "hover:bg-muted" },
+                                { icon: Printer, label: "In", action: () => printQr(lot.maLo, `${lot.maLo} — ${lot.tenThuongPham}`), color: "hover:bg-muted" },
                               ].map(({ icon: Icon, label, action, color }) => (
                                 <button
                                   key={label}
@@ -512,10 +542,16 @@ export default function TxngKhaiBaoThuMuaPage() {
                                   >
                                     <QrCode className="w-3.5 h-3.5" />
                                   </button>
-                                  <button className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:bg-muted transition">
+                                  <button
+                                    onClick={() => downloadQr(serial, serial)}
+                                    className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:bg-muted transition"
+                                  >
                                     <Download className="w-3.5 h-3.5" />
                                   </button>
-                                  <button className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:bg-muted transition">
+                                  <button
+                                    onClick={() => printQr(serial, `${serial} — ${lot.tenThuongPham}`)}
+                                    className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:bg-muted transition"
+                                  >
                                     <Printer className="w-3.5 h-3.5" />
                                   </button>
                                 </div>
@@ -743,10 +779,16 @@ export default function TxngKhaiBaoThuMuaPage() {
                                 >
                                   <QrCode className="w-3.5 h-3.5" />
                                 </button>
-                                <button className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:bg-muted transition">
+                                <button
+                                  onClick={() => downloadQr(s, s)}
+                                  className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:bg-muted transition"
+                                >
                                   <Download className="w-3.5 h-3.5" />
                                 </button>
-                                <button className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:bg-muted transition">
+                                <button
+                                  onClick={() => printQr(s, `${s} — ${qrLot.tenThuongPham}`)}
+                                  className="w-6 h-6 rounded flex items-center justify-center text-muted-foreground hover:bg-muted transition"
+                                >
                                   <Printer className="w-3.5 h-3.5" />
                                 </button>
                               </div>
@@ -780,10 +822,22 @@ export default function TxngKhaiBaoThuMuaPage() {
             </div>
 
             <div className="px-5 py-3 border-t border-border flex justify-end gap-2">
-              <button className="h-8 px-4 rounded-lg border border-border text-xs font-medium hover:bg-muted/50 transition flex items-center gap-1.5">
+              <button
+                onClick={() => {
+                  const text = qrSerial ?? qrLot.maLo;
+                  downloadQr(text, text);
+                }}
+                className="h-8 px-4 rounded-lg border border-border text-xs font-medium hover:bg-muted/50 transition flex items-center gap-1.5"
+              >
                 <Download className="w-3.5 h-3.5" /> Tải xuống
               </button>
-              <button className="h-8 px-4 rounded-lg border border-border text-xs font-medium hover:bg-muted/50 transition flex items-center gap-1.5">
+              <button
+                onClick={() => {
+                  const text = qrSerial ?? qrLot.maLo;
+                  printQr(text, `${text} — ${qrLot.tenThuongPham}`);
+                }}
+                className="h-8 px-4 rounded-lg border border-border text-xs font-medium hover:bg-muted/50 transition flex items-center gap-1.5"
+              >
                 <Printer className="w-3.5 h-3.5" /> In
               </button>
             </div>
