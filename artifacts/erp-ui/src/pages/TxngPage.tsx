@@ -155,6 +155,14 @@ export default function TxngPage() {
             />
           </SectionGroup>
 
+          <SectionGroup title="Khai báo truy xuất">
+            <ShortcutCard
+              icon={ScanLine} label="Khai báo sự kiện" desc="Thu mua, Chế biến, Đóng gói"
+              href="/module/txng/khai-bao" color="bg-blue-50 text-blue-700 border-blue-200"
+              onClick={() => go("/module/txng/khai-bao")}
+            />
+          </SectionGroup>
+
           <SectionGroup title="Quản lý sự kiện trọng yếu">
             <ShortcutCard
               icon={CalendarClock} label="Biểu mẫu sự kiện" desc="Danh sách sự kiện trong chuỗi"

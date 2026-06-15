@@ -38,6 +38,9 @@ import TxngTemPage from "@/pages/TxngTemPage";
 import TxngTheoLoPage from "@/pages/TxngTheoLoPage";
 import TxngChungChiPage from "@/pages/TxngChungChiPage";
 import TxngBieuMauHoatDongPage from "@/pages/TxngBieuMauHoatDongPage";
+import TxngKhaiBaoPage from "@/pages/TxngKhaiBaoPage";
+import TxngKhaiBaoThuMuaPage from "@/pages/TxngKhaiBaoThuMuaPage";
+import TxngKhaiBaoCheBienPage from "@/pages/TxngKhaiBaoCheBienPage";
 import VungTrongPage from "@/pages/VungTrongPage";
 import VungTrongZonesPage from "@/pages/VungTrongZonesPage";
 import VungTrongHarvestPage from "@/pages/VungTrongHarvestPage";
@@ -216,6 +219,15 @@ function Router() {
       </Route>
       <Route path="/module/txng/vung-nuoi-trong">
         {() => <ProtectedRoute component={VungTrongZonesPage} />}
+      </Route>
+      <Route path="/module/txng/khai-bao/thu-mua">
+        {() => <ProtectedRoute component={TxngKhaiBaoThuMuaPage} />}
+      </Route>
+      <Route path="/module/txng/khai-bao/che-bien">
+        {() => <ProtectedRoute component={TxngKhaiBaoCheBienPage} />}
+      </Route>
+      <Route path="/module/txng/khai-bao">
+        {() => <ProtectedRoute component={TxngKhaiBaoPage} />}
       </Route>
       <Route path="/module/txng/lich-su-tem">
         {() => <ProtectedRoute component={TxngTemPage} />}
