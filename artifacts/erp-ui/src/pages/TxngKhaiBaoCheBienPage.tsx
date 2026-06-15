@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -53,10 +53,12 @@ type SelectedInputLot = {
   lotId: string;
   maLo: string;
   tenThuongPham: string;
+  coSoName: string;
   soLuongMax: number;
   donVi: string;
   soLuongSuDung: string;
   serials: string[];
+  serialQuantities: Record<string, string>;
   expandedSerials: boolean;
 };
 
@@ -65,9 +67,12 @@ type OutputProduct = {
   productId: string;
   tonKho: "khoi-luong" | "so-luong";
   khoiLuong: string;
+  donViKL: string;
   soLuong: string;
+  donViSL: string;
   loThuongPham: string;
   hanSuDung: string;
+  xuatMaDonLe: boolean;
 };
 
 type LotRow = { id: string; maLo: string; tenThuongPham: string; soLuong: number; donVi: string; serials: string[] };
@@ -131,6 +136,8 @@ export default function TxngKhaiBaoCheBienPage() {
 
   const [temAssigns, setTemAssigns] = useState<Map<string, TemAssign>>(new Map());
   const [confirmed, setConfirmed] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
+  const imageInputRef = useRef<HTMLInputElement>(null);
 
   const { data: facilitiesData } = useQuery({ queryKey: ["facilities"], queryFn: fetchFacilities });
   const { data: productsData } = useQuery({ queryKey: ["products"], queryFn: fetchProducts });
@@ -155,23 +162,25 @@ export default function TxngKhaiBaoCheBienPage() {
     (l) => !selectedInputLots.find((s) => s.lotId === l.id)
   );
 
-  function addInputLot() {
-    const lot = MOCK_INPUT_LOTS.find((l) => l.id === lotDropdownVal);
+  function addInputLot(lotId: string) {
+    const lot = MOCK_INPUT_LOTS.find((l) => l.id === lotId);
     if (!lot) return;
+    const coSo = facilities.find((f) => String(f.id) === coSoId);
     setSelectedInputLots((prev) => [
       ...prev,
       {
         lotId: lot.id,
         maLo: lot.maLo,
         tenThuongPham: lot.tenThuongPham,
+        coSoName: coSo?.name || "",
         soLuongMax: lot.soLuongMax,
         donVi: lot.donVi,
         soLuongSuDung: "",
         serials: lot.serials,
+        serialQuantities: {},
         expandedSerials: false,
       },
     ]);
-    setLotDropdownVal("");
   }
 
   function removeInputLot(lotId: string) {
@@ -184,12 +193,32 @@ export default function TxngKhaiBaoCheBienPage() {
     );
   }
 
-  function addOutputProduct() {
+  function addOutputProduct(productId?: string) {
     const key = String(Date.now());
+    const product = productId ? products.find((p) => String(p.id) === productId) : undefined;
     setOutputProducts((prev) => [
       ...prev,
-      { key, productId: "", tonKho: "so-luong", khoiLuong: "", soLuong: "", loThuongPham: "", hanSuDung: "" },
+      {
+        key,
+        productId: productId || "",
+        tonKho: "khoi-luong",
+        khoiLuong: "",
+        donViKL: "Kg",
+        soLuong: "",
+        donViSL: product?.unitName || "Cái",
+        loThuongPham: product ? genLotCode(product.code || "SP", ngayCheBien) : "",
+        hanSuDung: "",
+        xuatMaDonLe: false,
+      },
     ]);
+  }
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setImageUrl(ev.target?.result as string);
+    reader.readAsDataURL(file);
   }
 
   function removeOutputProduct(key: string) {
@@ -275,27 +304,37 @@ export default function TxngKhaiBaoCheBienPage() {
         {/* ═══════════════════════════════ STEP 1 ═══════════════════════════════ */}
         {step === 1 && (
           <div className="space-y-4">
-            <div className="flex gap-4 items-start min-h-0">
-              {/* Left panel */}
-              <div className="w-52 shrink-0 space-y-3">
-                <div className="bg-white border border-border rounded-xl overflow-hidden">
-                  <div className="h-28 bg-gradient-to-br from-amber-400 to-orange-600 flex items-center justify-center relative group cursor-pointer">
-                    <ImageIcon className="w-8 h-8 text-white/60" />
-                    <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <span className="text-white text-xs font-medium">Thay đổi hình ảnh</span>
+            <div className="flex gap-4 items-start">
+              {/* ── LEFT: Image + Info ── */}
+              <div className="w-56 shrink-0 space-y-3">
+                <div
+                  className="bg-white border border-border rounded-xl overflow-hidden cursor-pointer group"
+                  onClick={() => imageInputRef.current?.click()}
+                >
+                  <div className="relative h-36">
+                    {imageUrl ? (
+                      <img src={imageUrl} className="w-full h-full object-cover" alt="facility" />
+                    ) : (
+                      <div className="w-full h-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center">
+                        <ImageIcon className="w-10 h-10 text-white/50" />
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <span className="text-white text-[11px] font-medium">Thay đổi hình ảnh</span>
                     </div>
                   </div>
                 </div>
+                <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
 
                 <div className="bg-white border border-border rounded-xl p-3.5 space-y-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">Thông tin chung</p>
-
                   <div>
-                    <label className="block text-[11px] font-medium text-muted-foreground mb-1">Cơ sở chế biến</label>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 flex items-center gap-0.5 block">
+                      Cơ sở <span className="text-rose-500">*</span>
+                    </label>
                     <select
                       value={coSoId}
                       onChange={(e) => setCoSoId(e.target.value)}
-                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-amber-400"
+                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-green-400"
                     >
                       <option value="">— Chọn cơ sở —</option>
                       {facilities.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
@@ -303,248 +342,370 @@ export default function TxngKhaiBaoCheBienPage() {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-medium text-muted-foreground mb-1">Địa chỉ</label>
-                    <input
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Địa chỉ</label>
+                    <textarea
                       value={diaChi}
                       onChange={(e) => setDiaChi(e.target.value)}
-                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-amber-400"
-                      placeholder="Tự động từ cơ sở"
+                      rows={2}
+                      className="w-full px-2 py-1.5 rounded-lg border border-border bg-white text-xs outline-none focus:border-green-400 resize-none"
+                      placeholder="<địa chỉ cụ thể, xã/phường, quận/huyện, tỉnh/thành phố>"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-medium text-muted-foreground mb-1">Người thực hiện</label>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 flex items-center gap-0.5 block">
+                      Người thực hiện <span className="text-rose-500">*</span>
+                    </label>
                     <input
                       value={nguoiThucHien}
                       onChange={(e) => setNguoiThucHien(e.target.value)}
-                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-amber-400"
+                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-green-400"
+                      placeholder="Tự fill theo tên tài khoản"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-medium text-muted-foreground mb-1">Thời gian chế biến</label>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 flex items-center gap-0.5 block">
+                      Thời gian thực hiện <span className="text-rose-500">*</span>
+                    </label>
                     <input
                       type="date"
                       value={ngayCheBien}
                       onChange={(e) => setNgayCheBien(e.target.value)}
-                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-amber-400"
+                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-green-400"
                     />
                   </div>
                 </div>
               </div>
 
-              {/* Middle: ĐẦU VÀO */}
+              {/* ── MIDDLE: ĐẦU VÀO ── */}
               <div className="flex-1 bg-white border border-border rounded-xl overflow-hidden">
-                <div className="px-4 py-2.5 bg-amber-50 border-b border-amber-200 flex items-center gap-2">
-                  <span className="text-[11px] font-bold uppercase tracking-widest text-amber-700">Đầu vào</span>
-                  <span className="text-[10px] text-amber-600">Lô nguyên liệu</span>
+                <div className="px-4 py-3 border-b border-border flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
+                    <Package className="w-4 h-4 text-green-700" />
+                  </div>
+                  <div>
+                    <p className="text-[12px] font-bold text-foreground leading-tight">ĐẦU VÀO</p>
+                    <p className="text-[10px] text-muted-foreground leading-tight">Nguyên liệu / Lô thành phẩm sử dụng</p>
+                  </div>
                 </div>
-                <div className="p-4 space-y-3">
-                  <div className="flex gap-2">
-                    <select
-                      value={lotDropdownVal}
-                      onChange={(e) => setLotDropdownVal(e.target.value)}
-                      className="flex-1 h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-amber-400"
-                    >
-                      <option value="">— Chọn lô nguyên liệu —</option>
-                      {availableInputLots.map((l) => (
-                        <option key={l.id} value={l.id}>
-                          {l.maLo} ({l.soLuongMax} {l.donVi})
-                        </option>
+
+                <div className="p-4 space-y-4">
+                  {/* Tag multi-select cho lô */}
+                  <div>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1.5 flex items-center gap-0.5">
+                      Lô đầu vào <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="min-h-[38px] border border-border rounded-lg bg-white px-2 py-1 flex flex-wrap gap-1.5 items-center">
+                      {selectedInputLots.map((sl) => (
+                        <span key={sl.lotId} className="inline-flex items-center gap-1 bg-green-50 border border-green-200 text-green-800 text-[11px] px-2 py-0.5 rounded-md font-medium">
+                          {sl.maLo} ({sl.serials.length}/{sl.soLuongMax} Serial)
+                          <button
+                            onClick={() => removeInputLot(sl.lotId)}
+                            className="text-green-500 hover:text-green-800 leading-none ml-0.5"
+                          >×</button>
+                        </span>
                       ))}
-                    </select>
-                    <button
-                      onClick={addInputLot}
-                      disabled={!lotDropdownVal}
-                      className="h-9 px-3 rounded-lg bg-amber-500 text-white text-sm font-medium hover:bg-amber-600 disabled:opacity-50 transition flex items-center gap-1"
-                    >
-                      <Plus className="w-4 h-4" />
-                    </button>
+                      {availableInputLots.length > 0 && (
+                        <select
+                          value=""
+                          onChange={(e) => { if (e.target.value) addInputLot(e.target.value); }}
+                          className="flex-1 min-w-[120px] h-7 text-[12px] bg-transparent outline-none text-muted-foreground cursor-pointer"
+                        >
+                          <option value="">Chọn lô đầu vào...</option>
+                          {availableInputLots.map((l) => (
+                            <option key={l.id} value={l.id}>{l.maLo} ({l.soLuongMax} {l.donVi})</option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
                   </div>
 
                   {selectedInputLots.length === 0 && (
-                    <div className="py-8 text-center text-muted-foreground">
+                    <div className="py-6 text-center text-muted-foreground">
                       <Package className="w-8 h-8 mx-auto mb-2 opacity-20" />
                       <p className="text-[12px]">Chưa chọn lô nguyên liệu đầu vào</p>
                     </div>
                   )}
 
-                  <div className="space-y-2">
-                    {selectedInputLots.map((sl) => (
-                      <div key={sl.lotId} className="border border-amber-200 bg-amber-50/50 rounded-lg p-3 space-y-2">
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className="font-mono text-[12px] font-semibold text-amber-800">{sl.maLo}</p>
-                            <p className="text-[11px] text-muted-foreground">{sl.tenThuongPham}</p>
-                          </div>
-                          <div className="flex items-center gap-1.5">
-                            {sl.serials.length > 0 && (
-                              <button
-                                onClick={() => updateInputLot(sl.lotId, { expandedSerials: !sl.expandedSerials })}
-                                className="text-[10px] font-medium bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full hover:bg-amber-200 transition"
-                              >
-                                {sl.serials.length} Serial {sl.expandedSerials ? "▲" : "▼"}
-                              </button>
-                            )}
-                            <button
-                              onClick={() => removeInputLot(sl.lotId)}
-                              className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-rose-500 transition"
-                            >
+                  {/* Lot cards */}
+                  <div className="space-y-3">
+                    {selectedInputLots.map((sl, idx) => {
+                      const totalSerial = sl.serials.reduce((sum, s) => sum + (parseFloat(sl.serialQuantities[s] || "0") || 0), 0);
+                      const slSuDung = parseFloat(sl.soLuongSuDung) || 0;
+                      const hasError = sl.serials.length > 0 && !!sl.soLuongSuDung && Math.abs(totalSerial - slSuDung) > 0.001;
+                      return (
+                        <div key={sl.lotId} className="border border-border rounded-xl overflow-hidden">
+                          <div className="px-3 py-2 bg-muted/20 flex items-center gap-2.5 border-b border-border/60">
+                            <span className="w-5 h-5 rounded-full bg-green-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">{idx + 1}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="font-mono text-[12px] font-bold text-foreground">{sl.maLo}</p>
+                              <p className="text-[10px] text-muted-foreground">{sl.tenThuongPham}{sl.coSoName ? ` - ${sl.coSoName}` : ""}</p>
+                            </div>
+                            <button onClick={() => removeInputLot(sl.lotId)} className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-rose-500 transition">
                               <X className="w-3.5 h-3.5" />
                             </button>
                           </div>
-                        </div>
 
-                        {sl.expandedSerials && sl.serials.length > 0 && (
-                          <div className="bg-white rounded-lg border border-amber-200 max-h-28 overflow-y-auto p-2">
-                            <div className="flex flex-wrap gap-1">
-                              {sl.serials.slice(0, 30).map((s) => (
-                                <span key={s} className="text-[10px] font-mono bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded text-amber-800">
-                                  {s}
-                                </span>
-                              ))}
-                              {sl.serials.length > 30 && (
-                                <span className="text-[10px] text-muted-foreground italic">+{sl.serials.length - 30} khác</span>
-                              )}
+                          <div className="px-3 py-2.5 space-y-2">
+                            <div className="flex justify-between items-center">
+                              <label className="text-[11px] font-medium text-muted-foreground flex items-center gap-0.5">
+                                Khối lượng / SL sử dụng <span className="text-rose-500">*</span>
+                              </label>
+                              <span className="text-[10px] text-muted-foreground">Tối đa: {sl.soLuongMax} {sl.donVi}</span>
                             </div>
-                          </div>
-                        )}
+                            <div className="flex gap-1.5">
+                              <input
+                                type="number"
+                                value={sl.soLuongSuDung}
+                                onChange={(e) => updateInputLot(sl.lotId, { soLuongSuDung: e.target.value })}
+                                placeholder="0"
+                                className={`flex-1 h-9 px-3 rounded-lg border text-sm outline-none focus:border-green-400 ${hasError ? "border-rose-400 bg-rose-50/50" : "border-border bg-white"}`}
+                              />
+                              <select className="h-9 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-green-400 w-20">
+                                <option>{sl.donVi}</option>
+                                <option>Kg</option>
+                              </select>
+                            </div>
 
-                        <div className="grid grid-cols-2 gap-2">
-                          <div>
-                            <label className="block text-[10px] font-medium text-muted-foreground mb-0.5">KL sử dụng (Kg)</label>
-                            <input
-                              type="number"
-                              placeholder="0"
-                              className="w-full h-7 px-2 rounded border border-border bg-white text-xs outline-none focus:border-amber-400"
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-[10px] font-medium text-muted-foreground mb-0.5">SL sử dụng ({sl.donVi})</label>
-                            <input
-                              type="number"
-                              value={sl.soLuongSuDung}
-                              onChange={(e) => updateInputLot(sl.lotId, { soLuongSuDung: e.target.value })}
-                              placeholder={`0 / ${sl.soLuongMax}`}
-                              className="w-full h-7 px-2 rounded border border-border bg-white text-xs outline-none focus:border-amber-400"
-                            />
+                            {hasError && (
+                              <p className="text-[11px] text-rose-600 leading-snug">
+                                Lỗi: Tổng SL của Serial ({totalSerial} {sl.donVi}) phải bằng SL Lô cha sử dụng ({slSuDung} {sl.donVi}).
+                              </p>
+                            )}
+
+                            {sl.serials.length > 0 && (
+                              <div className="mt-1">
+                                <button
+                                  onClick={() => updateInputLot(sl.lotId, { expandedSerials: !sl.expandedSerials })}
+                                  className="flex items-center gap-1.5 text-[11px] font-semibold text-muted-foreground hover:text-foreground transition"
+                                >
+                                  {sl.expandedSerials ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                                  <span className="uppercase tracking-wider text-[10px]">Mã đơn lẻ</span>
+                                  {sl.expandedSerials && (
+                                    <span className="ml-auto text-[10px] font-bold text-foreground">
+                                      TỔNG: {totalSerial} {sl.donVi.toUpperCase()}
+                                    </span>
+                                  )}
+                                </button>
+
+                                {sl.expandedSerials && (
+                                  <div className="border border-border rounded-lg overflow-hidden mt-1.5">
+                                    <div className="px-3 py-1.5 bg-muted/30 border-b border-border flex justify-between items-center">
+                                      <span className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Mã đơn lẻ</span>
+                                      <span className="text-[10px] font-bold text-foreground">TỔNG: {totalSerial} {sl.donVi.toUpperCase()}</span>
+                                    </div>
+                                    <div className="max-h-40 overflow-y-auto divide-y divide-border/50">
+                                      {sl.serials.slice(0, 15).map((serial) => (
+                                        <div key={serial} className="flex items-center gap-2 px-3 py-1.5">
+                                          <span className="font-mono text-[11px] text-muted-foreground flex-1 truncate">{serial}</span>
+                                          <input
+                                            type="number"
+                                            value={sl.serialQuantities[serial] || ""}
+                                            onChange={(e) => updateInputLot(sl.lotId, { serialQuantities: { ...sl.serialQuantities, [serial]: e.target.value } })}
+                                            placeholder="0"
+                                            className="w-16 h-6 px-2 rounded border border-border bg-white text-[11px] text-center outline-none focus:border-green-400"
+                                          />
+                                          <span className="text-[10px] text-muted-foreground w-8 shrink-0">{sl.donVi}</span>
+                                          <button className="w-4 h-4 flex items-center justify-center text-muted-foreground hover:text-rose-500 transition">
+                                            <Trash2 className="w-3 h-3" />
+                                          </button>
+                                        </div>
+                                      ))}
+                                      {sl.serials.length > 15 && (
+                                        <div className="px-3 py-1.5 text-[10px] text-muted-foreground italic">...và {sl.serials.length - 15} serial khác</div>
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
+                            )}
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               </div>
 
-              {/* Right: ĐẦU RA */}
+              {/* ── RIGHT: ĐẦU RA ── */}
               <div className="flex-1 bg-white border border-border rounded-xl overflow-hidden">
-                <div className="px-4 py-2.5 bg-green-50 border-b border-green-200 flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[11px] font-bold uppercase tracking-widest text-green-700">Đầu ra thương phẩm</span>
+                <div className="px-4 py-3 border-b border-border flex items-center gap-2.5">
+                  <div className="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
+                    <Package className="w-4 h-4 text-green-700" />
                   </div>
-                  <button
-                    onClick={addOutputProduct}
-                    className="h-6 px-2.5 rounded-md bg-green-600 text-white text-[11px] font-medium hover:bg-green-700 transition flex items-center gap-1"
-                  >
-                    <Plus className="w-3 h-3" /> Thêm
-                  </button>
+                  <div>
+                    <p className="text-[12px] font-bold text-foreground leading-tight">ĐẦU RA THƯƠNG PHẨM</p>
+                    <p className="text-[10px] text-muted-foreground leading-tight">Tối đa 5 thương phẩm</p>
+                  </div>
                 </div>
-                <div className="p-4 space-y-3">
+
+                <div className="p-4 space-y-4">
+                  {/* Tag multi-select cho thương phẩm */}
+                  <div>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1.5 flex items-center gap-0.5">
+                      Thương phẩm đầu ra <span className="text-rose-500">*</span>
+                    </label>
+                    <div className="min-h-[38px] border border-border rounded-lg bg-white px-2 py-1 flex flex-wrap gap-1.5 items-center">
+                      {outputProducts.filter((op) => op.productId).map((op) => {
+                        const p = products.find((pr) => String(pr.id) === op.productId);
+                        return (
+                          <span key={op.key} className="inline-flex items-center gap-1 bg-green-50 border border-green-200 text-green-800 text-[11px] px-2 py-0.5 rounded-md font-medium">
+                            {p?.name || ""}
+                            <button onClick={() => removeOutputProduct(op.key)} className="text-green-500 hover:text-green-800 leading-none ml-0.5">×</button>
+                          </span>
+                        );
+                      })}
+                      {outputProducts.length < 5 && (
+                        <select
+                          value=""
+                          onChange={(e) => {
+                            if (!e.target.value) return;
+                            if (outputProducts.some((op) => op.productId === e.target.value)) return;
+                            addOutputProduct(e.target.value);
+                          }}
+                          className="flex-1 min-w-[120px] h-7 text-[12px] bg-transparent outline-none text-muted-foreground cursor-pointer"
+                        >
+                          <option value="">Chọn thương phẩm...</option>
+                          {products
+                            .filter((p) => !outputProducts.some((op) => op.productId === String(p.id)))
+                            .map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                        </select>
+                      )}
+                    </div>
+                  </div>
+
                   {outputProducts.length === 0 && (
-                    <div className="py-8 text-center text-muted-foreground">
+                    <div className="py-6 text-center text-muted-foreground">
                       <Package className="w-8 h-8 mx-auto mb-2 opacity-20" />
                       <p className="text-[12px]">Chưa có thương phẩm đầu ra</p>
-                      <p className="text-[11px] mt-0.5 opacity-70">Nhấn "+ Thêm" để thêm</p>
                     </div>
                   )}
 
+                  {/* Product cards */}
                   <div className="space-y-3">
                     {outputProducts.map((op, idx) => {
                       const selectedProduct = products.find((p) => String(p.id) === op.productId);
                       return (
-                        <div key={op.key} className="border border-green-200 bg-green-50/40 rounded-lg p-3 space-y-2">
-                          <div className="flex items-center justify-between">
-                            <span className="text-[11px] font-semibold text-green-800">Thương phẩm #{idx + 1}</span>
-                            <button
-                              onClick={() => removeOutputProduct(op.key)}
-                              className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-rose-500 transition"
-                            >
+                        <div key={op.key} className="border border-border rounded-xl overflow-hidden">
+                          <div className="px-3 py-2 bg-muted/20 flex items-center gap-2.5 border-b border-border/60">
+                            <span className="w-5 h-5 rounded-full bg-green-600 text-white text-[10px] font-bold flex items-center justify-center shrink-0">{idx + 1}</span>
+                            <span className="flex-1 text-[12px] font-semibold text-foreground">{selectedProduct?.name || "—"}</span>
+                            <button onClick={() => removeOutputProduct(op.key)} className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-rose-500 transition">
                               <Trash2 className="w-3.5 h-3.5" />
                             </button>
                           </div>
 
-                          <select
-                            value={op.productId}
-                            onChange={(e) => updateOutputProduct(op.key, { productId: e.target.value })}
-                            className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-green-400"
-                          >
-                            <option value="">— Chọn thương phẩm —</option>
-                            {products.map((p) => <option key={p.id} value={p.id}>{p.name} ({p.code})</option>)}
-                          </select>
-
-                          {op.productId && (
-                            <>
-                              <div className="flex gap-2">
-                                {(["so-luong", "khoi-luong"] as const).map((val) => (
+                          <div className="px-3 py-2.5 space-y-2.5">
+                            {/* Quy tắc tồn kho */}
+                            <div>
+                              <label className="text-[11px] font-medium text-muted-foreground block mb-1.5">Quy tắc tồn kho</label>
+                              <div className="flex gap-5">
+                                {([["khoi-luong", "Theo Khối lượng"], ["so-luong", "Theo Số lượng"]] as const).map(([val, label]) => (
                                   <label key={val} className="flex items-center gap-1.5 cursor-pointer">
                                     <input
                                       type="radio"
                                       checked={op.tonKho === val}
                                       onChange={() => updateOutputProduct(op.key, { tonKho: val })}
-                                      className="accent-green-600 w-3 h-3"
+                                      className="accent-green-600 w-3.5 h-3.5"
                                     />
-                                    <span className="text-[11px]">{val === "so-luong" ? "Theo SL" : "Theo KL"}</span>
+                                    <span className="text-[11px]">{label}</span>
                                   </label>
                                 ))}
                               </div>
+                            </div>
 
-                              <div className="grid grid-cols-2 gap-2">
-                                <div>
-                                  <label className="block text-[10px] font-medium text-muted-foreground mb-0.5">Khối lượng (Kg)</label>
+                            {/* KL + SL */}
+                            <div className="grid grid-cols-2 gap-2">
+                              <div>
+                                <label className="text-[11px] font-medium text-muted-foreground mb-1 flex items-center gap-0.5">
+                                  Khối lượng <span className="text-rose-500">*</span>
+                                </label>
+                                <div className="flex">
                                   <input
                                     type="number"
                                     value={op.khoiLuong}
                                     onChange={(e) => updateOutputProduct(op.key, { khoiLuong: e.target.value })}
                                     placeholder="0"
-                                    className="w-full h-7 px-2 rounded border border-border bg-white text-xs outline-none focus:border-green-400"
+                                    className="min-w-0 flex-1 h-8 px-2 rounded-l-lg border border-r-0 border-border bg-white text-xs outline-none focus:border-green-400"
                                   />
+                                  <select
+                                    value={op.donViKL}
+                                    onChange={(e) => updateOutputProduct(op.key, { donViKL: e.target.value })}
+                                    className="h-8 w-16 px-1 rounded-r-lg border border-border bg-muted/20 text-[11px] outline-none"
+                                  >
+                                    <option>Kg</option>
+                                    <option>Tấn</option>
+                                    <option>G</option>
+                                  </select>
                                 </div>
-                                <div>
-                                  <label className="block text-[10px] font-medium text-muted-foreground mb-0.5">Số lượng (Cái)</label>
+                              </div>
+                              <div>
+                                <label className="text-[11px] font-medium text-muted-foreground mb-1 flex items-center gap-0.5">
+                                  Số lượng <span className="text-rose-500">*</span>
+                                </label>
+                                <div className="flex">
                                   <input
                                     type="number"
                                     value={op.soLuong}
                                     onChange={(e) => updateOutputProduct(op.key, { soLuong: e.target.value })}
                                     placeholder="0"
-                                    className="w-full h-7 px-2 rounded border border-border bg-white text-xs outline-none focus:border-green-400"
+                                    className="min-w-0 flex-1 h-8 px-2 rounded-l-lg border border-r-0 border-border bg-white text-xs outline-none focus:border-green-400"
                                   />
+                                  <select
+                                    value={op.donViSL}
+                                    onChange={(e) => updateOutputProduct(op.key, { donViSL: e.target.value })}
+                                    className="h-8 w-20 px-1 rounded-r-lg border border-border bg-muted/20 text-[11px] outline-none"
+                                  >
+                                    <option>Cái</option>
+                                    <option>Hộp</option>
+                                    <option>Túi</option>
+                                    <option>Thùng</option>
+                                    {selectedProduct?.unitName && !["Cái","Hộp","Túi","Thùng"].includes(selectedProduct.unitName) && (
+                                      <option>{selectedProduct.unitName}</option>
+                                    )}
+                                  </select>
                                 </div>
                               </div>
+                            </div>
 
-                              <div>
-                                <label className="block text-[10px] font-medium text-muted-foreground mb-0.5">
-                                  Lô thương phẩm
-                                  <span className="ml-1 text-[9px] bg-green-100 text-green-700 px-1 py-0.5 rounded">Tự động</span>
-                                </label>
-                                <input
-                                  value={op.loThuongPham}
-                                  readOnly
-                                  className="w-full h-7 px-2 rounded border border-border bg-muted/20 text-[11px] font-mono text-muted-foreground outline-none"
-                                  placeholder="Chọn sản phẩm để tạo mã lô"
-                                />
-                              </div>
+                            {/* Lô thương phẩm */}
+                            <div>
+                              <label className="text-[11px] font-medium text-muted-foreground mb-1 flex items-center gap-0.5">
+                                Lô thương phẩm <span className="text-rose-500">*</span>
+                              </label>
+                              <input
+                                value={op.loThuongPham}
+                                readOnly
+                                className="w-full h-8 px-2 rounded-lg border border-border bg-muted/20 text-[11px] font-mono text-muted-foreground outline-none"
+                                placeholder="Chọn sản phẩm để tạo mã lô"
+                              />
+                            </div>
 
-                              <div>
-                                <label className="block text-[10px] font-medium text-muted-foreground mb-0.5">Hạn sử dụng</label>
-                                <input
-                                  type="date"
-                                  value={op.hanSuDung}
-                                  onChange={(e) => updateOutputProduct(op.key, { hanSuDung: e.target.value })}
-                                  className="w-full h-7 px-2 rounded border border-border bg-white text-xs outline-none focus:border-green-400"
-                                />
-                              </div>
-                            </>
-                          )}
+                            {/* Xuất mã đơn lẻ */}
+                            <label className="flex items-center gap-2 cursor-pointer">
+                              <input
+                                type="checkbox"
+                                checked={op.xuatMaDonLe}
+                                onChange={(e) => updateOutputProduct(op.key, { xuatMaDonLe: e.target.checked })}
+                                className="w-4 h-4 accent-green-600 rounded"
+                              />
+                              <span className="text-[11px] font-medium text-foreground">Xuất mã đơn lẻ</span>
+                            </label>
+
+                            {/* Hạn sử dụng */}
+                            <div>
+                              <label className="text-[11px] font-medium text-muted-foreground mb-1 flex items-center gap-0.5">
+                                Hạn sử dụng <span className="text-rose-500">*</span>
+                              </label>
+                              <input
+                                type="date"
+                                value={op.hanSuDung}
+                                onChange={(e) => updateOutputProduct(op.key, { hanSuDung: e.target.value })}
+                                className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-green-400"
+                              />
+                            </div>
+                          </div>
                         </div>
                       );
                     })}
@@ -563,9 +724,9 @@ export default function TxngKhaiBaoCheBienPage() {
               <button
                 onClick={goToStep2}
                 disabled={!canProceed1}
-                className="h-9 px-6 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 disabled:opacity-50 transition flex items-center gap-2"
+                className="h-9 px-6 rounded-lg bg-green-600 text-white text-sm font-medium hover:bg-green-700 disabled:opacity-50 transition"
               >
-                Tiếp theo <ChevronRight className="w-4 h-4" />
+                Xác nhận khai báo
               </button>
             </div>
           </div>
