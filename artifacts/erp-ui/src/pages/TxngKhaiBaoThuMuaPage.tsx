@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -101,6 +101,17 @@ export default function TxngKhaiBaoThuMuaPage() {
   const [temAssigns, setTemAssigns] = useState<Map<string, TemAssign>>(new Map());
   const [confirmed, setConfirmed] = useState(false);
 
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
+
+  function handleImageChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (ev) => setImagePreview(ev.target?.result as string);
+    reader.readAsDataURL(file);
+  }
+
   const { data: facilitiesData } = useQuery({ queryKey: ["facilities"], queryFn: fetchFacilities });
   const { data: productsData } = useQuery({ queryKey: ["products"], queryFn: fetchProducts });
   const { data: ordersData } = useQuery({ queryKey: ["purchase-orders"], queryFn: fetchPurchaseOrders });
@@ -195,12 +206,33 @@ export default function TxngKhaiBaoThuMuaPage() {
               {/* Left panel */}
               <div className="w-56 shrink-0 space-y-3">
                 <div className="bg-white border border-border rounded-xl overflow-hidden">
-                  <div className="h-32 bg-gradient-to-br from-green-400 to-teal-600 flex items-center justify-center relative group cursor-pointer">
-                    <ImageIcon className="w-8 h-8 text-white/60" />
-                    <div className="absolute inset-0 bg-black/25 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <span className="text-white text-xs font-medium">Thay đổi hình ảnh</span>
+                  <div
+                    onClick={() => imageInputRef.current?.click()}
+                    className="h-32 flex items-center justify-center relative group cursor-pointer bg-gradient-to-br from-green-400 to-teal-600"
+                  >
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview}
+                        alt="Hình ảnh khai báo"
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <ImageIcon className="w-8 h-8 text-white/60" />
+                    )}
+                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
+                      <ImageIcon className="w-5 h-5 text-white" />
+                      <span className="text-white text-xs font-medium">
+                        {imagePreview ? "Đổi ảnh" : "Tải ảnh lên"}
+                      </span>
                     </div>
                   </div>
+                  <input
+                    ref={imageInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
                 </div>
 
                 <div className="bg-white border border-border rounded-xl p-3.5 space-y-3">
