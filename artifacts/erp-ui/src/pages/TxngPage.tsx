@@ -6,6 +6,7 @@ import {
   CalendarClock, Sprout, ClipboardList, MapPin, Search,
   Tag, FileBarChart, History, Users, Factory,
   CheckCircle2, ArrowRight, Clock, AlertCircle,
+  ShoppingCart, FlaskConical, PackageCheck,
 } from "lucide-react";
 
 /* ── Stat card ─────────────────────────────────────────── */
@@ -121,6 +122,24 @@ export default function TxngPage() {
         <section className="space-y-5">
           <SectionLabel>Chức năng hệ thống</SectionLabel>
 
+          <SectionGroup title="Khai báo truy xuất">
+            <ShortcutCard
+              icon={ShoppingCart} label="Thu mua nguyên liệu" desc="Khai báo lô thu mua, tạo tem QR"
+              href="/module/txng/khai-bao/thu-mua" color="bg-green-50 text-green-700 border-green-200"
+              onClick={() => go("/module/txng/khai-bao/thu-mua")}
+            />
+            <ShortcutCard
+              icon={FlaskConical} label="Chế biến sản xuất" desc="Khai báo lô chế biến, đầu vào/đầu ra"
+              href="/module/txng/khai-bao/che-bien" color="bg-amber-50 text-amber-700 border-amber-200"
+              onClick={() => go("/module/txng/khai-bao/che-bien")}
+            />
+            <ShortcutCard
+              icon={PackageCheck} label="Đóng gói – Niêm phong" desc="Sắp ra mắt"
+              href="/module/txng/khai-bao" color="bg-blue-50 text-blue-400 border-blue-100"
+              onClick={() => {}}
+            />
+          </SectionGroup>
+
           <SectionGroup title="Quản trị doanh nghiệp">
             <ShortcutCard
               icon={Users} label="Quản lý nhân viên" desc="Nhân viên và phân quyền TXNG"
@@ -152,14 +171,6 @@ export default function TxngPage() {
               icon={Package} label="Thương phẩm" desc="Sản phẩm và thông tin truy xuất"
               href="/module/txng/thuong-pham" color="bg-emerald-50 text-emerald-700 border-emerald-200"
               onClick={() => go("/module/txng/thuong-pham")}
-            />
-          </SectionGroup>
-
-          <SectionGroup title="Khai báo truy xuất">
-            <ShortcutCard
-              icon={ScanLine} label="Khai báo sự kiện" desc="Thu mua, Chế biến, Đóng gói"
-              href="/module/txng/khai-bao" color="bg-blue-50 text-blue-700 border-blue-200"
-              onClick={() => go("/module/txng/khai-bao")}
             />
           </SectionGroup>
 
