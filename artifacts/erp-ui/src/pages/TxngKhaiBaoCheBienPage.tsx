@@ -7,7 +7,7 @@ import QRCode from "qrcode";
 import {
   Factory, ArrowLeft, ChevronRight, Check, ImageIcon,
   QrCode, Download, Printer, ChevronDown, X, Info,
-  CheckCircle2, Plus, Trash2, Package,
+  CheckCircle2, Plus, Trash2, Package, RefreshCw,
 } from "lucide-react";
 import { fetchFacilities, fetchProducts, type Facility, type Product } from "@/lib/api";
 
@@ -650,62 +650,138 @@ export default function TxngKhaiBaoCheBienPage() {
               <p className="text-[13px] text-muted-foreground mt-0.5">Gán lô tem và dải seri cho từng lô thương phẩm đầu ra.</p>
             </div>
 
-            <div className="border border-green-200 bg-green-50 rounded-xl p-4 flex gap-3">
-              <Info className="w-4 h-4 text-green-700 shrink-0 mt-0.5" />
-              <p className="text-[13px] text-green-800 leading-relaxed">
-                Kích hoạt tem giúp liên kết lô thương phẩm sau chế biến với tem vật lý. Sau khi xác nhận, người tiêu dùng có thể quét tem để truy xuất toàn bộ chuỗi cung ứng.
+            <div className="border border-green-200 bg-green-50 rounded-xl p-4">
+              <p className="text-[11px] font-bold text-green-700 mb-2 flex items-center gap-1.5">
+                <Info className="w-3.5 h-3.5" /> CHÚ Ý:
               </p>
+              <ul className="text-[12px] text-green-800 space-y-1 list-disc pl-4 leading-relaxed">
+                <li>Lô không có mã đơn lẻ: Nhập dải số vào ô Seri đầu → Seri cuối.</li>
+                <li>Lô có mã đơn lẻ: Nhập Seri đầu ở Lô cha và bấm <strong>"Phân bổ tự động"</strong> <RefreshCw className="w-3 h-3 inline-block align-middle mx-0.5" /> để cấp tem cho các mã đơn lẻ.</li>
+                <li>Chọn "Gán tem lô": hệ thống sẽ cấp tem đầu tiên của dải tem đã chọn cho Lô cha, các số tiếp theo sẽ cấp tuần tự cho Mã đơn lẻ.</li>
+                <li>Không gán tem đã kích hoạt cho Lô và Mã đơn lẻ.</li>
+              </ul>
             </div>
 
             <div className="bg-white border border-border rounded-xl overflow-hidden">
               <div className="overflow-x-auto">
-                <table className="w-full text-sm min-w-[860px]">
+                <table className="w-full text-sm min-w-[1060px]">
                   <thead>
                     <tr className="border-b border-border bg-muted/30">
+                      <th className="px-3 py-3 w-8"></th>
                       <th className="px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground w-8">#</th>
                       <th className="px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground">Tên lô (BATCH)</th>
                       <th className="px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground">Thương phẩm</th>
                       <th className="px-3 py-3 text-right text-[11px] font-semibold text-muted-foreground w-24">Số lượng</th>
-                      <th className="px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground w-36">Lô tem</th>
-                      <th className="px-3 py-3 text-right text-[11px] font-semibold text-muted-foreground w-28">Tem đã kích hoạt</th>
-                      <th className="px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground w-24">Seri đầu</th>
-                      <th className="px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground w-24">Seri cuối</th>
-                      <th className="px-3 py-3 text-center text-[11px] font-semibold text-muted-foreground w-24">Gán tem lô</th>
+                      <th className="px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground w-36">Lô tem <span className="text-rose-500">*</span></th>
+                      <th className="px-3 py-3 text-center text-[11px] font-semibold text-muted-foreground w-32">Tem đã kích hoạt</th>
+                      <th className="px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground w-32">Seri đầu <span className="text-rose-500">*</span></th>
+                      <th className="px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground w-24">Seri cuối <span className="text-rose-500">*</span></th>
+                      <th className="px-3 py-3 text-center text-[11px] font-semibold text-muted-foreground w-20">Đơn vị con</th>
+                      <th className="px-3 py-3 text-center text-[11px] font-semibold text-muted-foreground w-20">Gán tem lô</th>
                     </tr>
                   </thead>
                   <tbody>
                     {lots.map((lot, idx) => {
                       const assign = temAssigns.get(lot.id) || { loTem: "", seriDau: "1", seriCuoi: String(lot.soLuong), ganTemLo: false };
+                      const isExp = expandedLots.has(lot.id);
+                      const sD = parseInt(assign.seriDau) || 0;
+                      const sC = parseInt(assign.seriCuoi) || 0;
+                      const dvCon = assign.loTem && sD > 0 && sC >= sD ? `${sC - sD + 1}/${lot.soLuong}` : "—";
                       return (
-                        <tr key={lot.id} className="border-b border-border last:border-0 hover:bg-muted/10 transition">
-                          <td className="px-3 py-3 text-[12px] text-muted-foreground">{idx + 1}</td>
-                          <td className="px-3 py-3 font-mono text-[12px] font-semibold text-amber-700">{lot.maLo}</td>
-                          <td className="px-3 py-3 text-[12px]">{lot.tenThuongPham}</td>
-                          <td className="px-3 py-3 text-[12px] text-right">{lot.soLuong.toLocaleString()}</td>
-                          <td className="px-3 py-3">
-                            <select
-                              value={assign.loTem}
-                              onChange={(e) => updateTemAssign(lot.id, { loTem: e.target.value })}
-                              className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-amber-400"
-                            >
-                              <option value="">— Chọn lô tem —</option>
-                              {LOT_TEM_OPTIONS.map((o) => <option key={o}>{o}</option>)}
-                            </select>
-                          </td>
-                          <td className="px-3 py-3 text-[12px] text-right text-muted-foreground">{assign.loTem ? "0" : "—"}</td>
-                          <td className="px-3 py-3">
-                            <input type="number" value={assign.seriDau} onChange={(e) => updateTemAssign(lot.id, { seriDau: e.target.value })}
-                              className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-amber-400" />
-                          </td>
-                          <td className="px-3 py-3">
-                            <input type="number" value={assign.seriCuoi} onChange={(e) => updateTemAssign(lot.id, { seriCuoi: e.target.value })}
-                              className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-amber-400" />
-                          </td>
-                          <td className="px-3 py-3 flex justify-center mt-1">
-                            <input type="checkbox" checked={assign.ganTemLo} onChange={(e) => updateTemAssign(lot.id, { ganTemLo: e.target.checked })}
-                              className="w-4 h-4 accent-amber-500" />
-                          </td>
-                        </tr>
+                        <>
+                          <tr key={lot.id} className="border-b border-border hover:bg-muted/10 transition">
+                            <td className="px-3 py-3 w-8">
+                              {lot.serials.length > 0 && (
+                                <button onClick={() => toggleExpand(lot.id)} className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground">
+                                  {isExp ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                                </button>
+                              )}
+                            </td>
+                            <td className="px-3 py-3 text-[12px] text-muted-foreground">{idx + 1}</td>
+                            <td className="px-3 py-3 max-w-[130px]">
+                              <span title={lot.maLo} className="block truncate font-mono text-[12px] font-semibold text-amber-700">{lot.maLo}</span>
+                            </td>
+                            <td className="px-3 py-3 max-w-[130px]">
+                              <span title={lot.tenThuongPham} className="block truncate text-[12px]">{lot.tenThuongPham}</span>
+                            </td>
+                            <td className="px-3 py-3 text-[12px] text-right">
+                              {lot.soLuong.toLocaleString()}
+                            </td>
+                            <td className="px-3 py-3">
+                              <select
+                                value={assign.loTem}
+                                onChange={(e) => updateTemAssign(lot.id, { loTem: e.target.value })}
+                                className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                              >
+                                <option value="">— Chọn lô tem —</option>
+                                {LOT_TEM_OPTIONS.map((o) => <option key={o}>{o}</option>)}
+                              </select>
+                            </td>
+                            <td className="px-3 py-3 text-center">
+                              {assign.loTem ? (
+                                <button className="text-[11px] text-amber-600 hover:underline whitespace-nowrap">DS tem đã kích hoạt</button>
+                              ) : (
+                                <span className="text-[12px] text-muted-foreground">—</span>
+                              )}
+                            </td>
+                            <td className="px-3 py-3">
+                              <div className="flex gap-1 items-center">
+                                <input
+                                  type="number"
+                                  value={assign.seriDau}
+                                  onChange={(e) => updateTemAssign(lot.id, { seriDau: e.target.value })}
+                                  className="min-w-0 flex-1 h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                                />
+                                <button
+                                  onClick={() => updateTemAssign(lot.id, { seriCuoi: String(Number(assign.seriDau) + lot.soLuong - 1) })}
+                                  title="Phân bổ tự động"
+                                  className="w-7 h-8 shrink-0 flex items-center justify-center rounded-lg border border-border bg-white text-muted-foreground hover:bg-amber-50 hover:text-amber-600 transition"
+                                >
+                                  <RefreshCw className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
+                            </td>
+                            <td className="px-3 py-3">
+                              <input
+                                type="number"
+                                value={assign.seriCuoi}
+                                onChange={(e) => updateTemAssign(lot.id, { seriCuoi: e.target.value })}
+                                className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                              />
+                            </td>
+                            <td className="px-3 py-3 text-center text-[12px] font-medium text-muted-foreground">
+                              {dvCon}
+                            </td>
+                            <td className="px-3 py-3 text-center">
+                              <input
+                                type="checkbox"
+                                checked={assign.ganTemLo}
+                                onChange={(e) => updateTemAssign(lot.id, { ganTemLo: e.target.checked })}
+                                className="w-4 h-4 accent-amber-500"
+                              />
+                            </td>
+                          </tr>
+                          {isExp && lot.serials.slice(0, 30).map((serial, si) => (
+                            <tr key={serial} className="border-b border-border bg-amber-50/30 hover:bg-amber-50/50 transition">
+                              <td className="pl-7 py-2" colSpan={2}>
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
+                              </td>
+                              <td className="px-3 py-2" colSpan={2}>
+                                <span className="font-mono text-[11px] text-amber-600">{serial}</span>
+                                <span className="ml-2 text-[11px] text-muted-foreground">{idx + 1}.{si + 1}</span>
+                              </td>
+                              <td className="px-3 py-2 text-[11px] text-right text-muted-foreground">1</td>
+                              <td colSpan={6} />
+                            </tr>
+                          ))}
+                          {isExp && lot.serials.length > 30 && (
+                            <tr className="bg-amber-50/20">
+                              <td colSpan={11} className="px-7 py-2 text-[11px] text-muted-foreground italic">
+                                ...và {lot.serials.length - 30} serial khác
+                              </td>
+                            </tr>
+                          )}
+                        </>
                       );
                     })}
                   </tbody>
