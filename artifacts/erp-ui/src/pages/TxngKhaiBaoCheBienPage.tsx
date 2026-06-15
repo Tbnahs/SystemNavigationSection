@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLocation } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/contexts/AuthContext";
@@ -93,17 +93,17 @@ function Stepper({ step }: { step: 1 | 2 | 3 }) {
           <div
             key={n}
             className={`flex-1 flex items-center gap-2.5 px-4 py-3 border-b-2 transition-colors ${
-              isActive ? "border-amber-500 bg-amber-50/60" : isDone ? "border-green-500 bg-green-50/30" : "border-transparent"
+              isActive ? "border-green-600 bg-green-50/60" : isDone ? "border-green-500 bg-green-50/30" : "border-transparent"
             } ${n < 3 ? "border-r border-r-border" : ""}`}
           >
             <span
               className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${
-                isActive ? "bg-amber-500 text-white" : isDone ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"
+                isActive ? "bg-green-600 text-white" : isDone ? "bg-green-500 text-white" : "bg-muted text-muted-foreground"
               }`}
             >
               {isDone ? <Check className="w-3.5 h-3.5" /> : n}
             </span>
-            <span className={`text-[13px] font-medium ${isActive ? "text-amber-700" : isDone ? "text-green-700" : "text-muted-foreground"}`}>
+            <span className={`text-[13px] font-medium ${isActive ? "text-green-700" : isDone ? "text-green-700" : "text-muted-foreground"}`}>
               {label}
             </span>
           </div>
@@ -359,7 +359,7 @@ export default function TxngKhaiBaoCheBienPage() {
         </div>
 
         <h1 className="text-lg font-bold flex items-center gap-2">
-          <Factory className="w-5 h-5 text-amber-600" />
+          <Factory className="w-5 h-5 text-green-600" />
           Khai báo chế biến
         </h1>
 
@@ -823,8 +823,8 @@ export default function TxngKhaiBaoCheBienPage() {
                   {lots.map((lot, idx) => {
                     const isExp = expandedLots.has(lot.id);
                     return (
-                      <>
-                        <tr key={lot.id} className="border-b border-border hover:bg-muted/20 transition">
+                      <React.Fragment key={lot.id}>
+                        <tr className="border-b border-border hover:bg-muted/20 transition">
                           <td className="px-3 py-3">
                             {lot.serials.length > 0 && (
                               <button onClick={() => toggleExpand(lot.id)} className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground">
@@ -833,12 +833,12 @@ export default function TxngKhaiBaoCheBienPage() {
                             )}
                           </td>
                           <td className="px-3 py-3 text-[13px] text-muted-foreground">{idx + 1}</td>
-                          <td className="px-3 py-3 font-mono text-[13px] font-semibold text-amber-700">{lot.maLo}</td>
+                          <td className="px-3 py-3 font-mono text-[13px] font-semibold text-green-700">{lot.maLo}</td>
                           <td className="px-3 py-3 text-[13px]">{lot.tenThuongPham}</td>
                           <td className="px-3 py-3 text-[13px] text-right font-medium">{lot.soLuong.toLocaleString()}</td>
                           <td className="px-3 py-3">
                             <div className="flex items-center justify-center gap-1">
-                              <button onClick={() => { setQrLot(lot); setQrSerial(null); }} title="Xem QR" className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-amber-50 hover:text-amber-600 transition">
+                              <button onClick={() => { setQrLot(lot); setQrSerial(null); }} title="Xem QR" className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-green-50 hover:text-green-600 transition">
                                 <QrCode className="w-4 h-4" />
                               </button>
                               <button title="Tải xuống" className="w-7 h-7 rounded-lg flex items-center justify-center text-muted-foreground hover:bg-muted transition">
@@ -850,7 +850,7 @@ export default function TxngKhaiBaoCheBienPage() {
                             </div>
                           </td>
                         </tr>
-                      </>
+                      </React.Fragment>
                     );
                   })}
                 </tbody>
@@ -914,8 +914,8 @@ export default function TxngKhaiBaoCheBienPage() {
                       const sC = parseInt(assign.seriCuoi) || 0;
                       const dvCon = assign.loTem && sD > 0 && sC >= sD ? `${sC - sD + 1}/${lot.soLuong}` : "—";
                       return (
-                        <>
-                          <tr key={lot.id} className="border-b border-border hover:bg-muted/10 transition">
+                        <React.Fragment key={lot.id}>
+                          <tr className="border-b border-border hover:bg-muted/10 transition">
                             <td className="px-3 py-3 w-8">
                               {lot.serials.length > 0 && (
                                 <button onClick={() => toggleExpand(lot.id)} className="w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground">
@@ -925,7 +925,7 @@ export default function TxngKhaiBaoCheBienPage() {
                             </td>
                             <td className="px-3 py-3 text-[12px] text-muted-foreground">{idx + 1}</td>
                             <td className="px-3 py-3 max-w-[130px]">
-                              <span title={lot.maLo} className="block truncate font-mono text-[12px] font-semibold text-amber-700">{lot.maLo}</span>
+                              <span title={lot.maLo} className="block truncate font-mono text-[12px] font-semibold text-green-700">{lot.maLo}</span>
                             </td>
                             <td className="px-3 py-3 max-w-[130px]">
                               <span title={lot.tenThuongPham} className="block truncate text-[12px]">{lot.tenThuongPham}</span>
@@ -937,7 +937,7 @@ export default function TxngKhaiBaoCheBienPage() {
                               <select
                                 value={assign.loTem}
                                 onChange={(e) => updateTemAssign(lot.id, { loTem: e.target.value })}
-                                className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                                className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-green-400"
                               >
                                 <option value="">— Chọn lô tem —</option>
                                 {LOT_TEM_OPTIONS.map((o) => <option key={o}>{o}</option>)}
@@ -946,14 +946,14 @@ export default function TxngKhaiBaoCheBienPage() {
                             <td className="px-3 py-3 text-center">
                               <div className="flex flex-col items-center gap-0.5">
                                 {assign.loTem ? (
-                                  <button className="text-[11px] text-amber-600 hover:underline whitespace-nowrap">DS tem đã kích hoạt</button>
+                                  <button className="text-[11px] text-green-600 hover:underline whitespace-nowrap">DS tem đã kích hoạt</button>
                                 ) : (
                                   <span className="text-[12px] text-muted-foreground">—</span>
                                 )}
                                 {lot.serials.length > 0 && (
                                   <button
                                     onClick={() => openTemModal(lot)}
-                                    className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-800 font-medium whitespace-nowrap border border-blue-200 rounded-md px-1.5 py-0.5 hover:bg-blue-50 transition"
+                                    className="flex items-center gap-1 text-[11px] text-green-600 hover:text-green-800 font-medium whitespace-nowrap border border-green-200 rounded-md px-1.5 py-0.5 hover:bg-green-50 transition"
                                   >
                                     <Tag className="w-3 h-3" />
                                     {countGanForLot(lot.id) > 0 ? `${countGanForLot(lot.id)}/${lot.serials.length} đã gán` : "Kích hoạt đơn lẻ"}
@@ -967,12 +967,12 @@ export default function TxngKhaiBaoCheBienPage() {
                                   type="number"
                                   value={assign.seriDau}
                                   onChange={(e) => updateTemAssign(lot.id, { seriDau: e.target.value })}
-                                  className="min-w-0 flex-1 h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                                  className="min-w-0 flex-1 h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-green-400"
                                 />
                                 <button
                                   onClick={() => updateTemAssign(lot.id, { seriCuoi: String(Number(assign.seriDau) + lot.soLuong - 1) })}
                                   title="Phân bổ tự động"
-                                  className="w-7 h-8 shrink-0 flex items-center justify-center rounded-lg border border-border bg-white text-muted-foreground hover:bg-amber-50 hover:text-amber-600 transition"
+                                  className="w-7 h-8 shrink-0 flex items-center justify-center rounded-lg border border-border bg-white text-muted-foreground hover:bg-green-50 hover:text-green-600 transition"
                                 >
                                   <RefreshCw className="w-3.5 h-3.5" />
                                 </button>
@@ -983,7 +983,7 @@ export default function TxngKhaiBaoCheBienPage() {
                                 type="number"
                                 value={assign.seriCuoi}
                                 onChange={(e) => updateTemAssign(lot.id, { seriCuoi: e.target.value })}
-                                className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                                className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-green-400"
                               />
                             </td>
                             <td className="px-3 py-3 text-center text-[12px] font-medium text-muted-foreground">
@@ -994,17 +994,17 @@ export default function TxngKhaiBaoCheBienPage() {
                                 type="checkbox"
                                 checked={assign.ganTemLo}
                                 onChange={(e) => updateTemAssign(lot.id, { ganTemLo: e.target.checked })}
-                                className="w-4 h-4 accent-amber-500"
+                                className="w-4 h-4 accent-green-600"
                               />
                             </td>
                           </tr>
                           {isExp && lot.serials.slice(0, 30).map((serial, si) => (
-                            <tr key={serial} className="border-b border-border bg-amber-50/30 hover:bg-amber-50/50 transition">
+                            <tr key={serial} className="border-b border-border bg-green-50/30 hover:bg-green-50/50 transition">
                               <td className="pl-7 py-2" colSpan={2}>
-                                <span className="w-1.5 h-1.5 rounded-full bg-amber-400 inline-block" />
+                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 inline-block" />
                               </td>
                               <td className="px-3 py-2" colSpan={2}>
-                                <span className="font-mono text-[11px] text-amber-600">{serial}</span>
+                                <span className="font-mono text-[11px] text-green-600">{serial}</span>
                                 <span className="ml-2 text-[11px] text-muted-foreground">{idx + 1}.{si + 1}</span>
                               </td>
                               <td className="px-3 py-2 text-[11px] text-right text-muted-foreground">1</td>
@@ -1012,13 +1012,13 @@ export default function TxngKhaiBaoCheBienPage() {
                             </tr>
                           ))}
                           {isExp && lot.serials.length > 30 && (
-                            <tr className="bg-amber-50/20">
+                            <tr className="bg-green-50/20">
                               <td colSpan={11} className="px-7 py-2 text-[11px] text-muted-foreground italic">
                                 ...và {lot.serials.length - 30} serial khác
                               </td>
                             </tr>
                           )}
-                        </>
+                        </React.Fragment>
                       );
                     })}
                   </tbody>
@@ -1098,13 +1098,13 @@ export default function TxngKhaiBaoCheBienPage() {
                     <select
                       value={modalLotLoTem}
                       onChange={(e) => setModalLotLoTem(e.target.value)}
-                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-green-400"
                     >
                       <option value="">— Chọn lô tem —</option>
                       {LOT_TEM_OPTIONS.map((o) => <option key={o} value={o}>{o} (còn 1.980)</option>)}
                     </select>
                     {modalLotLoTem && (
-                      <button className="text-[11px] text-amber-600 hover:underline mt-0.5 block">DS tem đã kích hoạt</button>
+                      <button className="text-[11px] text-green-600 hover:underline mt-0.5 block">DS tem đã kích hoạt</button>
                     )}
                   </div>
                   <div className="w-40">
@@ -1115,12 +1115,12 @@ export default function TxngKhaiBaoCheBienPage() {
                         value={modalLotSeriDau}
                         onChange={(e) => setModalLotSeriDau(e.target.value)}
                         placeholder="Nhập số..."
-                        className="min-w-0 flex-1 h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                        className="min-w-0 flex-1 h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-green-400"
                       />
                       <button
                         onClick={handleAutoDistribute}
                         title="Phân bổ tự động"
-                        className="w-8 h-8 shrink-0 flex items-center justify-center rounded-lg border border-border bg-white text-muted-foreground hover:bg-amber-50 hover:text-amber-600 transition"
+                        className="w-8 h-8 shrink-0 flex items-center justify-center rounded-lg border border-border bg-white text-muted-foreground hover:bg-green-50 hover:text-green-600 transition"
                       >
                         <RefreshCw className="w-3.5 h-3.5" />
                       </button>
@@ -1136,7 +1136,7 @@ export default function TxngKhaiBaoCheBienPage() {
                     />
                   </div>
                   <label className="flex items-center gap-1.5 cursor-pointer h-8">
-                    <input type="checkbox" checked={modalGanTemLo} onChange={(e) => setModalGanTemLo(e.target.checked)} className="w-4 h-4 accent-amber-500" />
+                    <input type="checkbox" checked={modalGanTemLo} onChange={(e) => setModalGanTemLo(e.target.checked)} className="w-4 h-4 accent-green-600" />
                     <span className="text-[12px] font-medium">Gán tem lô</span>
                   </label>
                 </div>
@@ -1201,7 +1201,7 @@ export default function TxngKhaiBaoCheBienPage() {
                                   value={assign.seriDau}
                                   onChange={(e) => updateSerialTem(serial, { seriDau: e.target.value, loTem: assign.loTem || modalLotLoTem })}
                                   placeholder="Nhập số..."
-                                  className="w-full h-7 px-2 rounded border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                                  className="w-full h-7 px-2 rounded border border-border bg-white text-[12px] outline-none focus:border-green-400"
                                 />
                               </td>
                               <td className="px-4 py-2.5">
@@ -1210,12 +1210,12 @@ export default function TxngKhaiBaoCheBienPage() {
                                   value={assign.seriCuoi}
                                   onChange={(e) => updateSerialTem(serial, { seriCuoi: e.target.value, loTem: assign.loTem || modalLotLoTem })}
                                   placeholder="Nhập số..."
-                                  className="w-full h-7 px-2 rounded border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                                  className="w-full h-7 px-2 rounded border border-border bg-white text-[12px] outline-none focus:border-green-400"
                                 />
                               </td>
                               <td className="px-4 py-2.5">
                                 {assign.trangThai === "tu-dong" && <span className="text-[11px] font-semibold text-emerald-600">Tự động</span>}
-                                {assign.trangThai === "thu-cong" && <span className="text-[11px] font-semibold text-amber-600">Gán thủ công</span>}
+                                {assign.trangThai === "thu-cong" && <span className="text-[11px] font-semibold text-orange-500">Gán thủ công</span>}
                                 {assign.trangThai === "chua-gan" && <span className="text-[11px] text-muted-foreground">Chưa gán</span>}
                               </td>
                             </tr>
