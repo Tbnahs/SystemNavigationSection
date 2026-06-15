@@ -301,48 +301,43 @@ export default function TxngKhaiBaoThuMuaPage() {
         {/* ═══════════════════════════════ STEP 1 ═══════════════════════════════ */}
         {step === 1 && (
           <div className="space-y-4">
-            <div className="flex gap-4 items-start">
-              {/* Left panel */}
-              <div className="w-56 shrink-0 space-y-3">
-                <div className="bg-white border border-border rounded-xl overflow-hidden">
-                  <div
-                    onClick={() => imageInputRef.current?.click()}
-                    className="h-32 flex items-center justify-center relative group cursor-pointer bg-gradient-to-br from-green-400 to-teal-600"
-                  >
-                    {imagePreview ? (
-                      <img
-                        src={imagePreview}
-                        alt="Hình ảnh khai báo"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <ImageIcon className="w-8 h-8 text-white/60" />
-                    )}
-                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-1">
-                      <ImageIcon className="w-5 h-5 text-white" />
-                      <span className="text-white text-xs font-medium">
-                        {imagePreview ? "Đổi ảnh" : "Tải ảnh lên"}
-                      </span>
-                    </div>
-                  </div>
-                  <input
-                    ref={imageInputRef}
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageChange}
-                    className="hidden"
-                  />
+            {/* ── ROW 1: Thông tin chung ── */}
+            <div className="bg-white border border-border rounded-xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-border flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
+                  <ShoppingCart className="w-4 h-4 text-blue-700" />
                 </div>
+                <p className="text-[13px] font-bold">Thông tin chung</p>
+              </div>
+              <div className="p-5 flex gap-5 items-start">
+                {/* Image */}
+                <div
+                  className="w-28 h-28 shrink-0 rounded-xl overflow-hidden border border-border cursor-pointer group relative"
+                  onClick={() => imageInputRef.current?.click()}
+                >
+                  {imagePreview ? (
+                    <img src={imagePreview} className="w-full h-full object-cover" alt="Hình ảnh khai báo" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-blue-400 to-teal-500 flex items-center justify-center">
+                      <ImageIcon className="w-8 h-8 text-white/50" />
+                    </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl">
+                    <span className="text-white text-[10px] font-medium text-center px-1">Thay đổi<br/>hình ảnh</span>
+                  </div>
+                </div>
+                <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
 
-                <div className="bg-white border border-border rounded-xl p-3.5 space-y-3">
-                  <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">Thông tin chung</p>
-
+                {/* Fields grid */}
+                <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-3">
                   <div>
-                    <label className="block text-[11px] font-medium text-muted-foreground mb-1">Cơ sở</label>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 flex items-center gap-0.5 block">
+                      Cơ sở <span className="text-rose-500">*</span>
+                    </label>
                     <select
                       value={coSoId}
                       onChange={(e) => setCoSoId(e.target.value)}
-                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-blue-400"
+                      className="w-full h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-blue-400"
                     >
                       <option value="">— Chọn cơ sở —</option>
                       {facilities.map((f) => (
@@ -352,39 +347,50 @@ export default function TxngKhaiBaoThuMuaPage() {
                   </div>
 
                   <div>
-                    <label className="block text-[11px] font-medium text-muted-foreground mb-1">Địa chỉ</label>
-                    <input
-                      value={diaChi}
-                      onChange={(e) => setDiaChi(e.target.value)}
-                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-blue-400"
-                      placeholder="Tự động từ cơ sở"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-medium text-muted-foreground mb-1">Người thực hiện</label>
-                    <input
-                      value={nguoiThucHien}
-                      onChange={(e) => setNguoiThucHien(e.target.value)}
-                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-blue-400"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-[11px] font-medium text-muted-foreground mb-1">Thời gian thu mua</label>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 flex items-center gap-0.5 block">
+                      Thời gian thu mua <span className="text-rose-500">*</span>
+                    </label>
                     <input
                       type="date"
                       value={ngayThuMua}
                       onChange={(e) => setNgayThuMua(e.target.value)}
-                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-blue-400"
+                      className="w-full h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-blue-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Người thực hiện</label>
+                    <input
+                      value={nguoiThucHien}
+                      onChange={(e) => setNguoiThucHien(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-blue-400"
+                      placeholder="Tự fill theo tên tài khoản"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Địa chỉ</label>
+                    <input
+                      value={diaChi}
+                      onChange={(e) => setDiaChi(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-blue-400"
+                      placeholder="Tự điền theo cơ sở đã chọn"
+                      readOnly={!!coSoId}
                     />
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* Main form */}
-              <div className="flex-1 bg-white border border-border rounded-xl p-5 space-y-4">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/60">Thông tin thu mua</p>
+            {/* ── ROW 2: Thông tin thu mua ── */}
+            <div className="bg-white border border-border rounded-xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-border flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-blue-100 flex items-center justify-center shrink-0">
+                  <Package className="w-4 h-4 text-blue-700" />
+                </div>
+                <p className="text-[13px] font-bold">Thông tin thu mua</p>
+              </div>
+              <div className="p-5 space-y-4">
 
                 <div>
                   <label className="block text-[12px] font-medium text-muted-foreground mb-1">Đơn thu mua</label>
