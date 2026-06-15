@@ -9,8 +9,8 @@ import {
   QrCode, Download, Printer, ChevronDown, X, Info, CheckCircle2, Tag,
 } from "lucide-react";
 import {
-  fetchFacilities, fetchProducts, fetchPurchaseOrders,
-  type Facility, type Product, type PurchaseOrder,
+  fetchFacilities, fetchProducts, fetchPurchaseOrders, fetchUnits,
+  type Facility, type Product, type PurchaseOrder, type Unit,
 } from "@/lib/api";
 
 function todayStr() {
@@ -101,6 +101,9 @@ export default function TxngKhaiBaoThuMuaPage() {
   const [temAssigns, setTemAssigns] = useState<Map<string, TemAssign>>(new Map());
   const [confirmed, setConfirmed] = useState(false);
 
+  const [donViKL, setDonViKL] = useState("");
+  const [donViSL, setDonViSL] = useState("");
+
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const imageInputRef = useRef<HTMLInputElement>(null);
 
@@ -145,6 +148,8 @@ export default function TxngKhaiBaoThuMuaPage() {
   const { data: facilitiesData } = useQuery({ queryKey: ["facilities"], queryFn: fetchFacilities });
   const { data: productsData } = useQuery({ queryKey: ["products"], queryFn: fetchProducts });
   const { data: ordersData } = useQuery({ queryKey: ["purchase-orders"], queryFn: fetchPurchaseOrders });
+  const { data: unitsData } = useQuery({ queryKey: ["units"], queryFn: fetchUnits });
+  const units: Unit[] = unitsData?.items ?? [];
 
   const facilities = (facilitiesData as { items: Facility[] } | undefined)?.items ?? [];
   const products = (productsData as { items: Product[] } | undefined)?.items ?? [];
@@ -395,7 +400,16 @@ export default function TxngKhaiBaoThuMuaPage() {
                         className="min-w-0 flex-1 h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-blue-400"
                         placeholder="0"
                       />
-                      <span className="h-9 px-3 flex items-center text-sm text-muted-foreground bg-muted/50 rounded-lg border border-border shrink-0">Kg</span>
+                      <select
+                        value={donViKL}
+                        onChange={(e) => setDonViKL(e.target.value)}
+                        className="h-9 px-2 rounded-lg border border-border bg-white text-sm text-muted-foreground outline-none focus:border-blue-400 shrink-0"
+                      >
+                        <option value="">—</option>
+                        {units.map((u) => (
+                          <option key={u.id} value={u.abbreviation}>{u.abbreviation}</option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                   <div className="min-w-0">
@@ -408,7 +422,16 @@ export default function TxngKhaiBaoThuMuaPage() {
                         className="min-w-0 flex-1 h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-blue-400"
                         placeholder="0"
                       />
-                      <span className="h-9 px-3 flex items-center text-sm text-muted-foreground bg-muted/50 rounded-lg border border-border shrink-0">Cái</span>
+                      <select
+                        value={donViSL}
+                        onChange={(e) => setDonViSL(e.target.value)}
+                        className="h-9 px-2 rounded-lg border border-border bg-white text-sm text-muted-foreground outline-none focus:border-blue-400 shrink-0"
+                      >
+                        <option value="">—</option>
+                        {units.map((u) => (
+                          <option key={u.id} value={u.abbreviation}>{u.abbreviation}</option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
