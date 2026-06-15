@@ -368,29 +368,35 @@ export default function TxngKhaiBaoCheBienPage() {
         {/* ═══════════════════════════════ STEP 1 ═══════════════════════════════ */}
         {step === 1 && (
           <div className="space-y-4">
-            <div className="flex gap-4 items-start">
-              {/* ── LEFT: Image + Info ── */}
-              <div className="w-56 shrink-0 space-y-3">
+            {/* ── ROW 1: Thông tin chế biến ── */}
+            <div className="bg-white border border-border rounded-xl overflow-hidden">
+              <div className="px-5 py-3 border-b border-border flex items-center gap-2.5">
+                <div className="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
+                  <Factory className="w-4 h-4 text-green-700" />
+                </div>
+                <p className="text-[13px] font-bold">Thông tin chế biến</p>
+              </div>
+              <div className="p-5 flex gap-5 items-start">
+                {/* Image */}
                 <div
-                  className="bg-white border border-border rounded-xl overflow-hidden cursor-pointer group"
+                  className="w-28 h-28 shrink-0 rounded-xl overflow-hidden border border-border cursor-pointer group relative"
                   onClick={() => imageInputRef.current?.click()}
                 >
-                  <div className="relative h-36">
-                    {imageUrl ? (
-                      <img src={imageUrl} className="w-full h-full object-cover" alt="facility" />
-                    ) : (
-                      <div className="w-full h-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center">
-                        <ImageIcon className="w-10 h-10 text-white/50" />
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <span className="text-white text-[11px] font-medium">Thay đổi hình ảnh</span>
+                  {imageUrl ? (
+                    <img src={imageUrl} className="w-full h-full object-cover" alt="facility" />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center">
+                      <ImageIcon className="w-8 h-8 text-white/50" />
                     </div>
+                  )}
+                  <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-xl">
+                    <span className="text-white text-[10px] font-medium text-center px-1">Thay đổi<br/>hình ảnh</span>
                   </div>
                 </div>
                 <input ref={imageInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
 
-                <div className="bg-white border border-border rounded-xl p-3.5 space-y-3">
+                {/* Fields grid */}
+                <div className="flex-1 grid grid-cols-2 gap-x-6 gap-y-3">
                   <div>
                     <label className="text-[11px] font-medium text-muted-foreground mb-1 flex items-center gap-0.5 block">
                       Cơ sở <span className="text-rose-500">*</span>
@@ -398,34 +404,11 @@ export default function TxngKhaiBaoCheBienPage() {
                     <select
                       value={coSoId}
                       onChange={(e) => setCoSoId(e.target.value)}
-                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-green-400"
+                      className="w-full h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-green-400"
                     >
                       <option value="">— Chọn cơ sở —</option>
                       {facilities.map((f) => <option key={f.id} value={f.id}>{f.name}</option>)}
                     </select>
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Địa chỉ</label>
-                    <textarea
-                      value={diaChi}
-                      onChange={(e) => setDiaChi(e.target.value)}
-                      rows={2}
-                      className="w-full px-2 py-1.5 rounded-lg border border-border bg-white text-xs outline-none focus:border-green-400 resize-none"
-                      placeholder="<địa chỉ cụ thể, xã/phường, quận/huyện, tỉnh/thành phố>"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="text-[11px] font-medium text-muted-foreground mb-1 flex items-center gap-0.5 block">
-                      Người thực hiện <span className="text-rose-500">*</span>
-                    </label>
-                    <input
-                      value={nguoiThucHien}
-                      onChange={(e) => setNguoiThucHien(e.target.value)}
-                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-green-400"
-                      placeholder="Tự fill theo tên tài khoản"
-                    />
                   </div>
 
                   <div>
@@ -436,14 +419,40 @@ export default function TxngKhaiBaoCheBienPage() {
                       type="date"
                       value={ngayCheBien}
                       onChange={(e) => setNgayCheBien(e.target.value)}
-                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-xs outline-none focus:border-green-400"
+                      className="w-full h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-green-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 flex items-center gap-0.5 block">
+                      Người thực hiện <span className="text-rose-500">*</span>
+                    </label>
+                    <input
+                      value={nguoiThucHien}
+                      onChange={(e) => setNguoiThucHien(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-green-400"
+                      placeholder="Tự fill theo tên tài khoản"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-medium text-muted-foreground mb-1 block">Địa chỉ</label>
+                    <input
+                      value={diaChi}
+                      onChange={(e) => setDiaChi(e.target.value)}
+                      className="w-full h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-green-400"
+                      placeholder="Tự điền theo cơ sở đã chọn"
+                      readOnly={!!coSoId}
                     />
                   </div>
                 </div>
               </div>
+            </div>
 
-              {/* ── MIDDLE: ĐẦU VÀO ── */}
-              <div className="flex-1 bg-white border border-border rounded-xl overflow-hidden">
+            {/* ── ROW 2: ĐẦU VÀO + ĐẦU RA ── */}
+            <div className="grid grid-cols-2 gap-4 items-start">
+              {/* ── LEFT: ĐẦU VÀO ── */}
+              <div className="bg-white border border-border rounded-xl overflow-hidden">
                 <div className="px-4 py-3 border-b border-border flex items-center gap-2.5">
                   <div className="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
                     <Package className="w-4 h-4 text-green-700" />
@@ -593,7 +602,7 @@ export default function TxngKhaiBaoCheBienPage() {
               </div>
 
               {/* ── RIGHT: ĐẦU RA ── */}
-              <div className="flex-1 bg-white border border-border rounded-xl overflow-hidden">
+              <div className="bg-white border border-border rounded-xl overflow-hidden">
                 <div className="px-4 py-3 border-b border-border flex items-center gap-2.5">
                   <div className="w-7 h-7 rounded-lg bg-green-100 flex items-center justify-center shrink-0">
                     <Package className="w-4 h-4 text-green-700" />
