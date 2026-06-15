@@ -323,27 +323,27 @@ export default function TxngKhaiBaoThuMuaPage() {
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
-                  <div>
+                  <div className="min-w-0">
                     <label className="block text-[12px] font-medium text-muted-foreground mb-1">Khối lượng</label>
                     <div className="flex gap-2">
                       <input
                         type="number"
                         value={khoiLuong}
                         onChange={(e) => setKhoiLuong(e.target.value)}
-                        className="flex-1 h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-blue-400"
+                        className="min-w-0 flex-1 h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-blue-400"
                         placeholder="0"
                       />
                       <span className="h-9 px-3 flex items-center text-sm text-muted-foreground bg-muted/50 rounded-lg border border-border shrink-0">Kg</span>
                     </div>
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <label className="block text-[12px] font-medium text-muted-foreground mb-1">Số lượng</label>
                     <div className="flex gap-2">
                       <input
                         type="number"
                         value={soLuong}
                         onChange={(e) => setSoLuong(e.target.value)}
-                        className="flex-1 h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-blue-400"
+                        className="min-w-0 flex-1 h-9 px-3 rounded-lg border border-border bg-white text-sm outline-none focus:border-blue-400"
                         placeholder="0"
                       />
                       <span className="h-9 px-3 flex items-center text-sm text-muted-foreground bg-muted/50 rounded-lg border border-border shrink-0">Cái</span>
