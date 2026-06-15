@@ -1103,7 +1103,12 @@ export default function TxngKhaiBaoCheBienPage() {
                 </div>
                 <div className="flex-1 flex flex-wrap gap-3 items-end">
                   <div className="flex-1 min-w-[150px]">
-                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1 block">LÔ TEM *</label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">LÔ TEM *</label>
+                      {modalLotLoTem && (
+                        <button className="text-[11px] text-green-600 hover:underline">DS tem đã kích hoạt</button>
+                      )}
+                    </div>
                     <select
                       value={modalLotLoTem}
                       onChange={(e) => setModalLotLoTem(e.target.value)}
@@ -1112,9 +1117,6 @@ export default function TxngKhaiBaoCheBienPage() {
                       <option value="">— Chọn lô tem —</option>
                       {LOT_TEM_OPTIONS.map((o) => <option key={o} value={o}>{o} (còn 1.980)</option>)}
                     </select>
-                    {modalLotLoTem && (
-                      <button className="text-[11px] text-green-600 hover:underline mt-0.5 block">DS tem đã kích hoạt</button>
-                    )}
                   </div>
                   <div className="w-40">
                     <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1 block">SERI ĐẦU</label>
