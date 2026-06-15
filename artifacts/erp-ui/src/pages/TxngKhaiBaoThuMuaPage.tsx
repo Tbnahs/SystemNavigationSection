@@ -5,8 +5,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import AppLayout from "@/components/AppLayout";
 import QRCode from "qrcode";
 import {
-  ShoppingBasket, ArrowLeft, ChevronRight, Check, ImageIcon,
-  QrCode, Download, Printer, ChevronDown, X, Info, CheckCircle2, Tag, RefreshCw,
+  ShoppingBasket, ShoppingCart, ArrowLeft, ChevronRight, Check, ImageIcon,
+  QrCode, Download, Printer, ChevronDown, X, Info, CheckCircle2, Tag, RefreshCw, Package,
 } from "lucide-react";
 import {
   fetchFacilities, fetchProducts, fetchPurchaseOrders, fetchUnits,
