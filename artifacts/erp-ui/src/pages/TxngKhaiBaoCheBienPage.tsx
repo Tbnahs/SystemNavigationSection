@@ -450,7 +450,7 @@ export default function TxngKhaiBaoCheBienPage() {
             </div>
 
             {/* ── ROW 2: ĐẦU VÀO + ĐẦU RA ── */}
-            <div className="grid grid-cols-2 gap-4 items-start">
+            <div className="grid grid-cols-2 gap-4">
               {/* ── LEFT: ĐẦU VÀO ── */}
               <div className="bg-white border border-border rounded-xl overflow-hidden">
                 <div className="px-4 py-3 border-b border-border flex items-center gap-2.5">
