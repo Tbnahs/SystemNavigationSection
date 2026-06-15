@@ -144,6 +144,9 @@ export type TranslationKey =
   | "nav.div.truy-xuat"
   | "nav.div.quan-ly-tem"
   | "nav.div.thiet-bi-iot"
+  | "nav.div.khai-bao-tx"
+  | "nav.txng.kb-thu-mua"
+  | "nav.txng.kb-che-bien"
   | "nav.txng.staff"
   | "nav.txng.chung-chi-dn"
   | "nav.txng.chung-chi-tp"
@@ -414,6 +417,9 @@ const vi: Translations = {
   "nav.div.truy-xuat": "Truy xuất",
   "nav.div.quan-ly-tem": "Quản lý tem",
   "nav.div.thiet-bi-iot": "Thiết bị IoT",
+  "nav.div.khai-bao-tx": "Khai báo truy xuất",
+  "nav.txng.kb-thu-mua": "Thu mua nguyên liệu",
+  "nav.txng.kb-che-bien": "Chế biến sản xuất",
   "nav.txng.staff": "Nhân viên",
   "nav.txng.chung-chi-dn": "Chứng chỉ doanh nghiệp",
   "nav.txng.chung-chi-tp": "Chứng chỉ thương phẩm",
@@ -729,6 +735,9 @@ const en: Translations = {
   "nav.div.truy-xuat": "Traceability",
   "nav.div.quan-ly-tem": "Label Management",
   "nav.div.thiet-bi-iot": "IoT Devices",
+  "nav.div.khai-bao-tx": "Traceability Declaration",
+  "nav.txng.kb-thu-mua": "Raw Material Procurement",
+  "nav.txng.kb-che-bien": "Processing & Production",
   "nav.txng.staff": "Staff",
   "nav.txng.chung-chi-dn": "Enterprise Certs",
   "nav.txng.chung-chi-tp": "Product Certs",
@@ -1044,6 +1053,9 @@ const ko: Translations = {
   "nav.div.truy-xuat": "추적",
   "nav.div.quan-ly-tem": "라벨 관리",
   "nav.div.thiet-bi-iot": "IoT 장치",
+  "nav.div.khai-bao-tx": "추적 신고",
+  "nav.txng.kb-thu-mua": "원자재 구매",
+  "nav.txng.kb-che-bien": "가공 및 생산",
   "nav.txng.staff": "직원",
   "nav.txng.chung-chi-dn": "기업 인증서",
   "nav.txng.chung-chi-tp": "제품 인증서",
@@ -1350,6 +1362,9 @@ const ja: Translations = {
   "nav.div.truy-xuat": "トレーサビリティ",
   "nav.div.quan-ly-tem": "ラベル管理",
   "nav.div.thiet-bi-iot": "IoTデバイス",
+  "nav.div.khai-bao-tx": "トレーサビリティ申告",
+  "nav.txng.kb-thu-mua": "原材料調達",
+  "nav.txng.kb-che-bien": "加工・生産",
   "nav.txng.staff": "スタッフ",
   "nav.txng.chung-chi-dn": "企業証明書",
   "nav.txng.chung-chi-tp": "製品証明書",

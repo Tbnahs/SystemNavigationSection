@@ -50,6 +50,10 @@ const ERP_SUB_ITEMS: NavItem[] = [
 ];
 
 const TXNG_SUB_ITEMS: NavItem[] = [
+  { type: "divider", labelKey: "nav.div.khai-bao-tx" },
+  { id: "khai-bao/thu-mua", icon: ShoppingCart,  labelKey: "nav.txng.kb-thu-mua" },
+  { id: "khai-bao/che-bien",icon: FlaskConical,  labelKey: "nav.txng.kb-che-bien" },
+
   { type: "divider", labelKey: "nav.div.quan-tri-dn" },
   { id: "nhan-vien",       icon: Users,       labelKey: "nav.txng.staff" },
   { id: "co-so",           icon: Factory,     labelKey: "nav.portal.co-so" },
