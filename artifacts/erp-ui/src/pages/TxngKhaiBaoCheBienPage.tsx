@@ -7,7 +7,7 @@ import QRCode from "qrcode";
 import {
   Factory, ArrowLeft, ChevronRight, Check, ImageIcon,
   QrCode, Download, Printer, ChevronDown, X, Info,
-  CheckCircle2, Plus, Trash2, Package, RefreshCw,
+  CheckCircle2, Plus, Trash2, Package, RefreshCw, Tag,
 } from "lucide-react";
 import { fetchFacilities, fetchProducts, type Facility, type Product } from "@/lib/api";
 
@@ -77,6 +77,7 @@ type OutputProduct = {
 
 type LotRow = { id: string; maLo: string; tenThuongPham: string; soLuong: number; donVi: string; serials: string[] };
 type TemAssign = { loTem: string; seriDau: string; seriCuoi: string; ganTemLo: boolean };
+type SerialTemAssign = { loTem: string; seriDau: string; seriCuoi: string; trangThai: 'tu-dong' | 'thu-cong' | 'chua-gan' };
 
 const LOT_TEM_OPTIONS = ["LT-ESG-001", "LT-ESG-002", "LT-ESG-003", "LT-ESG-004"];
 
@@ -138,6 +139,13 @@ export default function TxngKhaiBaoCheBienPage() {
   const [confirmed, setConfirmed] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
   const imageInputRef = useRef<HTMLInputElement>(null);
+
+  const [serialTemMap, setSerialTemMap] = useState<Map<string, Map<string, SerialTemAssign>>>(new Map());
+  const [modalLot, setModalLot] = useState<LotRow | null>(null);
+  const [modalLotLoTem, setModalLotLoTem] = useState("");
+  const [modalLotSeriDau, setModalLotSeriDau] = useState("");
+  const [modalGanTemLo, setModalGanTemLo] = useState(false);
+  const [modalTabFilter, setModalTabFilter] = useState<'all' | 'da-gan' | 'chua-gan'>('all');
 
   const { data: facilitiesData } = useQuery({ queryKey: ["facilities"], queryFn: fetchFacilities });
   const { data: productsData } = useQuery({ queryKey: ["products"], queryFn: fetchProducts });
@@ -251,7 +259,7 @@ export default function TxngKhaiBaoCheBienPage() {
           tenThuongPham: product?.name || "Không xác định",
           soLuong: qty,
           donVi: product?.unitName || "",
-          serials: [],
+          serials: op.xuatMaDonLe ? Array.from({ length: Math.min(qty, 100) }, (_, i) => `SC-${String(i + 1).padStart(3, "0")}`) : [],
         };
       });
 
@@ -279,6 +287,62 @@ export default function TxngKhaiBaoCheBienPage() {
       next.set(lotId, { ...cur, ...updates });
       return next;
     });
+  }
+
+  function openTemModal(lot: LotRow) {
+    const assign = temAssigns.get(lot.id);
+    setModalLotLoTem(assign?.loTem || "");
+    setModalLotSeriDau(assign?.seriDau || "");
+    setModalGanTemLo(assign?.ganTemLo || false);
+    setModalTabFilter("all");
+    setSerialTemMap((prev) => {
+      if (prev.has(lot.id)) return prev;
+      const map = new Map<string, SerialTemAssign>();
+      lot.serials.forEach((s) => map.set(s, { loTem: "", seriDau: "", seriCuoi: "", trangThai: "chua-gan" }));
+      const next = new Map(prev);
+      next.set(lot.id, map);
+      return next;
+    });
+    setModalLot(lot);
+  }
+
+  function handleAutoDistribute() {
+    if (!modalLot || !modalLotLoTem || !modalLotSeriDau) return;
+    const startSeri = parseInt(modalLotSeriDau);
+    if (isNaN(startSeri)) return;
+    const newMap = new Map<string, SerialTemAssign>();
+    modalLot.serials.forEach((serial, i) => {
+      const seriNum = startSeri + i;
+      newMap.set(serial, { loTem: modalLotLoTem, seriDau: String(seriNum), seriCuoi: String(seriNum), trangThai: "tu-dong" });
+    });
+    setSerialTemMap((prev) => { const next = new Map(prev); next.set(modalLot!.id, newMap); return next; });
+    updateTemAssign(modalLot.id, {
+      loTem: modalLotLoTem,
+      seriDau: modalLotSeriDau,
+      seriCuoi: String(startSeri + modalLot.serials.length - 1),
+    });
+  }
+
+  function updateSerialTem(serial: string, updates: Partial<SerialTemAssign>) {
+    if (!modalLot) return;
+    setSerialTemMap((prev) => {
+      const next = new Map(prev);
+      const lotMap = new Map(next.get(modalLot!.id) || []);
+      const cur = lotMap.get(serial) || { loTem: "", seriDau: "", seriCuoi: "", trangThai: "chua-gan" as const };
+      const updated = { ...cur, ...updates };
+      if (!updates.trangThai) {
+        updated.trangThai = updated.loTem && updated.seriDau ? "thu-cong" : "chua-gan";
+      }
+      lotMap.set(serial, updated as SerialTemAssign);
+      next.set(modalLot!.id, lotMap);
+      return next;
+    });
+  }
+
+  function countGanForLot(lotId: string): number {
+    const map = serialTemMap.get(lotId);
+    if (!map) return 0;
+    return Array.from(map.values()).filter((a) => a.loTem && a.seriDau).length;
   }
 
   const canProceed1 = selectedInputLots.length > 0 && outputProducts.some((p) => p.productId);
@@ -880,11 +944,22 @@ export default function TxngKhaiBaoCheBienPage() {
                               </select>
                             </td>
                             <td className="px-3 py-3 text-center">
-                              {assign.loTem ? (
-                                <button className="text-[11px] text-amber-600 hover:underline whitespace-nowrap">DS tem đã kích hoạt</button>
-                              ) : (
-                                <span className="text-[12px] text-muted-foreground">—</span>
-                              )}
+                              <div className="flex flex-col items-center gap-0.5">
+                                {assign.loTem ? (
+                                  <button className="text-[11px] text-amber-600 hover:underline whitespace-nowrap">DS tem đã kích hoạt</button>
+                                ) : (
+                                  <span className="text-[12px] text-muted-foreground">—</span>
+                                )}
+                                {lot.serials.length > 0 && (
+                                  <button
+                                    onClick={() => openTemModal(lot)}
+                                    className="flex items-center gap-1 text-[11px] text-blue-600 hover:text-blue-800 font-medium whitespace-nowrap border border-blue-200 rounded-md px-1.5 py-0.5 hover:bg-blue-50 transition"
+                                  >
+                                    <Tag className="w-3 h-3" />
+                                    {countGanForLot(lot.id) > 0 ? `${countGanForLot(lot.id)}/${lot.serials.length} đã gán` : "Kích hoạt đơn lẻ"}
+                                  </button>
+                                )}
+                              </div>
                             </td>
                             <td className="px-3 py-3">
                               <div className="flex gap-1 items-center">
@@ -988,6 +1063,195 @@ export default function TxngKhaiBaoCheBienPage() {
           </div>
         )}
       </div>
+
+      {/* ═══════ Kích hoạt tem mã đơn lẻ Modal ═══════ */}
+      {modalLot && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl flex flex-col max-h-[92vh]">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border shrink-0">
+              <h3 className="text-base font-bold">Kích hoạt tem mã đơn lẻ</h3>
+              <button onClick={() => setModalLot(null)} className="w-8 h-8 rounded-lg flex items-center justify-center hover:bg-muted/60 text-muted-foreground transition"><X className="w-4.5 h-4.5" /></button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-5 space-y-4">
+              {/* CHÚ Ý */}
+              <div className="border border-green-200 bg-green-50 rounded-xl p-3.5">
+                <p className="text-[11px] font-bold text-green-700 mb-1.5 flex items-center gap-1.5"><Info className="w-3.5 h-3.5" /> CHÚ Ý:</p>
+                <ul className="text-[11px] text-green-800 space-y-1 list-disc pl-4 leading-relaxed">
+                  <li>Lô có mã đơn lẻ: Nhập Seri đầu ở Lô cha và bấm <strong>"Phân bổ tự động"</strong> <RefreshCw className="w-2.5 h-2.5 inline-block align-middle mx-0.5" /> để cấp tem cho các mã đơn lẻ.</li>
+                  <li>Chọn "Gán tem lô": hệ thống sẽ cấp tem đầu tiên của dải tem đã chọn cho Lô cha, các số tiếp theo sẽ cấp tuần tự cho Mã đơn lẻ.</li>
+                  <li>Không gán tem đã kích hoạt cho Lô và Mã đơn lẻ.</li>
+                </ul>
+              </div>
+
+              {/* Lot info + Controls */}
+              <div className="flex items-start gap-4 bg-muted/20 rounded-xl px-4 py-3">
+                <div className="shrink-0 min-w-[160px]">
+                  <p className="font-mono text-[13px] font-bold text-primary">{modalLot.maLo}</p>
+                  <p className="text-[12px] text-muted-foreground mt-0.5">{modalLot.tenThuongPham}</p>
+                  <p className="text-[12px] font-medium">{modalLot.soLuong} {modalLot.donVi || "hộp"}</p>
+                </div>
+                <div className="flex-1 flex flex-wrap gap-3 items-end">
+                  <div className="flex-1 min-w-[150px]">
+                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1 block">LÔ TEM *</label>
+                    <select
+                      value={modalLotLoTem}
+                      onChange={(e) => setModalLotLoTem(e.target.value)}
+                      className="w-full h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                    >
+                      <option value="">— Chọn lô tem —</option>
+                      {LOT_TEM_OPTIONS.map((o) => <option key={o} value={o}>{o} (còn 1.980)</option>)}
+                    </select>
+                    {modalLotLoTem && (
+                      <button className="text-[11px] text-amber-600 hover:underline mt-0.5 block">DS tem đã kích hoạt</button>
+                    )}
+                  </div>
+                  <div className="w-40">
+                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1 block">SERI ĐẦU</label>
+                    <div className="flex gap-1">
+                      <input
+                        type="number"
+                        value={modalLotSeriDau}
+                        onChange={(e) => setModalLotSeriDau(e.target.value)}
+                        placeholder="Nhập số..."
+                        className="min-w-0 flex-1 h-8 px-2 rounded-lg border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                      />
+                      <button
+                        onClick={handleAutoDistribute}
+                        title="Phân bổ tự động"
+                        className="w-8 h-8 shrink-0 flex items-center justify-center rounded-lg border border-border bg-white text-muted-foreground hover:bg-amber-50 hover:text-amber-600 transition"
+                      >
+                        <RefreshCw className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                  <div className="w-28">
+                    <label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1 block">SERI CUỐI</label>
+                    <input
+                      readOnly
+                      value={(() => { const sd = parseInt(modalLotSeriDau); return !isNaN(sd) && modalLot.serials.length > 0 ? String(sd + modalLot.serials.length - 1) : ""; })()}
+                      placeholder="Tự động"
+                      className="w-full h-8 px-2 rounded-lg border border-border bg-muted/30 text-[12px] text-muted-foreground outline-none"
+                    />
+                  </div>
+                  <label className="flex items-center gap-1.5 cursor-pointer h-8">
+                    <input type="checkbox" checked={modalGanTemLo} onChange={(e) => setModalGanTemLo(e.target.checked)} className="w-4 h-4 accent-amber-500" />
+                    <span className="text-[12px] font-medium">Gán tem lô</span>
+                  </label>
+                </div>
+              </div>
+
+              {/* Filter tabs */}
+              {(() => {
+                const serials = modalLot.serials;
+                const map = serialTemMap.get(modalLot.id) || new Map();
+                const daGan = serials.filter((s) => { const a = map.get(s); return a?.loTem && a?.seriDau; }).length;
+                const chuaGan = serials.length - daGan;
+                return (
+                  <div className="flex gap-0 border-b border-border">
+                    {([
+                      { key: "all", label: `Tất cả (${serials.length})`, cls: "" },
+                      { key: "da-gan", label: `Đã gán (${daGan})`, cls: "text-emerald-600" },
+                      { key: "chua-gan", label: `Chưa gán (${chuaGan})`, cls: "text-rose-500" },
+                    ] as const).map((t) => (
+                      <button
+                        key={t.key}
+                        onClick={() => setModalTabFilter(t.key)}
+                        className={`px-5 py-2 text-[12px] font-medium border-b-2 -mb-px transition ${modalTabFilter === t.key ? "border-primary text-primary" : `border-transparent ${t.cls || "text-muted-foreground"} hover:text-foreground`}`}
+                      >
+                        {t.label}
+                      </button>
+                    ))}
+                  </div>
+                );
+              })()}
+
+              {/* Serial table */}
+              {(() => {
+                const map = serialTemMap.get(modalLot.id) || new Map();
+                let serials = modalLot.serials;
+                if (modalTabFilter === "da-gan") serials = serials.filter((s) => { const a = map.get(s); return a?.loTem && a?.seriDau; });
+                if (modalTabFilter === "chua-gan") serials = serials.filter((s) => { const a = map.get(s); return !a?.loTem || !a?.seriDau; });
+                return (
+                  <div className="border border-border rounded-xl overflow-hidden">
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="bg-muted/30 border-b border-border">
+                          <th className="px-4 py-2.5 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Mã Serial Con</th>
+                          <th className="px-4 py-2.5 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wide">Lô Tem</th>
+                          <th className="px-4 py-2.5 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wide w-36">Seri Đầu <span className="text-rose-500">*</span></th>
+                          <th className="px-4 py-2.5 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wide w-36">Seri Cuối <span className="text-rose-500">*</span></th>
+                          <th className="px-4 py-2.5 text-left text-[11px] font-semibold text-muted-foreground uppercase tracking-wide w-36">Trạng Thái</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {serials.length === 0 && (
+                          <tr><td colSpan={5} className="py-10 text-center text-muted-foreground text-sm">Không có serial nào</td></tr>
+                        )}
+                        {serials.slice(0, 50).map((serial) => {
+                          const assign = map.get(serial) || { loTem: "", seriDau: "", seriCuoi: "", trangThai: "chua-gan" as const };
+                          return (
+                            <tr key={serial} className="border-b border-border last:border-0 hover:bg-muted/20">
+                              <td className="px-4 py-2.5 font-mono text-[12px] font-semibold text-primary">{serial}</td>
+                              <td className="px-4 py-2.5 text-[12px]">{assign.loTem || <span className="text-muted-foreground">—</span>}</td>
+                              <td className="px-4 py-2.5">
+                                <input
+                                  type="number"
+                                  value={assign.seriDau}
+                                  onChange={(e) => updateSerialTem(serial, { seriDau: e.target.value, loTem: assign.loTem || modalLotLoTem })}
+                                  placeholder="Nhập số..."
+                                  className="w-full h-7 px-2 rounded border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                                />
+                              </td>
+                              <td className="px-4 py-2.5">
+                                <input
+                                  type="number"
+                                  value={assign.seriCuoi}
+                                  onChange={(e) => updateSerialTem(serial, { seriCuoi: e.target.value, loTem: assign.loTem || modalLotLoTem })}
+                                  placeholder="Nhập số..."
+                                  className="w-full h-7 px-2 rounded border border-border bg-white text-[12px] outline-none focus:border-amber-400"
+                                />
+                              </td>
+                              <td className="px-4 py-2.5">
+                                {assign.trangThai === "tu-dong" && <span className="text-[11px] font-semibold text-emerald-600">Tự động</span>}
+                                {assign.trangThai === "thu-cong" && <span className="text-[11px] font-semibold text-amber-600">Gán thủ công</span>}
+                                {assign.trangThai === "chua-gan" && <span className="text-[11px] text-muted-foreground">Chưa gán</span>}
+                              </td>
+                            </tr>
+                          );
+                        })}
+                        {serials.length > 50 && (
+                          <tr><td colSpan={5} className="px-4 py-2 text-[11px] text-muted-foreground italic text-center">...và {serials.length - 50} serial khác</td></tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Footer */}
+            <div className="px-6 py-4 border-t border-border flex items-center justify-between shrink-0">
+              <p className="text-[13px] text-muted-foreground">
+                Đã gán thành công: <span className="font-bold text-foreground">{countGanForLot(modalLot.id)} / {modalLot.serials.length}</span>
+              </p>
+              <div className="flex gap-2">
+                <button onClick={() => setModalLot(null)} className="h-9 px-5 rounded-lg border border-border text-sm font-medium hover:bg-muted/50 transition">Hủy bỏ</button>
+                <button
+                  onClick={() => {
+                    updateTemAssign(modalLot.id, { loTem: modalLotLoTem, ganTemLo: modalGanTemLo });
+                    setModalLot(null);
+                  }}
+                  className="h-9 px-6 rounded-lg bg-primary text-white text-sm font-medium hover:bg-primary/90 transition"
+                >
+                  Lưu
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* QR Modal */}
       {qrLot !== null && (
