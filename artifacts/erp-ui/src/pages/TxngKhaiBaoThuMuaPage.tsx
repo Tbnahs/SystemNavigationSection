@@ -715,7 +715,7 @@ export default function TxngKhaiBaoThuMuaPage() {
                       <th className="px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground w-36">Lô tem <span className="text-rose-500">*</span></th>
                       <th className="px-3 py-3 text-center text-[11px] font-semibold text-muted-foreground w-32">Tem đã kích hoạt</th>
                       <th className="px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground w-32">Seri đầu <span className="text-rose-500">*</span></th>
-                      <th className="px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground w-24">Seri cuối <span className="text-rose-500">*</span></th>
+                      <th className="px-3 py-3 text-left text-[11px] font-semibold text-muted-foreground w-32">Seri cuối <span className="text-rose-500">*</span></th>
                       <th className="px-3 py-3 text-center text-[11px] font-semibold text-muted-foreground w-20">Đơn vị con</th>
                       <th className="px-3 py-3 text-center text-[11px] font-semibold text-muted-foreground w-20">Gán tem lô</th>
                     </tr>
