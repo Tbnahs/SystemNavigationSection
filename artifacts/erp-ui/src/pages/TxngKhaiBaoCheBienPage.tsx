@@ -7,7 +7,7 @@ import QRCode from "qrcode";
 import {
   Factory, ArrowLeft, ChevronRight, Check, ImageIcon,
   QrCode, Download, Printer, ChevronDown, X, Info,
-  CheckCircle2, Plus, Trash2, Package, RefreshCw, Tag,
+  CheckCircle2, Plus, Trash2, Package, RefreshCw, Tag, Search,
 } from "lucide-react";
 import { fetchFacilities, fetchProducts, type Facility, type Product } from "@/lib/api";
 
@@ -126,6 +126,11 @@ export default function TxngKhaiBaoCheBienPage() {
 
   const [selectedInputLots, setSelectedInputLots] = useState<SelectedInputLot[]>([]);
   const [lotDropdownVal, setLotDropdownVal] = useState("");
+  const [lotPickerOpen, setLotPickerOpen] = useState(false);
+  const [lotPickerSearch, setLotPickerSearch] = useState("");
+  const [lotPickerExpandedIds, setLotPickerExpandedIds] = useState<Set<string>>(new Set());
+  const [pickerSerialSel, setPickerSerialSel] = useState<Map<string, Set<string>>>(new Map());
+  const lotPickerRef = useRef<HTMLDivElement>(null);
 
   const [outputProducts, setOutputProducts] = useState<OutputProduct[]>([]);
 
@@ -166,6 +171,17 @@ export default function TxngKhaiBaoCheBienPage() {
       .catch(() => setQrDataUrl(""));
   }, [qrLot, qrSerial]);
 
+  useEffect(() => {
+    if (!lotPickerOpen) return;
+    function onDown(e: MouseEvent) {
+      if (lotPickerRef.current && !lotPickerRef.current.contains(e.target as Node)) {
+        setLotPickerOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", onDown);
+    return () => document.removeEventListener("mousedown", onDown);
+  }, [lotPickerOpen]);
+
   const availableInputLots = MOCK_INPUT_LOTS.filter(
     (l) => !selectedInputLots.find((s) => s.lotId === l.id)
   );
@@ -193,6 +209,34 @@ export default function TxngKhaiBaoCheBienPage() {
 
   function removeInputLot(lotId: string) {
     setSelectedInputLots((prev) => prev.filter((l) => l.lotId !== lotId));
+  }
+
+  function toggleLotInPicker(lot: typeof MOCK_INPUT_LOTS[0]) {
+    const isSelected = !!selectedInputLots.find((s) => s.lotId === lot.id);
+    if (isSelected) {
+      removeInputLot(lot.id);
+      setPickerSerialSel((prev) => { const m = new Map(prev); m.delete(lot.id); return m; });
+    } else {
+      addInputLot(lot.id);
+      if (lot.serials.length > 0) {
+        setPickerSerialSel((prev) => new Map(prev).set(lot.id, new Set(lot.serials)));
+      }
+    }
+  }
+
+  function toggleSerialInPicker(lotId: string, serial: string) {
+    setPickerSerialSel((prev) => {
+      const m = new Map(prev);
+      const s = new Set(m.get(lotId) ?? []);
+      if (s.has(serial)) s.delete(serial); else s.add(serial);
+      m.set(lotId, s);
+      return m;
+    });
+  }
+
+  function clearAllPicker() {
+    selectedInputLots.forEach((sl) => removeInputLot(sl.lotId));
+    setPickerSerialSel(new Map());
   }
 
   function updateInputLot(lotId: string, updates: Partial<SelectedInputLot>) {
@@ -464,32 +508,176 @@ export default function TxngKhaiBaoCheBienPage() {
                 </div>
 
                 <div className="p-4 space-y-4">
-                  {/* Tag multi-select cho lô */}
+                  {/* Custom lot picker */}
                   <div>
                     <label className="text-[11px] font-medium text-muted-foreground mb-1.5 flex items-center gap-0.5">
                       Lô đầu vào <span className="text-rose-500">*</span>
                     </label>
-                    <div className="min-h-[38px] border border-border rounded-lg bg-white px-2 py-1 flex flex-wrap gap-1.5 items-center">
-                      {selectedInputLots.map((sl) => (
-                        <span key={sl.lotId} className="inline-flex items-center gap-1 bg-green-50 border border-green-200 text-green-800 text-[11px] px-2 py-0.5 rounded-md font-medium">
-                          {sl.maLo} ({sl.serials.length}/{sl.soLuongMax} Serial)
-                          <button
-                            onClick={() => removeInputLot(sl.lotId)}
-                            className="text-green-500 hover:text-green-800 leading-none ml-0.5"
-                          >×</button>
-                        </span>
-                      ))}
-                      {availableInputLots.length > 0 && (
-                        <select
-                          value=""
-                          onChange={(e) => { if (e.target.value) addInputLot(e.target.value); }}
-                          className="flex-1 min-w-[120px] h-7 text-[12px] bg-transparent outline-none text-muted-foreground cursor-pointer"
-                        >
-                          <option value="">Chọn lô đầu vào...</option>
-                          {availableInputLots.map((l) => (
-                            <option key={l.id} value={l.id}>{l.maLo} ({l.soLuongMax} {l.donVi})</option>
-                          ))}
-                        </select>
+                    <div className="relative" ref={lotPickerRef}>
+                      {/* Trigger */}
+                      <button
+                        type="button"
+                        onClick={() => setLotPickerOpen((v) => !v)}
+                        className="w-full min-h-[38px] border border-border rounded-lg bg-white px-3 py-1.5 flex items-center gap-2 text-left hover:border-green-400 transition"
+                      >
+                        {selectedInputLots.length === 0 ? (
+                          <span className="text-[13px] text-muted-foreground flex-1">Chọn lô nguyên liệu đầu vào...</span>
+                        ) : (
+                          <div className="flex flex-wrap gap-1.5 flex-1">
+                            {selectedInputLots.map((sl) => (
+                              <span key={sl.lotId} className="inline-flex items-center gap-1 bg-green-50 border border-green-200 text-green-800 text-[11px] px-2 py-0.5 rounded-md font-medium">
+                                {sl.maLo}
+                                <button
+                                  type="button"
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    removeInputLot(sl.lotId);
+                                    setPickerSerialSel((prev) => { const m = new Map(prev); m.delete(sl.lotId); return m; });
+                                  }}
+                                  className="text-green-500 hover:text-green-800 leading-none ml-0.5"
+                                >×</button>
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                        <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform ${lotPickerOpen ? "rotate-180" : ""}`} />
+                      </button>
+
+                      {/* Dropdown panel */}
+                      {lotPickerOpen && (
+                        <div className="absolute z-50 top-full left-0 right-0 mt-1 bg-white border border-border rounded-xl shadow-lg overflow-hidden">
+                          {/* Search */}
+                          <div className="px-3 py-2 border-b border-border">
+                            <div className="flex items-center gap-2 border border-border rounded-lg px-3 h-9 bg-muted/30">
+                              <Search className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
+                              <input
+                                autoFocus
+                                value={lotPickerSearch}
+                                onChange={(e) => setLotPickerSearch(e.target.value)}
+                                placeholder="Tìm kiếm lô hoặc số serial..."
+                                className="flex-1 bg-transparent text-[13px] outline-none placeholder:text-muted-foreground"
+                              />
+                              {lotPickerSearch && (
+                                <button type="button" onClick={() => setLotPickerSearch("")} className="text-muted-foreground hover:text-foreground">
+                                  <X className="w-3.5 h-3.5" />
+                                </button>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Lot list */}
+                          <div className="max-h-72 overflow-y-auto">
+                            {MOCK_INPUT_LOTS.filter((lot) => {
+                              const q = lotPickerSearch.toLowerCase();
+                              if (!q) return true;
+                              return lot.maLo.toLowerCase().includes(q) ||
+                                lot.tenThuongPham.toLowerCase().includes(q) ||
+                                lot.serials.some((s) => s.toLowerCase().includes(q));
+                            }).map((lot) => {
+                              const isSelected = !!selectedInputLots.find((s) => s.lotId === lot.id);
+                              const serialSel = pickerSerialSel.get(lot.id);
+                              const selCount = serialSel?.size ?? 0;
+                              const totalSerials = lot.serials.length;
+                              const isExpanded = lotPickerExpandedIds.has(lot.id);
+                              const isIndeterminate = isSelected && totalSerials > 0 && selCount < totalSerials;
+                              const filteredSerials = lotPickerSearch
+                                ? lot.serials.filter((s) => s.toLowerCase().includes(lotPickerSearch.toLowerCase()))
+                                : lot.serials;
+
+                              return (
+                                <div key={lot.id} className="border-b border-border/50 last:border-0">
+                                  {/* Lot row */}
+                                  <div className={`flex items-center gap-2 px-3 py-2.5 hover:bg-muted/30 transition ${isSelected ? "bg-green-50/40" : ""}`}>
+                                    {/* Expand chevron */}
+                                    <button
+                                      type="button"
+                                      onClick={() => setLotPickerExpandedIds((prev) => {
+                                        const s = new Set(prev);
+                                        s.has(lot.id) ? s.delete(lot.id) : s.add(lot.id);
+                                        return s;
+                                      })}
+                                      className={`w-5 h-5 flex items-center justify-center text-muted-foreground hover:text-foreground transition shrink-0 ${lot.serials.length === 0 ? "invisible" : ""}`}
+                                    >
+                                      {isExpanded ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                                    </button>
+
+                                    {/* Lot checkbox */}
+                                    <button
+                                      type="button"
+                                      onClick={() => toggleLotInPicker(lot)}
+                                      className={`w-5 h-5 rounded flex items-center justify-center shrink-0 border-2 transition ${
+                                        isSelected ? "bg-green-600 border-green-600" : "border-border bg-white hover:border-green-400"
+                                      }`}
+                                    >
+                                      {isIndeterminate ? (
+                                        <span className="w-2 h-0.5 bg-white rounded-full block" />
+                                      ) : isSelected ? (
+                                        <Check className="w-3 h-3 text-white" />
+                                      ) : null}
+                                    </button>
+
+                                    {/* Lot info */}
+                                    <div className="flex-1 min-w-0 cursor-pointer" onClick={() => toggleLotInPicker(lot)}>
+                                      <p className="text-[13px] font-semibold text-foreground">Lô {lot.maLo}</p>
+                                      <p className="text-[11px] text-muted-foreground">{lot.tenThuongPham}</p>
+                                    </div>
+
+                                    {/* Badge */}
+                                    <span className={`text-[11px] px-2 py-0.5 rounded-full font-medium whitespace-nowrap shrink-0 ${
+                                      isSelected ? "bg-green-100 text-green-700" : "bg-muted text-muted-foreground"
+                                    }`}>
+                                      Đã chọn {selCount}/{totalSerials}
+                                    </span>
+                                  </div>
+
+                                  {/* Serial sub-rows */}
+                                  {isExpanded && (
+                                    <div className="bg-muted/10">
+                                      {filteredSerials.slice(0, 20).map((serial) => {
+                                        const isSerialSel = serialSel?.has(serial) ?? false;
+                                        return (
+                                          <div
+                                            key={serial}
+                                            className={`flex items-center gap-2 pl-10 pr-3 py-1.5 hover:bg-muted/20 cursor-pointer transition ${isSerialSel ? "bg-green-50/30" : ""}`}
+                                            onClick={() => toggleSerialInPicker(lot.id, serial)}
+                                          >
+                                            <div className={`w-4 h-4 rounded flex items-center justify-center shrink-0 border-2 transition ${
+                                              isSerialSel ? "bg-green-600 border-green-600" : "border-border bg-white"
+                                            }`}>
+                                              {isSerialSel && <Check className="w-2.5 h-2.5 text-white" />}
+                                            </div>
+                                            <span className="font-mono text-[12px] text-muted-foreground flex-1">{serial}</span>
+                                            {isSerialSel && <Check className="w-3.5 h-3.5 text-green-500" />}
+                                          </div>
+                                        );
+                                      })}
+                                      {lot.serials.length > 20 && (
+                                        <div className="pl-10 pr-3 py-1.5 text-[11px] text-muted-foreground italic">...và {lot.serials.length - 20} serial khác</div>
+                                      )}
+                                      {lot.serials.length === 0 && (
+                                        <div className="pl-10 pr-3 py-1.5 text-[11px] text-muted-foreground italic">Không có mã đơn lẻ bên trong lô này</div>
+                                      )}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
+                          </div>
+
+                          {/* Footer */}
+                          <div className="px-3 py-2 border-t border-border bg-muted/20 flex items-center justify-between">
+                            <span className="text-[12px] text-muted-foreground">
+                              {Array.from(pickerSerialSel.values()).reduce((s, set) => s + set.size, 0)} serial · {selectedInputLots.length} lô được chọn
+                            </span>
+                            <button
+                              type="button"
+                              onClick={clearAllPicker}
+                              className="text-[12px] text-muted-foreground hover:text-rose-500 transition font-medium"
+                            >
+                              Xóa tất cả
+                            </button>
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>
