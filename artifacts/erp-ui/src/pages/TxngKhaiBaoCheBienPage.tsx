@@ -515,10 +515,12 @@ export default function TxngKhaiBaoCheBienPage() {
                     </label>
                     <div className="relative" ref={lotPickerRef}>
                       {/* Trigger */}
-                      <button
-                        type="button"
+                      <div
+                        role="button"
+                        tabIndex={0}
                         onClick={() => setLotPickerOpen((v) => !v)}
-                        className="w-full min-h-[38px] border border-border rounded-lg bg-white px-3 py-1.5 flex items-center gap-2 text-left hover:border-green-400 transition"
+                        onKeyDown={(e) => e.key === "Enter" && setLotPickerOpen((v) => !v)}
+                        className="w-full min-h-[38px] border border-border rounded-lg bg-white px-3 py-1.5 flex items-center gap-2 cursor-pointer hover:border-green-400 transition select-none"
                       >
                         {selectedInputLots.length === 0 ? (
                           <span className="text-[13px] text-muted-foreground flex-1">Chọn lô nguyên liệu đầu vào...</span>
@@ -541,7 +543,7 @@ export default function TxngKhaiBaoCheBienPage() {
                           </div>
                         )}
                         <ChevronDown className={`w-4 h-4 text-muted-foreground shrink-0 transition-transform ${lotPickerOpen ? "rotate-180" : ""}`} />
-                      </button>
+                      </div>
 
                       {/* Dropdown panel */}
                       {lotPickerOpen && (

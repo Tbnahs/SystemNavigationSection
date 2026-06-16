@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import {
   fetchFacilities, fetchProducts, fetchPurchaseOrders, fetchUnits,
+  fetchEmployeeFacilities,
   type Facility, type Product, type PurchaseOrder, type Unit,
 } from "@/lib/api";
 
@@ -157,11 +158,22 @@ export default function TxngKhaiBaoThuMuaPage() {
   const { data: productsData } = useQuery({ queryKey: ["products"], queryFn: fetchProducts });
   const { data: ordersData } = useQuery({ queryKey: ["purchase-orders"], queryFn: fetchPurchaseOrders });
   const { data: unitsData } = useQuery({ queryKey: ["units"], queryFn: fetchUnits });
+  const { data: empFacilitiesData } = useQuery({
+    queryKey: ["employee-facilities", user?.id],
+    queryFn: () => fetchEmployeeFacilities(user!.id),
+    enabled: !!user?.id,
+  });
   const units: Unit[] = unitsData?.items ?? [];
 
   const facilities = (facilitiesData as { items: Facility[] } | undefined)?.items ?? [];
   const products = (productsData as { items: Product[] } | undefined)?.items ?? [];
   const orders = (ordersData as { items: PurchaseOrder[] } | undefined)?.items ?? [];
+
+  useEffect(() => {
+    if (!empFacilitiesData || coSoId) return;
+    const ids: number[] = empFacilitiesData.facilityIds ?? [];
+    if (ids.length > 0) setCoSoId(String(ids[0]));
+  }, [empFacilitiesData]);
 
   const selectedPO = orders.find((o) => String(o.id) === donThuMuaId) ?? null;
 
