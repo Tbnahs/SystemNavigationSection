@@ -312,7 +312,7 @@ export default function TxngKhaiBaoThuMuaPage() {
               <div className="p-5 flex gap-5 items-start">
                 {/* Image */}
                 <div
-                  className="w-28 h-28 shrink-0 rounded-xl overflow-hidden border border-border cursor-pointer group relative"
+                  className="w-44 h-28 shrink-0 rounded-xl overflow-hidden border border-border cursor-pointer group relative"
                   onClick={() => imageInputRef.current?.click()}
                 >
                   {imagePreview ? (
